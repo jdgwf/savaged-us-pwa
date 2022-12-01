@@ -2,8 +2,9 @@ use serde::{Serialize, Deserialize};
 use std::rc::Rc;
 use yew::prelude::*;
 use savaged_libs::user::User;
+use yew::prelude::*;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct GlobalVars {
     pub login_token: String,
     pub current_user: User,
@@ -13,6 +14,9 @@ pub struct GlobalVars {
     pub site_title: String,
 
     pub no_calls: bool,
+    pub offline: bool,
+
+    pub update_global_vars: Callback<GlobalVars>,
 }
 
 impl Default for GlobalVars {
@@ -21,10 +25,12 @@ impl Default for GlobalVars {
             current_user: User::default(),
             login_token: "".to_owned(),
             user_loading: true,
+            offline: true,
             api_root: "".to_owned(),
             server_root: "".to_owned(),
             site_title: "".to_owned(),
             no_calls: false,
+            update_global_vars: Callback::noop(),
         }
     }
 }

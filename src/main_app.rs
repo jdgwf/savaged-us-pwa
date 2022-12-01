@@ -6,7 +6,7 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::fetch_api::fetch_api;
 use gloo_console::error;
-// use gloo_console::log;
+use gloo_console::log;
 use crate::pages::main_home::MainHome;
 use crate::pages::main_about::MainAbout;
 use crate::pages::main_tech::MainTech;
@@ -281,6 +281,9 @@ fn top_menu_switch(
                     <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
                 </li>
                 <li class={login_class_active}>
+                    if global_vars.offline {
+                        {"OFFLINE"}<br /><br />
+                    }
                     if global_vars.current_user.id > 0 {
                         <div class="user-login-badge">
                         <Link<UserRoute> to={UserRoute::SettingsPrivate}>
@@ -424,7 +427,9 @@ impl Component for MainApp {
 
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
+            let update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
             let mut global_vars = global_vars.clone();
+            global_vars.update_global_vars = update_global_vars;
             let global_vars_context = global_vars_context.clone();
             spawn_local (
                 async move {
@@ -497,6 +502,7 @@ impl Component for MainApp {
         msg: MainAppMessage,
     ) -> bool {
 
+
         let ( global_vars_context, _global_vars_context_handler ) = ctx
             .link()
             .context::<GlobalVarsContext>(
@@ -505,7 +511,7 @@ impl Component for MainApp {
             .expect("global_vars context was not set");
         let global_vars = (*global_vars_context).clone();
         // self.global_vars = (*global_vars_context).clone();
-        // log!("main_app update called", global_vars.current_user.unread_notifications  );
+        log!("main_app update called", global_vars.current_user.unread_notifications  );
 
         match msg {
             MainAppMessage::ToggleMobileMenu( _new_value ) => {
@@ -536,6 +542,7 @@ impl Component for MainApp {
             }
 
             MainAppMessage::UpdateGlobalVars( new_value ) => {
+                log!("MainAppMessage::UpdateGlobalVars called");
                 self.global_vars_context.dispatch( new_value.to_owned() );
                 self.global_vars = new_value.clone();
 

@@ -12,11 +12,11 @@
   left: -$ra-li-width;
   position: absolute;
   text-align: center;
-  top: (2em / 14);
+  top: calc(2em / 14);
   width: $ra-li-width;
 
   &.#{$ra-css-prefix}-lg {
-    left: -$ra-li-width + (4em / 14);
+    left: -$ra-li-width + calc(4em / 14);
   }
 
 }

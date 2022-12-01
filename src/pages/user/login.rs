@@ -132,7 +132,9 @@ impl Component for UserLogin {
         ctx: &Context<Self>,
     ) -> Html {
 
-        let global_vars = self.global_vars.clone();
+        // let global_vars = self.global_vars.clone();
+        let global_vars = ctx.props().global_vars.clone();
+        let global_vars_event = ctx.props().global_vars.clone();
 
         let update_username = ctx.link().callback(UserLoginMessage::UpdateUsername);
         let update_password = ctx.link().callback(UserLoginMessage::UpdatePassword);
@@ -152,6 +154,7 @@ impl Component for UserLogin {
         let do_login_submit = move |e: SubmitEvent | {
             // log!("trying do_login_submit");
             e.prevent_default();
+            let global_vars = global_vars_event.clone();
             let username = username.to_owned();
             let password = password.to_owned();
             let api_root = api_root.to_owned();
@@ -159,7 +162,6 @@ impl Component for UserLogin {
             let set_login_message = set_login_message.clone();
             spawn_local (
                 async move {
-
                     log!("trying login-for-token", api_root.clone() + "/auth/login-for-token");
                     let result = savaged_login(
                         (api_root + "/auth/login-for-token").to_owned(),
@@ -170,15 +172,16 @@ impl Component for UserLogin {
                     match result {
                         Ok( value ) => {
 
-                            log!("value", &value);
-                            // let vec_val_result = value.into_serde::<LoginTokenResult>();
+                            // let mut global_vars = global_vars.clone();
+                            // global_vars.offline = false;
+                            // global_vars.update_global_vars.emit( global_vars.clone() );
+
                             let vec_val_result: Result<LoginTokenResult, Error> = JsValueSerdeExt::into_serde(&value);
                             match vec_val_result {
                                 Ok( vec_val ) => {
 
                                     update_current_user_from_login.emit( vec_val.clone() );
                                     set_login_message.emit( "".to_owned() );
-                                    // log!("get_data_via_fetch vec_val_result", &vec_val );
                                 }
                                 Err( err ) => {
                                     let err_string: String = format!("savaged_login Serde Err(): {}", &err);
@@ -191,15 +194,21 @@ impl Component for UserLogin {
                         Err( err ) => {
                             error!("savaged_login Err()", &err );
                             set_login_message.emit( "Can't connect to server".to_owned() );
+                            let mut global_vars = global_vars.clone();
+                            global_vars.offline = true;
+                            global_vars.update_global_vars.emit( global_vars.clone() );
+                            log!("???");
                         }
                     }
                 }
             );
         };
+        let global_vars = global_vars.clone();
 
         if global_vars.user_loading {
             html!(<p class={"text-center"}>{"loading user info...."}</p>)
         } else {
+
 
             html! {
                 <div class={"main-content"}>

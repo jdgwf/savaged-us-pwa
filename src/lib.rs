@@ -413,6 +413,8 @@ pub fn ServerApp(
             api_root: server_root + &"/_api",
             site_title: "v4.savaged.us".to_owned(),
             no_calls: true,
+            offline: true,
+            update_global_vars: Callback::noop(),
         }
     );
 
