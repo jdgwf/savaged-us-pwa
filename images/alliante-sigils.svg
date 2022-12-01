@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<svg style="max-width: 100%" width="240px" height="126px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- a, xo=6, yo=6 -->
+    <line x1="34.5" y1="12" x2="12" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="34.5" y1="12" x2="57" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="12" y1="57" x2="57" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- a, xo=6, yo=6 -->
+    <line x1="34.5" y1="12" x2="12" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="34.5" y1="12" x2="57" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <line x1="12" y1="57" x2="57" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- l, xo=6, yo=63 -->
+    <line x1="25" y1="69" x2="25" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="44" y1="69" x2="44" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- l, xo=6, yo=63 -->
+    <line x1="25" y1="69" x2="25" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="44" y1="69" x2="44" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- l, xo=63, yo=6 -->
+    <line x1="82" y1="12" x2="82" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="101" y1="12" x2="101" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- l, xo=63, yo=6 -->
+    <line x1="82" y1="12" x2="82" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="101" y1="12" x2="101" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- i, xo=63, yo=63 -->
+    <line x1="91.5" y1="69" x2="69" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="91.5" y1="69" x2="114" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- i, xo=63, yo=63 -->
+    <line x1="91.5" y1="69" x2="69" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="91.5" y1="69" x2="114" y2="114" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- a, xo=120, yo=6 -->
+    <line x1="148.5" y1="12" x2="126" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="148.5" y1="12" x2="171" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="126" y1="57" x2="171" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- a, xo=120, yo=6 -->
+    <line x1="148.5" y1="12" x2="126" y2="57" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="148.5" y1="12" x2="171" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <line x1="126" y1="57" x2="171" y2="57" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- n, xo=120, yo=63 -->
+    <line x1="126" y1="69" x2="158" y2="82" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="158" y1="82" x2="126" y2="92" stroke="#3f3" stroke-width="6" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="126" y1="92" x2="171" y2="114" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- n, xo=120, yo=63 -->
+    <line x1="126" y1="69" x2="158" y2="82" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="158" y1="82" x2="126" y2="92" stroke="#3f3" stroke-width="6" stroke-linecap="round" style=""></line>
+    <line x1="126" y1="92" x2="171" y2="114" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- t, xo=177, yo=6 -->
+    <circle cx="186.5" cy="25" r="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);" stroke-width="6" fill="transparent"></circle>
+    <line x1="196" y1="25" x2="228" y2="25" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <line x1="183" y1="44" x2="228" y2="44" stroke-width="6" stroke="#3f3" stroke-linecap="round" style="filter:url(#glow);"></line>
+    <!-- t, xo=177, yo=6 -->
+    <circle cx="186.5" cy="25" r="6" stroke="#3f3" stroke-linecap="round" style="" stroke-width="6" fill="transparent"></circle>
+    <line x1="196" y1="25" x2="228" y2="25" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <line x1="183" y1="44" x2="228" y2="44" stroke-width="6" stroke="#3f3" stroke-linecap="round" style=""></line>
+    <filter filterUnits="userSpaceOnUse" id="glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur></filter>
+    <!-- e, xo=177, yo=63 -->
+    <circle cx="205.5" cy="91.5" r="22.5" stroke="#3f3" stroke-linecap="round" stroke-width="6" style="filter:url(#glow);" fill="transparent"></circle>
+    <!-- e, xo=177, yo=63 -->
+    <circle cx="205.5" cy="91.5" r="22.5" stroke="#3f3" stroke-linecap="round" stroke-width="6" style="" fill="transparent"></circle>
+    <animate attributeType="XML" attributeName="opacity" values="0.5;1;0.5" dur="6.0s" repeatCount="indefinite"></animate>
+</svg>

@@ -1,0 +1,61 @@
+body {
+
+    .edit-table {
+        background: #222;
+        width: 100%;
+        thead {
+            tr {
+                th {
+                    background: #222;
+                    color: #fff;
+                    padding: .125rem .5rem;
+                    &.min-width {
+                        width: 1%;
+                    }
+                }
+            }
+        }
+        tbody {
+            tr{
+                td {
+                    padding: .125rem .5rem;
+                    background: #999;
+                    color: #333;
+                    &.min-width {
+                        width: 1%;
+                    }
+                }
+                th {
+                    background: #666;
+                    color: #fff;
+                    padding: .125rem .5rem;
+                    &.min-width {
+                        width: 1%;
+                    }
+                }
+            }
+            &:hover {
+                td {
+                    background: #aaa;
+                }
+            }
+        }
+        &.alternating {
+            tbody {
+                &:nth-child(odd) {
+                    tr{
+                        td {
+                            background: #ccc;
+                        }
+
+                    }
+                    &:hover {
+                        td {
+                            background: #ddd;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

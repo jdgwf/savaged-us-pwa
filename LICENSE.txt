@@ -1,0 +1,4 @@
+Copyright (c) 2022 Jeffrey D. Gordon
+
+All rights are currently reserved except for the standard_components directory,
+see the LICENSE.txt file there for the code pertaining to that area.

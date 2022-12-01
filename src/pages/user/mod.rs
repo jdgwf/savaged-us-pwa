@@ -1,0 +1,10 @@
+pub mod login;
+pub mod user_router;
+pub mod settings_public;
+pub mod settings_private;
+pub mod settings_devices;
+mod subscription;
+mod notifications;
+pub mod forgot_password;
+pub mod register;
+pub mod settings_api_key;

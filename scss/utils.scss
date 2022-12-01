@@ -1,0 +1,55 @@
+body {
+    .position-relative {
+        position: relative;
+    }
+
+    .pull-right {
+        float: right;
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    .flex-grow {
+        flex-grow: 1;
+    }
+
+    .pull-left {
+        float: left;
+    }
+
+    .no-wrap {
+        white-space: nowrap;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .small-text {
+        font-size: .7rem;
+    }
+
+    .inline {
+        display: inline;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+    .text-right {
+        text-align: right;
+    }
+    .text-left {
+        text-align: left;
+    }
+
+    .width-50-perc {
+        display: inline-block;
+        width: 50%;
+    }
+    .text-right {
+        text-align: right;
+    }
+}

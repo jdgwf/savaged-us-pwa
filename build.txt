@@ -1,0 +1,10 @@
+rustup upgrade stable
+rustup target add wasm32-unknown-unknown
+cargo update
+cargo install trunk
+---
+building for release/gitlab:
+trunk build --release
+git add .
+git commit -a -m "Message"
+git push origin
