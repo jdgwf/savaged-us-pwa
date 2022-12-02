@@ -180,8 +180,14 @@ impl Component for UserLogin {
                             match vec_val_result {
                                 Ok( vec_val ) => {
 
-                                    update_current_user_from_login.emit( vec_val.clone() );
-                                    set_login_message.emit( "".to_owned() );
+                                    if !vec_val.success {
+                                        set_login_message.emit( "Invalid Login".to_owned() );
+                                    } else {
+                                        set_login_message.emit( "".to_owned() );
+                                        update_current_user_from_login.emit( vec_val.clone() );
+                                    }
+
+
                                 }
                                 Err( err ) => {
                                     let err_string: String = format!("savaged_login Serde Err(): {}", &err);

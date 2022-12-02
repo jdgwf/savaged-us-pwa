@@ -3,6 +3,11 @@ use std::rc::Rc;
 use yew::prelude::*;
 use savaged_libs::user::User;
 use yew::prelude::*;
+use gloo_net::websocket::{
+    Message,
+    futures::WebSocket,
+
+};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GlobalVars {

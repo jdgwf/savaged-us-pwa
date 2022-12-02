@@ -1,3 +1,7 @@
+use savaged_libs::websocket_message::{
+    WebSocketMessage,
+    WebsocketMessageType,
+};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -5,6 +9,7 @@ use standard_components::libs::set_document_title::set_document_title;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::fetch_api::fetch_api;
+use crate::pages::user::login::_UserLoginProps::update_global_vars;
 use gloo_console::error;
 use gloo_console::log;
 use crate::pages::main_home::MainHome;
@@ -14,6 +19,8 @@ use crate::pages::main_todos::MainTodos;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
+use crate::web_sockets::WebsocketService;
+use crate::web_sockets::handle_message::handle_message;
 use serde_json::Error;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
@@ -27,6 +34,13 @@ use crate::pages::user::user_router::UserRouter;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 
 use savaged_libs::user::User;
+
+use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
+use gloo_net::websocket::{
+    Message,
+    futures::WebSocket,
+
+};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum MainRoute {
@@ -75,6 +89,9 @@ pub enum MainAppMessage {
     ContextUpdated( GlobalVarsContext ),
     LogOut( String ),
 
+    SendWebSocket( WebSocketMessage ),
+    ReceivedWebSocket( String ),
+
     OpenConfirmationDialog(
         ConfirmationDialogDefinition,
     ),
@@ -91,6 +108,8 @@ pub struct MainApp {
 
     confirmation_dialog_open: bool,
     confirmation_dialog_properties: ConfirmationDialogDefinition,
+
+    wss: WebsocketService,
 }
 
 fn content_switch(
@@ -98,7 +117,7 @@ fn content_switch(
     submenu_callback: &Callback<SubmenuData>,
     global_vars: GlobalVars,
     on_logout_action: &Callback<MouseEvent>,
-    update_global_vars: &Callback<GlobalVars>,
+    base_update_global_vars: &Callback<GlobalVars>,
     open_confirmation_dialog: &Callback<ConfirmationDialogDefinition>,
     _show_mobile_menu: bool,
 
@@ -151,21 +170,17 @@ fn content_switch(
                     global_vars={global_vars}
                     set_submenu={submenu_callback}
                     on_logout_action={on_logout_action}
-                    update_global_vars={update_global_vars}
+                    update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
                 />
             }
         },
-        // MainRoute::TestSheetRouterRedirect => {
-        //     html! {
-        //         <Redirect<MainRoute> to={MainRoute::TestSheetRouter { sub_route: "home".to_owned() }} />
-        //     }
-        // }
+
         MainRoute::UserLogin => {
             html! {
                 <UserLogin
                     global_vars={global_vars}
-                    update_global_vars={update_global_vars}
+                    update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
                 />
             }
@@ -420,16 +435,19 @@ impl Component for MainApp {
             )
             .expect("global_vars context was not set");
 
-        let global_vars = (*global_vars_context).clone();
+        let mut global_vars = (*global_vars_context).clone();
 
         let login_token = global_vars.login_token.to_owned();
         let api_root = global_vars.api_root.to_owned();
 
+        let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        global_vars.update_global_vars = base_update_global_vars;
+
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
-            let update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+
             let mut global_vars = global_vars.clone();
-            global_vars.update_global_vars = update_global_vars;
+
             let global_vars_context = global_vars_context.clone();
             spawn_local (
                 async move {
@@ -472,6 +490,13 @@ impl Component for MainApp {
             update_current_user.emit( User::default().clone() );
         }
 
+        let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+
+        let wss = WebsocketService::new(
+            global_vars.server_root.to_owned(),
+            received_message_callback,
+        ) ;
+
         MainApp {
             global_vars_context: global_vars_context,
             global_vars: global_vars,
@@ -482,6 +507,8 @@ impl Component for MainApp {
             confirmation_dialog_open: false,
 
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
+            wss: wss,
+
         }
     }
 
@@ -523,6 +550,7 @@ impl Component for MainApp {
                 self.show_mobile_menu = false;
                 return true;
             }
+
 
             MainAppMessage::CloseConfirmationDialog( _event ) => {
                 self.confirmation_dialog_open = false;
@@ -578,6 +606,54 @@ impl Component for MainApp {
                 return true;
             }
 
+            MainAppMessage::SendWebSocket(
+                send_message,
+            ) => {
+                let send_data_result = serde_json::to_string( &send_message );
+
+                match send_data_result {
+                    Ok( send_data ) => {
+                        let msg_result = self.wss.tx.clone().try_send(send_data.to_owned() );
+                        match msg_result {
+                            Ok(_) => {
+                                // do nothing, everything's GREAT!
+                                return true;
+                            }
+                            Err( err ) => {
+                                error!("MainWebAppMessages::SendWebSocket json send error", err.to_string(), send_data.to_owned() );
+                                return false;
+                            }
+                        }
+
+                    }
+                    Err( err ) => {
+                        error!( format!("MainWebAppMessages::SendWebSocket json to_str error {} {:?}", err.to_string(), &send_message) );
+                        return false;
+                    }
+                }
+
+            }
+
+            MainAppMessage::ReceivedWebSocket( sent_data ) => {
+                let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
+                match msg_result {
+                    Ok( msg ) => {
+
+                        handle_message(
+                            msg,
+                            self.global_vars.clone(),
+                            ctx.link().callback(MainAppMessage::UpdateGlobalVars),
+                        );
+                        return true;
+                    }
+                    Err( err ) => {
+                        error!("MainWebAppMessages::ReceivedWebSocket json from_str error", err.to_string(), &sent_data );
+                        return false;
+                    }
+                }
+            }
+
+
             MainAppMessage::SetSubmenu(
                 new_value,
             ) => {
@@ -607,11 +683,14 @@ impl Component for MainApp {
         let submenu = self.submenu.clone();
         let mobile_submenu = self.submenu.clone();
 
+
+        let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
+
         let set_submenu = ctx.link().callback(MainAppMessage::SetSubmenu);
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
         let logout_action = ctx.link().callback(MainAppMessage::LogOut);
-        let update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
         let open_confirmation_dialog = ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
         let close_confirmation_dialog = ctx.link().callback(MainAppMessage::CloseConfirmationDialog);
 
@@ -640,7 +719,9 @@ impl Component for MainApp {
         let global_vars2 = self.global_vars.clone();
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
+        let global_vars5 = self.global_vars.clone();
 
+        let login_token= self.global_vars.login_token.to_owned();
         // let callback_content =
         //     move |routes| {
         //         content_switch(
@@ -690,6 +771,19 @@ impl Component for MainApp {
                     )
                 } />
                     <div class={active_class}>
+                        <button
+                            onclick={ move |_e| {
+                                let login_token = login_token.to_owned();
+                                let msg = WebSocketMessage {
+                                    token: login_token,
+                                    kind: WebsocketMessageType::Online,
+                                    user: None,
+                                };
+                                send_websocket.emit( msg );
+                            }}
+                        >
+                            {"Clicky"}
+                        </button>
                         <Switch<MainRoute> render={
                             move |routes| {
                                 content_switch(
@@ -697,7 +791,7 @@ impl Component for MainApp {
                                     &set_submenu,
                                     global_vars3.clone(),
                                     &on_logout_action,
-                                    &update_global_vars,
+                                    &base_update_global_vars,
                                     &open_confirmation_dialog,
                                     show_mobile_menu,
                                 )

@@ -4,7 +4,7 @@ use yew_router::history::{AnyHistory, History, MemoryHistory};
 
 mod pages;
 mod main_app;
-// mod main_app_server;
+mod web_sockets;
 mod libs;
 mod components;
 use std::collections::HashMap;
