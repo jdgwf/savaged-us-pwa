@@ -440,8 +440,10 @@ impl Component for MainApp {
         let login_token = global_vars.login_token.to_owned();
         let api_root = global_vars.api_root.to_owned();
 
+        let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
         let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
         global_vars.update_global_vars = base_update_global_vars;
+        global_vars.send_websocket = send_websocket;
 
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
@@ -684,7 +686,6 @@ impl Component for MainApp {
         let mobile_submenu = self.submenu.clone();
 
 
-        let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
 
         let set_submenu = ctx.link().callback(MainAppMessage::SetSubmenu);
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
@@ -771,19 +772,7 @@ impl Component for MainApp {
                     )
                 } />
                     <div class={active_class}>
-                        <button
-                            onclick={ move |_e| {
-                                let login_token = login_token.to_owned();
-                                let msg = WebSocketMessage {
-                                    token: login_token,
-                                    kind: WebsocketMessageType::Online,
-                                    user: None,
-                                };
-                                send_websocket.emit( msg );
-                            }}
-                        >
-                            {"Clicky"}
-                        </button>
+
                         <Switch<MainRoute> render={
                             move |routes| {
                                 content_switch(

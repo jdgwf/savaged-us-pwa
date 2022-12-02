@@ -1,3 +1,7 @@
+use savaged_libs::websocket_message::{
+    WebSocketMessage,
+    WebsocketMessageType,
+};
 use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
 
@@ -48,13 +52,28 @@ impl Component for MainHome {
         ctx: &Context<Self>,
     ) -> Html {
 
-        let _global_vars = ctx.props().global_vars.clone();
+        let global_vars = ctx.props().global_vars.clone();
 
         html! {
             <div class={"main-content"}>
                 <h2><i class="fa fa-house" /><Nbsp />{"Home Page"}</h2>
                 <hr />
                 {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
+                // <hr />
+                // <button
+                //     class="btn"
+                //     onclick={ move |_e| {
+                //         let login_token = global_vars.login_token.to_owned();
+                //         let msg = WebSocketMessage {
+                //             token: login_token,
+                //             kind: WebsocketMessageType::Online,
+                //             user: None,
+                //         };
+                //         global_vars.send_websocket.emit( msg );
+                //     }}
+                // >
+                //     {"Clicky"}
+                // </button>
             </div>
 
         }

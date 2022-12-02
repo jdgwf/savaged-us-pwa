@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::rc::Rc;
 use yew::prelude::*;
-use savaged_libs::user::User;
+use savaged_libs::{user::User, websocket_message::WebSocketMessage};
 use yew::prelude::*;
 use gloo_net::websocket::{
     Message,
@@ -22,6 +22,7 @@ pub struct GlobalVars {
     pub offline: bool,
 
     pub update_global_vars: Callback<GlobalVars>,
+    pub send_websocket: Callback<WebSocketMessage>,
 }
 
 impl Default for GlobalVars {
@@ -36,6 +37,7 @@ impl Default for GlobalVars {
             site_title: "".to_owned(),
             no_calls: false,
             update_global_vars: Callback::noop(),
+            send_websocket: Callback::noop(),
         }
     }
 }
