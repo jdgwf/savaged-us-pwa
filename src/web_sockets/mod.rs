@@ -29,7 +29,8 @@ impl WebsocketService {
         .replace("https://", "wss://")
         + &"/_ws".to_owned();
         let ws = WebSocket::open(wss_url.as_ref()).unwrap();
-        log!("WebSocket Connected to ", &wss_url);
+
+
         let (mut write, mut read) = ws.split();
 
         let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);

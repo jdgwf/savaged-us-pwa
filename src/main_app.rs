@@ -445,6 +445,17 @@ impl Component for MainApp {
         global_vars.update_global_vars = base_update_global_vars;
         global_vars.send_websocket = send_websocket;
 
+
+
+        let msg = WebSocketMessage {
+            token: login_token,
+            kind: WebsocketMessageType::Online,
+            user: None,
+        };
+        global_vars.send_websocket.emit( msg );
+
+        let login_token = global_vars.login_token.to_owned();
+
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
 
@@ -497,7 +508,9 @@ impl Component for MainApp {
         let wss = WebsocketService::new(
             global_vars.server_root.to_owned(),
             received_message_callback,
-        ) ;
+        );
+
+
 
         MainApp {
             global_vars_context: global_vars_context,
