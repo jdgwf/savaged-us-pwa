@@ -59,21 +59,26 @@ impl Component for MainHome {
                 <h2><i class="fa fa-house" /><Nbsp />{"Home Page"}</h2>
                 <hr />
                 {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
-                // <hr />
-                // <button
-                //     class="btn"
-                //     onclick={ move |_e| {
-                //         let login_token = global_vars.login_token.to_owned();
-                //         let msg = WebSocketMessage {
-                //             token: login_token,
-                //             kind: WebsocketMessageType::Online,
-                //             user: None,
-                //         };
-                //         global_vars.send_websocket.emit( msg );
-                //     }}
-                // >
-                //     {"Clicky"}
-                // </button>
+                <hr />
+                <button
+                    class="btn"
+                    onclick={ move |_e| {
+                        let login_token = global_vars.login_token.to_owned();
+                        let mut login_token_send: Option<String> = None;
+                        if !login_token.is_empty() {
+                            login_token_send = Some(login_token);
+                        }
+                        let msg = WebSocketMessage {
+                            token: login_token_send,
+                            kind: WebsocketMessageType::Online,
+                            user: None,
+                            payload: None,
+                        };
+                        global_vars.send_websocket.emit( msg );
+                    }}
+                >
+                    {"Clicky"}
+                </button>
             </div>
 
         }

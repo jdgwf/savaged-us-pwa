@@ -84,6 +84,7 @@ pub async fn update_current_user(
             post_val["password"] = serde_json::Value::String(new_password.to_owned());
             post_val["repeat_password"] = serde_json::Value::String(repeat_password.to_owned());
             post_val["remove_image"] = serde_json::Value::Bool(remove_image);
+            post_val["current_user"] = serde_json::Value::String( current_user_string.clone() );
 
             let post_val_string = post_val.to_string();
 

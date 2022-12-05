@@ -446,12 +446,19 @@ impl Component for MainApp {
         global_vars.send_websocket = send_websocket;
 
 
+        let login_token = global_vars.login_token.to_owned();
 
+        let mut login_token_send: Option<String> = None;
+        if !login_token.is_empty() {
+            login_token_send = Some(login_token);
+        }
         let msg = WebSocketMessage {
-            token: login_token,
+            token: login_token_send,
             kind: WebsocketMessageType::Online,
             user: None,
+            payload: None,
         };
+
         global_vars.send_websocket.emit( msg );
 
         let login_token = global_vars.login_token.to_owned();
