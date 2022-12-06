@@ -12,21 +12,26 @@ pub fn handle_message(
     global_vars: GlobalVars,
     update_global_vars: Callback<GlobalVars>,
 ) {
-
-
     match msg.kind {
         WebsocketMessageType::Online => {
             log!( format!("handle_message Online {:?}", msg) );
-            // update_global_vars.emit( global_vars );
+            let mut global_vars = global_vars.clone();
+            global_vars.offline = false;
+            update_global_vars.emit( global_vars );
         }
 
         WebsocketMessageType::Offline => {
             log!( format!("handle_message Offline {:?}", msg) );
-            // update_global_vars.emit( global_vars );
+            let mut global_vars = global_vars.clone();
+            global_vars.offline = true;
+            update_global_vars.emit( global_vars );
         }
 
         _ => {
             error!( format!("Unhandled Message Type! {:?}", msg ) );
+            let mut global_vars = global_vars.clone();
+            global_vars.offline = false;
+            update_global_vars.emit( global_vars );
         }
     }
 }

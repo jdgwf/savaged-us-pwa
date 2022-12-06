@@ -1,3 +1,6 @@
+use std::ops::Deref;
+
+use gloo_timers::callback::Timeout;
 use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
@@ -10,6 +13,7 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::fetch_api::fetch_api;
 use crate::pages::user::login::_UserLoginProps::update_global_vars;
+use crate::web_sockets::connect_to_websocket;
 use gloo_console::error;
 use gloo_console::log;
 use crate::pages::main_home::MainHome;
@@ -39,8 +43,10 @@ use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
 use gloo_net::websocket::{
     Message,
     futures::WebSocket,
+    State,
 
 };
+use gloo_timers::callback::Interval;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum MainRoute {
@@ -91,6 +97,7 @@ pub enum MainAppMessage {
 
     SendWebSocket( WebSocketMessage ),
     ReceivedWebSocket( String ),
+    WebsocketOffline( bool ),
 
     OpenConfirmationDialog(
         ConfirmationDialogDefinition,
@@ -106,6 +113,7 @@ pub struct MainApp {
     current_unread_notifications: u32,
     current_sub_menu: String,
 
+    interval: Option<Interval>,
     confirmation_dialog_open: bool,
     confirmation_dialog_properties: ConfirmationDialogDefinition,
 
@@ -297,9 +305,12 @@ fn top_menu_switch(
                 </li>
                 <li class={login_class_active}>
                     if global_vars.offline {
-                        {"OFFLINE"}<br /><br />
+                        <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
+                            {"OFFLINE"}
+                            <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
+                        </div>
                     }
-                    if global_vars.current_user.id > 0 {
+                    if global_vars.current_user.id > 0 && !global_vars.offline {
                         <div class="user-login-badge">
                         <Link<UserRoute> to={UserRoute::SettingsPrivate}>
                             if global_vars.current_user.unread_notifications > 0 {
@@ -313,7 +324,9 @@ fn top_menu_switch(
                         </div>
                     } else {
                         <>
-                            <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
+                            if !global_vars.offline {
+                                <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
+                            }
                         </>
                     }
                 </li>
@@ -353,10 +366,10 @@ fn mobile_menu_switch(
         },
         MainRoute::Home => {
             home_class_active = "active".to_owned();
-            home_submenu = submenu.clone();
+            home_submenu = submenu;
         },
         MainRoute::UserRouterRedirect => {
-            settings_submenu = submenu.clone();
+            settings_submenu = submenu;
         }
         MainRoute::UserLogin => {
 
@@ -369,15 +382,15 @@ fn mobile_menu_switch(
         },
         MainRoute::UserRouter => {
             settings_class_active = "active".to_owned();
-            settings_submenu = submenu.clone();
+            settings_submenu = submenu;
         },
         MainRoute::About => {
             about_class_active = "active".to_owned();
-            about_submenu = submenu.clone();
+            about_submenu = submenu;
         },
         MainRoute::ToDos => {
             todos_class_active = "active".to_owned();
-            todos_submenu = submenu.clone();
+            todos_submenu = submenu;
         },
         MainRoute::NotFound => {
 
@@ -437,7 +450,7 @@ impl Component for MainApp {
 
         let mut global_vars = (*global_vars_context).clone();
 
-        let login_token = global_vars.login_token.to_owned();
+        // let login_token = global_vars.login_token.to_owned();
         let api_root = global_vars.api_root.to_owned();
 
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
@@ -465,6 +478,7 @@ impl Component for MainApp {
 
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
+            // let other_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
 
             let mut global_vars = global_vars.clone();
 
@@ -489,6 +503,7 @@ impl Component for MainApp {
                                 Ok( vec_val ) => {
                                     update_current_user.emit( vec_val.clone() );
                                     // log!("get_data_via_fetch vec_val_result", &vec_val.share_bio );
+
                                 }
                                 Err( err ) => {
                                     let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
@@ -503,21 +518,31 @@ impl Component for MainApp {
                             error!("get_data_via_fetch Err()", &err );
                         }
                     }
+
+                    // other_update_global_vars.emit( global_vars );
                 }
             );
         } else {
+            global_vars.user_loading = false;
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
             update_current_user.emit( User::default().clone() );
         }
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+        let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
 
-        let wss = WebsocketService::new(
+        // let wss = WebsocketService::new(
+        //     global_vars.server_root.to_owned(),
+        //     received_message_callback,
+        //     websocket_offline_callback,
+        // );
+
+        let wss = connect_to_websocket(
             global_vars.server_root.to_owned(),
-            received_message_callback,
+            &received_message_callback,
+            &websocket_offline_callback,
+            global_vars.login_token.to_owned(),
         );
-
-
 
         MainApp {
             global_vars_context: global_vars_context,
@@ -527,30 +552,32 @@ impl Component for MainApp {
             current_sub_menu: "".to_owned(),
             current_unread_notifications: 0,
             confirmation_dialog_open: false,
-
+            interval: None,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
             wss: wss,
 
         }
     }
 
-    fn changed(
-        &mut self,
-        _ctx: &Context<Self>,
-        _props: &MainAppProps,
-    ) -> bool {
+    // fn changed(
+    //     &mut self,
+    //     _ctx: &Context<Self>,
+    //     _props: &MainAppProps,
+    // ) -> bool {
 
-        self.global_vars = (*self.global_vars_context).clone();
-        // log!("main_app changed called", self.global_vars.user_loading );
-        true
-    }
+    //     self.global_vars = (*self.global_vars_context).clone();
+
+    //     log!("main_app changed called" );
+    //     // self.reconnect_interval();
+
+    //     true
+    // }
 
     fn update(
         &mut self,
         ctx: &Context<Self>,
         msg: MainAppMessage,
     ) -> bool {
-
 
         let ( global_vars_context, _global_vars_context_handler ) = ctx
             .link()
@@ -559,8 +586,26 @@ impl Component for MainApp {
             )
             .expect("global_vars context was not set");
         let global_vars = (*global_vars_context).clone();
-        // self.global_vars = (*global_vars_context).clone();
-        log!("main_app update called", global_vars.current_user.unread_notifications  );
+
+        log!( format!("main_app update called {:?}, {:?}", self.global_vars.current_user.id, global_vars.current_user.id) );
+
+        self.global_vars = (*global_vars_context).clone();
+
+
+
+        // if global_vars.offline {
+        // // if !global_vars.login_token.is_empty() {
+        //     let msg = WebSocketMessage {
+        //         token: Some(global_vars.login_token.to_owned()),
+        //         kind: WebsocketMessageType::Online,
+        //         user: None,
+        //         payload: None,
+        //     };
+        //     ctx.link().callback(MainAppMessage::SendWebSocket).emit( msg );
+
+        // // }
+        // }
+
 
         match msg {
             MainAppMessage::ToggleMobileMenu( _new_value ) => {
@@ -580,8 +625,8 @@ impl Component for MainApp {
                 return true;
             }
 
-            MainAppMessage::ContextUpdated( _global_vars_context ) => {
-                self.global_vars = global_vars.clone();
+            MainAppMessage::ContextUpdated( global_vars_context ) => {
+                self.global_vars = (*global_vars_context).clone();
                 return true;
             }
 
@@ -593,6 +638,20 @@ impl Component for MainApp {
 
             MainAppMessage::UpdateGlobalVars( new_value ) => {
                 log!("MainAppMessage::UpdateGlobalVars called");
+
+                // if new_value.offline {
+                //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+                //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+
+
+                //     let wss = connect_to_websocket(
+                //         new_value.server_root.to_owned(),
+                //         &received_message_callback,
+                //         &websocket_offline_callback,
+                //         new_value.login_token.to_owned(),
+                //     );
+                // }
+
                 self.global_vars_context.dispatch( new_value.to_owned() );
                 self.global_vars = new_value.clone();
 
@@ -633,13 +692,15 @@ impl Component for MainApp {
             ) => {
                 let send_data_result = serde_json::to_string( &send_message );
 
+                log!("MainWebAppMessages::SendWebSocket called");
                 match send_data_result {
                     Ok( send_data ) => {
                         let msg_result = self.wss.tx.clone().try_send(send_data.to_owned() );
                         match msg_result {
-                            Ok(_) => {
+                            Ok( _) => {
                                 // do nothing, everything's GREAT!
-                                return true;
+                                log!("MainWebAppMessages::SendWebSocket called");
+                                return false;
                             }
                             Err( err ) => {
                                 error!("MainWebAppMessages::SendWebSocket json send error", err.to_string(), send_data.to_owned() );
@@ -656,11 +717,34 @@ impl Component for MainApp {
 
             }
 
+            MainAppMessage::WebsocketOffline( offline ) => {
+                let mut global_vars = self.global_vars.clone();
+
+                global_vars.offline = offline;
+
+                log!("WebsocketOffline called", offline);
+                // if offline {
+                //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+                //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+
+                //     self.wss = connect_to_websocket(
+                //         self.global_vars.server_root.to_owned(),
+                //         &received_message_callback,
+                //         &websocket_offline_callback,
+                //         self.global_vars.login_token.to_owned(),
+                //     );
+                // }
+                ctx.link().callback(MainAppMessage::UpdateGlobalVars).emit( global_vars );
+
+                return false;
+            }
+
             MainAppMessage::ReceivedWebSocket( sent_data ) => {
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
+                let mut global_vars = self.global_vars.clone();
                 match msg_result {
                     Ok( msg ) => {
-
+                        global_vars.offline = false;
                         handle_message(
                             msg,
                             self.global_vars.clone(),
@@ -740,9 +824,9 @@ impl Component for MainApp {
         let global_vars2 = self.global_vars.clone();
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
-        let global_vars5 = self.global_vars.clone();
+        // let global_vars5 = self.global_vars.clone();
 
-        let login_token= self.global_vars.login_token.to_owned();
+        // let login_token= self.global_vars.login_token.to_owned();
         // let callback_content =
         //     move |routes| {
         //         content_switch(
@@ -813,4 +897,97 @@ impl Component for MainApp {
             </>
         }
     }
+}
+
+impl MainApp {
+    fn _reconnect_interval(
+        &mut self,
+        // global_vars: GlobalVars,
+    ) {
+
+        // match self.wss.ws.state() {
+        //     State::Closed => {
+        //         log!("State Closed?!?")
+        //     }
+        //     _ => {
+
+        //     }
+        // }
+        // if self.wss.ws.state() == State::Closed {
+        //     log!("State Closed?!?")
+        // }
+        // if self.global_vars.offline {
+        //     log!("reconnect_interval called");
+
+        //     let login_token = self.global_vars.login_token.to_owned();
+
+        //     let mut login_token_send: Option<String> = None;
+        //     if !login_token.is_empty() {
+        //         login_token_send = Some(login_token);
+        //     }
+        //     let msg = WebSocketMessage {
+        //         token: login_token_send,
+        //         kind: WebsocketMessageType::Online,
+        //         user: None,
+        //         payload: None,
+        //     };
+
+        //     log!(format!("reconnection l {:?}", msg));
+        //     self.global_vars.send_websocket.emit( msg );
+        // }
+        // return;
+        // log!("reconnect_interval called");
+        // if !self.interval != 0 {
+        //     web_sys::clear_interval_with_handle( self.interval );
+        // }
+
+        // if self.global_vars.offline {
+        //     log!("We're disconnected, trying to reconnect...");
+
+        //     // if self.interval.is_none() {
+        //         // log!( format!("self.interval {:?}", self.interval));
+
+        //         let global_vars = self.global_vars.clone();
+        //         Some(Timeout::new(
+        //             5_000,
+        //             move || {
+
+        //                 // Do something...
+        //                 let login_token = global_vars.login_token.to_owned();
+
+        //                 let mut login_token_send: Option<String> = None;
+        //                 if !login_token.is_empty() {
+        //                     login_token_send = Some(login_token);
+        //                 }
+        //                 let msg = WebSocketMessage {
+        //                     token: login_token_send,
+        //                     kind: WebsocketMessageType::Online,
+        //                     user: None,
+        //                     payload: None,
+        //                 };
+
+        //                 log!(format!("reconnection l {:?}", msg));
+        //                 global_vars.send_websocket.emit( msg );
+        //             }
+        //         ));
+        //     // }
+        // // } else {
+        //     // let iv_option = &mut self.interval;
+        //     // match iv_option {
+        //     //     Some( iv ) => {
+        //     //         // iv.cancel(); // ownership error; trying more hacky way
+        //     //         log!("Disconnecting Interval");
+        //     //         let window = web_sys::window().unwrap();
+        //     //         window.clear_interval_with_handle( 1 );
+        //     //         window.clear_interval_with_handle( 2 );
+        //     //         window.clear_interval_with_handle( 3 );
+        //     //     }
+        //     //     None => {
+
+        //     //     }
+        //     // }
+        //     // self.interval = None;
+        // };
+    }
+
 }
