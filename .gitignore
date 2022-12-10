@@ -3,3 +3,4 @@ target/*
 src/target
 /dist
 /public
+Cargo.lock
