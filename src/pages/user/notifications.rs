@@ -50,7 +50,7 @@ fn get_notifications(
     spawn_local (
         async move {
             let result = fetch_api(
-                (api_root + "/auth/notifications-get").to_owned(),
+                (api_root + "/notifications/get").to_owned(),
                 "".to_owned(),
                 login_token,
             ).await;
@@ -100,7 +100,7 @@ fn mark_all_read(
             let set_notifications_notify = set_notifications.clone();
 
             let result = fetch_api(
-                (api_root + "/auth/notifications-set-all-read").to_owned(),
+                (api_root + "/notifications/set-all-read").to_owned(),
                 "".to_owned(),
                 login_token,
             ).await;
@@ -156,7 +156,7 @@ fn delete_basic_admin(
             let set_notifications_notify = set_notifications.clone();
 
             let result = fetch_api(
-                (api_root + "/auth/notifications-delete-basic-admin").to_owned(),
+                (api_root + "/notifications/delete-basic-admin").to_owned(),
                 "".to_owned(),
                 login_token,
             ).await;
@@ -218,7 +218,7 @@ fn delete_notification(
             let set_notifications_notify = set_notifications.clone();
 
             let result = fetch_api_for_id(
-                (api_root + "/auth/notifications-set-deleted").to_owned(),
+                (api_root + "/notifications/set-deleted").to_owned(),
                 login_token,
                 notification_id,
                 "notification_id".to_owned(),

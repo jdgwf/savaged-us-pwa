@@ -13,7 +13,6 @@ use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::user::UserUpdateResult;
 use gloo_console::error;
-use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
 
@@ -26,7 +25,12 @@ pub async fn fetch_api(
     let mut opts = RequestInit::new();
     opts.method("POST");
     opts.body(Some(&wasm_bindgen::JsValue::from_str(
-        format!("{{\"api_key\": \"{}\", \"login_token\": \"{}\"}}", &api_key, &login_token).as_ref()
+        format!("{{
+            \"api_key\": \"{}\",
+            \"login_token\": \"{}\"
+            }}",
+            &api_key,
+            &login_token).as_ref()
     ) ));
     opts.mode(RequestMode::Cors);
     let request = Request::new_with_str_and_init(&endpoint, &opts)?;

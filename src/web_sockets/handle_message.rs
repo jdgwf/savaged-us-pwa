@@ -10,28 +10,30 @@ use gloo_console::log;
 pub fn handle_message(
     msg: WebSocketMessage,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
+    // update_global_vars: Callback<GlobalVars>,
 ) {
     match msg.kind {
         WebsocketMessageType::Online => {
             log!( format!("handle_message Online {:?}", msg) );
-            let mut global_vars = global_vars.clone();
-            global_vars.offline = false;
-            update_global_vars.emit( global_vars );
+            let mut new_global_vars = global_vars.clone();
+            new_global_vars.offline = false;
+            new_global_vars.user_loading = false;
+            global_vars.update_global_vars.emit( new_global_vars );
         }
 
         WebsocketMessageType::Offline => {
             log!( format!("handle_message Offline {:?}", msg) );
-            let mut global_vars = global_vars.clone();
-            global_vars.offline = true;
-            update_global_vars.emit( global_vars );
+            let mut new_global_vars = global_vars.clone();
+            new_global_vars.offline = true;
+            new_global_vars.user_loading = false;
+            global_vars.update_global_vars.emit( new_global_vars );
         }
 
         _ => {
             error!( format!("Unhandled Message Type! {:?}", msg ) );
-            let mut global_vars = global_vars.clone();
-            global_vars.offline = false;
-            update_global_vars.emit( global_vars );
+            let mut new_global_vars = global_vars.clone();
+            new_global_vars.offline = false;
+            global_vars.update_global_vars.emit( new_global_vars );
         }
     }
 }

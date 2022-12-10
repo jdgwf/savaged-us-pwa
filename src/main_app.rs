@@ -18,6 +18,7 @@ use gloo_console::error;
 use gloo_console::log;
 use crate::pages::main_home::MainHome;
 use crate::pages::main_about::MainAbout;
+use crate::pages::main_playground::MainPlayground;
 use crate::pages::main_tech::MainTech;
 use crate::pages::main_todos::MainTodos;
 use crate::pages::user::login::UserLogin;
@@ -68,6 +69,8 @@ pub enum MainRoute {
     Tech,
     #[at("/todos")]
     ToDos,
+    #[at("/playground")]
+    Playground,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -172,6 +175,14 @@ fn content_switch(
                 />
             }
         },
+        MainRoute::Playground => {
+
+            html! {
+                <MainPlayground
+                    global_vars={global_vars}
+                />
+            }
+        },
         MainRoute::UserRouter => {
             html! {
                 <UserRouter
@@ -230,6 +241,7 @@ fn top_menu_switch(
 
     let mut todos_class_active = "".to_owned();
     let mut tech_class_active = "".to_owned();
+    let mut playground_class_active = "".to_owned();
     match routes {
         MainRoute::Tech => {
             // test_sheet_class_active = "active".to_owned();
@@ -266,7 +278,9 @@ fn top_menu_switch(
         MainRoute::ToDos => {
             todos_class_active = "active".to_owned();
         },
-
+        MainRoute::Playground => {
+            playground_class_active = "active".to_owned();
+        },
         MainRoute::UserRouterRedirect => {
         }
 
@@ -303,6 +317,9 @@ fn top_menu_switch(
                 <li class={todos_class_active}>
                     <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
                 </li>
+                // <li class={playground_class_active}>
+                //     <Link<MainRoute> to={MainRoute::Playground}><i class="fa fa-list" /><Nbsp />{"Playground"}</Link<MainRoute>>
+                // </li>
                 <li class={login_class_active}>
                     if global_vars.offline {
                         <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
@@ -351,6 +368,7 @@ fn mobile_menu_switch(
     let mut home_class_active = "".to_owned();
     // let mut test_sheet_class_active = "".to_owned();
     let mut about_class_active = "".to_owned();
+    let mut playground_class_active = "".to_owned();
     let mut todos_class_active = "".to_owned();
     let mut settings_class_active: String = "".to_owned();
     let mut home_submenu = html! { <></> };
@@ -392,6 +410,10 @@ fn mobile_menu_switch(
             todos_class_active = "active".to_owned();
             todos_submenu = submenu;
         },
+        MainRoute::Playground => {
+            playground_class_active = "active".to_owned();
+            // playground_submenu = submenu;
+        },
         MainRoute::NotFound => {
 
         },
@@ -420,6 +442,9 @@ fn mobile_menu_switch(
                     <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
                     {todos_submenu}
                 </li>
+                // <li class={playground_class_active}>
+                //     <Link<MainRoute> to={MainRoute::Playground}><i class="fa fa-list" /><Nbsp />{"Playground"}</Link<MainRoute>>
+                // </li>
                 if global_vars.current_user.id > 0 {
                     <li class={settings_class_active}>
                         <Link<UserRoute> to={UserRoute::SettingsPrivate}>{"Settings"}</Link<UserRoute>>
@@ -476,6 +501,16 @@ impl Component for MainApp {
 
         let login_token = global_vars.login_token.to_owned();
 
+        let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+        let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+
+        let wss = connect_to_websocket(
+            global_vars.server_root.to_owned(),
+            &received_message_callback,
+            &websocket_offline_callback,
+            global_vars.login_token.to_owned(),
+        );
+
         if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
             let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
             // let other_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
@@ -520,7 +555,11 @@ impl Component for MainApp {
                     }
 
                     // other_update_global_vars.emit( global_vars );
+
                 }
+
+
+
             );
         } else {
             global_vars.user_loading = false;
@@ -528,21 +567,13 @@ impl Component for MainApp {
             update_current_user.emit( User::default().clone() );
         }
 
-        let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
-        let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
-
         // let wss = WebsocketService::new(
         //     global_vars.server_root.to_owned(),
         //     received_message_callback,
         //     websocket_offline_callback,
         // );
 
-        let wss = connect_to_websocket(
-            global_vars.server_root.to_owned(),
-            &received_message_callback,
-            &websocket_offline_callback,
-            global_vars.login_token.to_owned(),
-        );
+
 
         MainApp {
             global_vars_context: global_vars_context,
@@ -637,12 +668,11 @@ impl Component for MainApp {
             }
 
             MainAppMessage::UpdateGlobalVars( new_value ) => {
-                log!("MainAppMessage::UpdateGlobalVars called");
+                log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
 
                 // if new_value.offline {
                 //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
                 //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
-
 
                 //     let wss = connect_to_websocket(
                 //         new_value.server_root.to_owned(),
@@ -665,8 +695,9 @@ impl Component for MainApp {
                 global_vars.current_user = new_value.clone();
                 global_vars.user_loading = false;
 
-                self.global_vars_context.dispatch( global_vars.to_owned() );
                 self.global_vars = global_vars.clone();
+                self.global_vars_context.dispatch( self.global_vars.to_owned() );
+
 
                 return true;
             }
@@ -747,8 +778,8 @@ impl Component for MainApp {
                         global_vars.offline = false;
                         handle_message(
                             msg,
-                            self.global_vars.clone(),
-                            ctx.link().callback(MainAppMessage::UpdateGlobalVars),
+                            global_vars,
+                            // ctx.link().callback(MainAppMessage::UpdateGlobalVars),
                         );
                         return true;
                     }
