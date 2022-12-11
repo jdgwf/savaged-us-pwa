@@ -12,6 +12,7 @@ use standard_components::libs::set_document_title::set_document_title;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::fetch_api::fetch_api;
+use crate::libs::global_vars;
 use crate::pages::user::login::_UserLoginProps::update_global_vars;
 use crate::web_sockets::connect_to_websocket;
 use gloo_console::error;
@@ -480,7 +481,7 @@ impl Component for MainApp {
 
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
         let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
-        global_vars.update_global_vars = base_update_global_vars;
+        // global_vars.update_global_vars = base_update_global_vars;
         global_vars.send_websocket = send_websocket;
 
 
@@ -612,17 +613,21 @@ impl Component for MainApp {
         msg: MainAppMessage,
     ) -> bool {
 
-        let ( global_vars_context, _global_vars_context_handler ) = ctx
-            .link()
-            .context::<GlobalVarsContext>(
-                Callback::noop()
-            )
-            .expect("global_vars context was not set");
-        let global_vars = (*global_vars_context).clone();
+        // let ( global_vars_context, _global_vars_context_handler ) = ctx
+        //     .link()
+        //     .context::<GlobalVarsContext>(
+        //         Callback::noop()
+        //     )
+        //     .expect("global_vars context was not set");
+        // let global_vars = (*global_vars_context).clone();
+
+        let global_vars = self.global_vars.clone();
 
         log!( format!("main_app update called {:?}, {:?}", self.global_vars.current_user.id, global_vars.current_user.id) );
+        log!( format!("main_app self.global_vars.user_loading {:?}", self.global_vars.user_loading ) );
+        log!( format!("main_app self.global_vars.offline {:?}", self.global_vars.offline ) );
 
-        self.global_vars = (*global_vars_context).clone();
+        // self.global_vars = (*global_vars_context).clone();
 
 
 
@@ -673,10 +678,8 @@ impl Component for MainApp {
                 log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
 
                 self.global_vars = new_value.clone();
-                self.global_vars_context.dispatch( new_value.to_owned() );
-
-                self.global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
                 self.global_vars.send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
+                self.global_vars_context.dispatch( new_value.to_owned() );
 
                 return true;
             }
@@ -771,7 +774,7 @@ impl Component for MainApp {
             MainAppMessage::ReceivedWebSocket( sent_data ) => {
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
-                global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+                // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
                 match msg_result {
                     Ok( msg ) => {
                         global_vars.offline = false;
@@ -780,7 +783,7 @@ impl Component for MainApp {
                         handle_message(
                             msg,
                             global_vars,
-                            // ctx.link().callback(MainAppMessage::UpdateGlobalVars),
+                            ctx.link().callback(MainAppMessage::UpdateGlobalVars),
                         );
                         return false;
                     }

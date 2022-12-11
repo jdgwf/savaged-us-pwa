@@ -151,15 +151,19 @@ impl Component for UserLogin {
         let password = self.password.to_owned();
         let api_root = ctx.props().global_vars.api_root.to_owned();
 
+        let update_global_vars = ctx.props().update_global_vars.clone();
+
         let do_login_submit = move |e: SubmitEvent | {
             // log!("trying do_login_submit");
             e.prevent_default();
             let global_vars = global_vars_event.clone();
+            let update_global_vars = update_global_vars.clone();
             let username = username.to_owned();
             let password = password.to_owned();
             let api_root = api_root.to_owned();
             let update_current_user_from_login = update_current_user_from_login.clone();
             let set_login_message = set_login_message.clone();
+
             spawn_local (
                 async move {
                     log!("trying login-for-token", api_root.clone() + "/auth/login-for-token");
@@ -202,7 +206,7 @@ impl Component for UserLogin {
                             set_login_message.emit( "Can't connect to server".to_owned() );
                             let mut global_vars = global_vars.clone();
                             global_vars.offline = true;
-                            global_vars.update_global_vars.emit( global_vars.clone() );
+                            update_global_vars.emit( global_vars.clone() );
                         }
                     }
                 }

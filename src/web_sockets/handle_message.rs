@@ -10,7 +10,7 @@ use gloo_console::log;
 pub fn handle_message(
     msg: WebSocketMessage,
     global_vars: GlobalVars,
-    // update_global_vars: Callback<GlobalVars>,
+    update_global_vars: Callback<GlobalVars>,
 ) {
     match msg.kind {
         WebsocketMessageType::Online => {
@@ -27,8 +27,8 @@ pub fn handle_message(
                 }
             }
 
-            log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
-            global_vars.update_global_vars.emit( new_global_vars );
+            // log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
+            update_global_vars.emit( new_global_vars );
         }
 
         WebsocketMessageType::Offline => {
@@ -36,7 +36,7 @@ pub fn handle_message(
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = true;
             new_global_vars.user_loading = false;
-            global_vars.update_global_vars.emit( new_global_vars );
+            update_global_vars.emit( new_global_vars );
         }
 
         WebsocketMessageType::ChargenData => {

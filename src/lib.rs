@@ -414,7 +414,7 @@ pub fn ServerApp(
             site_title: "v4.savaged.us".to_owned(),
             no_calls: true,
             offline: true,
-            update_global_vars: Callback::noop(),
+            // update_global_vars: Callback::noop(),
             send_websocket: Callback::noop(),
         }
     );
