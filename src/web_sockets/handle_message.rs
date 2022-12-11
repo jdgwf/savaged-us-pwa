@@ -14,7 +14,7 @@ pub fn handle_message(
 ) {
     match msg.kind {
         WebsocketMessageType::Online => {
-            log!( format!("handle_message Online {:?}", msg) );
+            // log!( format!("handle_message Online {:?}", msg) );
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             new_global_vars.user_loading = false;
@@ -40,19 +40,21 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::ChargenData => {
-            log!( format!("handle_message ChargenData {:?}", msg) );
-            // let mut new_global_vars = global_vars.clone();
-            // new_global_vars.offline = true;
+            // log!( format!("handle_message ChargenData {:?}", msg) );
+            let mut new_global_vars = global_vars.clone();
+            new_global_vars.chargen_data = msg.chargen_data;
             // new_global_vars.user_loading = false;
-            // global_vars.update_global_vars.emit( new_global_vars );
+            update_global_vars.emit( new_global_vars );
         }
 
         WebsocketMessageType::Saves => {
-            log!( format!("handle_message Saves {:?}", msg) );
-            // let mut new_global_vars = global_vars.clone();
+            // log!( format!("handle_message Saves {:?}", msg.saves) );
+
+            let mut new_global_vars = global_vars.clone();
+            new_global_vars.saves = msg.saves;
             // new_global_vars.offline = true;
             // new_global_vars.user_loading = false;
-            // global_vars.update_global_vars.emit( new_global_vars );
+            update_global_vars.emit( new_global_vars );
         }
 
         _ => {

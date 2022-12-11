@@ -416,6 +416,8 @@ pub fn ServerApp(
             offline: true,
             // update_global_vars: Callback::noop(),
             send_websocket: Callback::noop(),
+            saves: None,
+            chargen_data: None,
         }
     );
 

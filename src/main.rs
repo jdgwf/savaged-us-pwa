@@ -12,7 +12,7 @@ use main_app::MainApp;
 use crate::libs::global_vars::GlobalVars;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use savaged_libs::user::User;
+use savaged_libs::{user::User, player_character::chargen_data::ChargenData};
 use gloo_console::log;
 
 use futures::{SinkExt, StreamExt};
@@ -47,6 +47,8 @@ fn App() -> Html {
             no_calls: false,
             offline: false,
             send_websocket: Callback::noop(),
+            chargen_data: None,
+            saves: None,
         }
     );
 

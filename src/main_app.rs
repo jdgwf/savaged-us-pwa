@@ -496,6 +496,7 @@ impl Component for MainApp {
             kind: WebsocketMessageType::Online,
             user: None,
             payload: None,
+            updated_on: None,
             chargen_data: None,
             saves: None,
         };
@@ -623,9 +624,9 @@ impl Component for MainApp {
 
         let global_vars = self.global_vars.clone();
 
-        log!( format!("main_app update called {:?}, {:?}", self.global_vars.current_user.id, global_vars.current_user.id) );
-        log!( format!("main_app self.global_vars.user_loading {:?}", self.global_vars.user_loading ) );
-        log!( format!("main_app self.global_vars.offline {:?}", self.global_vars.offline ) );
+        // log!( format!("main_app update called {:?}, {:?}", self.global_vars.current_user.id, global_vars.current_user.id) );
+        // log!( format!("main_app self.global_vars.user_loading {:?}", self.global_vars.user_loading ) );
+        // log!( format!("main_app self.global_vars.offline {:?}", self.global_vars.offline ) );
 
         // self.global_vars = (*global_vars_context).clone();
 
@@ -675,7 +676,7 @@ impl Component for MainApp {
             }
 
             MainAppMessage::UpdateGlobalVars( new_value ) => {
-                log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
+                // log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
 
                 self.global_vars = new_value.clone();
                 self.global_vars.send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
@@ -719,18 +720,18 @@ impl Component for MainApp {
             ) => {
                 let send_data_result = serde_json::to_string( &send_message );
 
-                log!("MainWebAppMessages::SendWebSocket called");
+                // log!("MainWebAppMessages::SendWebSocket called");
                 match send_data_result {
                     Ok( send_data ) => {
                         let msg_result = self.wss.tx.clone().try_send(send_data.to_owned() );
                         match msg_result {
                             Ok( _) => {
                                 // do nothing, everything's GREAT!
-                                log!("MainWebAppMessages::SendWebSocket called (Ok)");
+                                // log!("MainWebAppMessages::SendWebSocket called (Ok)");
                                 return false;
                             }
                             Err( err ) => {
-                                error!("MainWebAppMessages::SendWebSocket json send error", err.to_string(), send_data.to_owned() );
+                                // error!("MainWebAppMessages::SendWebSocket json send error", err.to_string(), send_data.to_owned() );
                                 return false;
                             }
                         }

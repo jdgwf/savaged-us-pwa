@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::rc::Rc;
 use yew::prelude::*;
-use savaged_libs::{user::User, websocket_message::WebSocketMessage};
+use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::chargen_data::ChargenData};
 use yew::prelude::*;
 use gloo_net::websocket::{
     Message,
@@ -23,6 +23,8 @@ pub struct GlobalVars {
 
     // pub update_global_vars: Callback<GlobalVars>,
     pub send_websocket: Callback<WebSocketMessage>,
+    pub chargen_data: Option<ChargenData>,
+    pub saves: Option<Vec<SaveDBRow>>,
 }
 
 impl Default for GlobalVars {
@@ -38,6 +40,8 @@ impl Default for GlobalVars {
             no_calls: false,
             // update_global_vars: Callback::noop(),
             send_websocket: Callback::noop(),
+            chargen_data: None,
+            saves: None,
         }
     }
 }

@@ -45,7 +45,7 @@ impl WebsocketService {
             }
         }
 
-        log!("Attempting connection via web socket...", &login_token);
+        log!("Attempting connection via web socket...");
 
         let (mut write, mut read) = ws.split();
 
