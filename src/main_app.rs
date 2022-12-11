@@ -495,6 +495,8 @@ impl Component for MainApp {
             kind: WebsocketMessageType::Online,
             user: None,
             payload: None,
+            chargen_data: None,
+            saves: None,
         };
 
         global_vars.send_websocket.emit( msg );
@@ -511,61 +513,61 @@ impl Component for MainApp {
             global_vars.login_token.to_owned(),
         );
 
-        if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
-            let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
-            // let other_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        // if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
+        //     let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
+        //     // let other_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
 
-            let mut global_vars = global_vars.clone();
+        //     let mut global_vars = global_vars.clone();
 
-            let global_vars_context = global_vars_context.clone();
-            spawn_local (
-                async move {
-                    let result = fetch_api(
-                        (api_root + "/auth/get-user-data").to_owned(),
-                        "".to_owned(),
-                        login_token,
-                    ).await;
+        //     let global_vars_context = global_vars_context.clone();
+        //     spawn_local (
+        //         async move {
+        //             let result = fetch_api(
+        //                 (api_root + "/auth/get-user-data").to_owned(),
+        //                 "".to_owned(),
+        //                 login_token,
+        //             ).await;
 
-                    global_vars.user_loading = false;
+        //             global_vars.user_loading = false;
 
-                    global_vars_context.dispatch( global_vars.to_owned() );
+        //             global_vars_context.dispatch( global_vars.to_owned() );
 
-                    match result {
-                        Ok( value ) => {
-                            // let vec_val_result = value.into_serde::<User>();
-                            let vec_val_result: Result<User, Error> = JsValueSerdeExt::into_serde(&value);
-                            match vec_val_result {
-                                Ok( vec_val ) => {
-                                    update_current_user.emit( vec_val.clone() );
-                                    // log!("get_data_via_fetch vec_val_result", &vec_val.share_bio );
+        //             match result {
+        //                 Ok( value ) => {
+        //                     // let vec_val_result = value.into_serde::<User>();
+        //                     let vec_val_result: Result<User, Error> = JsValueSerdeExt::into_serde(&value);
+        //                     match vec_val_result {
+        //                         Ok( vec_val ) => {
+        //                             update_current_user.emit( vec_val.clone() );
+        //                             // log!("get_data_via_fetch vec_val_result", &vec_val.share_bio );
 
-                                }
-                                Err( err ) => {
-                                    let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                                    update_current_user.emit( User::default() );
-                                    error!( &err_string  );
-                                }
-                            }
+        //                         }
+        //                         Err( err ) => {
+        //                             let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+        //                             update_current_user.emit( User::default() );
+        //                             error!( &err_string  );
+        //                         }
+        //                     }
 
-                        }
-                        Err( err ) => {
-                            update_current_user.emit( User::default() );
-                            error!("get_data_via_fetch Err()", &err );
-                        }
-                    }
+        //                 }
+        //                 Err( err ) => {
+        //                     update_current_user.emit( User::default() );
+        //                     error!("get_data_via_fetch Err()", &err );
+        //                 }
+        //             }
 
-                    // other_update_global_vars.emit( global_vars );
+        //             // other_update_global_vars.emit( global_vars );
 
-                }
+        //         }
 
 
 
-            );
-        } else {
-            global_vars.user_loading = false;
-            let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
-            update_current_user.emit( User::default().clone() );
-        }
+        //     );
+        // } else {
+        //     global_vars.user_loading = false;
+        //     let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
+        //     update_current_user.emit( User::default().clone() );
+        // }
 
         // let wss = WebsocketService::new(
         //     global_vars.server_root.to_owned(),
@@ -670,20 +672,11 @@ impl Component for MainApp {
             MainAppMessage::UpdateGlobalVars( new_value ) => {
                 log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
 
-                // if new_value.offline {
-                //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
-                //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
-
-                //     let wss = connect_to_websocket(
-                //         new_value.server_root.to_owned(),
-                //         &received_message_callback,
-                //         &websocket_offline_callback,
-                //         new_value.login_token.to_owned(),
-                //     );
-                // }
-
-                self.global_vars_context.dispatch( new_value.to_owned() );
                 self.global_vars = new_value.clone();
+                self.global_vars_context.dispatch( new_value.to_owned() );
+
+                self.global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+                self.global_vars.send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
 
                 return true;
             }
@@ -730,7 +723,7 @@ impl Component for MainApp {
                         match msg_result {
                             Ok( _) => {
                                 // do nothing, everything's GREAT!
-                                log!("MainWebAppMessages::SendWebSocket called");
+                                log!("MainWebAppMessages::SendWebSocket called (Ok)");
                                 return false;
                             }
                             Err( err ) => {
@@ -751,9 +744,14 @@ impl Component for MainApp {
             MainAppMessage::WebsocketOffline( offline ) => {
                 let mut global_vars = self.global_vars.clone();
 
-                global_vars.offline = offline;
+                if global_vars.offline != offline {
+                    global_vars.offline = offline;
 
-                log!("WebsocketOffline called", offline);
+                    log!("WebsocketOffline called", offline);
+
+                    // ctx.link().callback(MainAppMessage::UpdateGlobalVars).emit( global_vars );
+                }
+
                 // if offline {
                 //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
                 //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
@@ -765,7 +763,7 @@ impl Component for MainApp {
                 //         self.global_vars.login_token.to_owned(),
                 //     );
                 // }
-                ctx.link().callback(MainAppMessage::UpdateGlobalVars).emit( global_vars );
+
 
                 return false;
             }
@@ -773,15 +771,18 @@ impl Component for MainApp {
             MainAppMessage::ReceivedWebSocket( sent_data ) => {
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
+                global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
                 match msg_result {
                     Ok( msg ) => {
                         global_vars.offline = false;
+                        // global_vars.user_loading = false;
+
                         handle_message(
                             msg,
                             global_vars,
                             // ctx.link().callback(MainAppMessage::UpdateGlobalVars),
                         );
-                        return true;
+                        return false;
                     }
                     Err( err ) => {
                         error!("MainWebAppMessages::ReceivedWebSocket json from_str error", err.to_string(), &sent_data );

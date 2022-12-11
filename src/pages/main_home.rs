@@ -73,6 +73,8 @@ impl Component for MainHome {
                             kind: WebsocketMessageType::Online,
                             user: None,
                             payload: None,
+                            saves: None,
+                            chargen_data: None,
                         };
                         global_vars.send_websocket.emit( msg );
                     }}

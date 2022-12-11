@@ -18,6 +18,16 @@ pub fn handle_message(
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             new_global_vars.user_loading = false;
+            match msg.user {
+                Some( user ) =>  {
+                    new_global_vars.current_user = user.clone();
+                }
+                None => {
+
+                }
+            }
+
+            log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
             global_vars.update_global_vars.emit( new_global_vars );
         }
 
@@ -29,11 +39,27 @@ pub fn handle_message(
             global_vars.update_global_vars.emit( new_global_vars );
         }
 
+        WebsocketMessageType::ChargenData => {
+            log!( format!("handle_message ChargenData {:?}", msg) );
+            // let mut new_global_vars = global_vars.clone();
+            // new_global_vars.offline = true;
+            // new_global_vars.user_loading = false;
+            // global_vars.update_global_vars.emit( new_global_vars );
+        }
+
+        WebsocketMessageType::Saves => {
+            log!( format!("handle_message Saves {:?}", msg) );
+            // let mut new_global_vars = global_vars.clone();
+            // new_global_vars.offline = true;
+            // new_global_vars.user_loading = false;
+            // global_vars.update_global_vars.emit( new_global_vars );
+        }
+
         _ => {
             error!( format!("Unhandled Message Type! {:?}", msg ) );
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
-            global_vars.update_global_vars.emit( new_global_vars );
+            // global_vars.update_global_vars.emit( new_global_vars );
         }
     }
 }

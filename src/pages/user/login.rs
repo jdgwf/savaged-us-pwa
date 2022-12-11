@@ -203,7 +203,6 @@ impl Component for UserLogin {
                             let mut global_vars = global_vars.clone();
                             global_vars.offline = true;
                             global_vars.update_global_vars.emit( global_vars.clone() );
-                            log!("???");
                         }
                     }
                 }
