@@ -7,6 +7,7 @@ use standard_components::ui::nbsp::Nbsp;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::ui_page::UIPage;
 use serde_json::Error;
 use crate::libs::fetch_api::savaged_login;
 use gloo_console::error;
@@ -220,6 +221,11 @@ impl Component for UserLogin {
 
 
             html! {
+            <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Login"
+                submenu_tag={"".to_owned()}
+            >
                 <div class={"main-content"}>
                     <h1>{ "Savaged.us Login" }</h1>
                     // {"ID: "}{global_vars.current_user.id}<br />
@@ -308,6 +314,7 @@ impl Component for UserLogin {
 
                 </div>
 
+                </UIPage>
             }
         }
     }

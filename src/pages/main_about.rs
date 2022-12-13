@@ -1,4 +1,5 @@
 use yew::{function_component, Properties, Html, html};
+use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::content_box::ContentBox;
@@ -18,7 +19,10 @@ pub fn main_about(
         props.global_vars.no_calls,
     );
     html! {
-        <div class={"main-content"}>
+    <UIPage
+        global_vars={props.global_vars.clone()}
+        page_title="About"
+    >
             <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>
             <div class="row">
         <div class="col-md-6">
@@ -135,7 +139,7 @@ pub fn main_about(
 
         </div>
     </div>
-        </div>
+        </UIPage>
     }
 }
 

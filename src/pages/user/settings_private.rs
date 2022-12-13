@@ -4,6 +4,7 @@ use standard_components::ui::input_text::InputText;
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::nbsp::Nbsp;
 use standard_components::libs::set_document_title::set_document_title;
+use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::update_user;
 use serde_json;
 use crate::libs::global_vars::GlobalVars;
@@ -308,22 +309,35 @@ impl Component for SettingsPrivate {
     ) -> Html {
 
         // let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = self.global_vars.clone();
 
         if self.global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if self.global_vars.current_user.id == 0 {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not logged in!"}
                 </div>
+                </UIPage>
             }
         }
 
@@ -350,8 +364,14 @@ impl Component for SettingsPrivate {
             }
         }
 
+        global_vars.current_sub_menu = "settings_private".to_owned();
+
         html! {
-            <>
+            <UIPage
+                global_vars={global_vars}
+                page_title="Private Settings"
+                submenu_tag={"user".to_owned()}
+            >
             <h2><i class={"fa-solid fa-user-secret"}></i><Nbsp />{"Private Settings"}</h2>
             <div class={"alert alert-success text-center"}>
                 {"The data in the section is strictly between you and Savaged.us. We won't share anything here with anyone else."}
@@ -520,7 +540,7 @@ impl Component for SettingsPrivate {
                     </fieldset>
                 </div>
             </div>
-            </>
+            </UIPage>
         }
 
     }

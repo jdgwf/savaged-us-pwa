@@ -1,6 +1,6 @@
 pub mod handle_message;
-use std::thread::sleep;
-
+// use std::thread::sleep;
+// use gloo_timers::callback::Timeout;
 use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
 use gloo_net::websocket::{
     Message,
@@ -9,11 +9,11 @@ use gloo_net::websocket::{
 };
 use gloo_console::log;
 use gloo_console::error;
-use savaged_libs::websocket_message::WebSocketMessage;
+// use savaged_libs::websocket_message::WebSocketMessage;
 use wasm_bindgen_futures::spawn_local;
 use yew::Callback;
 
-use crate::libs::global_vars::GlobalVars;
+// use crate::libs::global_vars::GlobalVars;
 
 pub struct WebsocketService {
     pub tx: Sender<String>,
@@ -25,7 +25,7 @@ impl WebsocketService {
         server_root: String,
         received_message_callback: &Callback<String>,
         websocket_offline_callback: &Callback<bool>,
-        login_token: String,
+        _login_token: String,
     ) -> Self {
 
         let wss_url = server_root
@@ -33,7 +33,10 @@ impl WebsocketService {
             .replace("https://", "wss://")
             + &"/_ws".to_owned();
 
-        let mut ws = WebSocket::open( &wss_url ).unwrap();
+        let mut ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
+
+        log!("Attempting connection via web socket...");
+
 
         match ws.state() {
             State::Closed => {
@@ -42,10 +45,10 @@ impl WebsocketService {
 
             _ => {
 
+
             }
         }
 
-        log!("Attempting connection via web socket...");
 
         let (mut write, mut read) = ws.split();
 
@@ -61,6 +64,10 @@ impl WebsocketService {
         });
         websocket_offline_callback.emit( false );
 
+        // spawn_local(async move {
+        //     send_ping( &mut &ws );
+        // });
+
         let received_message_callback = received_message_callback.clone();
         let websocket_offline_callback = websocket_offline_callback.clone();
         spawn_local(async move {
@@ -68,7 +75,6 @@ impl WebsocketService {
             while let Some(msg) = read.next().await {
                 match msg {
                     Ok(Message::Text(val)) => {
-
                         received_message_callback.emit( val.to_string()  );
                         websocket_offline_callback.emit( false );
                     }
@@ -103,7 +109,7 @@ impl WebsocketService {
 }
 
 
-pub fn connect_to_websocket(
+pub fn connect_to_websocket<'ping>(
     server_root: String,
     received_message_callback: &Callback<String>,
     websocket_offline_callback: &Callback<bool>,
@@ -117,3 +123,18 @@ pub fn connect_to_websocket(
         login_token,
     );
 }
+
+// fn send_ping( ws: &mut WebSocket ) {
+//     log!("send ping");
+//     ws.send(Message::Text("__ping__".to_string()));
+
+//     let timeout = Timeout::new(
+//         5_000,
+//         move || {
+
+//             // send_ping( ws );
+//         }
+//     );
+
+//     timeout.forget();
+// }

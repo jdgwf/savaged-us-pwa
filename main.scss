@@ -144,6 +144,7 @@ body {
                         margin: 0;
                         padding: 0;
                         display: block;
+                        position: relative;
 
                         > a {
                             border-radius: 0.5rem;
@@ -369,7 +370,7 @@ body {
                 margin: 0;
                 padding: 0;
                 display: inline;
-
+                position: relative;
                 a {
                     cursor: pointer;
                     display: block;

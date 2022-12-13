@@ -10,6 +10,7 @@ use wasm_bindgen_futures::spawn_local;
 use gloo_console::error;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
+use crate::components::ui_page::UIPage;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsDevicesProps {
@@ -88,19 +89,31 @@ impl Component for SettingsDevices {
         );
         if global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if global_vars.current_user.id == 0 {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not logged in!"}
                 </div>
+                </UIPage>
             }
         }
 
@@ -110,8 +123,16 @@ impl Component for SettingsDevices {
 
         let update_login_tokens = ctx.link().callback(SettingsDevicesMessages::UpdateLoginItems);
 
+        let mut global_vars = self.global_vars.clone();
+
+        global_vars.current_sub_menu = "settings_devices".to_owned();
+
         html! {
-            <>
+            <UIPage
+                global_vars={global_vars}
+                page_title="Devices"
+                submenu_tag={"user".to_owned()}
+            >
                 <h2><i class={"fa-solid fa-computer"}></i><Nbsp />{"Device Login Tokens"}</h2>
 
                 <table class={"edit-table alternating"}>
@@ -144,7 +165,7 @@ impl Component for SettingsDevices {
                     }).collect::<Html>()}
 
                 </table>
-            </>
+            </UIPage>
 
         }
 

@@ -2,6 +2,7 @@ use yew::prelude::*;
 // use standard_components::ui::input_text::InputText;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
+use crate::components::ui_page::UIPage;
 
 // use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
@@ -29,7 +30,7 @@ pub enum RegisterMessage {
 }
 
 pub struct Register {
-    global_vars: GlobalVars,
+    // global_vars: GlobalVars,
 }
 
 impl Component for Register {
@@ -44,7 +45,6 @@ impl Component for Register {
 
         set_document_title(global_vars.site_title.to_owned(), "Register".to_owned(), global_vars.no_calls,);
         Register {
-            global_vars: global_vars,
         }
     }
 
@@ -56,28 +56,39 @@ impl Component for Register {
         let global_vars = ctx.props().global_vars.clone();
         if global_vars.user_loading {
             return html! {
-                <div class={"main-content"}>
-                <div class={"text-center"}>
+                <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Register"
+                submenu_tag={"".to_owned()}
+            >                <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
-                </div>
+                </UIPage>
             }
         }
         if global_vars.current_user.id > 0 {
             return html! {
-                <div class={"main-content"}>
-                <div class={"text-center"}>
+                <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Register"
+                submenu_tag={"".to_owned()}
+            >                <div class={"text-center"}>
                     <br />
                     {"You are already logged in!"}
                 </div>
-                </div>
+                </UIPage>
             }
         }
         html! {
-            <div class={"main-content"}>
+            <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Register"
+                submenu_tag={"".to_owned()}
+            >
+
                 <h2><i class={"fa-solid fa-cogs"}></i><Nbsp />{"TODO: Register"}</h2>
-            </div>
+            </UIPage>
 
         }
 

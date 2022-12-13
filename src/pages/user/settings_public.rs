@@ -5,6 +5,7 @@ use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::nbsp::Nbsp;
 use web_sys::{HtmlInputElement};
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::ui_page::UIPage;
 
 use standard_components::libs::set_document_title::set_document_title;
 use chrono::Utc;
@@ -458,22 +459,35 @@ impl Component for SettingsPublic {
     ) -> Html {
 
         // let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = self.global_vars.clone();
 
         if self.global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if self.global_vars.current_user.id == 0 {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not logged in!"}
                 </div>
+                </UIPage>
             }
         }
 
@@ -487,8 +501,15 @@ impl Component for SettingsPublic {
                 share_settings_save_disabled = false;
             }
 
+
+        global_vars.current_sub_menu = "settings_public".to_owned();
+
         html! {
-            <>
+            <UIPage
+                global_vars={global_vars}
+                page_title="Public Settings"
+                submenu_tag={"user".to_owned()}
+            >
                 <h2><i class={"fa-solid fa-globe"}></i><Nbsp />{"Public Settings"}</h2>
                 <div class={"alert alert-warning"}>
                     {"Anything here can potentially be shared on the public side, so if you wish to remain anonymous to everyone this is the place to do it!"}
@@ -658,7 +679,7 @@ impl Component for SettingsPublic {
                     </div>
                 </div>
 
-            </>
+            </UIPage>
 
         }
 

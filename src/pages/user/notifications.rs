@@ -1,6 +1,7 @@
 use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
 
+use crate::components::ui_page::UIPage;
 use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::raw_html::RawHtml;
 use standard_components::ui::input_checkbox::InputCheckbox;
@@ -24,7 +25,6 @@ pub struct UserNotificationsProps {
     pub global_vars: GlobalVars,
     pub update_global_vars: Callback<GlobalVars>,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
-
 }
 
 pub enum UserNotificationsMessage {
@@ -477,24 +477,45 @@ impl Component for UserNotifications {
 
         if global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if global_vars.current_user.id == 0 {
             return html! {
-                <div class={"text-center"}>
-                    <br />
-                    {"You are not logged in!"}
-                </div>
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
+                    <div class={"text-center"}>
+                        <br />
+                        {"You are not logged in!"}
+                    </div>
+                </UIPage>
             }
         }
 
+
+        let mut global_vars = self.global_vars.clone();
+
+        global_vars.current_sub_menu = "settings_notifications".to_owned();
+
         html! {
-            <>
+        <UIPage
+            global_vars={global_vars}
+            page_title="Notifications"
+            submenu_tag={"user".to_owned()}
+        >
                 <h2><i class={"fa-solid fa-radio"}></i><Nbsp />{"My Notifications"}</h2>
                 <div>
 
@@ -590,7 +611,7 @@ impl Component for UserNotifications {
                     }
 
                 </table>
-            </>
+            </UIPage>
 
         }
 

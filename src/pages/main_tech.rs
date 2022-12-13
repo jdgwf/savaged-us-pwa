@@ -1,4 +1,5 @@
 use yew::{function_component, Properties, Html, html};
+use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::libs::set_document_title::set_document_title;
 
@@ -17,7 +18,10 @@ pub fn main_tech(
         props.global_vars.no_calls,
     );
     html! {
-        <div class={"main-content"}>
+    <UIPage
+        global_vars={props.global_vars.clone()}
+        page_title="About"
+    >
             <h2><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</h2>
             <p class="text-center"><strong>{"Version"}<Nbsp />{env!("CARGO_PKG_VERSION")}</strong></p>
             <p>{"This web app uses the following technologies:"}</p>
@@ -54,7 +58,7 @@ pub fn main_tech(
                     {"A CSS precompiler which, for me, makes CSS so much cleaner to edit."}
                 </li>
             </ul>
-        </div>
+        </UIPage>
     }
 }
 

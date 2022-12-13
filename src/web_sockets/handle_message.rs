@@ -14,7 +14,6 @@ pub fn handle_message(
 ) {
     match msg.kind {
         WebsocketMessageType::Online => {
-            // log!( format!("handle_message Online {:?}", msg) );
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             new_global_vars.user_loading = false;

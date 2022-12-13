@@ -17,6 +17,7 @@ use gloo_console::error;
 // use gloo_utils::format::JsValueSerdeExt;
 use crate::libs::global_vars::GlobalVars;
 use gloo_utils::format::JsValueSerdeExt;
+use crate::components::ui_page::UIPage;
 
 // use savaged_libs::user::User;
 
@@ -159,33 +160,58 @@ impl Component for SettingsAPIKey {
 
         if global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if global_vars.current_user.id == 0 {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not logged in!"}
                 </div>
+                </UIPage>
             }
         }
 
         if !global_vars.current_user.is_premium {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not a WildCard subscriber!"}
                 </div>
+                </UIPage>
             }
         }
+        let mut global_vars = self.global_vars.clone();
+
+        global_vars.current_sub_menu = "settings_apikey".to_owned();
 
         html! {
-            <>
+            <UIPage
+                global_vars={global_vars.clone()}
+                page_title="API Key"
+                submenu_tag={"user".to_owned()}
+            >
                 <h2><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</h2>
                 <p>{"If you're planning on using the Savaged.us API and want to get more data than unregistered users, then you'll have to generate an API key to get to your data."}</p>
 
@@ -219,7 +245,7 @@ impl Component for SettingsAPIKey {
                         <i class={"fa fa-refresh"} /><Nbsp />{"Regenerate API Key"}
                     </button>
                 </div>
-            </>
+            </UIPage>
 
         }
 

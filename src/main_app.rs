@@ -1,19 +1,16 @@
-use std::ops::Deref;
 
-use gloo_timers::callback::Timeout;
+
 use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
+
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use standard_components::libs::set_document_title::set_document_title;
+
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::ui::nbsp::Nbsp;
-use crate::libs::fetch_api::fetch_api;
-use crate::libs::global_vars;
-use crate::pages::user::login::_UserLoginProps::update_global_vars;
+
 use crate::web_sockets::connect_to_websocket;
 use gloo_console::error;
 use gloo_console::log;
@@ -25,6 +22,7 @@ use crate::pages::main_todos::MainTodos;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
+use crate::pages::user_data::user_data_router::UserDataRouter;
 use crate::web_sockets::WebsocketService;
 use crate::web_sockets::handle_message::handle_message;
 use serde_json::Error;
@@ -32,28 +30,21 @@ use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
 use crate::libs::global_vars::GlobalVars;
-use gloo_utils::format::JsValueSerdeExt;
 
-use wasm_bindgen_futures::spawn_local;
 use crate::pages::user::user_router::UserRoute;
 use crate::pages::user::user_router::UserRouter;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 
 use savaged_libs::user::User;
 
-use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
-use gloo_net::websocket::{
-    Message,
-    futures::WebSocket,
-    State,
-
-};
 use gloo_timers::callback::Interval;
 
-#[derive(Clone, Routable, PartialEq)]
+#[derive(Clone, Routable, PartialEq, Debug)]
 pub enum MainRoute {
     #[at("/")]
     Home,
+    #[at("/my-data/*")]
+    UserDataRouter,
     #[at("/me/*")]
     UserRouter,
     #[at("/me")]
@@ -94,7 +85,6 @@ pub enum MainAppMessage {
     ToggleMobileMenu(bool),
     HidePopupMenus(bool),
 
-    UpdateCurrentUser( User ),
     UpdateGlobalVars( GlobalVars ),
     ContextUpdated( GlobalVarsContext ),
     LogOut( String ),
@@ -117,7 +107,6 @@ pub struct MainApp {
     current_unread_notifications: u32,
     current_sub_menu: String,
 
-    interval: Option<Interval>,
     confirmation_dialog_open: bool,
     confirmation_dialog_properties: ConfirmationDialogDefinition,
 
@@ -132,18 +121,25 @@ fn content_switch(
     base_update_global_vars: &Callback<GlobalVars>,
     open_confirmation_dialog: &Callback<ConfirmationDialogDefinition>,
     _show_mobile_menu: bool,
+    on_click_hide_popup_menus: &Callback<MouseEvent>,
+    toggle_mobile_menu_callback: &Callback<MouseEvent>,
 
 ) -> Html {
 
+    let mut global_vars = global_vars.clone();
+    global_vars.current_menu = format!("{}-{:?}", "main", routes ).to_lowercase();
+    global_vars.current_sub_menu = "".to_string();
+    global_vars.hide_popup_menus_callback = on_click_hide_popup_menus.clone();
+    global_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.clone();
+    global_vars.logout_callback = on_logout_action.clone();
     match routes {
         MainRoute::Home => {
 
             html! {
-
                 <MainHome
                     global_vars={global_vars}
-                />
 
+                />
             }
         },
         MainRoute::About => {
@@ -165,14 +161,17 @@ fn content_switch(
             html! {
                 <MainTech
                     global_vars={global_vars}
+
                 />
             }
         },
+
         MainRoute::ToDos => {
 
             html! {
                 <MainTodos
                     global_vars={global_vars}
+
                 />
             }
         },
@@ -181,6 +180,7 @@ fn content_switch(
             html! {
                 <MainPlayground
                     global_vars={global_vars}
+
                 />
             }
         },
@@ -192,16 +192,30 @@ fn content_switch(
                     on_logout_action={on_logout_action}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
 
+        MainRoute::UserDataRouter => {
+            html! {
+                <UserDataRouter
+                    global_vars={global_vars}
+                    set_submenu={submenu_callback}
+                    on_logout_action={on_logout_action}
+                    update_global_vars={base_update_global_vars}
+                    open_confirmation_dialog={open_confirmation_dialog}
+
+                />
+            }
+        }
         MainRoute::UserLogin => {
             html! {
                 <UserLogin
                     global_vars={global_vars}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -210,6 +224,7 @@ fn content_switch(
                 <ForgotPassword
                     global_vars={global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -218,6 +233,7 @@ fn content_switch(
                 <Register
                     global_vars={global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -227,236 +243,6 @@ fn content_switch(
         }
     }
 
-}
-
-fn top_menu_switch(
-    routes: MainRoute,
-    submenu: Html,
-    mobile_menu_callback: &Callback<MouseEvent>,
-    global_vars: GlobalVars,
-    _show_mobile_menu: bool,
-) -> Html {
-    let mut home_class_active = "".to_owned();
-    let mut login_class_active = "login-item".to_owned();
-    let mut about_class_active = "".to_owned();
-
-    let mut todos_class_active = "".to_owned();
-    let mut tech_class_active = "".to_owned();
-    let mut playground_class_active = "".to_owned();
-    match routes {
-        MainRoute::Tech => {
-            // test_sheet_class_active = "active".to_owned();
-            tech_class_active = "active".to_owned();
-        },
-        MainRoute::Home => {
-            home_class_active = "active".to_owned();
-
-        },
-        MainRoute::UserRouter => {
-            // test_sheet_class_active = "active".to_owned();
-            login_class_active = "login-item active".to_owned();
-        },
-
-        MainRoute::Register => {
-            if global_vars.current_user.id == 0 {
-                login_class_active = "login-item active".to_owned();
-            }
-        },
-        MainRoute::ForgotPassword => {
-            if global_vars.current_user.id == 0 {
-                login_class_active = "login-item active".to_owned();
-            }
-        },
-        MainRoute::UserLogin => {
-            if global_vars.current_user.id == 0 {
-                login_class_active = "login-item active".to_owned();
-            }
-        },
-
-        MainRoute::About => {
-            about_class_active = "active".to_owned();
-        },
-        MainRoute::ToDos => {
-            todos_class_active = "active".to_owned();
-        },
-        MainRoute::Playground => {
-            playground_class_active = "active".to_owned();
-        },
-        MainRoute::UserRouterRedirect => {
-        }
-
-        MainRoute::NotFound => {
-
-        },
-    }
-
-    html! {
-        <header>
-            <div class={"width-limit"}>
-            <img src="/images/svgd-us.webp" class={"main-logo"} />
-            </div>
-            <h1>{"Savaged.us v4"}</h1>
-            <div class={"top-menu-bottom"}>
-            <div class={"width-limit"}>
-            <ul class={"top-menu"}>
-
-                <li class={"mobile-menu-button"}>
-                    <svg onclick={mobile_menu_callback} stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>
-                </li>
-                <li class={home_class_active}>
-                    <Link<MainRoute> to={MainRoute::Home}><i class="fa fa-house" /><Nbsp />{"Home"}</Link<MainRoute>>
-                </li>
-                // <li class={test_sheet_class_active}>
-                //     <Link<MainRoute> to={MainRoute::TestSheetRouter { sub_route: "home".to_owned() }}>{"Test Sheet"}</Link<MainRoute>>
-                // </li>
-                <li class={about_class_active}>
-                    <Link<MainRoute> to={MainRoute::About}><i class="fa fa-circle-info" /><Nbsp />{"About"}</Link<MainRoute>>
-                </li>
-                <li class={tech_class_active}>
-                    <Link<MainRoute> to={MainRoute::Tech}><i class="fa fa-microchip" /><Nbsp />{"Tech"}</Link<MainRoute>>
-                </li>
-                <li class={todos_class_active}>
-                    <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
-                </li>
-                // <li class={playground_class_active}>
-                //     <Link<MainRoute> to={MainRoute::Playground}><i class="fa fa-list" /><Nbsp />{"Playground"}</Link<MainRoute>>
-                // </li>
-                <li class={login_class_active}>
-                    if global_vars.offline {
-                        <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
-                            {"OFFLINE"}
-                            <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
-                        </div>
-                    }
-                    if global_vars.current_user.id > 0 && !global_vars.offline {
-                        <div class="user-login-badge">
-                        <Link<UserRoute> to={UserRoute::SettingsPrivate}>
-                            if global_vars.current_user.unread_notifications > 0 {
-                                <div class={"unread-notifications"}>{global_vars.current_user.unread_notifications}</div>
-                            }
-                            <img
-                            src={global_vars.current_user.get_image( &global_vars.server_root )}
-                            />
-
-                        </Link<UserRoute>>
-                        </div>
-                    } else {
-                        <>
-                            if !global_vars.offline {
-                                <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
-                            }
-                        </>
-                    }
-                </li>
-
-            </ul>
-            </div>
-            </div>
-            <div class={"width-limit"}>
-                {submenu}
-            </div>
-        </header>
-    }
-}
-
-fn mobile_menu_switch(
-    routes: MainRoute,
-    submenu: Html,
-    hide_popup_menus_callback: &Callback<MouseEvent>,
-    global_vars: GlobalVars,
-    show_mobile_menu: bool,
-) -> Html {
-    let mut home_class_active = "".to_owned();
-    // let mut test_sheet_class_active = "".to_owned();
-    let mut about_class_active = "".to_owned();
-    let mut playground_class_active = "".to_owned();
-    let mut todos_class_active = "".to_owned();
-    let mut settings_class_active: String = "".to_owned();
-    let mut home_submenu = html! { <></> };
-    // let mut test_sheet_submenu = html! { <></> };
-    let mut about_submenu = html! { <></> };
-    let mut todos_submenu = html! { <></> };
-    let mut settings_submenu = html! { <></> };
-    let mut tech_class_active = "".to_owned();
-    match routes {
-        MainRoute::Tech => {
-            // test_sheet_class_active = "active".to_owned();
-            tech_class_active = "active".to_owned();
-        },
-        MainRoute::Home => {
-            home_class_active = "active".to_owned();
-            home_submenu = submenu;
-        },
-        MainRoute::UserRouterRedirect => {
-            settings_submenu = submenu;
-        }
-        MainRoute::UserLogin => {
-
-        },
-        MainRoute::Register => {
-
-        },
-        MainRoute::ForgotPassword => {
-
-        },
-        MainRoute::UserRouter => {
-            settings_class_active = "active".to_owned();
-            settings_submenu = submenu;
-        },
-        MainRoute::About => {
-            about_class_active = "active".to_owned();
-            about_submenu = submenu;
-        },
-        MainRoute::ToDos => {
-            todos_class_active = "active".to_owned();
-            todos_submenu = submenu;
-        },
-        MainRoute::Playground => {
-            playground_class_active = "active".to_owned();
-            // playground_submenu = submenu;
-        },
-        MainRoute::NotFound => {
-
-        },
-    }
-
-    let mut active_class = "mobile-menu";
-
-    if show_mobile_menu {
-        active_class = "mobile-menu show-mobile-menu"
-    }
-
-    html! {
-        <div class={active_class}>
-            <ul onclick={hide_popup_menus_callback} class={"main-menu"}>
-                <li class={home_class_active}>
-                    <Link<MainRoute> to={MainRoute::Home}><i class="fa fa-house" /><Nbsp />{"Home"}</Link<MainRoute>>
-                    {home_submenu}
-                </li>
-                <li class={about_class_active}>
-                    <Link<MainRoute> to={MainRoute::About}><i class="fa fa-circle-info" /><Nbsp />{"About"}</Link<MainRoute>>
-                </li>
-                <li class={tech_class_active}>
-                    <Link<MainRoute> to={MainRoute::Tech}><i class="fa fa-microchip" /><Nbsp />{"Tech"}</Link<MainRoute>>
-                </li>
-                <li class={todos_class_active}>
-                    <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
-                    {todos_submenu}
-                </li>
-                // <li class={playground_class_active}>
-                //     <Link<MainRoute> to={MainRoute::Playground}><i class="fa fa-list" /><Nbsp />{"Playground"}</Link<MainRoute>>
-                // </li>
-                if global_vars.current_user.id > 0 {
-                    <li class={settings_class_active}>
-                        <Link<UserRoute> to={UserRoute::SettingsPrivate}>{"Settings"}</Link<UserRoute>>
-                        {settings_submenu}
-                    </li>
-                }
-
-            </ul>
-
-        </div>
-    }
 }
 
 impl Component for MainApp {
@@ -477,10 +263,10 @@ impl Component for MainApp {
         let mut global_vars = (*global_vars_context).clone();
 
         // let login_token = global_vars.login_token.to_owned();
-        let api_root = global_vars.api_root.to_owned();
+        // let api_root = global_vars.api_root.to_owned();
 
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
-        let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        // let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
         // global_vars.update_global_vars = base_update_global_vars;
         global_vars.send_websocket = send_websocket;
 
@@ -491,19 +277,7 @@ impl Component for MainApp {
         if !login_token.is_empty() {
             login_token_send = Some(login_token);
         }
-        let msg = WebSocketMessage {
-            token: login_token_send,
-            kind: WebsocketMessageType::Online,
-            user: None,
-            payload: None,
-            updated_on: None,
-            chargen_data: None,
-            saves: None,
-        };
 
-        global_vars.send_websocket.emit( msg );
-
-        let login_token = global_vars.login_token.to_owned();
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
@@ -515,67 +289,14 @@ impl Component for MainApp {
             global_vars.login_token.to_owned(),
         );
 
-        // if !&global_vars.login_token.is_empty() && !global_vars.no_calls {
-        //     let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
-        //     // let other_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        let mut msg = WebSocketMessage::default();
 
-        //     let mut global_vars = global_vars.clone();
-
-        //     let global_vars_context = global_vars_context.clone();
-        //     spawn_local (
-        //         async move {
-        //             let result = fetch_api(
-        //                 (api_root + "/auth/get-user-data").to_owned(),
-        //                 "".to_owned(),
-        //                 login_token,
-        //             ).await;
-
-        //             global_vars.user_loading = false;
-
-        //             global_vars_context.dispatch( global_vars.to_owned() );
-
-        //             match result {
-        //                 Ok( value ) => {
-        //                     // let vec_val_result = value.into_serde::<User>();
-        //                     let vec_val_result: Result<User, Error> = JsValueSerdeExt::into_serde(&value);
-        //                     match vec_val_result {
-        //                         Ok( vec_val ) => {
-        //                             update_current_user.emit( vec_val.clone() );
-        //                             // log!("get_data_via_fetch vec_val_result", &vec_val.share_bio );
-
-        //                         }
-        //                         Err( err ) => {
-        //                             let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-        //                             update_current_user.emit( User::default() );
-        //                             error!( &err_string  );
-        //                         }
-        //                     }
-
-        //                 }
-        //                 Err( err ) => {
-        //                     update_current_user.emit( User::default() );
-        //                     error!("get_data_via_fetch Err()", &err );
-        //                 }
-        //             }
-
-        //             // other_update_global_vars.emit( global_vars );
-
-        //         }
+        msg.token = login_token_send;
+        msg.kind = WebsocketMessageType::Online;
 
 
 
-        //     );
-        // } else {
-        //     global_vars.user_loading = false;
-        //     let update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
-        //     update_current_user.emit( User::default().clone() );
-        // }
-
-        // let wss = WebsocketService::new(
-        //     global_vars.server_root.to_owned(),
-        //     received_message_callback,
-        //     websocket_offline_callback,
-        // );
+        global_vars.send_websocket.emit( msg );
 
 
 
@@ -587,7 +308,6 @@ impl Component for MainApp {
             current_sub_menu: "".to_owned(),
             current_unread_notifications: 0,
             confirmation_dialog_open: false,
-            interval: None,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
             wss: wss,
 
@@ -614,46 +334,19 @@ impl Component for MainApp {
         msg: MainAppMessage,
     ) -> bool {
 
-        // let ( global_vars_context, _global_vars_context_handler ) = ctx
-        //     .link()
-        //     .context::<GlobalVarsContext>(
-        //         Callback::noop()
-        //     )
-        //     .expect("global_vars context was not set");
-        // let global_vars = (*global_vars_context).clone();
-
-        let global_vars = self.global_vars.clone();
-
-        // log!( format!("main_app update called {:?}, {:?}", self.global_vars.current_user.id, global_vars.current_user.id) );
-        // log!( format!("main_app self.global_vars.user_loading {:?}", self.global_vars.user_loading ) );
-        // log!( format!("main_app self.global_vars.offline {:?}", self.global_vars.offline ) );
-
-        // self.global_vars = (*global_vars_context).clone();
 
 
-
-        // if global_vars.offline {
-        // // if !global_vars.login_token.is_empty() {
-        //     let msg = WebSocketMessage {
-        //         token: Some(global_vars.login_token.to_owned()),
-        //         kind: WebsocketMessageType::Online,
-        //         user: None,
-        //         payload: None,
-        //     };
-        //     ctx.link().callback(MainAppMessage::SendWebSocket).emit( msg );
-
-        // // }
-        // }
-
+        // let global_vars = self.global_vars.clone();
 
         match msg {
             MainAppMessage::ToggleMobileMenu( _new_value ) => {
-                self.show_mobile_menu = !self.show_mobile_menu;
+                log!("ToggleMobileMenu called");
+                self.global_vars.show_mobile_menu = !self.global_vars.show_mobile_menu;
                 return true;
             }
 
             MainAppMessage::HidePopupMenus( _new_value ) => {
-                self.show_mobile_menu = false;
+                self.global_vars.show_mobile_menu = false;
                 return true;
             }
 
@@ -685,25 +378,13 @@ impl Component for MainApp {
                 return true;
             }
 
-            MainAppMessage::UpdateCurrentUser( new_value ) => {
-                // log!("UpdateCurrentUser", new_value.id, new_value.unread_notifications);
-                let mut global_vars = self.global_vars.clone();
-
-                global_vars.current_user = new_value.clone();
-                global_vars.user_loading = false;
-
-                self.global_vars = global_vars.clone();
-                self.global_vars_context.dispatch( self.global_vars.to_owned() );
-
-
-                return true;
-            }
-
             MainAppMessage::LogOut( _new_value ) => {
 
                 // log!("LogOut?");
                 self.global_vars.current_user = User::default();
                 self.show_mobile_menu = false;
+                self.global_vars.saves = None;
+                self.global_vars.chargen_data = None;
 
                 self.global_vars.login_token = "".to_owned();
                 self.global_vars.user_loading = false;
@@ -730,7 +411,7 @@ impl Component for MainApp {
                                 // log!("MainWebAppMessages::SendWebSocket called (Ok)");
                                 return false;
                             }
-                            Err( err ) => {
+                            Err( _err ) => {
                                 // error!("MainWebAppMessages::SendWebSocket json send error", err.to_string(), send_data.to_owned() );
                                 return false;
                             }
@@ -773,6 +454,7 @@ impl Component for MainApp {
             }
 
             MainAppMessage::ReceivedWebSocket( sent_data ) => {
+
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
                 // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
@@ -822,8 +504,8 @@ impl Component for MainApp {
 
         let show_mobile_menu = self.show_mobile_menu;
         // // log!("main_app view", self.global_vars.current_user.unread_notifications);
-        let submenu = self.submenu.clone();
-        let mobile_submenu = self.submenu.clone();
+        // let submenu = self.submenu.clone();
+        // let mobile_submenu = self.submenu.clone();
 
 
 
@@ -850,32 +532,17 @@ impl Component for MainApp {
 
         });
 
-        let mut active_class = "content-pane";
+        // let mut active_class = "content-pane";
 
-        if show_mobile_menu {
-            active_class = "content-pane show-mobile-menu"
-        }
+        // if show_mobile_menu {
+        //     active_class = "content-pane show-mobile-menu"
+        // }
 
-        let global_vars1 = self.global_vars.clone();
-        let global_vars2 = self.global_vars.clone();
+        // let global_vars1 = self.global_vars.clone();
+        // let global_vars2 = self.global_vars.clone();
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
-        // let global_vars5 = self.global_vars.clone();
 
-        // let login_token= self.global_vars.login_token.to_owned();
-        // let callback_content =
-        //     move |routes| {
-        //         content_switch(
-        //             routes,
-        //             &set_submenu,
-        //             global_vars3.clone(),
-        //             &on_logout_action,
-        //             &update_global_vars,
-        //             &open_confirmation_dialog,
-        //             show_mobile_menu,
-        //         )
-        //     }
-        // ;
 
         html! {
 
@@ -888,30 +555,8 @@ impl Component for MainApp {
                     />
                 }
 
-                <BrowserRouter>
-                    <Switch<MainRoute> render={
-                        move |routes|
-                        top_menu_switch(
-                            routes,
-                            submenu.clone(),
-                            &on_click_toggle_mobile_menu,
-                            global_vars1.clone(),
-                            show_mobile_menu,
-                        )
-                    } />
 
-                <div class={"position-relative"}>
-                <Switch<MainRoute> render={
-                    move |routes|
-                    mobile_menu_switch(
-                        routes,
-                        mobile_submenu.clone(),
-                        &on_click_hide_popup_menus,
-                        global_vars2.clone(),
-                        show_mobile_menu,
-                    )
-                } />
-                    <div class={active_class}>
+                <BrowserRouter>
 
                         <Switch<MainRoute> render={
                             move |routes| {
@@ -923,12 +568,14 @@ impl Component for MainApp {
                                     &base_update_global_vars,
                                     &open_confirmation_dialog,
                                     show_mobile_menu,
+                                    &on_click_hide_popup_menus,
+                                    &on_click_toggle_mobile_menu,
                                 )
                             }
                         } />
-                        <footer class="text-center">{("Connecting to server ").to_owned() + &self.global_vars.server_root}</footer>
-                    </div>
-                </div>
+
+                    // </div>
+                // </div>
                 </BrowserRouter>
             </>
         }

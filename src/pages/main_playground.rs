@@ -1,4 +1,4 @@
-use stdweb::web::Window;
+// use stdweb::web::Window;
 // use savaged_libs::websocket_message::{
 //     WebSocketMessage,
 //     WebsocketMessageType,
@@ -21,7 +21,10 @@ use gloo_console::log;
 // use savaged_libs::user::User;
 // use savaged_libs::user::LoginTokenResult;
 // extern crate stdweb;
-use web_sys::{EventTarget, HtmlElement, MouseEvent, TouchEvent, Touch, TouchList};
+use web_sys::{
+    EventTarget, HtmlElement, MouseEvent, TouchEvent,
+    // Touch, TouchList
+};
 
 #[derive(Properties, PartialEq)]
 pub struct MainPlaygroundProps {
@@ -140,7 +143,7 @@ impl Component for MainPlayground {
                     }
                 // }
                 match self.moving_item.clone() {
-                    Some( mut moving_item ) => {
+                    Some( moving_item ) => {
 
                         let mut style = self.moving_item_original_style.to_owned();
                         style = style + &";z-index: 100".to_owned();
@@ -148,7 +151,7 @@ impl Component for MainPlayground {
                         style = style + &";width: ".to_owned() + &self.moving_item_width.to_string() + &"px";
                         style = style + &";height: ".to_owned() + &self.moving_item_height.to_string() + &"px";
 
-                        moving_item.set_attribute( "style", style.as_str());
+                        let _ = moving_item.set_attribute( "style", style.as_str());
                     }
                     None => {}
                 }
@@ -175,7 +178,7 @@ impl Component for MainPlayground {
 
 
                 match self.moving_item.clone() {
-                    Some( mut moving_item ) => {
+                    Some( moving_item ) => {
 
                         let style_option = moving_item.get_attribute("style");
                         match style_option {
@@ -199,7 +202,7 @@ impl Component for MainPlayground {
                         style = style + &";height: ".to_owned() + &self.moving_item_height.to_string() + &"px";
 
 
-                        moving_item.set_attribute( "style", style.as_str());
+                        let _ = moving_item.set_attribute( "style", style.as_str());
                         // moving_item.style.height = moving_item.client_height();
                         // moving_item.style.width = moving_item.client_width();
                         // moving_item.style.position = "fixed".to_owned();
@@ -218,10 +221,10 @@ impl Component for MainPlayground {
 
             }
 
-            MainPlaygroundMessage::TouchDrop(e) => {
+            MainPlaygroundMessage::TouchDrop(_e) => {
                 // let target = e.target().unwrap();
 
-                let target = e.target();
+                // let target = e.target();
 
                 // target.
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
@@ -230,11 +233,11 @@ impl Component for MainPlayground {
 
 
                 match self.moving_item.clone() {
-                    Some( mut moving_item ) => {
+                    Some( moving_item ) => {
 
-                        let mut style = self.moving_item_original_style.to_owned();
+                        let style = self.moving_item_original_style.to_owned();
 
-                        moving_item.set_attribute( "style", style.as_str());
+                        let _ = moving_item.set_attribute( "style", style.as_str());
 
                     }
                     None => {}
@@ -258,7 +261,7 @@ impl Component for MainPlayground {
 
 
                 match self.moving_item.clone() {
-                    Some( mut current_mover ) => {
+                    Some( current_mover ) => {
 
                         let mut style = self.moving_item_original_style.to_owned();
                         style = style + &";z-index: 100".to_owned();
@@ -335,7 +338,7 @@ impl Component for MainPlayground {
 
 
 
-                        current_mover.set_attribute( "style", style.as_str());
+                        let _ = current_mover.set_attribute( "style", style.as_str());
                         // self.moving_item = Some( current_mover );
 
                         log!("TouchMove ", self.moving_item.clone().unwrap().id(), style);
@@ -358,7 +361,7 @@ impl Component for MainPlayground {
 
 
                 match self.moving_item.clone() {
-                    Some( mut moving_item ) => {
+                    Some( moving_item ) => {
 
                         let style_option = moving_item.get_attribute("style");
                         match style_option {
@@ -382,7 +385,7 @@ impl Component for MainPlayground {
                         style = style + &";height: ".to_owned() + &self.moving_item_height.to_string() + &"px";
 
 
-                        moving_item.set_attribute( "style", style.as_str());
+                        let _ = moving_item.set_attribute( "style", style.as_str());
                         // moving_item.style.height = moving_item.client_height();
                         // moving_item.style.width = moving_item.client_width();
                         // moving_item.style.position = "fixed".to_owned();
@@ -501,7 +504,6 @@ impl Component for MainPlayground {
 
 
         html! {
-            <div class={"main-content"}>
             <div
 
                 onmousemove={ctx.link().callback(MainPlaygroundMessage::MouseMove)}
@@ -576,7 +578,6 @@ impl Component for MainPlayground {
                             }
                     </div>
                 </div>
-            </div>
             </div>
 
         }

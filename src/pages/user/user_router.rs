@@ -48,6 +48,15 @@ fn content_switch(
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
+
+    let mut global_vars = global_vars.clone();
+
+    if global_vars.current_user.id > 0 {
+        global_vars.current_sub_menu = "user".to_owned();
+    } else {
+        global_vars.current_sub_menu = "".to_owned();
+    }
+
     match routes {
 
         UserRoute::SettingsAPIKey => html! {
@@ -100,92 +109,6 @@ fn content_switch(
     }
 }
 
-pub fn top_menu_switch(
-    routes: UserRoute,
-    global_vars: GlobalVars,
-    onclick: &yew::Callback<yew::MouseEvent>,
-) -> Html {
-    let mut private_class_active = "".to_owned();
-    let mut public_class_active = "".to_owned();
-    let mut notifications_class_active = "".to_owned();
-    let mut devices_class_active = "".to_owned();
-    let mut subscriptions_class_active = "".to_owned();
-    let mut api_class_active = "".to_owned();
-
-    // log!("top_menu_switch", global_vars.current_user.unread_notifications);
-    match routes {
-        UserRoute::SettingsAPIKey => {
-            api_class_active = "active".to_owned();
-
-        },
-        UserRoute::SettingsPrivate => {
-            private_class_active = "active".to_owned();
-
-        },
-        UserRoute::Notifications => {
-            notifications_class_active = "active".to_owned();
-        },
-        UserRoute::Subscription => {
-            subscriptions_class_active = "active".to_owned();
-        },
-
-        UserRoute::SettingsPublic => {
-            public_class_active = "active".to_owned();
-        },
-
-        UserRoute::Devices => {
-            devices_class_active = "active".to_owned();
-        },
-        UserRoute::NotFound => {
-
-        },
-    }
-
-    html! {
-        <ul id={"user-menu"} class={"sub-menu"}>
-            <li class={private_class_active}>
-                <Link<UserRoute> to={UserRoute::SettingsPrivate}><i class={"fa-solid fa-user-secret"}></i><Nbsp />{"Private Settings"}</Link<UserRoute>>
-            </li>
-            <li class={public_class_active}>
-                <Link<UserRoute> to={UserRoute::SettingsPublic}><i class={"fa-solid fa-globe"}></i><Nbsp />{"Public Settings"}</Link<UserRoute>>
-            </li>
-            <li class={"position-relative ".to_owned() + &notifications_class_active}>
-                <Link<UserRoute> to={UserRoute::Notifications}>
-                    <i class={"fa-solid fa-radio"}></i><Nbsp />{"Notifications"}
-
-                    if global_vars.current_user.unread_notifications > 0 {
-                        <>
-                            <div class={"notification-spacer"} />
-                            <div id="unread-notifications" class={"unread-notifications"}>
-                                {global_vars.current_user.unread_notifications}
-                            </div>
-
-                        </>
-                    }
-
-                </Link<UserRoute>>
-            </li>
-            <li class={subscriptions_class_active}>
-                <Link<UserRoute> to={UserRoute::Subscription}><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"Subscriptions"}</Link<UserRoute>>
-            </li>
-            <li class={devices_class_active}>
-                <Link<UserRoute> to={UserRoute::Devices}><i class={"fa-solid fa-computer"}></i><Nbsp />{"Devices"}</Link<UserRoute>>
-            </li>
-
-            if global_vars.current_user.is_premium {
-                <li class={api_class_active}>
-                    <Link<UserRoute> to={UserRoute::SettingsAPIKey}><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</Link<UserRoute>>
-                </li>
-            }
-
-            <li class={"logout-item"}>
-                <a {onclick}>
-                    <i class={"fa-solid fa-right-from-bracket"}></i>
-                    <Nbsp />{"Log Out"}</a>
-            </li>
-        </ul>
-    }
-}
 
 #[derive(Properties, PartialEq)]
 pub struct UserRouterProps {
@@ -215,128 +138,18 @@ impl Component for UserRouter {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        let mut submenu_data =
-            SubmenuData {
-                html: html! (<></>),
-                menu: "user-menu-no-user".to_owned(),
-                unread_notifications: ctx.props().global_vars.current_user.unread_notifications,
-            };
-
-        if ctx.props().global_vars.current_user.id > 0  {
-            let on_logout_action = ctx.props().on_logout_action.clone();
-
-            // log!("user_router", global_vars1.current_user.unread_notifications);
-
-            submenu_data.menu = "user-menu".to_owned();
-            submenu_data.html = html! {
-                <BrowserRouter>
-                    <Switch<UserRoute>
-                        render={
-                            move |routes|
-                            top_menu_switch(
-                                routes,
-                                global_vars.clone(),
-                                &on_logout_action,
-                            )
-                        }
-
-                    />
-                </BrowserRouter>
-            };
-
-        }
-        let _ = ctx.props().set_submenu.emit( submenu_data.clone() );
-
-        let global_vars = ctx.props().global_vars.clone();
         UserRouter {
             global_vars: global_vars.clone(),
         }
     }
-
-    // fn update(
-    //     &mut self,
-    //    ctx: &Context<Self>,
-    //     msg: UserRouterMessage,
-    // ) -> bool {
-
-    //     let global_vars = ctx.props().global_vars.clone();
-
-    //     let mut submenu_data =
-    //         SubmenuData {
-    //             html: html! (<></>),
-    //             menu: "user-menu-no-user".to_owned(),
-    //             unread_notifications: ctx.props().global_vars.current_user.unread_notifications,
-    //         };
-
-    //     if ctx.props().global_vars.current_user.id > 0  {
-    //         let on_logout_action = ctx.props().on_logout_action.clone();
-
-    //         // log!("user_router", global_vars1.current_user.unread_notifications);
-
-    //         submenu_data.menu = "user-menu".to_owned();
-    //         submenu_data.html = html! {
-    //             <BrowserRouter>
-    //                 <Switch<UserRoute>
-    //                     render={
-    //                         move |routes|
-    //                         top_menu_switch(
-    //                             routes,
-    //                             global_vars.clone(),
-    //                             &on_logout_action,
-    //                         )
-    //                     }
-
-    //                 />
-    //             </BrowserRouter>
-    //         };
-
-    //     }
-    //     let _ = ctx.props().set_submenu.emit( submenu_data.clone() );
-
-    //     true
-
-    // }
 
     fn changed(
         &mut self,
         ctx: &Context<Self>,
         _props: &UserRouterProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
-
-        let mut submenu_data =
-            SubmenuData {
-                html: html! (<></>),
-                menu: "user-menu-no-user".to_owned(),
-                unread_notifications: self.global_vars.current_user.unread_notifications,
-            };
-
-        if ctx.props().global_vars.current_user.id > 0  {
-            let global_vars = self.global_vars.clone();
-            let on_logout_action = ctx.props().on_logout_action.clone();
-
-            // log!("user_router", global_vars1.current_user.unread_notifications);
-
-            submenu_data.menu = "user-menu".to_owned();
-            submenu_data.html = html! {
-                <BrowserRouter>
-                    <Switch<UserRoute>
-                        render={
-                            move |routes|
-                            top_menu_switch(
-                                routes,
-                                global_vars.clone(),
-                                &on_logout_action,
-                            )
-                        }
-
-                    />
-                </BrowserRouter>
-            };
-
-        }
-        let _ = ctx.props().set_submenu.emit( submenu_data.clone() );
 
         true
     }

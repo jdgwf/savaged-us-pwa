@@ -1,6 +1,7 @@
 use yew::prelude::*;
 // use standard_components::ui::input_text::InputText;
 use standard_components::ui::nbsp::Nbsp;
+use crate::components::ui_page::UIPage;
 
 // use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
@@ -80,29 +81,50 @@ impl Component for UserSubscription {
     ) -> Html {
 
         // let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = self.global_vars.clone();
 
         if self.global_vars.user_loading {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
+                </UIPage>
             }
         }
 
         if self.global_vars.current_user.id == 0 {
             return html! {
+                <UIPage
+                    global_vars={global_vars.clone()}
+                    page_title="Settings"
+                    submenu_tag={"user".to_owned()}
+                >
                 <div class={"text-center"}>
                     <br />
                     {"You are not logged in!"}
                 </div>
+                </UIPage>
             }
         }
 
+
+
+        global_vars.current_sub_menu = "settings_subscription".to_owned();
+
         html! {
-            <>
+            <UIPage
+                global_vars={global_vars}
+                page_title="Subscriptions"
+                submenu_tag={"user".to_owned()}
+            >
                 <h2><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"TODO: My Subscriptions and Purchases"}</h2>
-            </>
+            </UIPage>
         }
 
     }

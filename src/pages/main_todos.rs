@@ -1,4 +1,5 @@
 use yew::{function_component, Properties, Html, html};
+use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::libs::set_document_title::set_document_title;
 
@@ -20,8 +21,10 @@ pub fn main_todos(
     );
 
     html! {
-        <div class={"main-content"}>
-            <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
+    <UIPage
+        global_vars={props.global_vars.clone()}
+        page_title="ToDos"
+    >            <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
             <div class={"row"}>
                 <div class={"col-md"}>
 
@@ -177,7 +180,7 @@ pub fn main_todos(
                     </ul>
                 </div>
             </div>
-        </div>
+        </UIPage>
     }
 }
 

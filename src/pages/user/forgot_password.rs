@@ -6,6 +6,7 @@ use crate::libs::global_vars::GlobalVars;
 // use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::ui_page::UIPage;
 
 // use crate::lib::fetch_api::fetch_api;
 // use crate::lib::fetch_api::savaged_login;
@@ -28,7 +29,7 @@ pub enum ForgotPasswordMessage {
 }
 
 pub struct ForgotPassword {
-    global_vars: GlobalVars,
+    // global_vars: GlobalVars,
 }
 
 impl Component for ForgotPassword {
@@ -43,7 +44,7 @@ impl Component for ForgotPassword {
 
         set_document_title(global_vars.site_title.to_owned(), "Recover Password".to_owned(), global_vars.no_calls,);
         ForgotPassword {
-            global_vars: global_vars,
+            // global_vars: global_vars,
         }
     }
 
@@ -55,28 +56,39 @@ impl Component for ForgotPassword {
         let global_vars = ctx.props().global_vars.clone();
         if global_vars.user_loading {
             return html! {
-                <div class={"main-content"}>
+                <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Forgot Password"
+                submenu_tag={"".to_owned()}
+            >
                 <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
-                </div>
+                </UIPage>
             }
         }
         if global_vars.current_user.id > 0 {
             return html! {
-                <div class={"main-content"}>
-                <div class={"text-center"}>
+                <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Forgot Password"
+                submenu_tag={"".to_owned()}
+            >                <div class={"text-center"}>
                     <br />
                     {"You are already logged in!"}
                 </div>
-                </div>
+                </UIPage>
             }
         }
         html! {
-            <div class={"main-content"}>
+            <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Forgot Password"
+                submenu_tag={"".to_owned()}
+            >
                 <h2><i class={"fa-solid fa-cogs"}></i><Nbsp />{"TODO: Forgot Password"}</h2>
-                </div>
+            </UIPage>
 
         }
 
