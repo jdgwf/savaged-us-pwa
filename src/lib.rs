@@ -8,15 +8,17 @@ mod web_sockets;
 mod libs;
 mod components;
 mod menu_items;
+mod local_storage;
 use std::collections::HashMap;
 use crate::pages::main_home::MainHome;
-use crate::pages::main_about::MainAbout;
-use crate::pages::main_tech::MainTech;
+// use crate::pages::main_about::MainAbout;
+// use crate::pages::main_tech::MainTech;
 
-use crate::pages::main_todos::MainTodos;
+// use crate::pages::main_todos::MainTodos;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
+use crate::pages::info::info_router::InfoRouter;
 // use serde_json::Error;
 // use standard_components::ui::nbsp::Nbsp;
 // use gloo_console::log;
@@ -44,12 +46,12 @@ pub enum MainServerRoute {
     ForgotPassword,
     #[at("/register")]
     Register,
-    #[at("/about")]
-    About,
-    #[at("/todos")]
-    ToDos,
-    #[at("/tech")]
-    Tech,
+    #[at("/info/*")]
+    InfoRouter,
+    // #[at("/todos")]
+    // ToDos,
+    // #[at("/tech")]
+    // Tech,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -110,13 +112,13 @@ fn content_switch(
 
     let open_confirmation_dialog = Callback::noop();
     match routes {
-        MainServerRoute::Tech => {
-            html!(
-                <MainTech
-                    global_vars={global_vars}
-                />
-            )
-        },
+        // MainServerRoute::Tech => {
+        //     html!(
+        //         <MainTech
+        //             global_vars={global_vars}
+        //         />
+        //     )
+        // },
         MainServerRoute::Home => {
 
             html! {
@@ -125,22 +127,26 @@ fn content_switch(
                 />
             }
         },
-        MainServerRoute::About => {
+        MainServerRoute::InfoRouter => {
 
             html! {
-                <MainAbout
+                <InfoRouter
                     global_vars={global_vars}
+                    set_submenu={Callback::noop()}
+                    on_logout_action={Callback::noop()}
+                    update_global_vars={Callback::noop()}
+                    open_confirmation_dialog={Callback::noop()}
                 />
             }
         },
-        MainServerRoute::ToDos => {
+        // MainServerRoute::ToDos => {
 
-            html! {
-                <MainTodos
-                    global_vars={global_vars}
-                />
-            }
-        },
+        //     html! {
+        //         <MainTodos
+        //             global_vars={global_vars}
+        //         />
+        //     }
+        // },
         // MainServerRoute::UserRouterRedirect => {
 
         //     html! {

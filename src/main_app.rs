@@ -4,21 +4,26 @@ use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
+use wasm_bindgen_futures::spawn_local;
 
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+use crate::local_storage::get_chargen_data_from_index_db;
 
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use crate::pages::info::info_router::InfoRouter;
 
 use crate::web_sockets::connect_to_websocket;
 use gloo_console::error;
 use gloo_console::log;
 use crate::pages::main_home::MainHome;
-use crate::pages::main_about::MainAbout;
+
+
 use crate::pages::main_playground::MainPlayground;
-use crate::pages::main_tech::MainTech;
-use crate::pages::main_todos::MainTodos;
+
+use crate::components::ui_page::UIPage;
+
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
@@ -55,12 +60,9 @@ pub enum MainRoute {
     ForgotPassword,
     #[at("/register")]
     Register,
-    #[at("/about")]
-    About,
-    #[at("/tech")]
-    Tech,
-    #[at("/todos")]
-    ToDos,
+    #[at("/info/*")]
+    InfoRouter,
+
     #[at("/playground")]
     Playground,
     #[not_found]
@@ -142,11 +144,15 @@ fn content_switch(
                 />
             }
         },
-        MainRoute::About => {
+        MainRoute::InfoRouter => {
 
             html! {
-                <MainAbout
+                <InfoRouter
                     global_vars={global_vars}
+                    set_submenu={submenu_callback}
+                    on_logout_action={on_logout_action}
+                    update_global_vars={base_update_global_vars}
+                    open_confirmation_dialog={open_confirmation_dialog}
                 />
             }
         },
@@ -156,25 +162,25 @@ fn content_switch(
                 <Redirect<UserRoute> to={UserRoute::SettingsPrivate} />
             }
         },
-        MainRoute::Tech => {
+        // MainRoute::Tech => {
 
-            html! {
-                <MainTech
-                    global_vars={global_vars}
+        //     html! {
+        //         <MainTech
+        //             global_vars={global_vars}
 
-                />
-            }
-        },
+        //         />
+        //     }
+        // },
 
-        MainRoute::ToDos => {
+        // MainRoute::ToDos => {
 
-            html! {
-                <MainTodos
-                    global_vars={global_vars}
+        //     html! {
+        //         <MainTodos
+        //             global_vars={global_vars}
 
-                />
-            }
-        },
+        //         />
+        //     }
+        // },
         MainRoute::Playground => {
 
             html! {
@@ -239,7 +245,15 @@ fn content_switch(
         },
         MainRoute::NotFound => {
             // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
-            html! { <h1>{ "MainRoute 404" }</h1> }
+            html! {
+                <UIPage
+                    global_vars={global_vars}
+                    page_title="Not Found 🥲"
+                    submenu_tag={"".to_owned()}
+                >
+                    <h1>{ "MainRoute 404" }</h1>
+                </UIPage>
+            }
         }
     }
 
@@ -271,6 +285,7 @@ impl Component for MainApp {
         global_vars.send_websocket = send_websocket;
 
 
+
         let login_token = global_vars.login_token.to_owned();
 
         let mut login_token_send: Option<String> = None;
@@ -294,7 +309,10 @@ impl Component for MainApp {
         msg.token = login_token_send;
         msg.kind = WebsocketMessageType::Online;
 
+        global_vars.chargen_data = None;
 
+
+        // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
 
         global_vars.send_websocket.emit( msg );
 

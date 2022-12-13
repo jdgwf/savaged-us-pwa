@@ -5,22 +5,27 @@ use standard_components::libs::set_document_title::set_document_title;
 
 use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
-pub struct MainTechProps {
+pub struct InfoTechProps {
     pub global_vars: GlobalVars,
 }
-#[function_component(MainTech)]
-pub fn main_tech(
-    props: &MainTechProps,
+#[function_component(InfoTech)]
+pub fn info_tech(
+    props: &InfoTechProps,
 ) -> Html {
     set_document_title(
         props.global_vars.site_title.to_owned(),
         "Tech".to_owned(),
         props.global_vars.no_calls,
     );
+
+    let mut global_vars = props.global_vars.clone();
+    global_vars.current_sub_menu = "info-tech".to_owned();
+
     html! {
     <UIPage
-        global_vars={props.global_vars.clone()}
-        page_title="About"
+        global_vars={global_vars}
+        page_title="Info"
+        submenu_tag={"info".to_owned()}
     >
             <h2><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</h2>
             <p class="text-center"><strong>{"Version"}<Nbsp />{env!("CARGO_PKG_VERSION")}</strong></p>

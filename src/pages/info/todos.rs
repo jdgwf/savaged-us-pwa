@@ -6,13 +6,13 @@ use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::nbsp::Nbsp;
 
 #[derive(Properties, PartialEq)]
-pub struct MainTodosProps {
+pub struct InfoTodosProps {
     pub global_vars: GlobalVars,
 }
 
-#[function_component(MainTodos)]
-pub fn main_todos(
-    props: &MainTodosProps,
+#[function_component(InfoTodos)]
+pub fn info_todos(
+    props: &InfoTodosProps,
 ) -> Html {
     set_document_title(
         props.global_vars.site_title.to_owned(),
@@ -20,11 +20,15 @@ pub fn main_todos(
         props.global_vars.no_calls,
     );
 
+    let mut global_vars = props.global_vars.clone();
+    global_vars.current_sub_menu = "info-todos".to_owned();
     html! {
     <UIPage
-        global_vars={props.global_vars.clone()}
+        global_vars={global_vars}
         page_title="ToDos"
-    >            <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
+        submenu_tag={"info".to_owned()}
+    >
+    <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
             <div class={"row"}>
                 <div class={"col-md"}>
 

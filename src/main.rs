@@ -4,9 +4,11 @@ use yew::prelude::*;
 mod pages;
 mod main_app;
 mod libs;
+mod local_storage;
 mod components;
 mod web_sockets;
 mod menu_items;
+
 
 // use gloo_console::log;
 use main_app::MainApp;

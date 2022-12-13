@@ -6,22 +6,25 @@ use standard_components::ui::content_box::ContentBox;
 
 use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
-pub struct MainAboutProps {
+pub struct InfoAboutProps {
     pub global_vars: GlobalVars,
 }
-#[function_component(MainAbout)]
-pub fn main_about(
-    props: &MainAboutProps,
+#[function_component(InfoAbout)]
+pub fn info_about(
+    props: &InfoAboutProps,
 ) -> Html {
     set_document_title(
         props.global_vars.site_title.to_owned(),
         "About".to_owned(),
         props.global_vars.no_calls,
     );
+    let mut global_vars = props.global_vars.clone();
+    global_vars.current_sub_menu = "info-about".to_owned();
     html! {
     <UIPage
-        global_vars={props.global_vars.clone()}
+        global_vars={global_vars}
         page_title="About"
+        submenu_tag={"info".to_owned()}
     >
             <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>
             <div class="row">

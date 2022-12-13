@@ -58,8 +58,8 @@ pub fn menu_main(
                                         return html! {
                                             <li class={li_class} title={sub_item.title}>
                                             {html}
-                                            // <br />{&sub_item.sub_menu_tag}
-                                            // <br />{&props.global_vars.current_sub_menu}
+                   //                         <br />{&sub_item.sub_menu_tag}
+                   //                         <br />{&props.global_vars.current_sub_menu}
                                             </li>
                                         };
                                     }
@@ -134,10 +134,14 @@ pub fn menu_main(
                         }
                         None => {}
                     }
+
                     match menu.html {
                         Some( html ) => {
                             return html! {
-                                <li class={li_class} title={menu.title}>{html}</li>
+                                <li class={li_class} title={menu.title}>
+                                    {html}
+                                    // {menu.menu_tag.clone()}{" / "}{props.global_vars.current_menu.clone()}
+                                </li>
                             };
                         }
                         None => {

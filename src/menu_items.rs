@@ -4,7 +4,9 @@ use yew_router::prelude::Link;
 use savaged_libs::user::User;
 use crate::libs::global_vars::GlobalVars;
 use crate::{main_app::MainRoute, pages::{user_data::user_data_router::UserDataRoute, user::user_router::UserRoute}};
-
+use crate::pages::info::info_router::{
+    InfoRoute,
+};
 #[derive(Debug, Clone)]
 pub struct MenuItem {
     pub html: Option<Html>,
@@ -152,12 +154,12 @@ pub fn get_menu_items(
         MenuItem {
             hardcoded: false,
             html: Some( html!{
-                <Link<MainRoute>
-                    to={MainRoute::About}
+                <Link<InfoRoute>
+                    to={InfoRoute::InfoAbout}
                 >
                     <i class="fa fa-circle-info" /><Nbsp />
-                    {"About"}
-                </Link<MainRoute>>
+                    {"Info"}
+                </Link<InfoRoute>>
             }),
             registered_only: false,
             wildcard_only: false,
@@ -165,71 +167,101 @@ pub fn get_menu_items(
             admin_only: false,
             link_class: None,
 
-            submenu_tag: None,
-            submenu: None,
+            submenu_tag: Some("info".to_string()),
+            submenu: Some(
+                vec![
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
+                                to={InfoRoute::InfoAbout}
+                            >
+                                <i class="fa fa-circle-info" /><Nbsp />
+                                {"About"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "The About Page".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Info".to_owned(),
+                        url: None,
+                        menu_tag: "info-about".to_owned(),
+                        sub_menu_tag: "info-about".to_owned(),
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
+                                to={InfoRoute::InfoTech}
+                            >
+                                <i class="fa fa-microchip" /><Nbsp />
+                                {"Tech"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "The Technology Used Page".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Tech".to_owned(),
+                        url: None,
+                        menu_tag: "info-tech".to_owned(),
+                        sub_menu_tag: "info-tech".to_owned(),
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
+                                to={InfoRoute::InfoTodos}
+                            >
+                                <i class="fa fa-list" /><Nbsp />
+                                {"To-Dos"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "The To-Dos Page".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "To-Dos".to_owned(),
+                        url: None,
+
+                        menu_tag: "info-todos".to_owned(),
+                        sub_menu_tag: "info-todos".to_owned(),
+                    },
+                ]
+            ),
 
             title: "The About Page".to_owned(),
             icon_class: None, // "fa fa-house".to_owned(),
             label: "About".to_owned(),
             url: None,
-            menu_tag: "main-about".to_owned(),
+            menu_tag: "main-inforouter".to_owned(),
             sub_menu_tag: "".to_owned(),
         },
-        MenuItem {
-            hardcoded: false,
-            html: Some( html!{
-                <Link<MainRoute>
-                    to={MainRoute::Tech}
-                >
-                    <i class="fa fa-microchip" /><Nbsp />
-                    {"Tech"}
-                </Link<MainRoute>>
-            }),
-            registered_only: false,
-            wildcard_only: false,
-            developer_only: false,
-            admin_only: false,
 
-            link_class: None,
-
-            submenu_tag: None,
-            submenu: None,
-
-            title: "The Technology Used Page".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "Tech".to_owned(),
-            url: None,
-            menu_tag: "main-tech".to_owned(),
-            sub_menu_tag: "".to_owned(),
-        },
-        MenuItem {
-            hardcoded: false,
-            html: Some( html!{
-                <Link<MainRoute>
-                    to={MainRoute::ToDos}
-                >
-                    <i class="fa fa-list" /><Nbsp />
-                    {"To-Dos"}
-                </Link<MainRoute>>
-            }),
-            registered_only: false,
-            wildcard_only: false,
-            developer_only: false,
-            admin_only: false,
-
-            link_class: None,
-
-            submenu_tag: None,
-            submenu: None,
-
-            title: "The To-Dos Page".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "To-Dos".to_owned(),
-            url: None,
-
-            menu_tag: "main-todos".to_owned(),
-            sub_menu_tag: "".to_owned(),
-        },
 
         MenuItem {
             hardcoded: true,
