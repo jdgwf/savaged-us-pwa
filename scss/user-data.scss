@@ -34,8 +34,23 @@ body {
                 z-index: 10;
                 height: 175px;
                 width: 175px;
-                padding: 70px 10px 0 10px;
+                padding: 20% 10px 0 10px;
                 background: rgba(0,0,0,.6);
+                h3 {
+                    font-size: 1.1rem;
+                    font-weight: 500;
+                    margin: 0;
+                }
+                hr {
+                    padding: 0;
+                    margin: .125rem 0;
+                    height: 0;
+                    border: none;
+                    border-bottom-color: currentcolor;
+                    border-bottom-style: none;
+                    border-bottom-width: medium;
+                    border-bottom: solid 1px #eef;
+                }
             }
 
             &:hover {

@@ -24,19 +24,8 @@ use crate::libs::global_vars::GlobalVars;
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
 
-#[derive(Clone, Routable, PartialEq)]
-pub enum UserDataRoute {
-    #[at("/my-data/saves")]
-    Saves,
-
-    #[at("/my-data/campaigns")]
-    Campaigns,
-    #[at("/404")]
-    NotFound,
-}
-
 #[derive(Properties, PartialEq)]
-pub struct UserDataRouterProps {
+pub struct UserSavesProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
@@ -45,20 +34,20 @@ pub struct UserDataRouterProps {
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub struct UserDataRouterMessage {
+pub struct UserSavesMessage {
 
 }
-pub struct UserDataSaves {
+pub struct UserSaves {
     global_vars: GlobalVars,
 }
 
-impl Component for UserDataSaves {
-    type Message = UserDataRouterMessage;
-    type Properties = UserDataRouterProps;
+impl Component for UserSaves {
+    type Message = UserSavesMessage;
+    type Properties = UserSavesProps;
 
     fn create(ctx: &Context<Self>) -> Self {
 
-        UserDataSaves {
+        UserSaves {
             global_vars: ctx.props().global_vars.clone(),
         }
     }
@@ -72,7 +61,7 @@ impl Component for UserDataSaves {
     fn changed(
         &mut self,
         ctx: &Context<Self>,
-        _props: &UserDataRouterProps,
+        _props: &UserSavesProps,
     ) -> bool {
         // log!("main_home changed called" );
         self.global_vars = ctx.props().global_vars.clone();
@@ -164,8 +153,12 @@ impl Component for UserDataSaves {
                                 style={image_style}
                             >
                                 <div class="text">
-                                    {save.name}<Nbsp />{"("}{save.save_type}{")"}
-                                    <div class="small-text">{"U "}{save.uuid}</div>
+                                    <h3>{save.name}</h3>
+                                    <hr />
+                                    {save.short_desc}<br />
+                                    <br />
+                                    <div class="small-text">{save.save_type}<Nbsp />{"|"}<Nbsp />{save.folder}</div>
+                                    <div class="small-text">{save.uuid}</div>
                                 </div>
                             </div>
                         }

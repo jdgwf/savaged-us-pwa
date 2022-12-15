@@ -3,7 +3,7 @@ use yew::{Html, html};
 use yew_router::prelude::Link;
 use savaged_libs::user::User;
 use crate::libs::global_vars::GlobalVars;
-use crate::{main_app::MainRoute, pages::{user_data::user_data_router::UserDataRoute, user::user_router::UserRoute}};
+use crate::{main_app::MainRoute, pages::{user::user_router::UserRoute}};
 use crate::pages::info::info_router::{
     InfoRoute,
 };
@@ -68,12 +68,12 @@ pub fn get_menu_items(
         MenuItem {
             hardcoded: false,
             html: Some( html!{
-                <Link<UserDataRoute>
-                    to={UserDataRoute::Saves}
+                <Link<UserRoute>
+                    to={UserRoute::UserSaves}
                 >
                     <i class="fa fa-boxes-stacked" /><Nbsp />
                     {"My Stuff"}
-                </Link<UserDataRoute>>
+                </Link<UserRoute>>
             }),
             registered_only: true,
             wildcard_only: false,
@@ -86,12 +86,12 @@ pub fn get_menu_items(
                     MenuItem {
                         hardcoded: false,
                         html: Some( html!{
-                            <Link<UserDataRoute>
-                                to={UserDataRoute::Saves}
+                            <Link<UserRoute>
+                                to={UserRoute::UserSaves}
                             >
                                 <i class="fa fa-boxes-stacked" /><Nbsp />
                                 {"My Saves"}
-                            </Link<UserDataRoute>>
+                            </Link<UserRoute>>
                         }),
                         registered_only: true,
                         wildcard_only: false,
@@ -114,12 +114,12 @@ pub fn get_menu_items(
                     MenuItem {
                         hardcoded: false,
                         html: Some( html!{
-                            <Link<UserDataRoute>
-                                to={UserDataRoute::Campaigns}
+                            <Link<UserRoute>
+                                to={UserRoute::UserCampaigns}
                             >
                                 <i class="fa fa-dice" /><Nbsp />
                                 {"Campaigns"}
-                            </Link<UserDataRoute>>
+                            </Link<UserRoute>>
                         }),
                         registered_only: true,
                         wildcard_only: false,

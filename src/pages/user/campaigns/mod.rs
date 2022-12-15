@@ -23,19 +23,9 @@ use crate::libs::global_vars::GlobalVars;
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
 
-#[derive(Clone, Routable, PartialEq)]
-pub enum UserDataRoute {
-    #[at("/my-data/saves")]
-    Saves,
-
-    #[at("/my-data/campaigns")]
-    Campaigns,
-    #[at("/404")]
-    NotFound,
-}
 
 #[derive(Properties, PartialEq)]
-pub struct UserDataRouterProps {
+pub struct UserCampaignsProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
@@ -44,20 +34,20 @@ pub struct UserDataRouterProps {
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub struct UserDataRouterMessage {
+pub struct UserCampaignsMessage {
 
 }
-pub struct UserDataCampaigns {
+pub struct UserCampaigns {
     global_vars: GlobalVars,
 }
 
-impl Component for UserDataCampaigns {
-    type Message = UserDataRouterMessage;
-    type Properties = UserDataRouterProps;
+impl Component for UserCampaigns {
+    type Message = UserCampaignsMessage;
+    type Properties = UserCampaignsProps;
 
     fn create(ctx: &Context<Self>) -> Self {
 
-        UserDataCampaigns {
+        UserCampaigns {
             global_vars: ctx.props().global_vars.clone(),
         }
     }
@@ -71,7 +61,7 @@ impl Component for UserDataCampaigns {
     fn changed(
         &mut self,
         ctx: &Context<Self>,
-        _props: &UserDataRouterProps,
+        _props: &UserCampaignsProps,
     ) -> bool {
         // log!("main_home changed called" );
         self.global_vars = ctx.props().global_vars.clone();

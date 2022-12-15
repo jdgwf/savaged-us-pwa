@@ -8,3 +8,5 @@ mod notifications;
 pub mod forgot_password;
 pub mod register;
 pub mod settings_api_key;
+pub mod campaigns;
+pub mod saves;

@@ -26,7 +26,6 @@ use crate::components::ui_page::UIPage;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
-use crate::pages::user_data::user_data_router::UserDataRouter;
 use crate::web_sockets::WebsocketService;
 use crate::web_sockets::handle_message::handle_message;
 use serde_json::Error;
@@ -47,8 +46,7 @@ use gloo_timers::callback::Interval;
 pub enum MainRoute {
     #[at("/")]
     Home,
-    #[at("/my-data/*")]
-    UserDataRouter,
+
     #[at("/me/*")]
     UserRouter,
     #[at("/me")]
@@ -202,18 +200,6 @@ fn content_switch(
             }
         },
 
-        MainRoute::UserDataRouter => {
-            html! {
-                <UserDataRouter
-                    global_vars={global_vars}
-                    set_submenu={submenu_callback}
-                    on_logout_action={on_logout_action}
-                    update_global_vars={base_update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
-
-                />
-            }
-        }
         MainRoute::UserLogin => {
             html! {
                 <UserLogin
@@ -458,20 +444,21 @@ impl Component for MainApp {
 
                     log!("WebsocketOffline called", offline);
 
-                    // ctx.link().callback(MainAppMessage::UpdateGlobalVars).emit( global_vars );
+                    ctx.link().callback(MainAppMessage::UpdateGlobalVars).emit( global_vars );
+
                 }
 
-                // if offline {
-                //     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
-                //     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+                if offline {
+                    let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+                    let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
 
-                //     self.wss = connect_to_websocket(
-                //         self.global_vars.server_root.to_owned(),
-                //         &received_message_callback,
-                //         &websocket_offline_callback,
-                //         self.global_vars.login_token.to_owned(),
-                //     );
-                // }
+                    self.wss = connect_to_websocket(
+                        self.global_vars.server_root.to_owned(),
+                        &received_message_callback,
+                        &websocket_offline_callback,
+                        self.global_vars.login_token.to_owned(),
+                    );
+                }
 
 
                 return false;

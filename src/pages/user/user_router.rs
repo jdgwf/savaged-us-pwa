@@ -18,6 +18,9 @@ use super::settings_devices::SettingsDevices;
 use super::settings_api_key::SettingsAPIKey;
 use super::subscription::UserSubscription;
 use super::notifications::UserNotifications;
+
+use super::saves::UserSaves;
+use super::campaigns::UserCampaigns;
 // use gloo_console::log;
 
 // use super::subscription::UserSubscription;
@@ -37,6 +40,13 @@ pub enum UserRoute {
     Subscription,
     #[at("/me/api-key")]
     SettingsAPIKey,
+
+
+    #[at("/me/saves")]
+    UserSaves,
+
+    #[at("/me/campaigns")]
+    UserCampaigns,
 
     #[at("/404")]
     NotFound,
@@ -60,13 +70,27 @@ fn content_switch(
 
     match routes {
 
+        UserRoute::UserCampaigns => html! {
+            <UserCampaigns
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
+        UserRoute::UserSaves => html! {
+            <UserSaves
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
         UserRoute::SettingsAPIKey => html! {
             <SettingsAPIKey
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
-    },
+        },
 
         UserRoute::SettingsPrivate => html! {
             <SettingsPrivate

@@ -5,8 +5,9 @@ use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
 use gloo_net::websocket::{
     Message,
     futures::WebSocket,
-    State,
+    // State,
 };
+// use web_sys::EventListener;
 use gloo_console::log;
 use gloo_console::error;
 use savaged_libs::websocket_message::WebSocketMessage;
@@ -16,13 +17,12 @@ use wasm_bindgen_futures::spawn_local;
 use yew::Callback;
 use serde_json;
 
-use crate::pages::user::login;
+// use crate::pages::user::login;
 
 // use crate::libs::global_vars::GlobalVars;
 
 pub struct WebsocketService {
     pub tx: Sender<String>,
-
 }
 
 impl WebsocketService {
@@ -38,26 +38,12 @@ impl WebsocketService {
             .replace("https://", "wss://")
             + &"/_ws".to_owned();
 
-        let mut ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
-
-        log!("Attempting connection via web socket...");
-
-
-        match ws.state() {
-            State::Closed => {
-                ws = WebSocket::open( &wss_url ).unwrap();
-            }
-
-            _ => {
-
-
-            }
-        }
-
+        let ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
 
         let (mut write, mut read) = ws.split();
 
         let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);
+
 
         let websocket_offline_callback_send = websocket_offline_callback.clone();
         spawn_local(async move {
@@ -67,6 +53,7 @@ impl WebsocketService {
                 websocket_offline_callback_send.clone().emit( false );
             }
         });
+
         // websocket_offline_callback.emit( false );
 
         // spawn_local(async move {
@@ -96,8 +83,10 @@ impl WebsocketService {
                             websocket_offline_callback.emit( false );
                         }
                     }
+
                     Err(e) => {
-                        error!("ws: {:?}", e.to_string());
+                        //error!( format!)"ws: {:?}", e.to_string()) );
+                        log!("WebSocket connection failure - will try to reconnect periodically.");
                         websocket_offline_callback.emit( true );
 
                     }
@@ -108,13 +97,10 @@ impl WebsocketService {
 
         });
 
-
         let mut msg = WebSocketMessage::default();
 
         msg.token = Some(login_token);
         msg.kind = WebsocketMessageType::Online;
-
-
 
         // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
         let send_data_result = serde_json::to_string( &msg );
