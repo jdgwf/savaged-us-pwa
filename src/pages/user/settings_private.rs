@@ -90,7 +90,7 @@ impl Component for SettingsPrivate {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Private Settings".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Private Settings".to_owned(), global_vars.server_side_renderer,);
         SettingsPrivate {
             global_vars: global_vars.clone(),
             first_name: global_vars.current_user.first_name.to_owned(),

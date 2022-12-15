@@ -42,7 +42,7 @@ impl Component for UserSubscription {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Subscriptions and Purchases".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Subscriptions and Purchases".to_owned(), global_vars.server_side_renderer,);
         UserSubscription {
             global_vars: global_vars,
         }

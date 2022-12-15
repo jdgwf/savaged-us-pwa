@@ -54,7 +54,7 @@ impl Component for UserLogin {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Login".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Login".to_owned(), global_vars.server_side_renderer,);
         UserLogin {
             global_vars: global_vars,
             username: "".to_owned(),
@@ -216,7 +216,15 @@ impl Component for UserLogin {
         let global_vars = global_vars.clone();
 
         if global_vars.user_loading {
-            html!(<p class={"text-center"}>{"loading user info...."}</p>)
+            html!(
+            <UIPage
+                global_vars={global_vars.clone()}
+                page_title="Login"
+                submenu_tag={"".to_owned()}
+            >
+                <p class={"text-center"}>{"loading user info...."}</p>
+            </UIPage>
+    )
         } else {
 
 

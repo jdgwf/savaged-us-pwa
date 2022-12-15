@@ -42,7 +42,7 @@ impl Component for ForgotPassword {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Recover Password".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Recover Password".to_owned(), global_vars.server_side_renderer,);
         ForgotPassword {
             // global_vars: global_vars,
         }

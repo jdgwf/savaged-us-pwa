@@ -9,9 +9,14 @@ use gloo_net::websocket::{
 };
 use gloo_console::log;
 use gloo_console::error;
+use savaged_libs::websocket_message::WebSocketMessage;
+use savaged_libs::websocket_message::WebsocketMessageType;
 // use savaged_libs::websocket_message::WebSocketMessage;
 use wasm_bindgen_futures::spawn_local;
 use yew::Callback;
+use serde_json;
+
+use crate::pages::user::login;
 
 // use crate::libs::global_vars::GlobalVars;
 
@@ -25,7 +30,7 @@ impl WebsocketService {
         server_root: String,
         received_message_callback: &Callback<String>,
         websocket_offline_callback: &Callback<bool>,
-        _login_token: String,
+        login_token: String,
     ) -> Self {
 
         let wss_url = server_root
@@ -62,7 +67,7 @@ impl WebsocketService {
                 websocket_offline_callback_send.clone().emit( false );
             }
         });
-        websocket_offline_callback.emit( false );
+        // websocket_offline_callback.emit( false );
 
         // spawn_local(async move {
         //     send_ping( &mut &ws );
@@ -72,9 +77,11 @@ impl WebsocketService {
         let websocket_offline_callback = websocket_offline_callback.clone();
         spawn_local(async move {
 
+
             while let Some(msg) = read.next().await {
                 match msg {
                     Ok(Message::Text(val)) => {
+                        // log!("Message::Text");
                         received_message_callback.emit( val.to_string()  );
                         websocket_offline_callback.emit( false );
                     }
@@ -100,6 +107,28 @@ impl WebsocketService {
             websocket_offline_callback.emit( true );
 
         });
+
+
+        let mut msg = WebSocketMessage::default();
+
+        msg.token = Some(login_token);
+        msg.kind = WebsocketMessageType::Online;
+
+
+
+        // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
+        let send_data_result = serde_json::to_string( &msg );
+
+        // log!("MainWebAppMessages::SendWebSocket called");
+        match send_data_result {
+            Ok( send_data ) => {
+                // write.send( send_data );
+                let _ = in_tx.clone().try_send(send_data.to_owned() );
+            }
+            Err( _err ) => {
+
+            }
+        }
 
         Self {
             tx: in_tx,

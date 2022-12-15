@@ -1,7 +1,6 @@
 use yew::{function_component, Properties, Html, html};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use standard_components::libs::set_document_title::set_document_title;
 
 use standard_components::ui::nbsp::Nbsp;
 
@@ -14,18 +13,14 @@ pub struct InfoTodosProps {
 pub fn info_todos(
     props: &InfoTodosProps,
 ) -> Html {
-    set_document_title(
-        props.global_vars.site_title.to_owned(),
-        "To-Dos".to_owned(),
-        props.global_vars.no_calls,
-    );
 
     let mut global_vars = props.global_vars.clone();
     global_vars.current_sub_menu = "info-todos".to_owned();
+
     html! {
     <UIPage
         global_vars={global_vars}
-        page_title="ToDos"
+        page_title="Development To-Dos"
         submenu_tag={"info".to_owned()}
     >
     <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>

@@ -48,7 +48,7 @@ impl Component for SettingsAPIKey {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "API Key".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "API Key".to_owned(), global_vars.server_side_renderer,);
         SettingsAPIKey {
             global_vars: global_vars,
         }

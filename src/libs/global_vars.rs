@@ -2,7 +2,8 @@ use serde::{Serialize, Deserialize};
 use std::rc::Rc;
 use yew::prelude::*;
 use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::chargen_data::ChargenData};
-use yew::prelude::*;
+use yew_router::history::{AnyHistory, History, MemoryHistory};
+
 
 use gloo_net::websocket::{
     Message,
@@ -19,7 +20,7 @@ pub struct GlobalVars {
     pub server_root: String,
     pub site_title: String,
 
-    pub no_calls: bool,
+    pub server_side_renderer: bool,
     pub offline: bool,
 
     // pub update_global_vars: Callback<GlobalVars>,
@@ -34,6 +35,8 @@ pub struct GlobalVars {
     pub logout_callback: Callback<MouseEvent>,
 
     pub show_mobile_menu: bool,
+
+    pub server_side_renderer_history: Option<AnyHistory>,
 }
 
 impl Default for GlobalVars {
@@ -47,7 +50,7 @@ impl Default for GlobalVars {
             server_root: "".to_owned(),
             site_title: "".to_owned(),
             show_mobile_menu: false,
-            no_calls: false,
+            server_side_renderer: false,
             // update_global_vars: Callback::noop(),
             send_websocket: Callback::noop(),
             hide_popup_menus_callback: Callback::noop(),
@@ -59,6 +62,7 @@ impl Default for GlobalVars {
             current_menu: "".to_owned(),
             current_sub_menu: "".to_owned(),
 
+            server_side_renderer_history: None,
         }
     }
 }

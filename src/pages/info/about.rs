@@ -1,7 +1,6 @@
 use yew::{function_component, Properties, Html, html};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::content_box::ContentBox;
 
 use standard_components::ui::nbsp::Nbsp;
@@ -13,17 +12,14 @@ pub struct InfoAboutProps {
 pub fn info_about(
     props: &InfoAboutProps,
 ) -> Html {
-    set_document_title(
-        props.global_vars.site_title.to_owned(),
-        "About".to_owned(),
-        props.global_vars.no_calls,
-    );
+
     let mut global_vars = props.global_vars.clone();
     global_vars.current_sub_menu = "info-about".to_owned();
+
     html! {
     <UIPage
         global_vars={global_vars}
-        page_title="About"
+        page_title="About Savaged.us"
         submenu_tag={"info".to_owned()}
     >
             <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>

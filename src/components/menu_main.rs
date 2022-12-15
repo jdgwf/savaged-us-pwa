@@ -156,33 +156,35 @@ pub fn menu_main(
 
             }).collect::<Html>()}
 
-            <li class={login_class_active}>
-                if props.global_vars.offline {
-                    <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
-                        {"OFFLINE"}
-                        <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
-                    </div>
-                }
-                if props.global_vars.current_user.id > 0 && !props.global_vars.offline {
-                    <div class="user-login-badge">
-                    <Link<UserRoute> to={UserRoute::SettingsPrivate}>
-                        if props.global_vars.current_user.unread_notifications > 0 {
-                            <div class={"unread-notifications"}>{props.global_vars.current_user.unread_notifications}</div>
-                        }
-                        <img
-                        src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
-                        />
+            if !props.global_vars.server_side_renderer {
+                <li class={login_class_active}>
+                    if props.global_vars.offline {
+                        <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
+                            {"OFFLINE"}
+                            <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
+                        </div>
+                    }
+                    if props.global_vars.current_user.id > 0 && !props.global_vars.offline {
+                        <div class="user-login-badge">
+                        <Link<UserRoute> to={UserRoute::SettingsPrivate}>
+                            if props.global_vars.current_user.unread_notifications > 0 {
+                                <div class={"unread-notifications"}>{props.global_vars.current_user.unread_notifications}</div>
+                            }
+                            <img
+                            src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
+                            />
 
-                    </Link<UserRoute>>
-                    </div>
-                } else {
-                    <>
-                        if !props.global_vars.offline {
-                            <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
-                        }
-                    </>
-                }
-            </li>
+                        </Link<UserRoute>>
+                        </div>
+                    } else {
+                        <>
+                            if !props.global_vars.offline {
+                                <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
+                            }
+                        </>
+                    }
+                </li>
+            }
 
         </ul>
 

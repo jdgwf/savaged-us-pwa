@@ -1,5 +1,6 @@
 use yew_router::prelude::*;
 use yew::prelude::*;
+use yew_router::history::{AnyHistory, History, MemoryHistory};
 
 use yew::{function_component, html};
 
@@ -158,10 +159,36 @@ impl Component for UserRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-    let update_global_vars = ctx.props().update_global_vars.clone();
-    let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
-        let global_vars = ctx.props().global_vars.clone();
-        html! {
+        let update_global_vars = ctx.props().update_global_vars.clone();
+        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
+
+        if ctx.props().global_vars.server_side_renderer {
+            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let global_vars = ctx.props().global_vars.clone();
+
+            html! {
+
+                <Router
+                    history={history}
+                >
+                    <div class={"main-content"}>
+                        <Switch<UserRoute>
+                            render={
+                                move |routes|
+                                content_switch(
+                                    routes,
+                                    global_vars.clone(),
+                                    update_global_vars.clone(),
+                                    open_confirmation_dialog.clone(),
+                                )
+                            }
+                        />
+                    </div>
+                </Router>
+        }
+        } else {
+            let global_vars = ctx.props().global_vars.clone();
+            html! {
 
                 <BrowserRouter>
                     <div class={"main-content"}>
@@ -178,6 +205,8 @@ impl Component for UserRouter {
                         />
                     </div>
                 </BrowserRouter>
+            }
         }
+
     }
 }

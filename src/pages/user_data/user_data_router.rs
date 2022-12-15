@@ -8,6 +8,8 @@ use yew::{function_component, html};
 // use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
+use super::saves::UserDataSaves;
+use super::campaigns::UserDataCampaigns;
 use crate::components::ui_page::UIPage;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
@@ -112,16 +114,97 @@ impl Component for UserDataRouter {
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
-        html! {
-            <UIPage
-                global_vars={global_vars}
-                page_title="My Stuff"
-                submenu_tag={"my-stuff".to_owned()}
-            >
-                <>{"TODO"}</>
-            </UIPage>
+        let update_global_vars = ctx.props().update_global_vars.clone();
+        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
+
+
+        if ctx.props().global_vars.server_side_renderer {
+            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let global_vars = ctx.props().global_vars.clone();
+
+            html! {
+
+                <Router
+                    history={history}
+                >
+                    <div class={"main-content"}>
+                        <Switch<UserDataRoute>
+                            render={
+                                move |routes|
+                                content_switch(
+                                    routes,
+                                    global_vars.clone(),
+                                    update_global_vars.clone(),
+                                    open_confirmation_dialog.clone(),
+                                )
+                            }
+                        />
+                    </div>
+                </Router>
+        }
+        } else {
+            let global_vars = ctx.props().global_vars.clone();
+            html! {
+
+                <BrowserRouter>
+                    <div class={"main-content"}>
+                        <Switch<UserDataRoute>
+                            render={
+                                move |routes|
+                                content_switch(
+                                    routes,
+                                    global_vars.clone(),
+                                    update_global_vars.clone(),
+                                    open_confirmation_dialog.clone(),
+                                )
+                            }
+                        />
+                    </div>
+                </BrowserRouter>
+            }
         }
     }
 }
 
 
+
+
+fn content_switch(
+    routes: UserDataRoute,
+    global_vars: GlobalVars,
+    update_global_vars: Callback<GlobalVars>,
+    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
+) -> Html {
+
+
+    let mut global_vars = global_vars.clone();
+
+    if global_vars.current_user.id > 0 {
+        global_vars.current_sub_menu = "user".to_owned();
+    } else {
+        global_vars.current_sub_menu = "".to_owned();
+    }
+
+    match routes {
+
+        UserDataRoute::Saves => html! {
+            <UserDataSaves
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+    },
+
+        UserDataRoute::Campaigns => html! {
+            <UserDataCampaigns
+                global_vars={global_vars}
+                // update_global_vars={update_global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+                // update_global_vars={update_global_vars}
+            />
+        },
+
+
+        UserDataRoute::NotFound => html! { <h1>{ "UserDataRoute 404" }</h1> },
+    }
+}

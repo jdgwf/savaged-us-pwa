@@ -344,13 +344,15 @@ impl Component for UserNotifications {
         );
         let api_root = ctx.props().global_vars.api_root.to_owned();
 
-        get_notifications(
-            api_root,
-            login_token,
-            set_notifications,
-        );
+        if !global_vars.server_side_renderer {
+            get_notifications(
+                api_root,
+                login_token,
+                set_notifications,
+            );
 
-        set_document_title(global_vars.site_title.to_owned(), "Notifications".to_owned(), global_vars.no_calls,);
+            set_document_title(global_vars.site_title.to_owned(), "Notifications".to_owned(), global_vars.server_side_renderer,);
+        }
         UserNotifications {
             notifications: Vec::new(),
             loading: true,

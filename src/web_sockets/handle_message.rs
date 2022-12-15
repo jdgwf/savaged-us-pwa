@@ -6,7 +6,9 @@ use savaged_libs::websocket_message::{
 };
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::get_chargen_data_from_index_db;
+use crate::local_storage::get_saves_from_index_db;
 use crate::local_storage::index_db_save_chargen_data;
+use crate::local_storage::index_db_save_saves;
 use gloo_console::error;
 use gloo_console::log;
 
@@ -34,9 +36,16 @@ pub fn handle_message(
             spawn_local(async move {
 
                 global_vars_future.chargen_data = get_chargen_data_from_index_db().await;
+                global_vars_future.saves = get_saves_from_index_db().await;
+
                 update_global_vars.emit(global_vars_future);
             });
 
+            // spawn_local(async move {
+
+
+            //     update_global_vars.emit(global_vars_future);
+            // });
             // log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
             // update_global_vars.emit( new_global_vars );
         }
@@ -50,7 +59,7 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::ChargenData => {
-            // log!( format!("handle_message ChargenData {:?}", msg) );
+            log!( format!("handle_message ChargenData") );
             let mut new_global_vars = global_vars.clone();
             new_global_vars.chargen_data = msg.chargen_data.clone();
             // new_global_vars.user_loading = false;
@@ -58,8 +67,8 @@ pub fn handle_message(
             match  msg.chargen_data {
                 Some( chargen_data ) => {
                     spawn_local(async move {
-                        let results = index_db_save_chargen_data(chargen_data).await;
-                        log!( format!(" results, {:?}", results ) );
+                        let _results = index_db_save_chargen_data(chargen_data).await;
+                        // log!( format!(" results, {:?}", results ) );
                     });
                 }
                 None => {}
@@ -74,7 +83,18 @@ pub fn handle_message(
             // log!( format!("handle_message Saves {:?}", msg.saves) );
 
             let mut new_global_vars = global_vars.clone();
-            new_global_vars.saves = msg.saves;
+            new_global_vars.saves = msg.saves.clone();
+
+            match msg.saves {
+                Some( saves ) => {
+
+                    spawn_local(async move {
+                        let _results = index_db_save_saves(saves).await;
+                        // log!( format!(" results, {:?}", results ) );
+                    });
+                }
+                None => {}
+            }
             // new_global_vars.offline = true;
             // new_global_vars.user_loading = false;
             update_global_vars.emit( new_global_vars );

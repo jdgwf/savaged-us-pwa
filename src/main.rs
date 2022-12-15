@@ -47,7 +47,7 @@ fn App() -> Html {
             server_root: server_root.to_owned(),
             api_root: server_root + &"/_api",
             site_title: "v4.savaged.us".to_owned(),
-            no_calls: false,
+            server_side_renderer: false,
             offline: false,
             send_websocket: Callback::noop(),
             hide_popup_menus_callback: Callback::noop(),
@@ -58,6 +58,7 @@ fn App() -> Html {
             toggle_mobile_menu_callback: Callback::noop(),
             current_menu: "".to_owned(),
             current_sub_menu: "".to_owned(),
+            server_side_renderer_history: None,
         }
     );
 

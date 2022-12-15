@@ -80,7 +80,7 @@ pub fn get_menu_items(
             developer_only: false,
             admin_only: false,
 
-            submenu_tag: Some("my-stuff".to_owned()),
+            submenu_tag: Some("user-data".to_owned()),
             submenu: Some(
                 vec![
                     MenuItem {

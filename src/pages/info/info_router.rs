@@ -1,3 +1,8 @@
+use std::f32::consts::E;
+
+
+use yew_router::history::{AnyHistory, History, MemoryHistory};
+
 use yew_router::prelude::*;
 use yew::prelude::*;
 
@@ -42,7 +47,6 @@ fn content_switch(
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
-
     let mut global_vars = global_vars.clone();
 
     if global_vars.current_user.id > 0 {
@@ -59,7 +63,7 @@ fn content_switch(
                 global_vars={global_vars}
                 // open_confirmation_dialog={open_confirmation_dialog}
             />
-    },
+        },
 
         InfoRoute::InfoTech => html! {
             <InfoTech
@@ -97,7 +101,6 @@ pub struct InfoRouterMessage {
 }
 
 pub struct InfoRouter {
-    global_vars: GlobalVars,
 }
 
 impl Component for InfoRouter {
@@ -108,10 +111,7 @@ impl Component for InfoRouter {
         ctx: &Context<Self>
     ) -> Self {
 
-        let global_vars = ctx.props().global_vars.clone();
-
         InfoRouter {
-            global_vars: global_vars.clone(),
         }
     }
 
@@ -120,9 +120,6 @@ impl Component for InfoRouter {
         ctx: &Context<Self>,
         _props: &InfoRouterProps,
     ) -> bool {
-
-        self.global_vars = ctx.props().global_vars.clone();
-
         true
     }
 
@@ -130,11 +127,41 @@ impl Component for InfoRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-    let update_global_vars = ctx.props().update_global_vars.clone();
-    let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
-        let global_vars = ctx.props().global_vars.clone();
+        let update_global_vars = ctx.props().update_global_vars.clone();
+        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
 
-        html! {
+
+        if ctx.props().global_vars.server_side_renderer {
+            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let global_vars = ctx.props().global_vars.clone();
+
+            html! {
+
+
+                <Router
+                    history={history}
+                >
+                    <div class={"main-content"}>
+                        <Switch<InfoRoute>
+                            render={
+                                move |routes|
+                                content_switch(
+                                    routes,
+                                    global_vars.clone(),
+                                    update_global_vars.clone(),
+                                    open_confirmation_dialog.clone(),
+                                )
+                            }
+                        />
+                    </div>
+                </Router>
+            }
+        } else {
+
+            let global_vars = ctx.props().global_vars.clone();
+
+            html! {
+
 
                 <BrowserRouter>
                     <div class={"main-content"}>
@@ -151,6 +178,8 @@ impl Component for InfoRouter {
                         />
                     </div>
                 </BrowserRouter>
+            }
         }
+
     }
 }

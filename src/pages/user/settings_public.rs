@@ -91,7 +91,7 @@ impl Component for SettingsPublic {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Public Settings".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Public Settings".to_owned(), global_vars.server_side_renderer,);
         SettingsPublic {
             edit_username: global_vars.current_user.username.clone(),
             edit_bio: global_vars.current_user.share_bio.clone(),

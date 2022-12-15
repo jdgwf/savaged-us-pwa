@@ -4,12 +4,11 @@ use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
-use wasm_bindgen_futures::spawn_local;
+// use wasm_bindgen_futures::spawn_local;
 
+use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
-
-use crate::local_storage::get_chargen_data_from_index_db;
 
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use crate::pages::info::info_router::InfoRouter;
@@ -21,7 +20,7 @@ use crate::pages::main_home::MainHome;
 
 
 use crate::pages::main_playground::MainPlayground;
-
+// use crate::local_storage::check_and_upgrade_index_db_stores;
 use crate::components::ui_page::UIPage;
 
 use crate::pages::user::login::UserLogin;
@@ -267,6 +266,9 @@ impl Component for MainApp {
         ctx: &Context<Self>
     ) -> Self {
 
+
+
+
         let ( global_vars_context, _global_vars_context_handler ) = ctx
             .link()
             .context::<GlobalVarsContext>(
@@ -304,19 +306,23 @@ impl Component for MainApp {
             global_vars.login_token.to_owned(),
         );
 
-        let mut msg = WebSocketMessage::default();
+        // let mut msg = WebSocketMessage::default();
 
-        msg.token = login_token_send;
-        msg.kind = WebsocketMessageType::Online;
+        // msg.token = login_token_send;
+        // msg.kind = WebsocketMessageType::Online;
+
+        // global_vars.chargen_data = None;
 
         global_vars.chargen_data = None;
+        // // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
 
+        // global_vars.send_websocket.emit( msg );
 
-        // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
-
-        global_vars.send_websocket.emit( msg );
-
-
+        // spawn_local(
+        //     async move {
+        //         check_and_upgrade_index_db_stores().await;
+        //     }
+        // );
 
         MainApp {
             global_vars_context: global_vars_context,
@@ -473,6 +479,7 @@ impl Component for MainApp {
 
             MainAppMessage::ReceivedWebSocket( sent_data ) => {
 
+                // log!( format!("ReceivedWebSocket {}", &sent_data.len() ) );
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
                 // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
@@ -481,6 +488,7 @@ impl Component for MainApp {
                         global_vars.offline = false;
                         // global_vars.user_loading = false;
 
+                        // log!( format!("calling handle_message " ));
                         handle_message(
                             msg,
                             global_vars,

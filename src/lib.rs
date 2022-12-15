@@ -1,3 +1,4 @@
+use pages::user::user_router::UserRouter;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
@@ -38,8 +39,8 @@ pub struct ServerAppProps {
 pub enum MainServerRoute {
     #[at("/")]
     Home,
-    // #[at("/me/*")]
-    // UserRouter,
+    #[at("/me/*")]
+    UserRouter,
     #[at("/login")]
     UserLogin,
     #[at("/forgot-password")]
@@ -71,32 +72,16 @@ pub struct SubmenuData {
 #[derive(Debug)]
 pub enum MainServerAppMessage {
     SetSubmenu( SubmenuData ),
-
-    // ToggleUserMenu( bool ),
     ToggleMobileMenu(bool),
     HidePopupMenus(bool),
-
-    // UpdateCurrentUser( User ),
     UpdateGlobalVars( GlobalVars ),
-    // ContextUpdated( GlobalVarsContext ),
     LogOut( String ),
 
-    // OpenConfirmationDialog(
-    //     ConfirmationDialogDefinition,
-    // ),
-    // CloseConfirmationDialog( MouseEvent ),
+
 }
 
 pub struct MainServerApp {
-    // submenu: Html,
-    // show_mobile_menu: bool,
-    // global_vars_context: GlobalVarsContext,
-    // global_vars: GlobalVars,
-    // current_unread_notifications: u32,
-    // current_sub_menu: String,
 
-    // confirmation_dialog_open: bool,
-    // confirmation_dialog_properties: ConfirmationDialogDefinition,
 }
 
 fn content_switch(
@@ -153,17 +138,17 @@ fn content_switch(
         //         <Redirect<MainServerRoute> to={MainServerRoute::SettingsPrivate} />
         //     }
         // },
-        // MainServerRoute::UserRouter => {
-        //     html! {
-        //         <UserRouter
-        //             global_vars={global_vars}
-        //             set_submenu={submenu_callback}
-        //             on_logout_action={on_logout_action}
-        //             update_global_vars={update_global_vars}
-        //             open_confirmation_dialog={open_confirmation_dialog}
-        //         />
-        //     }
-        // },
+        MainServerRoute::UserRouter => {
+            html! {
+                <UserRouter
+                    global_vars={global_vars}
+                    set_submenu={Callback::noop()}
+                    on_logout_action={Callback::noop()}
+                    update_global_vars={Callback::noop()}
+                    open_confirmation_dialog={Callback::noop()}
+                />
+            }
+        },
         // MainServerRoute::TestSheetRouterRedirect => {
         //     html! {
         //         <Redirect<MainServerRoute> to={MainServerRoute::TestSheetRouter { sub_route: "home".to_owned() }} />
@@ -195,10 +180,7 @@ fn content_switch(
             }
         },
 
-        // MainServerRoute::NotFound => {
-        //     // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
-        //     html! { <h1>{ "MainServerRoute 404" }</h1> }
-        // }
+
         MainServerRoute::NotFound => {
             // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
             html! { <h1>{ "MainServerRoute 404" }</h1> }
@@ -213,12 +195,6 @@ pub fn ServerApp(
     props: &ServerAppProps
 ) -> Html {
 
-    // let login_token = get_local_storage_string( "login_token", "".to_owned() );
-    // let mut user_loading = true;
-
-    // if login_token.is_empty() {
-    //     user_loading = false;
-    // }
 
     // let server_root = "http://localhost:5001".to_owned();
     let server_root = "https://v4/savaged.us".to_owned();
@@ -234,9 +210,8 @@ pub fn ServerApp(
             api_root: server_root + &"/_api",
             site_title: "v4.savaged.us".to_owned(),
             hide_popup_menus_callback: Callback::noop(),
-            no_calls: true,
+            server_side_renderer: true,
             offline: true,
-            // update_global_vars: Callback::noop(),
             send_websocket: Callback::noop(),
             saves: None,
             show_mobile_menu: false,
@@ -245,6 +220,7 @@ pub fn ServerApp(
             toggle_mobile_menu_callback: Callback::noop(),
             current_menu: "".to_string(),
             current_sub_menu: "".to_string(),
+            server_side_renderer_history: None,
         }
     );
 
@@ -256,36 +232,23 @@ pub fn ServerApp(
         .push_with_query(&*props.url, &blank_hs)
         .unwrap();
 
-    let global_vars: GlobalVars = (*global_vars_state).clone();
-    // let global_vars3: GlobalVars = (*global_vars_state).clone();
+    let mut global_vars: GlobalVars = (*global_vars_state).clone();
 
+    global_vars.server_side_renderer_history = Some(history.clone());
     let callback_content =
         move |routes| {
             content_switch(
                 routes,
-                // &set_submenu,
                 global_vars.clone(),
-                // &on_logout_action,
                 &Callback::noop(),
-                // &open_confirmation_dialog,
-                // show_mobile_menu,
             )
         }
     ;
 
-    // let submenu = html! { <></> };
-    // let mobile_submenu = html! { <></> };
-
-    // let global_vars1: GlobalVars = global_vars.clone();
-    // let global_vars2: GlobalVars = global_vars1.clone();
 
     html! {
-        // <ContextProvider<GlobalVarsContext>
-        //     context={global_vars_state}
-        // >
+
         <>
-            // <>{"Moo?"}</>
-            // <MainServerApp />
             <Router
                 history={history}
             >
@@ -293,7 +256,6 @@ pub fn ServerApp(
             <Switch<MainServerRoute> render={callback_content} />
 
             </Router>
-        // </ContextProvider<GlobalVarsContext>>
         </>
     }
 }

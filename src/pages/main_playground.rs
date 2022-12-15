@@ -68,7 +68,7 @@ impl Component for MainPlayground {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Playground".to_owned(), global_vars.no_calls,);
+        set_document_title(global_vars.site_title.to_owned(), "Playground".to_owned(), global_vars.server_side_renderer,);
         MainPlayground {
             // dragging_item: None,
             dropped_items: Vec::new(),
