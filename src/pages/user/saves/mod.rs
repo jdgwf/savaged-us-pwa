@@ -290,7 +290,7 @@ impl Component for UserSaves {
             TertiaryMenuItem {
                 tag: "".to_owned(),
                 label: "Add".to_owned(),
-                class: Some("abs-right".to_owned()),
+                class: Some("abs-right success-tab".to_owned()),
                 callback: Some(Callback::noop()),
                 title: None,
                 icon_class: Some("fa fa-plus".to_owned()),

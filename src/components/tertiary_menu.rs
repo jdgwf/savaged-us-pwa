@@ -144,13 +144,23 @@ impl Component for TertiaryMenu {
                             None => {}
                         }
 
+                        let mut base_class = "btn btn-primary".to_owned();
+
+                        match item.class {
+                            Some( the_class ) => {
+                                base_class += &" ";
+                                base_class += &the_class;
+                            }
+                            None => {}
+                        }
+
                         html!{
                             <div class="flex-grow-0">
                                 <a
                                     href="#"
                                     onclick={on_click}
                                     title={item_title}
-                                    class="btn btn-primary"
+                                    class={base_class}
                                 >
                                     {icon}{item.label.to_owned()}
                                 </a>

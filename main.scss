@@ -237,6 +237,10 @@ body {
             margin: 0 0 0 .25rem;
             display: block;
             white-space: nowrap;
+            float: none !important;
+            position: relative;
+            right: auto;
+
         }
         > ul {
             position: absolute;
@@ -621,6 +625,20 @@ body {
                         background: var(--borders-color);
                         &:hover {
                             background: var(--borders-color-lighten);
+                        }
+                    }
+                }
+                &.success-tab {
+                    a {
+
+
+                        color: #fff;
+                        background-color: #198754;
+                        border-color: #198754;
+                        &:hover {
+                            color: #fff;
+                            background-color: #157347;
+                            border-color: #146c43;
                         }
                     }
                 }
