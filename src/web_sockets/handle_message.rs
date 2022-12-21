@@ -1,3 +1,4 @@
+use savaged_libs::player_character::chargen_data::ChargenData;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use savaged_libs::websocket_message::{
@@ -5,6 +6,7 @@ use savaged_libs::websocket_message::{
     WebsocketMessageType,
 };
 use crate::libs::global_vars::GlobalVars;
+use crate::local_storage::clear_all_local_data;
 use crate::local_storage::get_chargen_data_from_index_db;
 use crate::local_storage::get_saves_from_index_db;
 use crate::local_storage::index_db_save_chargen_data;
@@ -32,14 +34,54 @@ pub fn handle_message(
             }
 
 
-            let mut global_vars_future = new_global_vars.clone();
-            spawn_local(async move {
+            if new_global_vars.current_user.id > 0 {
+                let mut global_vars_future = new_global_vars.clone();
+                spawn_local(async move {
 
-                global_vars_future.chargen_data = get_chargen_data_from_index_db().await;
-                global_vars_future.saves = get_saves_from_index_db().await;
+                    global_vars_future.chargen_data = get_chargen_data_from_index_db().await;
+                    global_vars_future.saves = get_saves_from_index_db().await;
 
-                update_global_vars.emit(global_vars_future);
-            });
+                    update_global_vars.emit(global_vars_future);
+                });
+            } else {
+                let mut global_vars_future = new_global_vars.clone();
+                spawn_local(async move {
+
+                    global_vars_future.chargen_data = get_chargen_data_from_index_db().await;
+                    global_vars_future.saves = get_saves_from_index_db().await;
+
+                    global_vars_future.offline = false;
+                    global_vars_future.user_loading = false;
+                    // update_global_vars.emit(global_vars_future);
+                    // global_vars_future.saves = global_vars_future.saves;
+                    // global_vars_future.chargen_data = global_vars_future.chargen_data;
+
+                    let saves = global_vars_future.clone().saves.unwrap_or( Vec::new() );
+                    let chargen_data = &global_vars_future.clone().chargen_data.unwrap_or( ChargenData::default() );
+
+                    // log!("new_global_vars.saves", saves.len());
+                    // log!("chargen_data.books", chargen_data.books.len());
+                    // log!("chargen_data.edges", chargen_data.edges.len());
+                    // log!("chargen_data.hindrances", chargen_data.hindrances.len());
+
+                    if saves.len() > 0 || chargen_data.books.len() != 2 {
+                        clear_all_local_data().await;
+
+                        log!("Clearing data");
+                        global_vars_future.chargen_data = None;
+                        global_vars_future.saves = None;
+
+                    }
+
+                    update_global_vars.emit(global_vars_future);
+
+                    let mut msg = WebSocketMessage::default();
+
+                    msg.token = None;
+                    msg.kind = WebsocketMessageType::ChargenData;
+                    new_global_vars.send_websocket.emit( msg );
+                });
+            }
 
             // spawn_local(async move {
 

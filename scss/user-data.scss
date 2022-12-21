@@ -11,11 +11,12 @@ body {
             height: 175px;
             margin: .5rem;
             display: inline-block;
-            overflow: hidden;
-            cursor: pointer;
+            // overflow: hidden;
+            // cursor: pointer;
             border-radius: .5rem;
             border: solid 2px #888;
             background-size: cover;
+            overflow: hidden;
 
             // .window-tinting {
             //     position: absolute;
@@ -34,8 +35,11 @@ body {
                 z-index: 10;
                 height: 175px;
                 width: 175px;
-                padding: 20% 10px 0 10px;
+                // border-radius: .5rem;
+                padding: 10% 10px 0 10px;
                 background: rgba(0,0,0,.6);
+                overflow: hidden;
+
                 h3 {
                     font-size: 1.1rem;
                     font-weight: 500;
@@ -53,9 +57,26 @@ body {
                 }
             }
 
-            &:hover {
+            .controls {
+                position: absolute;
+                bottom: -42px;
+                height: 0;
+                background: #000;
+                transition: bottom .5s;
+                transition: height .5s;
+                width: 100%;
+                z-index: 11;
+                overflow: hidden;
+
+            }
+
+            &:hover     {
                 .text {
                     background: rgba(0,0,0,.4);
+                }
+                .controls {
+                    bottom: 0;
+                    height: 126px;
                 }
             }
         }

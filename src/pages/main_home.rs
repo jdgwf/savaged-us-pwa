@@ -75,11 +75,16 @@ impl Component for MainHome {
                 page_title="Home"
             >
 
-
                 <h2><i class="fa fa-house" /><Nbsp />{"Home Page"}</h2>
                 <hr />
-                {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
+                <div class="alert alert-info">
+                    {"Note, this is using LIVE data from"}<Nbsp /><a href="https://savaged.us">{"https://savaged.us"}</a>{". However it's not using the live database. Every morning at 03:00CST the entirety of the live database is copied here. Which means your changes, settings, and login tokens at this URL will all be overwritten every day."}<br />
+                    <br />
+                    {"This is good, because this is a ground-up rewrite and there certainly will be breaking changes to our data - especially this early in development."}
+                </div>
+                // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
                 <hr />
+                <h3>{"Data Retrieval Event Buttons"}</h3>
                 <button
                     class="btn"
                     onclick={ move |_e| {

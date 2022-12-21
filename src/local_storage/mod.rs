@@ -264,6 +264,9 @@ pub async fn index_db_save_chargen_data(
     }
     db.close();
 
+    set_local_storage_string("chargen_data_level",  format!("{:?}", &chargen_data.data_level ).to_owned() );
+    set_local_storage_string("chargen_data_last_updated",  update_stats.latest_updated_on.to_string() );
+
     log!("index_db_save_chargen_data 5");
     return update_stats;
 }
@@ -375,13 +378,26 @@ pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
     return None;
 }
 
-pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
-    let mut chargen_data = ChargenData{
-        books: Vec::new(),
-        edges: Vec::new(),
-        hindrances: Vec::new(),
-    };
+pub async fn clear_all_local_data() {
+    let db_req_option = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
+    match db_req_option {
+        Ok( mut db_req ) => {
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            // let tx = db.transaction_on_one(INDEX_DB_BOOKS_STORE_NAME).unwrap();
+            // let store = tx.object_store(INDEX_DB_BOOKS_STORE_NAME).unwrap();
+
+            let _ = db.delete();
+        }
+        Err( _err ) => {
+
+        }
+    }
+
+}
+
+pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
+    let mut chargen_data = ChargenData::default();
 
     let db_req_option = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 

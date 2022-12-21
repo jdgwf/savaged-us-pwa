@@ -1,13 +1,14 @@
-use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html, Callback};
+// use web_sys::MouseEvent;
+use yew::{function_component, Properties, Html, html};
 use yew_router::prelude::Link;
 use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::user_router::UserRoute;
-use standard_components::libs::set_document_title::set_document_title;
-use gloo_console::log;
-use standard_components::ui::nbsp::Nbsp;
+use crate::components::lds_roller::LDSRoller;
+use crate::components::lds_spinner::LDSSpinner;
+// use gloo_console::log;
+// use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
 pub struct MenuMainProps {
     pub global_vars: GlobalVars,
@@ -183,6 +184,11 @@ pub fn menu_main(
                             }
                         </>
                     }
+                </li>
+            } else {
+                <li class={login_class_active}>
+                    <LDSSpinner />
+                    // <LDSRoller />
                 </li>
             }
 

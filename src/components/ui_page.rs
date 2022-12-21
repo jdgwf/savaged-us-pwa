@@ -1,5 +1,5 @@
-use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html, Children, Callback};
+// use web_sys::MouseEvent;
+use yew::{function_component, Properties, Html, html, Children};
 use crate::components::menu_main::MenuMain;
 use crate::components::menu_mobile::MenuMobile;
 use crate::libs::global_vars::GlobalVars;
@@ -61,7 +61,7 @@ pub fn ui_page(
             // </div>
         </header>
 
-        <div class={"position-relative"}>
+        <div class={"content-holder"}>
 
             <div class={mobile_active_class}>
                 <MenuMobile

@@ -5,10 +5,14 @@ use yew::prelude::*;
 use yew::{function_component, html};
 
 // use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
+use crate::components::tertiary_menu::{
+    TertiaryMenuItem,
+    TertiaryMenu
+};
 use crate::components::ui_page::UIPage;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
@@ -19,7 +23,7 @@ use crate::libs::global_vars::GlobalVars;
 // use super::settings_api_key::SettingsAPIKey;
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
-// use gloo_console::log;
+use gloo_console::log;
 
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
@@ -34,8 +38,8 @@ pub struct UserSavesProps {
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub struct UserSavesMessage {
-
+pub enum UserSavesMessage {
+    ChangeFilter(String),
 }
 pub struct UserSaves {
     global_vars: GlobalVars,
@@ -52,10 +56,21 @@ impl Component for UserSaves {
         }
     }
 
-    // fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
 
-    //     true
-    // }
+    fn update(
+        &mut self, ctx: &Context<Self>,
+        msg: UserSavesMessage
+    ) -> bool {
+
+
+        match msg {
+            UserSavesMessage::ChangeFilter( filter_type ) => {
+                log!("ChangeFilter", filter_type);
+                // set_local_storage_string( "saves_filter", filter_type);
+            }
+        }
+        true
+    }
 
 
     fn changed(
@@ -66,21 +81,22 @@ impl Component for UserSaves {
         // log!("main_home changed called" );
         self.global_vars = ctx.props().global_vars.clone();
 
-        // let submenu_data =
-        //     SubmenuData {
-        //         html: html! (<></>),
-        //         menu: "user-menu-no-user".to_owned(),
-        //         unread_notifications: self.global_vars.current_user.unread_notifications,
+        // read_notifications: self.global_vars.current_user.unread_notifications,
         //     };
 
         true
     }
 
-
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let mut global_vars = ctx.props().global_vars.clone();
 
+
+        let mut filter_type = "character".to_owned();
+
+        if !ctx.props().global_vars.server_side_renderer {
+            filter_type = get_local_storage_string( "saves_filter" , "character".to_string());
+        }
         if self.global_vars.user_loading {
 
 
@@ -132,16 +148,99 @@ impl Component for UserSaves {
         }
 
         let server_root = global_vars.server_root.clone();
+
+        let change_filter_callback_character = ctx.link().callback(UserSavesMessage::ChangeFilter);
+
+        let filter_by = | save: &SaveDBRow | {
+            let filter_type= filter_type.to_owned();
+
+            if filter_type == "scifi2014".to_owned() {
+                if save.save_type == "starship"
+                    || save.save_type == "vehicle"
+                    || save.save_type == "power-armor"
+                    || save.save_type == "walker" {
+                        return true;
+                    }
+            } else if filter_type == "gear".to_owned() {
+                if save.save_type == "gear"
+                    || save.save_type == "weapon"
+                    || save.save_type == "armor"
+                    || save.save_type == "cybernetics" {
+                        return true;
+                    }
+            }  else if filter_type == "other".to_owned() {
+                if save.save_type == "edges"
+                    || save.save_type == "hindrances" {
+                        return true;
+                    }
+            } else if save.save_type == filter_type {
+                return true;
+            }
+
+            return false;
+
+        };
+
+        let sub_menu_items: Vec<TertiaryMenuItem> = vec![
+            TertiaryMenuItem {
+                tag: "character".to_owned(),
+                label: "Characters".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem {
+                tag: "setting".to_owned(),
+                label: "Settings".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem{
+                tag: "race".to_owned(),
+                label: "Races".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem {
+                tag: "bestiary".to_owned(),
+                label: "Bestiary".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem {
+                tag: "gear".to_owned(),
+                label: "Gear".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem {
+                tag: "other".to_owned(),
+                label: "Other".to_owned(),
+                class: None,
+                callback: None,
+            },
+            TertiaryMenuItem {
+                tag: "scifi2014".to_owned(),
+                label: "Sci-fi Vehicles".to_owned(),
+                class: None,
+                callback: None,
+            },
+        ];
+
         html! {
             <UIPage
-                global_vars={global_vars}
+                global_vars={global_vars.clone()}
                 page_title="My Saves"
                 submenu_tag={"user-data".to_owned()}
             >
-                <>{"My Saves"}</>
+                <TertiaryMenu
+                    global_vars={global_vars.clone()}
+                    menu_items={sub_menu_items}
+                    menu_changed_callback={change_filter_callback_character}
+                    local_storage_variable={"saves_filter".to_owned()}
+                />
 
                 <div class="saves-card-container">
-                {saves.into_iter().map( |save| {
+                {saves.into_iter().filter( filter_by ).map( |save| {
                     if !save.deleted {
                         let mut image_style = "".to_owned();
                         if !save.imageurl.is_empty() {
@@ -160,6 +259,31 @@ impl Component for UserSaves {
                                     <div class="small-text">{save.save_type}<Nbsp />{"|"}<Nbsp />{save.folder}</div>
                                     <div class="small-text">{save.uuid}</div>
                                 </div>
+
+                                <div class={"controls"}>
+                                    <button
+                                        class="btn btn-primary"
+                                    >
+                                        <i class={"fa fa-edit"} />
+                                    </button>
+                                    <button
+                                        class="btn btn-danger"
+                                    >
+                                        <i class={"fa fa-trash"} />
+                                    </button>
+                                    // <button
+                                    //     class="btn btn-secondary"
+                                    // >
+                                    //     <i class={"fa fa-bars"} />
+                                    // </button>
+
+                                    <ul class="styleless">
+                                        <li>{"Sub-Menu"}</li>
+                                        <li>{"Sub-Menu"}</li>
+                                        <li>{"Sub-Menu"}</li>
+                                        <li>{"Sub-Menu"}</li>
+                                    </ul>
+                                </div>
                             </div>
                         }
                     } else {
@@ -171,5 +295,4 @@ impl Component for UserSaves {
         }
     }
 }
-
 
