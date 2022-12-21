@@ -11,14 +11,29 @@ body {
         display: flex;
     }
 
-    .flex-grow {
+    .no-margins {
+        margin: 0;
+    }
+    .flex-grow,
+    .flex-grow-1 {
         flex-grow: 1;
+    }
+    .flex-grow-0 {
+        flex-grow: 0;
     }
 
     .pull-left {
         float: left;
     }
 
+    .abs-right {
+        position: absolute;
+        right: 0;
+    }
+    .abs-left {
+        position: absolute;
+        left: 0;
+    }
     .no-wrap {
         white-space: nowrap;
     }

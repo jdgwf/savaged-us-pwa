@@ -181,48 +181,120 @@ impl Component for UserSaves {
 
         };
 
+        let mut character_count = 0;
+        let mut setting_count = 0;
+        let mut race_count = 0;
+        let mut gear_count = 0;
+        let mut other_count = 0;
+        let mut scifi_count = 0;
+        let mut bestiary_count = 0;
+        let mut trash_count = 0;
+
+        for item in global_vars.clone().saves.unwrap_or(Vec::new()) {
+            if item.deleted {
+                trash_count += 1;
+            }
+            if item.save_type == "character".to_owned() {
+                character_count += 1;
+            }
+            if item.save_type == "race".to_owned() {
+                race_count += 1;
+            }
+            if item.save_type == "setting".to_owned() {
+                setting_count += 1;
+            }
+            if item.save_type == "bestiary".to_owned() {
+                bestiary_count += 1;
+            }
+            if item.save_type == "gear".to_owned()
+                ||item.save_type == "weapon".to_owned()
+                || item.save_type == "armor".to_owned() {
+                gear_count += 1;
+            }
+            if item.save_type == "hindrances".to_owned()
+                ||item.save_type == "edges".to_owned() {
+                other_count += 1;
+            }
+            if item.save_type == "starship"
+            || item.save_type == "vehicle"
+            || item.save_type == "power-armor"
+            || item.save_type == "walker" {
+                scifi_count += 1;
+            }
+        }
+
         let sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
                 tag: "character".to_owned(),
-                label: "Characters".to_owned(),
+                label: "Characters".to_owned() + &" (" + &character_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem {
                 tag: "setting".to_owned(),
-                label: "Settings".to_owned(),
+                label: "Settings".to_owned() + &" (" + &setting_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem{
                 tag: "race".to_owned(),
-                label: "Races".to_owned(),
+                label: "Races".to_owned() + &" (" + &race_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem {
                 tag: "bestiary".to_owned(),
-                label: "Bestiary".to_owned(),
+                label: "Bestiary".to_owned() + &" (" + &bestiary_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem {
                 tag: "gear".to_owned(),
-                label: "Gear".to_owned(),
+                label: "Gear".to_owned() + &" (" + &gear_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem {
                 tag: "other".to_owned(),
-                label: "Other".to_owned(),
+                label: "Other".to_owned() + &" (" + &other_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
             },
             TertiaryMenuItem {
                 tag: "scifi2014".to_owned(),
-                label: "Sci-fi Vehicles".to_owned(),
+                label: "Sci-fi Vehicles".to_owned() + &" (" + &scifi_count.to_string() + &")",
                 class: None,
                 callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+            TertiaryMenuItem {
+                tag: "".to_owned(),
+                label: "Add".to_owned(),
+                class: Some("abs-right".to_owned()),
+                callback: Some(Callback::noop()),
+                title: None,
+                icon_class: Some("fa fa-plus".to_owned()),
+                separate: true,
             },
         ];
 
