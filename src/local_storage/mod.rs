@@ -1,9 +1,11 @@
 use chrono::{DateTime, TimeZone};
 use chrono::offset::{Utc};
+use gloo_console::__macro::Array;
+use savaged_libs::book::Book;
 use savaged_libs::player_character::chargen_data::ChargenData;
 use savaged_libs::save_db_row::SaveDBRow;
 use wasm_bindgen::JsValue;
-use web_sys::DomException;
+use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use indexed_db_futures::{prelude::*, js_sys};
@@ -12,7 +14,7 @@ use gloo_console::log;
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
 static INDEX_DB_SAVES_STORE_NAME: &str = "saves";
-static INDEX_DB_VERSION: u32 = 4;
+static INDEX_DB_VERSION: u32 = 5;
 
 #[derive(Debug)]
 pub struct ChargenSyncUpdateResults {
@@ -31,29 +33,29 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
     db_req.set_on_upgrade_needed(
         Some(|evt: &IdbVersionChangeEvent| -> Result<(), JsValue> {
 
-            log!("_create_tables?");
+            // log!("_create_tables?");
             // Check if the object store exists; create it if it doesn't
             if let None = evt.db().object_store_names().find(|n| n == INDEX_DB_BOOKS_STORE_NAME) {
                 let _ = evt.db().create_object_store(INDEX_DB_BOOKS_STORE_NAME).unwrap();
-                log!("Created indexed_db store", INDEX_DB_BOOKS_STORE_NAME);
+                // log!("Created indexed_db store", INDEX_DB_BOOKS_STORE_NAME);
             }
             if let None = evt.db().object_store_names().find(|n| n == "chargen_edges" ) {
                 let _ = evt.db().create_object_store("chargen_edges").unwrap();
-                log!("Created indexed_db store", "chargen_edges");
+                // log!("Created indexed_db store", "chargen_edges");
 
             }
             if let None = evt.db().object_store_names().find(|n| n == "chargen_hindrances" ) {
                 let _ = evt.db().create_object_store("chargen_hindrances").unwrap();
-                log!("Created indexed_db store", "chargen_hindrances");
+                // log!("Created indexed_db store", "chargen_hindrances");
 
             }
 
             if let None = evt.db().object_store_names().find(|n| n == INDEX_DB_SAVES_STORE_NAME ) {
                 let _ = evt.db().create_object_store(INDEX_DB_SAVES_STORE_NAME).unwrap();
-                log!("Created indexed_db store", INDEX_DB_SAVES_STORE_NAME);
+                // log!("Created indexed_db store", INDEX_DB_SAVES_STORE_NAME);
 
             }
-            log!("_create_tables end");
+            // log!("_create_tables end");
             Ok(())
         })
     );
@@ -106,7 +108,7 @@ pub async fn index_db_save_saves(
 
     let mut db_req: OpenDbRequest = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION).unwrap();
 
-    log!("index_db_save_saves 1");
+    // log!("index_db_save_saves 1");
 
     _create_tables( &mut db_req ).await;
 
@@ -114,7 +116,7 @@ pub async fn index_db_save_saves(
     /* Saves */
     let db: IdbDatabase = db_req.into_future().await.unwrap();
 
-    log!("index_db_save_saves 2");
+    // log!("index_db_save_saves 2");
     for  save in &saves {
 
         match save.updated_on {
@@ -140,7 +142,7 @@ pub async fn index_db_save_saves(
         match err {
             Ok( _ ) => {
                 let _ =  tx.await.into_result();
-                log!( format!("index_db_save_saves saved key ID:{} ", save.uuid) );
+                // log!( format!("index_db_save_saves saved key ID:{} ", save.uuid) );
                 update_stats.saves += 1;
             }
             Err( _err ) => {
@@ -166,7 +168,7 @@ pub async fn index_db_save_chargen_data(
 
     let mut db_req: OpenDbRequest = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION).unwrap();
 
-    log!("index_db_save_chargen_data 1");
+    // log!("index_db_save_chargen_data 1");
 
     _create_tables( &mut db_req ).await;
 
@@ -174,7 +176,7 @@ pub async fn index_db_save_chargen_data(
     /* Books */
     let db: IdbDatabase = db_req.into_future().await.unwrap();
 
-    log!("index_db_save_chargen_data 2");
+    // log!("index_db_save_chargen_data 2");
     for  book in &chargen_data.books {
 
         match book.updated_on {
@@ -206,7 +208,7 @@ pub async fn index_db_save_chargen_data(
 
 
     let db: IdbDatabase = db_req.into_future().await.unwrap();
-    log!("index_db_save_chargen_data 3");
+    // log!("index_db_save_chargen_data 3");
     for  item in &chargen_data.edges {
 
         let tx: IdbTransaction = db
@@ -238,7 +240,7 @@ pub async fn index_db_save_chargen_data(
 
 
     let db: IdbDatabase = db_req.into_future().await.unwrap();
-    log!("index_db_save_chargen_data 4");
+    // log!("index_db_save_chargen_data 4");
     for  item in &chargen_data.hindrances {
 
         let tx: IdbTransaction = db
@@ -267,7 +269,7 @@ pub async fn index_db_save_chargen_data(
     set_local_storage_string("chargen_data_level",  format!("{:?}", &chargen_data.data_level ).to_owned() );
     set_local_storage_string("chargen_data_last_updated",  update_stats.latest_updated_on.to_string() );
 
-    log!("index_db_save_chargen_data 5");
+    // log!("index_db_save_chargen_data 5", format!("{:?}", &chargen_data.data_level ).to_owned());
     return update_stats;
 }
 
@@ -379,21 +381,52 @@ pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
 }
 
 pub async fn clear_all_local_data() {
-    let db_req_option = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    clear_chargen_local_data().await;
+    clear_saves_local_data().await;
 
+}
+
+pub async fn clear_saves_local_data() {
+    clear_data_store( INDEX_DB_SAVES_STORE_NAME ).await;
+}
+
+pub async fn clear_data_store( store_name: &str ) {
+    let mut db_req_option = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+
+    // log!("clear_data_store called", store_name);
     match db_req_option {
         Ok( mut db_req ) => {
+
             let db: IdbDatabase = db_req.into_future().await.unwrap();
-            // let tx = db.transaction_on_one(INDEX_DB_BOOKS_STORE_NAME).unwrap();
-            // let store = tx.object_store(INDEX_DB_BOOKS_STORE_NAME).unwrap();
+            // let tx = db.transaction_on_one(store_name).unwrap();
+            let tx: IdbTransaction = db
+                .transaction_on_one_with_mode(
+                    store_name,
+                    IdbTransactionMode::Readwrite
+                ).unwrap();
+            let store = tx.object_store(store_name).unwrap();
 
-            let _ = db.delete();
+            let rv = store.clear();
+
+            match rv {
+                Ok( _val ) => {
+                    // log!( format!("clear_data_store cleared {}", store_name) );
+                }
+                Err( err ) => {
+                    log!( format!("clear_data_store errpr {} {:?}", store_name, err) );
+                }
+            }
         }
-        Err( _err ) => {
-
+        Err( err ) => {
+            log!( format!("clear_data_store error! {:?}", err) );
         }
     }
+}
 
+pub async fn clear_chargen_local_data() {
+    clear_data_store( INDEX_DB_BOOKS_STORE_NAME ).await;
+    clear_data_store( "chargen_edges" ).await;
+    clear_data_store( "chargen_hindrances" ).await;
 }
 
 pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
@@ -404,8 +437,10 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
     match db_req_option {
         Ok( mut db_req ) => {
 
+            // log!("get_chargen_data_from_index_db CALLED");
             _create_tables( &mut db_req ).await;
 
+            // log!("get_chargen_data_from_index_db CALLED 2");
             // Books.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one(INDEX_DB_BOOKS_STORE_NAME).unwrap();

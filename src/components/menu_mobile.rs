@@ -61,35 +61,6 @@ pub fn menu_mobile(
                 }
 
             }).collect::<Html>()}
-            //     <li class={home_class_active}>
-            //         <Link<MainRoute> to={MainRoute::Home}><i class="fa fa-house" /><Nbsp />{"Home"}</Link<MainRoute>>
-            //         {home_submenu}
-            //     </li>
-            //     if global_vars.current_user.id > 0 {
-            //         <li class={user_data_class_active}>
-            //             <Link<UserDataRoute> to={UserDataRoute::Saves}><i class="fa fa-boxes-stacked" /><Nbsp />{"My Stuff"}</Link<UserDataRoute>>
-            //             {user_data_submenu}
-            //         </li>
-            //     }
-            //     <li class={about_class_active}>
-            //         <Link<MainRoute> to={MainRoute::About}><i class="fa fa-circle-info" /><Nbsp />{"About"}</Link<MainRoute>>
-            //     </li>
-            //     <li class={tech_class_active}>
-            //         <Link<MainRoute> to={MainRoute::Tech}><i class="fa fa-microchip" /><Nbsp />{"Tech"}</Link<MainRoute>>
-            //     </li>
-            //     <li class={todos_class_active}>
-            //         <Link<MainRoute> to={MainRoute::ToDos}><i class="fa fa-list" /><Nbsp />{"To-Dos"}</Link<MainRoute>>
-            //         {todos_submenu}
-            //     </li>
-            //     // <li class={playground_class_active}>
-            //     //     <Link<MainRoute> to={MainRoute::Playground}><i class="fa fa-list" /><Nbsp />{"Playground"}</Link<MainRoute>>
-            //     // </li>
-            //     if global_vars.current_user.id > 0 {
-            //         <li class={settings_class_active}>
-            //             <Link<UserRoute> to={UserRoute::SettingsPrivate}>{"Settings"}</Link<UserRoute>>
-            //             {settings_submenu}
-            //         </li>
-            //     }
 
             </ul>
 

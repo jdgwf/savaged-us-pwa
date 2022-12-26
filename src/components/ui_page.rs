@@ -22,11 +22,13 @@ pub struct UIPageProps {
 pub fn ui_page(
     props: &UIPageProps,
 ) -> Html {
-    set_document_title(
-        props.global_vars.site_title.to_owned(),
-        props.page_title.to_owned(),
-        props.global_vars.server_side_renderer,
-    );
+    if !props.global_vars.server_side_renderer {
+        set_document_title(
+            props.global_vars.site_title.to_owned(),
+            props.page_title.to_owned(),
+            props.global_vars.server_side_renderer,
+        );
+    }
 
     // let on_click_toggle_mobile_menu = Callback::from( move | _e: MouseEvent | {
     //     // toggle_mobile_menu.emit( true );

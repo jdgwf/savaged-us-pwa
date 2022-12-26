@@ -1,4 +1,5 @@
 use savaged_libs::player_character::chargen_data::ChargenData;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use savaged_libs::websocket_message::{
@@ -7,6 +8,7 @@ use savaged_libs::websocket_message::{
 };
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
+use crate::local_storage::clear_chargen_local_data;
 use crate::local_storage::get_chargen_data_from_index_db;
 use crate::local_storage::get_saves_from_index_db;
 use crate::local_storage::index_db_save_chargen_data;
@@ -67,7 +69,6 @@ pub fn handle_message(
                     if saves.len() > 0 || chargen_data.books.len() != 2 {
                         clear_all_local_data().await;
 
-                        log!("Clearing data");
                         global_vars_future.chargen_data = None;
                         global_vars_future.saves = None;
 
@@ -104,11 +105,19 @@ pub fn handle_message(
             log!( format!("handle_message ChargenData") );
             let mut new_global_vars = global_vars.clone();
             new_global_vars.chargen_data = msg.chargen_data.clone();
+
+
+            let chargen_data_level = get_local_storage_string("chargen_data_level", "".to_owned() );
+            let chargen_data_last_updated = get_local_storage_string("chargen_data_last_updated", "".to_owned() );
+
+            log!( format!("handle_message ChargenData chargen_data_level {}", chargen_data_level) );
+            log!( format!("handle_message ChargenData chargen_data_last_updated {}", chargen_data_last_updated) );
             // new_global_vars.user_loading = false;
 
             match  msg.chargen_data {
                 Some( chargen_data ) => {
                     spawn_local(async move {
+                        let _results  = clear_chargen_local_data().await;
                         let _results = index_db_save_chargen_data(chargen_data).await;
                         // log!( format!(" results, {:?}", results ) );
                     });

@@ -69,16 +69,16 @@ pub struct SubmenuData {
     pub unread_notifications: u32,
 }
 
-#[derive(Debug)]
-pub enum MainServerAppMessage {
-    SetSubmenu( SubmenuData ),
-    ToggleMobileMenu(bool),
-    HidePopupMenus(bool),
-    UpdateGlobalVars( GlobalVars ),
-    LogOut( String ),
+// #[derive(Debug)]
+// pub enum MainServerAppMessage {
+//     SetSubmenu( SubmenuData ),
+//     ToggleMobileMenu(bool),
+//     HidePopupMenus(bool),
+//     UpdateGlobalVars( GlobalVars ),
+//     LogOut( String ),
 
 
-}
+// }
 
 pub struct MainServerApp {
 

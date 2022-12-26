@@ -11,6 +11,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use crate::local_storage::clear_all_local_data;
 use crate::pages::info::info_router::InfoRouter;
 
 use crate::web_sockets::connect_to_websocket;
@@ -400,6 +401,16 @@ impl Component for MainApp {
                 self.global_vars.user_loading = false;
                 set_local_storage_string( "login_token", "".to_owned() );
 
+
+                let send_websocket = self.global_vars.send_websocket.clone();
+                spawn_local(
+                    async move {
+                        clear_all_local_data().await;
+                        let mut msg = WebSocketMessage::default();
+                        msg.kind = WebsocketMessageType::ChargenData;
+                        send_websocket.emit( msg );
+                    }
+                );
                 self.global_vars_context.dispatch( self.global_vars.to_owned() );
                 // self.global_vars = global_vars.clone();
 

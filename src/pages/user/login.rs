@@ -1,3 +1,5 @@
+use savaged_libs::websocket_message::WebSocketMessage;
+use savaged_libs::websocket_message::WebsocketMessageType;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -8,6 +10,7 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::libs::set_document_title::set_document_title;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
+use crate::local_storage::clear_all_local_data;
 use serde_json::Error;
 use crate::libs::fetch_api::savaged_login;
 use gloo_console::error;
@@ -31,7 +34,6 @@ pub enum UserLoginMessage {
     UpdatePassword(String),
     UpdateUsername(String),
     UpdateCurrentUser( LoginTokenResult ),
-    LogOut( String ),
     UpdateLoginMessage( String ),
 }
 
@@ -82,27 +84,43 @@ impl Component for UserLogin {
         match msg {
 
             UserLoginMessage::UpdateCurrentUser( login_result ) => {
-                log!("UserLoginMessage::UpdateCurrentUser", login_result.success);
+                // log!("UserLoginMessage::UpdateCurrentUser", login_result.success);
                 self.global_vars.current_user = login_result.user.clone();
                 self.global_vars.login_token = login_result.login_token.clone();
                 self.global_vars.user_loading = false;
+
+
+                ctx.props().update_global_vars.emit( self.global_vars.clone() );
+
+                // clear out local data
+                spawn_local (
+                    async move {
+                        clear_all_local_data().await;
+                    }
+                );
+
+                // request user and chargen data
+
+                let mut msg = WebSocketMessage::default();
+
+                msg.token = Some(login_result.login_token.to_owned());
+                msg.kind = WebsocketMessageType::ChargenData;
+
+                self.global_vars.send_websocket.emit( msg );
+
+                let mut msg_saves = WebSocketMessage::default();
+
+                msg_saves.token = Some(login_result.login_token.to_owned());
+                msg_saves.kind = WebsocketMessageType::Saves;
+
+                self.global_vars.send_websocket.emit( msg_saves );
+
+                // set_local_storage_string( "saves_owner_id", login_result.user.id.to_string() );
                 set_local_storage_string( "login_token", login_result.login_token.to_owned() );
-                ctx.props().update_global_vars.emit( self.global_vars.clone() );
+
                 return true;
             }
 
-            UserLoginMessage::LogOut( _new_value ) => {
-
-                // log!("LogOut?");
-                self.global_vars.current_user = User::default();
-
-                // self.global_vars.user_loading = false;
-                self.global_vars.login_token = "".to_owned();
-                set_local_storage_string( "login_token", "".to_owned() );
-
-                ctx.props().update_global_vars.emit( self.global_vars.clone() );
-                return true;
-            }
 
             UserLoginMessage::UpdateLoginMessage( new_value ) => {
 
@@ -142,11 +160,6 @@ impl Component for UserLogin {
         let update_current_user_from_login = ctx.link().callback(UserLoginMessage::UpdateCurrentUser);
         let set_login_message =  ctx.link().callback(UserLoginMessage::UpdateLoginMessage);
 
-        let log_out = ctx.link().callback(UserLoginMessage::LogOut);
-
-        let do_log_out = Callback::from( move | _e: MouseEvent | {
-            log_out.emit( "".to_owned() );
-        });
 
         let username = self.username.to_owned();
         let password = self.password.to_owned();
@@ -250,12 +263,7 @@ impl Component for UserLogin {
                             <strong>{"Display Name: "}</strong>{&global_vars.current_user.get_name()}<br />
                             <strong>{"Twitter: "}</strong>{&global_vars.current_user.twitter}<br />
                             </div>
-                            <button
-                                class={"btn btn-primary"}
-                                onclick={do_log_out}
-                            >
-                                <i class={"fa-solid fa-right-from-bracket"}></i><Nbsp />{"Log Out"}
-                            </button>
+
                         </fieldset>
                     } else {
                         <div class="row equal-heights">

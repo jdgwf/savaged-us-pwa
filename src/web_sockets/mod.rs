@@ -68,7 +68,7 @@ impl WebsocketService {
             while let Some(msg) = read.next().await {
                 match msg {
                     Ok(Message::Text(val)) => {
-                        log!("Message::Text", &val);
+                        // log!("Message::Text", &val);
                         received_message_callback.emit( val.to_string()  );
                         websocket_offline_callback.emit( false );
                     }
