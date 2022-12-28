@@ -40,7 +40,7 @@ impl Component for MainHome {
     ) -> Html {
 
         let global_vars = ctx.props().global_vars.clone();
-        let global_vars2 = ctx.props().global_vars.clone();
+        // let global_vars2 = ctx.props().global_vars.clone();
 
         let mut saves_html = html!{<></>};
         let mut chargen_html = html!{<></>};
@@ -84,54 +84,56 @@ impl Component for MainHome {
                 </div>
                 // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
                 <hr />
-                <h3>{"Data Retrieval Event Buttons"}</h3>
-                <button
-                    class="btn"
-                    onclick={ move |_e| {
-                        let login_token = global_vars.login_token.to_owned();
-                        let mut login_token_send: Option<String> = None;
-                        if !login_token.is_empty() {
-                            login_token_send = Some(login_token);
-                        }
+                // <h3>{"Data Retrieval Event Buttons"}</h3>
+                // <button
+                //     class="btn"
+                //     onclick={ move |_e| {
+                //         let login_token = global_vars.login_token.to_owned();
+                //         let mut login_token_send: Option<String> = None;
+                //         if !login_token.is_empty() {
+                //             login_token_send = Some(login_token);
+                //         }
 
-                        let mut msg = WebSocketMessage::default();
+                //         let mut msg = WebSocketMessage::default();
 
-                        msg.token = login_token_send;
-                        msg.kind = WebsocketMessageType::ChargenData;
+                //         msg.token = login_token_send;
+                //         msg.kind = WebsocketMessageType::ChargenData;
 
-                        global_vars.send_websocket.emit( msg );
-                    }}
-                >
-                    {"Request Chargen Data"}
-                </button>
+                //         global_vars.send_websocket.emit( msg );
+                //     }}
+                // >
+                //     {"Request Chargen Data"}
+                // </button>
 
-                if global_vars2.current_user.id > 0 {
-                <button
-                    class="btn"
-                    onclick={ move |_e| {
-                        let login_token = global_vars2.login_token.to_owned();
-                        let mut login_token_send: Option<String> = None;
-                        if !login_token.is_empty() {
-                            login_token_send = Some(login_token);
-                        }
+                // if global_vars2.current_user.id > 0 {
+                // <button
+                //     class="btn"
+                //     onclick={ move |_e| {
+                //         let login_token = global_vars2.login_token.to_owned();
+                //         let mut login_token_send: Option<String> = None;
+                //         if !login_token.is_empty() {
+                //             login_token_send = Some(login_token);
+                //         }
 
-                        let mut msg = WebSocketMessage::default();
+                //         let mut msg = WebSocketMessage::default();
 
-                        msg.token = login_token_send;
-                        msg.kind = WebsocketMessageType::Saves;
+                //         msg.token = login_token_send;
+                //         msg.kind = WebsocketMessageType::Saves;
 
-                        global_vars2.send_websocket.emit( msg );
-                    }}
-                >
-                    {"Request Saves"}
-                </button>
-                }
+                //         global_vars2.send_websocket.emit( msg );
+                //     }}
+                // >
+                //     {"Request Saves"}
+                // </button>
+                // }
 
                 <div class="row">
                     <div class="col-6">
+                        <h4>{"Chargen Data Counts"}</h4>
                         {chargen_html}
                     </div>
                     <div class="col-6">
+                        <h4>{"Saves Count"}</h4>
                         {saves_html}
                     </div>
                 </div>

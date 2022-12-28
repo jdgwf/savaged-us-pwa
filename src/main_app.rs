@@ -397,10 +397,16 @@ impl Component for MainApp {
                 self.global_vars.saves = None;
                 self.global_vars.chargen_data = None;
 
-                self.global_vars.login_token = "".to_owned();
+
                 self.global_vars.user_loading = false;
                 set_local_storage_string( "login_token", "".to_owned() );
 
+                let mut logout = WebSocketMessage::default();
+                logout.kind = WebsocketMessageType::Logout;
+                logout.token = Some(self.global_vars.login_token.clone());
+                self.global_vars.send_websocket.emit( logout );
+
+                self.global_vars.login_token = "".to_owned();
 
                 let send_websocket = self.global_vars.send_websocket.clone();
                 spawn_local(

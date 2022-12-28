@@ -146,7 +146,7 @@ pub async fn index_db_save_saves(
                 update_stats.saves += 1;
             }
             Err( _err ) => {
-                log!( format!("index_db_save_saves store data error ID:{}  /{:?}", save.id, _err) );
+                log!( format!("index_db_save_saves store data error ID: {} / {:?}", save.id, _err) );
             }
         }
 

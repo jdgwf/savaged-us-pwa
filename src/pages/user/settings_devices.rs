@@ -327,13 +327,21 @@ impl Component for SettingsDeviceLineItem {
                     <td class={"no-wrap"}>
                         <div class={"flex"}>
                             <div class="flex-grow">
+                            if device.logged_out {
+                                <div class="text-center">{"This device was manually logged out"}</div>
+                            } else {
+
+
                                 <InputText
                                     label_class={"plain"}
                                     value={self.friendly_name.clone()}
                                     placeholder={"Enter a friendly name"}
                                     onchange={ctx.link().callback(SettingsDeviceLineItemMessage::UpdateFriendlyName)}
                                 />
+
+                            }
                             </div>
+                            if !device.logged_out {
                             <button
                                 class={"btn btn-primary"}
                                 disabled={self.friendly_name == ctx.props().token.friendly_name}
@@ -341,6 +349,7 @@ impl Component for SettingsDeviceLineItem {
                             >
                                 <i class={"fa fa-save"} />
                             </button>
+                            }
                         </div>
                     </td>
                     <td class={"min-width no-wrap"}>{self.global_vars.current_user.format_datetime( device.registered.clone(), false, false, false)}</td>
