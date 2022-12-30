@@ -131,17 +131,22 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::Saves => {
-            // log!( format!("handle_message Saves {:?}", msg.saves) );
+
 
             let mut new_global_vars = global_vars.clone();
             new_global_vars.saves = msg.saves.clone();
 
             match msg.saves {
                 Some( saves ) => {
-
+                    // log!( format!("handle_message Saves {:?}", &saves) );
+                    // for item in &saves {
+                    //     if (&item.name).to_owned() == "Chi Master".to_owned() {
+                    //         log!( format!("saves item {:?}", item) );
+                    //     }
+                    // }
                     spawn_local(async move {
                         let _results = index_db_save_saves(saves).await;
-                        // log!( format!(" results, {:?}", results ) );
+                        // log!( format!("÷ results, {:?}", &_results ) );
                     });
                 }
                 None => {}

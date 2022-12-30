@@ -4,6 +4,53 @@ body {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+
+        .folder {
+            position: relative;
+            text-align: center;
+            width: 150px;
+            height: 150px;
+            margin: .5rem;
+
+
+            overflow: hidden;
+            .folder-base {
+                width: 150px;
+                height: 130px;
+                // margin: .5rem;
+                border-radius: .5rem;
+                // border: solid 2px #888;
+                padding: 35% 0 0 0;
+                background: #888;
+                overflow: hidden;
+                position: absolute;
+                bottom: 0;
+                cursor: pointer;
+                &.folder-up {
+                    padding: 15% 0 0 0;
+
+                    font-size: .8rem;
+                    i {
+                        font-size: 3.5rem;
+                        margin-bottom: 1rem;
+                    }
+                }
+            }
+
+            .folder-nip {
+                cursor: pointer;
+                width: 75px;
+                height: 30px;
+                // margin: .5rem;
+                border-radius: .5rem;
+                // border: solid 2px #888;
+                background: #888;
+                overflow: hidden;
+                position: absolute;
+                top: 0;
+            }
+
+        }
         .save-card {
             position: relative;
             text-align: center;

@@ -8,6 +8,7 @@ use crate::libs::fetch_api::fetch_api_send_token;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use wasm_bindgen_futures::spawn_local;
 use gloo_console::error;
+use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
 use crate::components::ui_page::UIPage;
@@ -48,21 +49,18 @@ impl Component for SettingsDevices {
         ctx: &Context<Self>,
         msg: SettingsDevicesMessages,
     ) -> bool {
-
         match msg {
-
             SettingsDevicesMessages::UpdateLoginItems( login_tokens ) => {
 
                 let mut global_vars = ctx.props().global_vars.clone();
 
                 global_vars.current_user.login_tokens = login_tokens.clone();
+
                 ctx.props().update_global_vars.emit( global_vars );
 
                 return true;
             }
-
         }
-
     }
 
     fn changed(
@@ -71,7 +69,7 @@ impl Component for SettingsDevices {
         _props: &SettingsDevicesProps,
     ) -> bool {
         self.global_vars = ctx.props().global_vars.clone();
-        true
+        return true;
     }
 
     fn view(
@@ -81,12 +79,13 @@ impl Component for SettingsDevices {
 
         let global_vars = ctx.props().global_vars.clone();
 
-        let mut login_tokens = self.global_vars.current_user.login_tokens.clone();
+        let mut login_tokens = global_vars.current_user.login_tokens.clone();
 
         login_tokens.sort_by
         (|a, b|
             b.last_seen.cmp(&a.last_seen)
         );
+
         if global_vars.user_loading {
             return html! {
                 <UIPage
@@ -188,7 +187,7 @@ pub enum SettingsDeviceLineItemMessage {
 }
 
 pub struct SettingsDeviceLineItem {
-    global_vars: GlobalVars,
+    // global_vars: GlobalVars,
     friendly_name: String,
 }
 
@@ -200,10 +199,10 @@ impl Component for SettingsDeviceLineItem {
         ctx: &Context<Self>
     ) -> Self {
 
-        let global_vars = ctx.props().global_vars.clone();
+        // let global_vars = ctx.props().global_vars.clone();
 
         SettingsDeviceLineItem {
-            global_vars: global_vars,
+            // global_vars: global_vars,
             friendly_name: ctx.props().token.friendly_name.clone()
         }
     }
@@ -236,6 +235,7 @@ impl Component for SettingsDeviceLineItem {
                                 let vec_val_result: Result<Vec<LoginToken>, Error> = JsValueSerdeExt::into_serde(&login_tokens_replace);
                                 match vec_val_result {
                                     Ok( vec_val ) => {
+                                        // log!( format!("result {:?}", vec_val) );
                                         update_login_tokens.emit( vec_val );
                                     }
                                     Err( err ) => {
@@ -310,8 +310,8 @@ impl Component for SettingsDeviceLineItem {
         ctx: &Context<Self>,
         _props: &SettingsDeviceLineItemProps,
     ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
-        true
+        self.friendly_name = ctx.props().token.friendly_name.clone();
+        return true;
     }
 
     fn view(
@@ -328,7 +328,17 @@ impl Component for SettingsDeviceLineItem {
                         <div class={"flex"}>
                             <div class="flex-grow">
                             if device.logged_out {
-                                <div class="text-center">{"This device was manually logged out"}</div>
+                                <div class="text-center">
+                                if !self.friendly_name.is_empty() {
+                                    <>
+
+                                        <strong>{self.friendly_name.clone()}</strong>
+                                        <Nbsp />{"-"}<Nbsp />
+                                    </>
+                                }
+                                    {"This device was manually logged out"}
+
+                                </div>
                             } else {
 
 
@@ -352,11 +362,11 @@ impl Component for SettingsDeviceLineItem {
                             }
                         </div>
                     </td>
-                    <td class={"min-width no-wrap"}>{self.global_vars.current_user.format_datetime( device.registered.clone(), false, false, false)}</td>
-                    <td class={"min-width no-wrap"}>{self.global_vars.current_user.format_datetime( device.last_seen.clone(), false, false, false)}</td>
+                    <td class={"min-width no-wrap"}>{ctx.props().global_vars.current_user.format_datetime( device.registered.clone(), false, false, false)}</td>
+                    <td class={"min-width no-wrap"}>{ctx.props().global_vars.current_user.format_datetime( device.last_seen.clone(), false, false, false)}</td>
                     <td class={"min-width no-wrap"}>{device.last_seen_ip}</td>
                     <td rowspan={2}>
-                        if device.token != self.global_vars.login_token {
+                        if device.token != ctx.props().global_vars.login_token {
                             <button
                                 class={"btn btn-danger"}
                                 onclick={ctx.link().callback( SettingsDeviceLineItemMessage::DeleteDevice )}
