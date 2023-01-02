@@ -212,6 +212,42 @@ impl Component for UserSaves {
 
         };
 
+        let filter_by_type = | save: &SaveDBRow | {
+            let filter_type= filter_type.to_owned();
+            let current_folder= current_folder.to_owned();
+
+            if save.deleted {
+                return false;
+            }
+
+            if filter_type == "scifi2014".to_owned() {
+                if save.save_type == "starship"
+                    || save.save_type == "vehicle"
+                    || save.save_type == "power-armor"
+                    || save.save_type == "walker" {
+                        return true;
+                    }
+            } else if filter_type == "gear".to_owned() {
+                if save.save_type == "gear"
+                    || save.save_type == "weapon"
+                    || save.save_type == "armor"
+                    || save.save_type == "cybernetics" {
+                        return true;
+                    }
+            } else if filter_type == "other".to_owned() {
+                if save.save_type == "edges"
+                    || save.save_type == "hindrances" {
+                        return true;
+                    }
+            } else if save.save_type == filter_type {
+                return true;
+
+            }
+
+            return false;
+
+        };
+
         let mut character_count = 0;
         let mut setting_count = 0;
         let mut race_count = 0;
@@ -226,8 +262,10 @@ impl Component for UserSaves {
             if item.deleted {
                 trash_count += 1;
             } else {
-                if filter_type == item.save_type {
-                    if !item.folder.is_empty() && !current_available_folders.contains(&item.folder) {
+                if filter_by_type(&item) {
+                    if !item.folder.is_empty()
+                        && !current_available_folders.contains(&item.folder)
+                    {
                         current_available_folders.push(item.folder);
                     }
                 }
