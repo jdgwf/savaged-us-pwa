@@ -69,7 +69,7 @@ pub fn get_menu_items(
             hardcoded: false,
             html: Some( html!{
                 <Link<UserRoute>
-                    to={UserRoute::UserSaves}
+                    to={UserRoute::UserSavesList}
                 >
                     <i class="fa fa-boxes-stacked" /><Nbsp />
                     {"My Stuff"}
@@ -87,7 +87,7 @@ pub fn get_menu_items(
                         hardcoded: false,
                         html: Some( html!{
                             <Link<UserRoute>
-                                to={UserRoute::UserSaves}
+                                to={UserRoute::UserSavesList}
                             >
                                 <i class="fa fa-boxes-stacked" /><Nbsp />
                                 {"My Saves"}

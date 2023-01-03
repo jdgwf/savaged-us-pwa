@@ -1,64 +1,51 @@
+
+use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
-use yew_router::history::{AnyHistory, History, MemoryHistory};
-
+use crate::pages::user::saves::list::UserSavesList;
+use crate::pages::user::saves::edit::UserSavesEdit;
+use crate::pages::user::saves::view::UserSavesView;
 use yew::{function_component, html};
 
 // use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
+
+use crate::components::tertiary_menu::{
+    TertiaryMenuItem,
+    TertiaryMenu
+};
+use crate::components::ui_page::UIPage;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
-use super::settings_public::SettingsPublic;
-use super::settings_private::SettingsPrivate;
-use super::settings_devices::SettingsDevices;
-use super::settings_api_key::SettingsAPIKey;
-use super::subscription::UserSubscription;
-use super::notifications::UserNotifications;
-use crate::pages::user::saves::list::UserSavesList;
-
-use super::saves::saves_router::UserSavesRouter;
-use super::campaigns::UserCampaigns;
-// use gloo_console::log;
+// use super::settings_public::SettingsPublic;
+// use super::settings_private::SettingsPrivate;
+// use super::settings_devices::SettingsDevices;
+// use super::settings_api_key::SettingsAPIKey;
+// use super::subscription::UserSubscription;
+// use super::notifications::UserNotifications;
+use gloo_console::log;
 
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
 
 #[derive(Clone, Routable, PartialEq)]
-pub enum UserRoute {
-    #[at("/me/settings-private")]
-    SettingsPrivate,
-    #[at("/me/settings-public")]
-    SettingsPublic,
-    #[at("/me/devices")]
-    Devices,
-    #[at("/me/notifications")]
-    Notifications,
-    #[at("/me/subscription")]
-    Subscription,
-    #[at("/me/api-key")]
-    SettingsAPIKey,
-
-    #[at("/me/saves/*")]
-    UserSavesRouter,
-
+pub enum UserSavesRoute {
     #[at("/me/saves")]
-    UserSavesList,
-
-
-
-    #[at("/me/campaigns")]
-    UserCampaigns,
-
+    List,
+    #[at("/me/saves/edit")]
+    Edit,
+    #[at("/me/saves/view")]
+    View,
     #[at("/404")]
     NotFound,
 }
 
 fn content_switch(
-    routes: UserRoute,
+    routes: UserSavesRoute,
     global_vars: GlobalVars,
     update_global_vars: Callback<GlobalVars>,
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
@@ -75,120 +62,100 @@ fn content_switch(
 
     match routes {
 
-        UserRoute::UserCampaigns => html! {
-            <UserCampaigns
-                // update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-        UserRoute::UserSavesList => html! {
+        UserSavesRoute::List => html! {
             <UserSavesList
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
         },
-        UserRoute::UserSavesRouter => html! {
-            <UserSavesRouter
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-        UserRoute::SettingsAPIKey => html! {
-            <SettingsAPIKey
+
+        UserSavesRoute::Edit => html! {
+            <UserSavesEdit
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
-        UserRoute::SettingsPrivate => html! {
-            <SettingsPrivate
-                global_vars={global_vars}
-                update_global_vars={update_global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-
-        UserRoute::SettingsPublic => html! {
-            <SettingsPublic
+        UserSavesRoute::View => html! {
+            <UserSavesView
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
-        UserRoute::Devices => html! {
-            <SettingsDevices
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-
-        UserRoute::Notifications => html! {
-            <UserNotifications
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-        UserRoute::Subscription => html! {
-            <UserSubscription
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-        UserRoute::NotFound => html! { <h1>{ "UserRoute 404" }</h1> },
+        UserSavesRoute::NotFound => html! { <h1>{ "UserSavesRoute 404" }</h1> },
     }
 }
 
 
 #[derive(Properties, PartialEq)]
-pub struct UserRouterProps {
-    #[prop_or_default]
-    pub on_logout_action: Callback<MouseEvent>,
+pub struct UserSavesRouterProps {
+    // #[prop_or_default]
+    // pub set_submenu: Callback<SubmenuData>,
+    // pub on_logout_action: Callback<MouseEvent>,
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub struct UserRouterMessage {
-
+pub enum UserSavesRouterMessage {
+    ChangeFilter(String),
+    ChangeFolder(String),
 }
-
-pub struct UserRouter {
+pub struct UserSavesRouter {
     global_vars: GlobalVars,
 }
 
-impl Component for UserRouter {
-    type Message = UserRouterMessage;
-    type Properties = UserRouterProps;
+impl Component for UserSavesRouter {
+    type Message = UserSavesRouterMessage;
+    type Properties = UserSavesRouterProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
 
-        let global_vars = ctx.props().global_vars.clone();
-
-        UserRouter {
-            global_vars: global_vars.clone(),
+        UserSavesRouter {
+            global_vars: ctx.props().global_vars.clone(),
         }
     }
+
+
+    fn update(
+        &mut self, ctx: &Context<Self>,
+        msg: UserSavesRouterMessage
+    ) -> bool {
+
+
+        match msg {
+            UserSavesRouterMessage::ChangeFilter( filter_type ) => {
+                // log!("ChangeFilter", filter_type);
+                set_local_storage_string( "saves_filter", filter_type);
+            }
+
+            UserSavesRouterMessage::ChangeFolder( folder_name ) => {
+                // log!("ChangeFolder", folder);
+                set_local_storage_string( "saves_folder", folder_name);
+            }
+        }
+        true
+    }
+
 
     fn changed(
         &mut self,
         ctx: &Context<Self>,
-        _props: &UserRouterProps,
+        _props: &UserSavesRouterProps,
     ) -> bool {
-
+        // log!("main_home changed called" );
         self.global_vars = ctx.props().global_vars.clone();
+
+        // read_notifications: self.global_vars.current_user.unread_notifications,
+        //     };
 
         true
     }
+
 
     fn view(
         &self,
@@ -207,7 +174,7 @@ impl Component for UserRouter {
                     history={history}
                 >
                     <div class={"main-content"}>
-                        <Switch<UserRoute>
+                        <Switch<UserSavesRoute>
                             render={
                                 move |routes|
                                 content_switch(
@@ -227,7 +194,7 @@ impl Component for UserRouter {
 
                 <BrowserRouter>
                     <div class={"main-content"}>
-                        <Switch<UserRoute>
+                        <Switch<UserSavesRoute>
                             render={
                                 move |routes|
                                 content_switch(
@@ -245,3 +212,4 @@ impl Component for UserRouter {
 
     }
 }
+
