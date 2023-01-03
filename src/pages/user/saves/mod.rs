@@ -494,6 +494,11 @@ impl Component for UserSaves {
 
                             <div class={"controls"}>
                                 <button
+                                    class="btn btn-secondary"
+                                >
+                                    <i class={"fa fa-eye"} />
+                                </button>
+                                <button
                                     class="btn btn-primary"
                                 >
                                     <i class={"fa fa-edit"} />

@@ -114,7 +114,9 @@ body {
                 width: 100%;
                 z-index: 11;
                 overflow: hidden;
-
+                .btn {
+                    margin: .25rem;
+                }
             }
 
             &:hover     {

@@ -289,7 +289,7 @@ fn set_read_notification(
             let set_notifications_notify = set_notifications.clone();
 
             let result = fetch_api_for_id_with_value(
-                (api_root + "/auth/notifications-set-read").to_owned(),
+                (api_root + "/notifications/set-read").to_owned(),
                 login_token,
                 notification_id,
                 "notification_id".to_owned(),

@@ -138,7 +138,6 @@ fn content_switch(
 #[derive(Properties, PartialEq)]
 pub struct UserRouterProps {
     #[prop_or_default]
-    pub set_submenu: Callback<SubmenuData>,
     pub on_logout_action: Callback<MouseEvent>,
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,

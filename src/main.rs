@@ -31,13 +31,12 @@ fn App() -> Html {
         user_loading = false;
     }
 
-    // let server_root = "https://v4.savaged.us".to_owned();
-    let server_root = "http://localhost:5001".to_owned();
+    let server_root = "https://v4.savaged.us".to_owned();
+    // let server_root = "http://localhost:5001".to_owned();
     // let server_root = "https://savaged.us".to_owned();
     // let server_root = "https://staging.savaged.us".to_owned();
 
     // let mut offline = false;
-
 
     let global_vars_state = use_reducer(
         || GlobalVars {

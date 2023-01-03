@@ -117,7 +117,6 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    set_submenu={Callback::noop()}
                     on_logout_action={Callback::noop()}
                     update_global_vars={Callback::noop()}
                     open_confirmation_dialog={Callback::noop()}
@@ -142,7 +141,6 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    set_submenu={Callback::noop()}
                     on_logout_action={Callback::noop()}
                     update_global_vars={Callback::noop()}
                     open_confirmation_dialog={Callback::noop()}

@@ -79,7 +79,6 @@ pub struct SubmenuData {
     pub unread_notifications: u32,
 }
 pub enum MainAppMessage {
-    SetSubmenu( SubmenuData ),
 
     // ToggleUserMenu( bool ),
     ToggleMobileMenu(bool),
@@ -115,7 +114,6 @@ pub struct MainApp {
 
 fn content_switch(
     routes: MainRoute,
-    submenu_callback: &Callback<SubmenuData>,
     global_vars: GlobalVars,
     on_logout_action: &Callback<MouseEvent>,
     base_update_global_vars: &Callback<GlobalVars>,
@@ -147,7 +145,6 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    set_submenu={submenu_callback}
                     on_logout_action={on_logout_action}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
@@ -192,7 +189,6 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    set_submenu={submenu_callback}
                     on_logout_action={on_logout_action}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
@@ -508,22 +504,6 @@ impl Component for MainApp {
             }
 
 
-            MainAppMessage::SetSubmenu(
-                new_value,
-            ) => {
-
-                if &self.current_sub_menu != &new_value.menu || &self.current_unread_notifications != &new_value.unread_notifications
-                {
-                    self.submenu = new_value.html.clone();
-                    self.current_sub_menu = new_value.menu.to_owned();
-                    self.current_unread_notifications = new_value.unread_notifications;
-                    return true;
-                } else {
-                    return false;
-                }
-
-            }
-
         }
     }
 
@@ -539,7 +519,6 @@ impl Component for MainApp {
 
 
 
-        let set_submenu = ctx.link().callback(MainAppMessage::SetSubmenu);
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
         let logout_action = ctx.link().callback(MainAppMessage::LogOut);
@@ -592,7 +571,6 @@ impl Component for MainApp {
                             move |routes| {
                                 content_switch(
                                     routes,
-                                    &set_submenu,
                                     global_vars3.clone(),
                                     &on_logout_action,
                                     &base_update_global_vars,

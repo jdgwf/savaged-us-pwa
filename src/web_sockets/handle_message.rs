@@ -28,6 +28,7 @@ pub fn handle_message(
             new_global_vars.user_loading = false;
             match msg.user {
                 Some( user ) =>  {
+                    // log!( format!("user {} {}", user.id, user.unread_notifications));
                     new_global_vars.current_user = user.clone();
                 }
                 None => {
