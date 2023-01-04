@@ -34,6 +34,7 @@ pub struct UserSavesViewProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
+    pub uuid: String,
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
@@ -145,7 +146,7 @@ impl Component for UserSavesView {
                 page_title="Viewing Save"
                 submenu_tag={"user-data".to_owned()}
             >
-                {"VIEW"}
+                {"VIEW"}<Nbsp />{&ctx.props().uuid}
             </UIPage>
         }
     }

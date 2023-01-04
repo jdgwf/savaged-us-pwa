@@ -135,7 +135,8 @@ pub fn handle_message(
 
 
             let mut new_global_vars = global_vars.clone();
-            new_global_vars.saves = msg.saves.clone();
+            let server_root = global_vars.server_root.to_owned();
+            // new_global_vars.saves = msg.saves.clone();
 
             match msg.saves {
                 Some( saves ) => {
@@ -146,15 +147,20 @@ pub fn handle_message(
                     //     }
                     // }
                     spawn_local(async move {
-                        let _results = index_db_save_saves(saves).await;
+                        let _results = index_db_save_saves(server_root, saves).await;
                         // log!( format!("÷ results, {:?}", &_results ) );
+                        let mut global_vars_future = new_global_vars.clone();
+                        global_vars_future.saves = get_saves_from_index_db().await;
+                        update_global_vars.emit(global_vars_future);
                     });
+
                 }
                 None => {}
             }
+
             // new_global_vars.offline = true;
             // new_global_vars.user_loading = false;
-            update_global_vars.emit( new_global_vars );
+            // update_global_vars.emit( new_global_vars );
         }
 
         _ => {

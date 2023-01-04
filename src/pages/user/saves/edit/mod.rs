@@ -35,6 +35,7 @@ pub struct UserSavesEditProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
+    pub uuid: String,
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
@@ -146,7 +147,7 @@ impl Component for UserSavesEdit {
                 page_title="Editing Save"
                 submenu_tag={"user-data".to_owned()}
             >
-                {"EDIT"}
+                {"EDIT"}<Nbsp />{&ctx.props().uuid}
             </UIPage>
         }
     }

@@ -1,16 +1,21 @@
 use chrono::{DateTime, TimeZone};
 use chrono::offset::{Utc};
 use gloo_console::__macro::Array;
+use indexed_db_futures::js_sys::Uint8Array;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::chargen_data::ChargenData;
 use savaged_libs::save_db_row::SaveDBRow;
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsValue, JsCast};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use indexed_db_futures::{prelude::*, js_sys};
 use gloo_console::log;
-use web_sys::DomException;
+use gloo_console::error;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::JsFuture;
+use web_sys::{Request, RequestInit, RequestMode, Response, DomException, FileReader};
+use blob;
 
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
@@ -100,6 +105,7 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
 
 // }
 pub async fn index_db_save_saves(
+    server_root: String,
     saves: Vec<SaveDBRow>,
 ) -> SavesSyncUpdateResults {
     let mut update_stats: SavesSyncUpdateResults = SavesSyncUpdateResults {
@@ -118,8 +124,9 @@ pub async fn index_db_save_saves(
             let db: IdbDatabase = db_req.into_future().await.unwrap();
 
             // log!("index_db_save_saves 2");
-            for  save in &saves {
+            for save in &saves {
 
+                let mut edit_save = save.clone();
                 match save.updated_on {
                     Some( updated_on ) => {
                         if update_stats.latest_updated_on < updated_on {
@@ -128,6 +135,29 @@ pub async fn index_db_save_saves(
                     }
                     None => {}
                 }
+
+                edit_save.image_base64_mime = None;
+                edit_save.image_base64 = None;
+                edit_save.image_token_base64_mime = None;
+                edit_save.image_token_base64 = None;
+
+                if !save.imageurl.is_empty() {
+                    // TODO Fetch Image Data
+                    let image_url = server_root.clone() + &edit_save.imageurl;
+                    let (image_data, image_mime) = get_image_file( image_url ).await;
+
+                    // log!("image_data", image_data);
+                    // log!("image_mime", image_mime);
+
+                    edit_save.image_base64 = Some(image_data);
+                    edit_save.image_base64_mime = Some(image_mime);
+                    // TODO Encode to base 64
+
+                    // TODO Assign Mime
+
+                    // TODO Assign Data
+                }
+
                 let tx: IdbTransaction = db
                     .transaction_on_one_with_mode(
                         INDEX_DB_SAVES_STORE_NAME,
@@ -135,8 +165,7 @@ pub async fn index_db_save_saves(
                     ).unwrap();
                 let store: IdbObjectStore = tx.object_store(INDEX_DB_SAVES_STORE_NAME).unwrap();
 
-
-                let value_to_put: JsValue = serde_json::to_string(&save).unwrap().into();
+                let value_to_put: JsValue = serde_json::to_string(&edit_save).unwrap().into();
 
                 // log!( format!("value_to_put {:?}", value_to_put) );
                 let err = store.put_key_val_owned(save.uuid.clone(), &value_to_put);
@@ -649,4 +678,30 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
 
 
     return Some( chargen_data );
+}
+
+pub async fn get_image_file( url: String) -> (String, String) {
+    let mut opts = RequestInit::new();
+
+    opts.method("GET");
+
+    let request = Request::new_with_str_and_init(&url, &opts).unwrap();
+
+    let window = web_sys::window().unwrap();
+    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await.unwrap();
+
+    let resp: Response = resp_value.dyn_into().unwrap();
+
+    let data = JsFuture::from(resp.blob().unwrap()).await.unwrap();
+
+    let blob: web_sys::Blob = data.dyn_into().unwrap();
+
+    let array_buffer = JsFuture::from(blob.array_buffer()).await.unwrap();
+
+    let array = Uint8Array::new(&array_buffer);
+    let bytes: Vec<u8> = array.to_vec();
+
+    let native_blob: blob::Blob = blob::Blob::from_vec( bytes );
+
+    return ( native_blob.encode_base64() , blob.type_().to_string() );
 }

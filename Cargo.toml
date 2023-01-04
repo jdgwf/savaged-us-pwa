@@ -27,6 +27,7 @@ chrono = { version = "0.4.22", features = ["serde"] }
 chrono-tz = "0.8.0"
 stdweb = "0.4.20"
 indexed_db_futures = "0.3.0"
+blob = "0.3.0"
 
 [dependencies.web-sys]
 version = "0.3.60"
@@ -43,6 +44,9 @@ features = [
     'Window',
     "Clipboard",
     "Blob",
+    "MediaSource",
+    "Url",
+    "FileReader",
     "FormData",
     "TouchList",
     "Touch",

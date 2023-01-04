@@ -14,6 +14,8 @@ use crate::components::tertiary_menu::{
     TertiaryMenuItem,
     TertiaryMenu
 };
+
+use crate::pages::user::saves::saves_router::UserSavesRoute;
 use crate::components::ui_page::UIPage;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
@@ -168,50 +170,6 @@ impl Component for UserSavesList {
 
         let mut current_available_folders: Vec<String> = Vec::new();
 
-        let current_folder = get_local_storage_string("saves_folder", "".to_string());
-
-        let filter_by = | save: &SaveDBRow | {
-            let filter_type= filter_type.to_owned();
-            let current_folder= current_folder.to_owned();
-
-            if save.deleted {
-                return false;
-            }
-
-            if filter_type == "scifi2014".to_owned() {
-                if save.save_type == "starship"
-                    || save.save_type == "vehicle"
-                    || save.save_type == "power-armor"
-                    || save.save_type == "walker" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
-                    }
-            } else if filter_type == "gear".to_owned() {
-                if save.save_type == "gear"
-                    || save.save_type == "weapon"
-                    || save.save_type == "armor"
-                    || save.save_type == "cybernetics" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
-                    }
-            } else if filter_type == "other".to_owned() {
-                if save.save_type == "edges"
-                    || save.save_type == "hindrances" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
-                    }
-            } else if save.save_type == filter_type {
-                if current_folder == save.folder {
-                    return true;
-                }
-            }
-
-            return false;
-
-        };
 
         let filter_by_type = | save: &SaveDBRow | {
             let filter_type= filter_type.to_owned();
@@ -258,6 +216,7 @@ impl Component for UserSavesList {
         let mut bestiary_count = 0;
         let mut trash_count = 0;
 
+
         for item in global_vars.clone().saves.unwrap_or(Vec::new()) {
 
             if item.deleted {
@@ -303,6 +262,58 @@ impl Component for UserSavesList {
 
 
         }
+
+        let mut current_folder = get_local_storage_string("saves_folder", "".to_string());
+        let current_available_folders_list= current_available_folders.clone();
+        if !current_folder.is_empty() && !current_available_folders_list.contains(&current_folder) {
+            current_folder = "".to_string();
+            set_local_storage_string("saves_folder", "".to_string());
+        }
+        let filter_by = | save: &SaveDBRow | {
+            let filter_type= filter_type.to_owned();
+            // let mut current_folder= current_folder.to_owned();
+
+
+
+
+            if save.deleted {
+                return false;
+            }
+
+            if filter_type == "scifi2014".to_owned() {
+                if save.save_type == "starship"
+                    || save.save_type == "vehicle"
+                    || save.save_type == "power-armor"
+                    || save.save_type == "walker" {
+                        if current_folder == save.folder {
+                            return true;
+                        }
+                    }
+            } else if filter_type == "gear".to_owned() {
+                if save.save_type == "gear"
+                    || save.save_type == "weapon"
+                    || save.save_type == "armor"
+                    || save.save_type == "cybernetics" {
+                        if current_folder == save.folder {
+                            return true;
+                        }
+                    }
+            } else if filter_type == "other".to_owned() {
+                if save.save_type == "edges"
+                    || save.save_type == "hindrances" {
+                        if current_folder == save.folder {
+                            return true;
+                        }
+                    }
+            } else if save.save_type == filter_type {
+                if current_folder == save.folder {
+                    return true;
+                }
+            }
+
+            return false;
+
+        };
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
@@ -399,6 +410,7 @@ impl Component for UserSavesList {
         current_available_folders.sort();
         let change_folder_callback1 = change_folder_callback.clone();
         let change_folder_callback2 = change_folder_callback.clone();
+
         html! {
             <UIPage
                 global_vars={global_vars.clone()}
@@ -412,8 +424,11 @@ impl Component for UserSavesList {
                     local_storage_variable={"saves_filter".to_owned()}
                 />
 
-                <div class="saves-card-container">
                 if !current_folder.is_empty() {
+                    <h3 class="no-margins text-center">{"Current Folder:"}<Nbsp />{&current_folder}</h3>
+                }
+                <div class="saves-card-container">
+                if !(&current_folder).is_empty() {
                     <div
                         class="folder"
                     >
@@ -473,9 +488,15 @@ impl Component for UserSavesList {
 
                 {saves.into_iter().filter( filter_by ).map( |save| {
                     let mut image_style = "".to_owned();
-                    if !save.imageurl.is_empty() {
-                        image_style = "background-image: url('".to_owned() + &server_root + &save.imageurl + &"')";
+                    match save.image_base64 {
+                        Some( image_base64 ) => {
+                            image_style = format!("background-image: url(\"data::{};base64, {}\");", save.image_base64_mime.unwrap(), &image_base64, );
+                        }
+                        None => {}
                     }
+                    // if !save.imageurl.is_empty() {
+                    //     image_style = "background-image: url('".to_owned() + &server_root + &save.imageurl + &"')";
+                    // }
                     html!{
                         <div
                             class="save-card"
@@ -490,20 +511,29 @@ impl Component for UserSavesList {
                                 {save.short_desc}<br />
                                 <br />
                                 <div class="small-text">{save.save_type}<Nbsp />{"|"}<Nbsp />{save.folder}</div>
-                                <div class="small-text">{save.uuid}</div>
+                                <div class="small-text">{save.uuid.to_owned()}</div>
                             </div>
 
                             <div class={"controls"}>
-                                <button
-                                    class="btn btn-secondary"
+                                <Link<UserSavesRoute>
+                                    to={UserSavesRoute::View { uuid: save.uuid.to_owned() }}
                                 >
-                                    <i class={"fa fa-eye"} />
-                                </button>
-                                <button
-                                    class="btn btn-primary"
+                                    <span
+                                        class="btn btn-secondary"
+                                    >
+                                        <i class={"fa fa-eye"} />
+                                    </span>
+                                </Link<UserSavesRoute>>
+
+                                <Link<UserSavesRoute>
+                                    to={UserSavesRoute::Edit { uuid: save.uuid.to_owned() }}
                                 >
-                                    <i class={"fa fa-edit"} />
-                                </button>
+                                    <span
+                                        class="btn btn-primary"
+                                    >
+                                        <i class={"fa fa-edit"} />
+                                    </span>
+                                </Link<UserSavesRoute>>
                                 <button
                                     class="btn btn-danger"
                                 >

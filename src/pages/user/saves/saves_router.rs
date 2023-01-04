@@ -36,10 +36,10 @@ use gloo_console::log;
 pub enum UserSavesRoute {
     #[at("/me/saves")]
     List,
-    #[at("/me/saves/edit")]
-    Edit,
-    #[at("/me/saves/view")]
-    View,
+    #[at("/me/saves/edit/:uuid")]
+    Edit {uuid: String},
+    #[at("/me/saves/view/:uuid")]
+    View {uuid: String},
     #[at("/404")]
     NotFound,
 }
@@ -70,16 +70,18 @@ fn content_switch(
             />
         },
 
-        UserSavesRoute::Edit => html! {
+        UserSavesRoute::Edit {uuid} => html! {
             <UserSavesEdit
+                uuid={uuid}
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
-        UserSavesRoute::View => html! {
+        UserSavesRoute::View {uuid} => html! {
             <UserSavesView
+                uuid={uuid}
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
