@@ -13,6 +13,7 @@ use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::user::UserUpdateResult;
 use gloo_console::error;
+use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
 
@@ -279,6 +280,7 @@ pub fn update_user(
             match result {
                 Ok( value ) => {
 
+                    // log!("update_user global_vars.current_user.username", &global_vars.current_user.username);
                     update_global_vars.emit( global_vars.clone() );
                     // let update_value_result = value.into_serde::<UserUpdateResult>();
                     let update_value_result: Result<UserUpdateResult, Error> = JsValueSerdeExt::into_serde(&value);

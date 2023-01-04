@@ -11,6 +11,7 @@ use standard_components::libs::set_document_title::set_document_title;
 use chrono::Utc;
 use serde_json::Error;
 use gloo_console::error;
+use gloo_console::log;
 use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use crate::libs::global_vars::GlobalVars;
@@ -142,7 +143,7 @@ impl Component for SettingsPublic {
                             (api_root + "/user/save-username").to_owned(),
                             "".to_owned(),
                             login_token,
-                            username,
+                            username.clone(),
                             "username".to_owned(),
                         ).await;
 
@@ -156,6 +157,7 @@ impl Component for SettingsPublic {
                                         let mut global_vars = global_vars.clone();
                                         // self.global_vars.current_user.share_display_name = edit_share_display_name.to_owned();
                                         global_vars.current_user.share_display_name = edit_share_display_name.to_owned();
+                                        global_vars.current_user.username = username.clone();
 
                                         update_user(
                                             global_vars,
@@ -221,14 +223,30 @@ impl Component for SettingsPublic {
             }
 
             SettingsPublicMessage::UpdateShowUserPage( new_value ) => {
-                self.edit_show_user_page = new_value;
-                self.update_username_can_save = your_information_can_save(
-                    self.edit_show_user_page,
-                    self.global_vars.current_user.show_user_page,
-                    self.update_username_can_save,
-                    self.edit_username == self.global_vars.current_user.username,
+                // let input: HtmlInputElement = event.target_unchecked_into();
+                self.global_vars.current_user.show_user_page = new_value;
+                // let updated_tz_notification = ctx.link().callback(SettingsPublicMessage::UpdateTimezoneMessage).clone();
+
+                let global_vars = self.global_vars.clone();
+
+                let update_global_vars = ctx.props().update_global_vars.clone();
+                update_user(
+                    global_vars,
+                    update_global_vars,
+                    Callback::noop(),
+                    "".to_owned(),
+                    false,
                 );
+
                 true
+                // self.edit_show_user_page = new_value;
+                // self.update_username_can_save = your_information_can_save(
+                //     self.edit_show_user_page,
+                //     self.global_vars.current_user.show_user_page,
+                //     self.update_username_can_save,
+                //     self.edit_username == self.global_vars.current_user.username,
+                // );
+                // true
             }
 
             SettingsPublicMessage::UpdateUsername( new_value ) => {
@@ -335,6 +353,7 @@ impl Component for SettingsPublic {
                     self.update_username_message = "Your username has been successfully changed!".to_owned();
                     self.update_username_notification_class = "alert alert-success text-center".to_owned();
                 } else {
+                    log!("UpdateUsernameSaved saved", saved);
                     self.update_username_can_save = true;
                     self.update_username_message = "Oh no! Something went wrong! Please try again.".to_owned();
                     self.update_username_notification_class = "alert alert-danger text-center".to_owned();
@@ -380,10 +399,12 @@ impl Component for SettingsPublic {
                 self.edit_bio = new_value.to_owned();
                 true
             }
+
             SettingsPublicMessage::UpdateTwitter( new_value ) => {
                 self.edit_twitter = new_value.to_owned();
                 true
             }
+
             SettingsPublicMessage::UpdateDisplayName( new_value ) => {
                 self.edit_share_display_name = new_value.to_owned();
                 true
@@ -394,7 +415,7 @@ impl Component for SettingsPublic {
                 self.global_vars.current_user.twitter = self.edit_twitter.to_owned();
                 self.global_vars.current_user.share_display_name = self.edit_share_display_name.to_owned();
                 self.global_vars.current_user.share_show_profile_image = self.edit_share_show_profile_image;
-                // self.global_vars.current_user.share_bio = self.edit_bio.to_owned();
+                self.global_vars.current_user.share_bio = self.edit_bio.to_owned();
 
                 let updated_user_notification = ctx.link().callback(SettingsPublicMessage::UpdateSharedSettingsSaved).clone();
                 // let reset_user_notification = ctx.link().callback(SettingsPublicMessage::ResetShareSettings(())).clone();

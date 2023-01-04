@@ -9,7 +9,6 @@ mod components;
 mod web_sockets;
 mod menu_items;
 
-
 // use gloo_console::log;
 use main_app::MainApp;
 use crate::libs::global_vars::GlobalVars;
