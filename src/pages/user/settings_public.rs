@@ -139,7 +139,7 @@ impl Component for SettingsPublic {
                         let global_vars = global_vars.clone();
 
                         let result = fetch_api_with_value(
-                            (api_root + "/auth/save-username").to_owned(),
+                            (api_root + "/user/save-username").to_owned(),
                             "".to_owned(),
                             login_token,
                             username,
@@ -257,7 +257,7 @@ impl Component for SettingsPublic {
                         let username = username.clone();
 
                         let result = fetch_api_with_value(
-                            (api_root + "/auth/username-available").to_owned(),
+                            (api_root + "/user/username-available").to_owned(),
                             "".to_owned(),
                             login_token,
                             username,

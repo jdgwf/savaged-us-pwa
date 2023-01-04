@@ -11,6 +11,12 @@ body {
         display: flex;
     }
 
+    .text-header {
+        border-bottom: solid 2px var(--body-font-color);
+        max-width: 800px;
+        margin: auto;
+        text-align: center;
+    }
     .no-margins {
         margin: 0;
     }

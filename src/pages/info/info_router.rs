@@ -16,6 +16,9 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
+use super::privacy_policy::InfoPrivacyPolicy;
+use super::partners::InfoPartners;
+use super::contact_us::InfoContactUs;
 use super::tech::InfoTech;
 use super::about::InfoAbout;
 use super::todos::InfoTodos;
@@ -35,6 +38,15 @@ pub enum InfoRoute {
 
     #[at("/info/to-dos")]
     InfoTodos,
+
+    #[at("/info/privacy-policy")]
+    InfoPrivacyPolicy,
+
+    #[at("/info/partners")]
+    InfoPartners,
+
+    #[at("/info/contact-us")]
+    InfoContactUs,
 
     #[at("/404")]
     NotFound,
@@ -75,6 +87,30 @@ fn content_switch(
 
         InfoRoute::InfoTodos => html! {
             <InfoTodos
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
+
+        InfoRoute::InfoContactUs => html! {
+            <InfoContactUs
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
+
+        InfoRoute::InfoPrivacyPolicy => html! {
+            <InfoPrivacyPolicy
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
+
+        InfoRoute::InfoPartners => html! {
+            <InfoPartners
                 // update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 // open_confirmation_dialog={open_confirmation_dialog}

@@ -200,6 +200,87 @@ pub fn get_menu_items(
                         hardcoded: false,
                         html: Some( html!{
                             <Link<InfoRoute>
+                                to={InfoRoute::InfoContactUs}
+                            >
+                                <i class="fa fa-envelope" /><Nbsp />
+                                {"Contact Us"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "Contact Us".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Contact Us".to_owned(),
+                        url: None,
+                        menu_tag: "info-contact-us".to_owned(),
+                        sub_menu_tag: "info-contact-us".to_owned(),
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
+                                to={InfoRoute::InfoPartners}
+                            >
+                                <i class="fa fa-handshake" /><Nbsp />
+                                {"Partners"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "Our Partners".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Partners".to_owned(),
+                        url: None,
+                        menu_tag: "info-partners".to_owned(),
+                        sub_menu_tag: "info-partners".to_owned(),
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
+                                to={InfoRoute::InfoPrivacyPolicy}
+                            >
+                                <i class="fa fa-user-secret" /><Nbsp />
+                                {"Privacy Policy"}
+                            </Link<InfoRoute>>
+                        }),
+                        registered_only: false,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
+
+                        link_class: None,
+
+                        submenu_tag: None,
+                        submenu: None,
+
+                        title: "Our Privacy Policy".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Privacy Policy".to_owned(),
+                        url: None,
+                        menu_tag: "info-privacy-policy".to_owned(),
+                        sub_menu_tag: "info-privacy-policy".to_owned(),
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some( html!{
+                            <Link<InfoRoute>
                                 to={InfoRoute::InfoTech}
                             >
                                 <i class="fa fa-microchip" /><Nbsp />

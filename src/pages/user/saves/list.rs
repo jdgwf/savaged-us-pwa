@@ -157,14 +157,6 @@ impl Component for UserSavesList {
             }
         }
 
-        // for item in &saves {
-        //     if (&item.name).to_owned() == "Chi Master".to_owned() {
-        //         log!( format!("item {:?}", item) );
-        //     }
-        // }
-
-        let server_root = global_vars.server_root.clone();
-
         let change_filter_callback_character = ctx.link().callback(UserSavesListMessage::ChangeFilter);
         let change_folder_callback = ctx.link().callback(UserSavesListMessage::ChangeFolder);
 
@@ -411,6 +403,7 @@ impl Component for UserSavesList {
         let change_folder_callback1 = change_folder_callback.clone();
         let change_folder_callback2 = change_folder_callback.clone();
 
+        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
         html! {
             <UIPage
                 global_vars={global_vars.clone()}
@@ -488,6 +481,9 @@ impl Component for UserSavesList {
 
                 {saves.into_iter().filter( filter_by ).map( |save| {
                     let mut image_style = "".to_owned();
+                    let save_name = save.name.clone();
+                    let save_uuid = save.uuid.clone();
+                    let open_confirmation_dialog = open_confirmation_dialog.clone();
                     match save.image_base64 {
                         Some( image_base64 ) => {
                             image_style = format!("background-image: url(\"data::{};base64, {}\");", save.image_base64_mime.unwrap(), &image_base64, );
@@ -536,6 +532,14 @@ impl Component for UserSavesList {
                                 </Link<UserSavesRoute>>
                                 <button
                                     class="btn btn-danger"
+                                    onclick={ move | _event | {
+                                        let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
+                                        conf_def.text = format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name);
+                                        conf_def.callback = Callback::noop();
+                                        open_confirmation_dialog.emit(
+                                            conf_def
+                                        );
+                                    }}
                                 >
                                     <i class={"fa fa-trash"} />
                                 </button>

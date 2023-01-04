@@ -62,7 +62,7 @@ pub async fn update_current_user(
     repeat_password: String,
     remove_image: bool,
 ) -> Result<JsValue, JsValue> {
-    let endpoint = api_root + &"/auth/update-settings".to_owned();
+    let endpoint = api_root + &"/user/update-settings".to_owned();
 
     let mut opts = RequestInit::new();
     opts.method("POST");
@@ -309,7 +309,7 @@ pub async fn upload_user_image(
     uploaded_url_callback: Callback<String>,
 ) -> Result<JsValue,JsValue>  {
 
-    let endpoint = api_root.clone() + &"/auth/set-user-image-data".to_owned();
+    let endpoint = api_root.clone() + &"/user/set-user-image-data".to_owned();
 
     let mut opts = RequestInit::new();
     opts.method("POST");

@@ -219,7 +219,7 @@ impl Component for SettingsDeviceLineItem {
                 let login_token = ctx.props().global_vars.login_token.clone();
                 let current_token = ctx.props().token.token.clone();
                 let update_login_tokens = ctx.props().update_login_tokens.clone();
-                let endpoint = ctx.props().global_vars.api_root.clone() + &"/auth/token-remove".to_owned();
+                let endpoint = ctx.props().global_vars.api_root.clone() + &"/user/token-remove".to_owned();
                 spawn_local (
                     async move {
                         let fetch_result = fetch_api_send_token(
@@ -259,7 +259,7 @@ impl Component for SettingsDeviceLineItem {
                 let login_token = ctx.props().global_vars.login_token.clone();
                 let current_token = ctx.props().token.token.clone();
                 let friendly_name = self.friendly_name.to_owned();
-                let endpoint = ctx.props().global_vars.api_root.clone() + &"/auth/token-update-name".to_owned();
+                let endpoint = ctx.props().global_vars.api_root.clone() + &"/user/token-update-name".to_owned();
                 spawn_local (
                     async move {
 
