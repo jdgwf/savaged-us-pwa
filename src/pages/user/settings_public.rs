@@ -324,7 +324,6 @@ impl Component for SettingsPublic {
                     global_vars.current_user.image_url = "".to_owned();
                     global_vars.current_user.profile_image = "".to_owned();
                 } else {
-
                     global_vars.current_user.image_url = new_url.to_owned();
                     global_vars.current_user.profile_image = "webp".to_owned();
                 }

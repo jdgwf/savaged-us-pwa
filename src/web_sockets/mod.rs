@@ -38,6 +38,9 @@ impl WebsocketService {
             .replace("https://", "wss://")
             + &"/_ws".to_owned();
 
+
+        // log!("server_root", &server_root);
+        // log!("wss_url", &wss_url);
         let ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
 
         let (mut write, mut read) = ws.split();

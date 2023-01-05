@@ -20,7 +20,7 @@ use blob;
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
 static INDEX_DB_SAVES_STORE_NAME: &str = "saves";
-static INDEX_DB_VERSION: u32 = 5;
+static INDEX_DB_VERSION: u32 = 6;
 
 #[derive(Debug)]
 pub struct ChargenSyncUpdateResults {

@@ -80,6 +80,7 @@ impl Component for ImageUploader {
                             "user".to_owned(),
                             file.clone(),
                             upload_url_callback, // for now
+                            true, // crop square for user image
                         ).await;
                     }
                 );

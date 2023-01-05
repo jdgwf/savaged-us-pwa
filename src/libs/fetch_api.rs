@@ -309,6 +309,7 @@ pub async fn upload_user_image(
     upload_type: String,
     file: Option<File>,
     uploaded_url_callback: Callback<String>,
+    crop_square: bool,
 ) -> Result<JsValue,JsValue>  {
 
     let endpoint = api_root.clone() + &"/user/set-user-image-data".to_owned();
@@ -322,8 +323,11 @@ pub async fn upload_user_image(
     match form_data_request_result {
         Ok( form_data ) => {
             form_data.append_with_str("login_token", login_token.as_str() )?;
-            form_data.append_with_str("type", upload_type.as_str() )?;
+            form_data.append_with_str("upload_type", upload_type.as_str() )?;
 
+            if crop_square {
+                form_data.append_with_str("crop_square", "yes" )?;
+            }
             match file {
                 Some( ref actual_file ) => {
 
@@ -347,36 +351,56 @@ pub async fn upload_user_image(
         }
 
     }
+    opts.method("POST");
+
     let request = Request::new_with_str_and_init(&endpoint, &opts)?;
 
-    opts.body( Some(&wasm_bindgen::JsValue::from_str("") ) );
+    request
+        .headers()
+        .set("Accept", "application/vnd.github.v3+json")?;
+
+
+
+    // opts.body( Some(&wasm_bindgen::JsValue::from_str("") ) );
 
     let window = web_sys::window().unwrap();
     let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
 
     assert!(resp_value.is_instance_of::<Response>());
-    let resp: Response = resp_value.dyn_into().unwrap();
+    let resp_result: Result<Response, wasm_bindgen::JsValue> = resp_value.dyn_into();
 
-    // Convert this other `Promise` into a rust `Future`.
-    let json = JsFuture::from(resp.json()?).await?;
+    match resp_result {
+        Ok( resp ) => {
 
-    // log!("upload_user_image sent", &json );
-    // let parsed_result = json.into_serde::< FileUploadResults >();
-    let parsed_result: Result<FileUploadResults, Error> = JsValueSerdeExt::into_serde(&json);
-    match parsed_result {
-        Ok( result ) => {
-            if result.success {
-                // log!("upload_user_image success", &result.image_url );
-                uploaded_url_callback.emit( result.image_url );
+            // Convert this other `Promise` into a rust `Future`.
+            let json = JsFuture::from(resp.json()?).await?;
+
+            // log!("upload_user_image sent", &json );
+            // let parsed_result = json.into_serde::< FileUploadResults >();
+            let parsed_result: Result<FileUploadResults, Error> = JsValueSerdeExt::into_serde(&json);
+            match parsed_result {
+                Ok( result ) => {
+                    if result.success {
+                        // log!("upload_user_image success", &result.image_url );
+                        uploaded_url_callback.emit( result.image_url );
+
+                    }
+                }
+
+                Err( err ) => {
+                    error!( format!("upload_user_image error 2 {:?}", err) );
+                }
+
             }
+            return Ok( json );
         }
-
-        Err( _err ) => {
-
+        Err( err ) => {
+            error!( format!("upload_user_image error 1 {:?}", err) );
         }
     }
 
-    Ok( json )
+
+    return Ok( JsValue::from_str("") );
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
