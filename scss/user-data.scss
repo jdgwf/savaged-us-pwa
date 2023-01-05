@@ -20,20 +20,24 @@ body {
                 // margin: .5rem;
                 border-radius: .5rem;
                 // border: solid 2px #888;
-                padding: 35% 0 0 0;
+                padding: 15% 0 0 0;
                 background: #888;
                 overflow: hidden;
                 position: absolute;
                 bottom: 0;
                 cursor: pointer;
                 &.folder-up {
-                    padding: 15% 0 0 0;
+                    padding: 7% 0 0 0;
 
                     font-size: .8rem;
                     i {
                         font-size: 3.5rem;
                         margin-bottom: 1rem;
                     }
+                }
+                h3 {
+                    font-size: 1.1rem;
+                    margin: 0;
                 }
             }
 
@@ -48,6 +52,37 @@ body {
                 overflow: hidden;
                 position: absolute;
                 top: 0;
+                padding: 2px 0 0 0;
+                text-align: center;
+                font-size: .8rem;
+            }
+
+            .controls {
+                position: absolute;
+                bottom: -42px;
+                height: 0;
+                background: #000;
+                transition: bottom .2s;
+                transition: height .2s;
+                border-bottom-right-radius: .5rem;
+                border-bottom-left-radius: .5rem;
+                width: 100%;
+                z-index: 11;
+                overflow: hidden;
+                .btn {
+                    margin: .25rem;
+                }
+            }
+
+            &:hover {
+                .folder-nip,
+                .folder-base {
+                    background: #999;
+                }
+                .controls {
+                    bottom: 0;
+                    height: 40px;
+                }
             }
 
         }
@@ -83,7 +118,7 @@ body {
                 height: 150px;
                 width: 150px;
                 // border-radius: .5rem;
-                padding: 10% 10px 0 10px;
+                padding: 0 10px;
                 background: rgba(0,0,0,.6);
                 overflow: hidden;
 

@@ -1,4 +1,6 @@
 
+use std::collections::HashMap;
+
 use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
@@ -161,6 +163,7 @@ impl Component for UserSavesList {
         let change_folder_callback = ctx.link().callback(UserSavesListMessage::ChangeFolder);
 
         let mut current_available_folders: Vec<String> = Vec::new();
+        let mut current_folder_counts: HashMap< String, u32> = HashMap::new();
 
 
         let filter_by_type = | save: &SaveDBRow | {
@@ -218,13 +221,15 @@ impl Component for UserSavesList {
                     if !item.folder.is_empty()
                         && !current_available_folders.contains(&item.folder)
                     {
-                        current_available_folders.push(item.folder);
+                        current_available_folders.push(item.folder.clone());
+                    }
+                    if !item.folder.is_empty() {
+                        current_folder_counts.entry(item.folder).and_modify(|count| *count += 1).or_insert(1);
                     }
                 }
 
                 if item.save_type == "character".to_owned() {
                     character_count += 1;
-
                 }
                 if item.save_type == "race".to_owned() {
                     race_count += 1;
@@ -432,6 +437,7 @@ impl Component for UserSavesList {
                             change_folder_callback1.emit("".to_owned());
                         }}
                     >
+
                     </div>
                     <div
                         class="folder-base folder-up"
@@ -440,7 +446,7 @@ impl Component for UserSavesList {
                         }}
                     >
                         <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                        <br />{"Back To Base Folder"}
+                        <h3>{"Back To Base Folder"}</h3>
                     </div>
 
                 </div>
@@ -450,12 +456,23 @@ impl Component for UserSavesList {
                     let change_folder_callback1 = change_folder_callback.clone();
                     let change_folder_callback2 = change_folder_callback.clone();
 
+                    let mut folder_count = 0;
+                    match current_folder_counts.get_key_value(&folder.clone()) {
+                        Some( (_hash, val) ) => {
+                            folder_count = *val;
+                        }
+                        None => {
+
+                        }
+                    }
                     let folder1 = folder.to_owned();
                     let folder2 = folder.to_owned();
+
 
                     html! {
                         <div
                             class="folder"
+                            title={format!("This folder '{}' has {} saves.", &folder, &folder_count)}
                         >
                             <div
                                 class="folder-nip"
@@ -463,16 +480,49 @@ impl Component for UserSavesList {
 
                                     change_folder_callback1.emit(folder1.to_owned());
                                 }}
-                            ></div>
+
+                            >
+                                {&folder_count}
+                            </div>
                             <div
                                 class="folder-base"
                                 onclick={move |_e| {
                                     change_folder_callback2.emit(folder2.to_owned());
                                 }}
                             >
-                                {folder}
+                                <h3>{&folder}</h3>
                             </div>
+                            <div class={"controls"}>
 
+
+                            <button
+                                class="btn btn-success"
+                                // onclick={ move | _event | {
+                                //     let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
+                                //     conf_def.text = format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name);
+                                //     conf_def.callback = Callback::noop();
+                                //     open_confirmation_dialog.emit(
+                                //         conf_def
+                                //     );
+                                // }}
+                            >
+                                <i class={"fa fa-edit"} />
+                            </button>
+                            <button
+                                class="btn btn-danger"
+                                // onclick={ move | _event | {
+                                //     let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
+                                //     conf_def.text = format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name);
+                                //     conf_def.callback = Callback::noop();
+                                //     open_confirmation_dialog.emit(
+                                //         conf_def
+                                //     );
+                                // }}
+                            >
+                                <i class={"fa fa-trash"} />
+                            </button>
+
+                        </div>
                         </div>
                     }
                     }).collect::<Html>()
@@ -490,9 +540,32 @@ impl Component for UserSavesList {
                         }
                         None => {}
                     }
-                    // if !save.imageurl.is_empty() {
-                    //     image_style = "background-image: url('".to_owned() + &server_root + &save.imageurl + &"')";
-                    // }
+
+                    let mut created_on_html = html!{ <></> };
+                    let mut updated_on_html = html!{ <></> };
+                    match save.created_on {
+                        Some( created_on ) => {
+                            created_on_html = html!{ <div class="text-left small-text">{"Created: "}{global_vars.current_user.format_datetime(created_on, false, true, false)}</div> };
+                        }
+                        None => {
+
+                        }
+                    }
+
+                    match save.updated_on {
+                        Some( updated_on ) => {
+                            if &save.created_on != &save.updated_on {
+                                updated_on_html = html!{ <div class="text-left small-text">{"Updated: "}{global_vars.current_user.format_datetime(updated_on, false, true, false)}</div> };
+                            }
+                        }
+                        None => {
+
+                        }
+                    }
+
+                    log!( format!("s co {:?}", save.created_on));
+                    log!( format!("s uo {:?}", save.updated_on));
+
                     html!{
                         <div
                             class="save-card"
@@ -506,8 +579,11 @@ impl Component for UserSavesList {
                                 <hr />
                                 {save.short_desc}<br />
                                 <br />
-                                <div class="small-text">{save.save_type}<Nbsp />{"|"}<Nbsp />{save.folder}</div>
-                                <div class="small-text">{save.uuid.to_owned()}</div>
+                                // <div class="small-text">{save.save_type}<Nbsp />{"|"}<Nbsp />{save.folder}</div>
+                                // <div class="small-text">{save.uuid.to_owned()}</div>
+                                {created_on_html}
+                                {updated_on_html}
+
                             </div>
 
                             <div class={"controls"}>

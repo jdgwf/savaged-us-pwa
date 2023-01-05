@@ -409,44 +409,7 @@ pub struct FileUploadResults {
     pub message: String,
     pub image_url: String,
 }
-// pub async fn clear_user_image(
-//     api_root: String,
-//     login_token: String,
-//     upload_type: String,
-//     cleared_url_callback: Callback<String>,
-// ) {
-//     warn!("clear_user_image called" );
-//     let endpoint = api_root.clone() + &"/auth/set-user-image-data".to_owned();
-//     log!("clear_user_image upload_type", upload_type.clone() );
-//     log!("clear_user_image endpoint", endpoint.clone() );
-//     cleared_url_callback.emit("".to_owned());
 
-//     // let mut opts = RequestInit::new();
-//     // opts.method("POST");
-//     // // // opts.body(Some(&wasm_bindgen::JsValue::from_str(
-//     // // format!("{{\"api_key\": \"{}\", \"login_token\": \"{}\", \"{}\": \"{}\"}}", &api_key, &login_token, &var_name, &var_value).as_ref()
-//     // // // )));
-//     // // opts.
-//     // opts.mode(RequestMode::Cors);
-//     // let request = Request::new_with_str_and_init(&endpoint, &opts)?;
-
-//     // request
-//     //     .headers()
-//     //     .set("Accept", "application/vnd.github.v3+json")?;
-
-//     // request.headers().set("Content-Type", "application/json" )?;
-
-//     // let window = web_sys::window().unwrap();
-//     // let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
-
-//     // assert!(resp_value.is_instance_of::<Response>());
-//     // let resp: Response = resp_value.dyn_into().unwrap();
-
-//     // // Convert this other `Promise` into a rust `Future`.
-//     // let json = JsFuture::from(resp.json()?).await?;
-
-//     // Ok(json)
-// }
 
 pub async fn fetch_api_with_value(
     endpoint: String,
