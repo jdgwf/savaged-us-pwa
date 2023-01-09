@@ -1,6 +1,6 @@
 use yew::prelude::*;
 use standard_components::ui::input_text::InputText;
-use standard_components::ui::textarea::TextArea;
+use standard_components::ui::markdown_editor::MarkdownEditor;
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::nbsp::Nbsp;
 use web_sys::{HtmlInputElement};
@@ -612,7 +612,7 @@ impl Component for SettingsPublic {
                             <div class={"small-text"}>{"This will show your image on the General page on your User Badge and, if you're a WildCard subscriber, your Bio"}</div>
                         </InputCheckbox>
 
-                        <TextArea
+                        <MarkdownEditor
                             label={"A Brief Bio"}
                             // readonly={true}
                             value={self.edit_bio.clone()}

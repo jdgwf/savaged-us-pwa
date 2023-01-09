@@ -12,6 +12,11 @@ body {
             min-height: 100px;
         }
 
+        .markdown-edit-preview {
+            border: solid 1px var(--body-font-color);
+            padding: .25rem .5rem;
+            min-height: 100px;
+        }
         input {
             padding: .125rem .25rem;
         }

@@ -545,7 +545,7 @@ impl Component for UserSavesList {
                     let mut updated_on_html = html!{ <></> };
                     match save.created_on {
                         Some( created_on ) => {
-                            created_on_html = html!{ <div class="text-left small-text">{"Created: "}{global_vars.current_user.format_datetime(created_on, false, true, false)}</div> };
+                            created_on_html = html!{ <div class="small-text"><strong>{"Created On"}</strong><br />{global_vars.current_user.format_datetime(created_on, false, true, false)}</div> };
                         }
                         None => {
 
@@ -555,7 +555,7 @@ impl Component for UserSavesList {
                     match save.updated_on {
                         Some( updated_on ) => {
                             if &save.created_on != &save.updated_on {
-                                updated_on_html = html!{ <div class="text-left small-text">{"Updated: "}{global_vars.current_user.format_datetime(updated_on, false, true, false)}</div> };
+                                updated_on_html = html!{ <div class="small-text"><strong>{"Updated On"}</strong><br />{global_vars.current_user.format_datetime(updated_on, false, true, false)}</div> };
                             }
                         }
                         None => {

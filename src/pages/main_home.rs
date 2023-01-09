@@ -53,6 +53,10 @@ impl Component for MainHome {
                     {"Books: "}{chargen_data.books.len()}<br />
                     {"Edges: "}{chargen_data.edges.len()}<br />
                     {"Hindrances: "}{chargen_data.hindrances.len()}<br />
+                    <br />
+                    {"Gear: "}{chargen_data.gear.len()}<br />
+                    {"Armor: "}{chargen_data.armor.len()}<br />
+                    {"Weapons: "}{chargen_data.weapons.len()}<br />
                     </>
                 };
             }
