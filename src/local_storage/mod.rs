@@ -104,6 +104,105 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
 //     log!("check_and_upgrade_index_db_stores completed");
 
 // }
+
+pub async fn index_db_put_save(
+    server_root: String,
+    save: SaveDBRow,
+) -> SavesSyncUpdateResults {
+    let mut update_stats: SavesSyncUpdateResults = SavesSyncUpdateResults {
+        saves: 0,
+        latest_updated_on: Utc.with_ymd_and_hms(1990, 1, 1, 0, 0, 0).unwrap(),
+    };
+
+    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result {
+        Ok( mut db_req ) => {
+
+            _create_tables( &mut db_req ).await;
+
+
+            /* Saves */
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+
+            // log!("index_db_put_save 2");
+
+            let mut edit_save = save.clone();
+            match save.updated_on {
+                Some( updated_on ) => {
+                    if update_stats.latest_updated_on < updated_on {
+                        update_stats.latest_updated_on = updated_on;
+                    }
+                }
+                None => {}
+            }
+
+            edit_save.image_base64_mime = None;
+            edit_save.image_base64 = None;
+            edit_save.image_token_base64_mime = None;
+            edit_save.image_token_base64 = None;
+
+            if !save.imageurl.is_empty() {
+                // TODO Fetch Image Data
+                let image_url = server_root.clone() + &edit_save.imageurl;
+                let (image_data, image_mime) = get_image_file( image_url ).await;
+
+                // log!("image_data", image_data);
+                // log!("image_mime", image_mime);
+
+                edit_save.image_base64 = Some(image_data);
+                edit_save.image_base64_mime = Some(image_mime);
+                // TODO Encode to base 64
+
+                // TODO Assign Mime
+
+                // TODO Assign Data
+            }
+
+            let tx: IdbTransaction = db
+                .transaction_on_one_with_mode(
+                    INDEX_DB_SAVES_STORE_NAME,
+                    IdbTransactionMode::Readwrite
+                ).unwrap();
+            let store: IdbObjectStore = tx.object_store(INDEX_DB_SAVES_STORE_NAME).unwrap();
+
+            let value_to_put: JsValue = serde_json::to_string(&edit_save).unwrap().into();
+
+            // log!( format!("value_to_put {:?}", value_to_put) );
+            let err = store.put_key_val_owned(save.uuid.clone(), &value_to_put);
+            match err {
+                Ok( _ ) => {
+                    let _ =  tx.await.into_result();
+                    // log!( format!("index_db_put_save saved key ID:{} ", save.uuid) );
+                    update_stats.saves += 1;
+                    match edit_save.updated_on {
+                        Some( updated_on ) => {
+                            if update_stats.latest_updated_on < updated_on {
+                                update_stats.latest_updated_on = updated_on;
+                            }
+                        }
+                        None => {}
+                    }
+                }
+                Err( _err ) => {
+                    log!( format!("index_db_put_save store data error ID: {} / {:?}", save.id, _err) );
+                }
+            }
+
+            set_local_storage_string("saves_last_updated",  update_stats.latest_updated_on.to_string() );
+            db.close();
+        }
+
+        Err( _ ) => {
+
+        }
+    }
+
+    // log!("index_db_save_saves 1");
+
+
+    return update_stats;
+}
+
 pub async fn index_db_save_saves(
     server_root: String,
     saves: Vec<SaveDBRow>,
@@ -174,6 +273,14 @@ pub async fn index_db_save_saves(
                         let _ =  tx.await.into_result();
                         // log!( format!("index_db_save_saves saved key ID:{} ", save.uuid) );
                         update_stats.saves += 1;
+                        match edit_save.updated_on {
+                            Some( updated_on ) => {
+                                if update_stats.latest_updated_on < updated_on {
+                                    update_stats.latest_updated_on = updated_on;
+                                }
+                            }
+                            None => {}
+                        }
                     }
                     Err( _err ) => {
                         log!( format!("index_db_save_saves store data error ID: {} / {:?}", save.id, _err) );
@@ -181,6 +288,7 @@ pub async fn index_db_save_saves(
                 }
 
             }
+            set_local_storage_string("saves_last_updated",  update_stats.latest_updated_on.to_string() );
             db.close();
         }
 

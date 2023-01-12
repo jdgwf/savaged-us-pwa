@@ -1,11 +1,14 @@
 
 
+use chrono::Utc;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::player_character::edge::Edge;
 use savaged_libs::player_character::weapon::Weapon;
 use savaged_libs::player_character::armor::Armor;
 use savaged_libs::player_character::gear::Gear;
 use savaged_libs::save_db_row::SaveDBRow;
+use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
+use wasm_bindgen_futures::spawn_local;
 use yew_router::prelude::*;
 use yew::prelude::*;
 
@@ -21,8 +24,10 @@ use crate::components::tertiary_menu::{
     TertiaryMenu
 };
 use crate::components::ui_page::UIPage;
+use crate::local_storage::{index_db_put_save, get_saves_from_index_db};
 use crate::main_app::SubmenuData;
 use crate::components::edit_forms::hindrance::EditHindrance;
+use crate::pages::user::UserRoute;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
 // use super::settings_public::SettingsPublic;
@@ -41,6 +46,9 @@ pub struct UserSavesEditProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
+    #[prop_or_default]
+    pub new_save_type: Option<String>,
+
     pub uuid: String,
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
@@ -48,8 +56,13 @@ pub struct UserSavesEditProps {
 }
 
 pub enum UserSavesEditMessage {
-    UpdateHindrance(Hindrance),
     ChangeFolder(String),
+    Cancel(bool),
+
+    UpdateHindrance(Hindrance),
+    AddHindrance(bool),
+    SaveHindrance(bool),
+
 }
 pub struct UserSavesEdit {
     global_vars: GlobalVars,
@@ -61,6 +74,8 @@ pub struct UserSavesEdit {
     editing_gear: Option<Gear>,
     editing_armor: Option<Armor>,
 
+    is_adding: bool,
+    redirect_back: bool,
 }
 
 impl Component for UserSavesEdit {
@@ -83,6 +98,66 @@ impl Component for UserSavesEdit {
                 for item in local_saves {
                     if item.uuid == ctx.props().uuid {
                         save_option = Some(item.clone());
+                    }
+                }
+            }
+            None => {
+
+            }
+        }
+
+        match &ctx.props().new_save_type {
+            Some( save_type ) => {
+                match save_type.as_str() {
+                    "character" => {
+                        // form = html!{ <div class="text-center">{"TODO: Character Edit Form"}</div>};
+                    }
+                    "setting" => {
+                        // form = html!{ <div class="text-center">{"TODO: Setting Edit Form"}</div>};
+                    }
+                    "race" => {
+                        // form = html!{ <div class="text-center">{"TODO: Race Edit Form"}</div>};
+                    }
+                    "bestiary" => {
+                        // form = html!{ <div class="text-center">{"TODO: Bestiary Edit Form"}</div>};
+                    }
+                    "gear" => {
+                        // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
+                        // editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "weapon" => {
+                        // form = html!{ <div class="text-center">{"TODO: Weapon Edit Form"}</div>};
+                        // editing_weapon = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "armor" => {
+                        // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
+                        // editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "hindrances" => {
+                        // log!("setting Hindrance Data");
+                        // editing_hindrance = serde_json::from_str(save.data.as_str()).unwrap();
+
+                    }
+                    "edges" => {
+                        // form = html!{ <div class="text-center">{"TODO: Edge Edit Form"}</div>};
+                        // editing_edge = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "starship" => {
+                        // form = html!{ <div class="text-center">{"TODO: SciFi Vehicle 2014 Edit Form"}</div>};
+                    }
+                    "power-armor" => {
+                        // form = html!{ <div class="text-center">{"TODO: SciFi Vehicle 2014 Edit Form"}</div>};
+                    }
+                    "vehicle" => {
+                        // form = html!{ <div class="text-center">{"TODO: SciFi Vehicle 2014 Edit Form"}</div>};
+                    }
+                    "walker" => {
+                        // form = html!{ <div class="text-center">{"TODO: SciFi Vehicle 2014 Edit Form"}</div>};
+                    }
+
+                    _ => {
+                        log!( format!("Unhandled add save type: {}", &save_type ) );
+                        // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
                 }
             }
@@ -119,7 +194,7 @@ impl Component for UserSavesEdit {
                         editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
-                        log!("setting Hindrance Data");
+                        // log!("setting Hindrance Data");
                         editing_hindrance = serde_json::from_str(save.data.as_str()).unwrap();
 
                     }
@@ -140,6 +215,10 @@ impl Component for UserSavesEdit {
                         // form = html!{ <div class="text-center">{"TODO: SciFi Vehicle 2014 Edit Form"}</div>};
                     }
 
+                    "" => {
+                        // handled by Add above....
+                    }
+
                     _ => {
                         log!( format!("Unhandled save type: {}", &save.save_type ) );
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
@@ -152,7 +231,7 @@ impl Component for UserSavesEdit {
             }
         }
 
-        log!( format!("editing_hindrance {:?}", editing_hindrance ));
+        // log!( format!("editing_hindrance {:?}", editing_hindrance ));
 
         UserSavesEdit {
             global_vars: ctx.props().global_vars.clone(),
@@ -163,6 +242,9 @@ impl Component for UserSavesEdit {
             editing_weapon: editing_weapon,
             editing_gear: editing_gear,
             editing_armor: editing_armor,
+
+            is_adding: false,
+            redirect_back: false,
         }
     }
 
@@ -172,13 +254,47 @@ impl Component for UserSavesEdit {
         msg: UserSavesEditMessage
     ) -> bool {
 
-
         match msg {
             UserSavesEditMessage::UpdateHindrance( new_value ) => {
                 // log!("ChangeFilter", filter_type);
                 self.editing_hindrance = Some(new_value);
             }
+            UserSavesEditMessage::SaveHindrance( _new_value ) => {
+                let editing_hindrance = self.editing_hindrance.clone();
+                let mut save = self.save.clone().unwrap();
+                let close_callback = UserSavesEditMessage::Cancel.clone();
+                match editing_hindrance {
+                    Some( editing_hindrance ) => {
+                        let item = editing_hindrance.clone();
+                        let server_root = self.global_vars.server_root.clone();
+                        let mut global_vars = self.global_vars.clone();
+                        let update_global_vars = ctx.props().update_global_vars.clone();
+                        save.data = serde_json::to_string(&item).unwrap();
+                        save.name = item.name;
+                        save.updated_on =  Some(Utc::now());
+                        save.updated_by =  global_vars.current_user.id;
+                        close_callback( true );
+                        spawn_local(
+                            async move {
+                                index_db_put_save( server_root, save).await;
+                                global_vars.saves = get_saves_from_index_db().await;
+                                update_global_vars.emit( global_vars );
 
+                            }
+                        );
+                        self.close_and_cancel();
+                    }
+                    None => {}
+                }
+            }
+            UserSavesEditMessage::AddHindrance( new_value ) => {
+                // log!("AddHindrance");
+                // self.editing_hindrance = Some(new_value);
+            }
+            UserSavesEditMessage::Cancel( _new_value ) => {
+                // log!("Cancel called");
+                self.close_and_cancel();
+            }
             UserSavesEditMessage::ChangeFolder( folder_name ) => {
                 // log!("ChangeFolder", folder);
                 set_local_storage_string( "saves_folder", folder_name);
@@ -285,11 +401,14 @@ impl Component for UserSavesEdit {
             }
         }
 
-
         true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+
+        if self.redirect_back {
+            return html! { <Redirect<UserRoute> to={UserRoute::UserSavesList}/> }
+        }
 
         let mut global_vars = ctx.props().global_vars.clone();
 
@@ -330,8 +449,10 @@ impl Component for UserSavesEdit {
         }
 
         let mut form = html!{<></>};
+        let mut page_title = "Unhandled Save".to_owned();
         match &self.save {
             Some( save ) => {
+
 
                 form = html!{<>
                     <h2>{"Unhandled Save"}</h2>
@@ -343,27 +464,51 @@ impl Component for UserSavesEdit {
                 </>};
                 match &self.editing_hindrance {
                     Some( hindrance ) => {
+                        let mut save_callback : Option<Callback<bool>> = None;
+                        let mut save_as_new_callback : Option<Callback<bool>> = None;
+                        let mut add_callback: Option<Callback<bool>>  = None;
+
+                        if self.is_adding {
+                            page_title = "Adding Hindrance".to_owned();
+                            add_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveHindrance).clone());
+                        } else {
+                            page_title = "Editing Hindrance".to_owned();
+                            save_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveHindrance).clone());
+                        }
 
                         form = html!{
+                            <>
                             <EditHindrance
                                 global_vars={ctx.props().global_vars.clone()}
                                 edit_save={save.clone()}
+                                readonly={false}
                                 edit_item={hindrance.clone()}
+                                form_title={"Editing Hindrance"}
                                 on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateHindrance)}
                             />
+
+                            <StandardFormSaveButtons
+                                close_cancel_callback={ctx.link().callback(UserSavesEditMessage::Cancel).clone()}
+                                save_callback={save_callback}
+                                add_callback={add_callback}
+                                save_as_new_callback={save_as_new_callback}
+                            />
+
+                            </>
                         };
                     }
                     None => {
-                        log!("Cannot find Hindrance?");
+                        // log!("Cannot find Hindrance?");
                     }
                 }
 
                 return html! {
                     <UIPage
                         global_vars={global_vars.clone()}
-                        page_title="Editing Save"
+                        page_title={page_title}
                         submenu_tag={"user-data".to_owned()}
                     >
+
 
                         {form}
 
@@ -374,7 +519,7 @@ impl Component for UserSavesEdit {
                 return html!{
                     <UIPage
                         global_vars={global_vars.clone()}
-                        page_title="Editing Save"
+                        page_title="Error Loading Save"
                         submenu_tag={"user-data".to_owned()}
                     >
                         {"Cannot find save!"}
@@ -385,3 +530,14 @@ impl Component for UserSavesEdit {
     }
 }
 
+impl UserSavesEdit {
+    fn close_and_cancel(&mut self) {
+        self.editing_hindrance = None;
+        self.editing_edge = None;
+        self.editing_gear = None;
+        self.editing_weapon = None;
+        self.editing_armor = None;
+
+        self.redirect_back = true;
+    }
+}

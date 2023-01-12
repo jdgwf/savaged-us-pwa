@@ -1,0 +1,82 @@
+body {
+    .admin-filter {
+        label {
+            width: auto;
+            display: inline-block;
+            background: none !important;
+            margin: 0 1rem;
+            padding: 0;
+            input {
+                width: auto;
+            }
+        }
+    }
+    .admin-paging {
+        display: flex;
+        .row_count {
+            flex-grow: 0;
+        }
+        .paging {
+            flex-grow: 1;
+        }
+        .total {
+            flex-grow: 0;
+        }
+
+    }
+    .admin-table {
+        width: 100%;
+        background: var(--borders-color);
+        thead {
+            tr {
+                th {
+
+                }
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    background: var(--body-bg-color);
+                }
+            }
+        }
+        tfoot {
+            tr {
+                th {
+                    label {
+                        width: auto;
+                        display: inline-block;
+                        background: none !important;
+                        margin: 0 1rem;
+                        padding: 0;
+                        select {
+                            width: auto;
+                        }
+                    }
+                    .btn-ph {
+                        display: inline-block;
+                        width: 3rem;
+                    }
+                }
+            }
+        }
+
+        thead,tbody,tfoot {
+            tr {
+                th,
+                td {
+                    padding: .25rem .5rem;
+                    vertical-align: top;
+                    &.min-width {
+                        white-space: nowrap;
+                        width: 1%;
+                    }
+                    &.vert-middle {
+                        vertical-align: middle;
+                    }
+                }
+            }
+        }
+    }
+}

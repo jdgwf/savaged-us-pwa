@@ -7,3 +7,4 @@ pub mod lds_roller;
 pub mod lds_spinner;
 pub mod tertiary_menu;
 pub mod edit_forms;
+pub mod admin;

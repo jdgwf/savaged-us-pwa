@@ -4,7 +4,9 @@ use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::save_db_row::SaveDBRow;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::markdown_editor::MarkdownEditor;
+use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 use web_sys::File;
 use standard_components::ui::input_text::InputText;
@@ -19,6 +21,10 @@ pub struct EditHindranceProps {
     pub edit_item: Hindrance,
     pub edit_save: SaveDBRow,
     pub on_changed_callback: Callback< Hindrance >,
+    pub form_title: String,
+
+    #[prop_or_default]
+    pub readonly: bool,
 }
 
 
@@ -29,6 +35,14 @@ pub enum EditHindranceMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
+    SetMinorOrMajorHindrance(bool),
+    SetMajorHindrance(bool),
+
+    UpdateConflicts( String ),
+    UpdateEffects( String ),
+
+    UpdateMinorEffects( String ),
+    UpdateSummaryMinor( String ),
 }
 
 pub struct EditHindrance {
@@ -91,6 +105,60 @@ impl Component for EditHindrance {
             EditHindranceMessage::UpdateDescription( new_value ) => {
                 self.edit_item.description = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+
+            EditHindranceMessage::SetMinorOrMajorHindrance( new_value ) => {
+                self.edit_item.minor_or_major = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+
+            EditHindranceMessage::SetMajorHindrance( new_value ) => {
+                self.edit_item.major = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+
+            EditHindranceMessage::UpdateConflicts( new_value ) => {
+
+                let mut nv: Vec<String> = Vec::new();
+
+                for val in new_value.as_str().split("\n") {
+                    nv.push( val.to_owned() );
+                }
+
+                self.edit_item.conflicts = nv;
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+            EditHindranceMessage::UpdateEffects( new_value ) => {
+                let mut nv: Vec<String> = Vec::new();
+
+                for val in new_value.as_str().split("\n") {
+                    nv.push( val.to_owned() );
+                }
+
+                self.edit_item.effects = nv;
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+            EditHindranceMessage::UpdateMinorEffects( new_value ) => {
+
+                let mut nv: Vec<String> = Vec::new();
+
+                for val in new_value.as_str().split("\n") {
+                    nv.push( val.to_owned() );
+                }
+
+
+                self.edit_item.effects_minor = nv;
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                true
+            }
+            EditHindranceMessage::UpdateSummaryMinor( new_value ) => {
+                self.edit_item.summary_minor = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 true
             }
             _ => {
@@ -163,7 +231,7 @@ impl Component for EditHindrance {
                     local_storage_variable={self.local_storage_page_name.to_owned()}
                 />
 
-
+                <h3 class="text-center no-margins">{ctx.props().form_title.to_owned()}</h3>
 
             </>
         };
@@ -172,11 +240,11 @@ impl Component for EditHindrance {
 
             "admin" => {
                 html!{
-                    <div>
+                    <div class="edit-form">
                     {header}
                     <fieldset class={"fieldset"}>
-                    <legend>{"Admin"}</legend>
-                    {"Admin Page"}
+                        <legend>{"Admin"}</legend>
+                        {"Admin Page"}
                     </fieldset>
                     </div>
                 }
@@ -184,11 +252,16 @@ impl Component for EditHindrance {
 
             "selection" => {
                 html!{
-                    <div>
+                    <div class="edit-form">
                     {header}
                     <fieldset class={"fieldset"}>
-                    <legend>{"Selection"}</legend>
-                    {"Selection Page"}
+                        <legend>{"Selection"}</legend>
+                        <TextArea
+                            readonly={ctx.props().readonly}
+                            label={"Conflicts"}
+                            value={self.edit_item.conflicts.join("\n")}
+                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
+                        />
                     </fieldset>
                     </div>
                 }
@@ -197,11 +270,38 @@ impl Component for EditHindrance {
 
             "effects" => {
                 html!{
-                    <div>
+                    <div class="edit-form">
                     {header}
                     <fieldset class={"fieldset"}>
-                    <legend>{"Effects"}</legend>
-                    {"Effects Page"}
+                        <legend>{"Effects"}</legend>
+
+                        if self.edit_item.minor_or_major {
+                            <div class="row full-width">
+                                <div class="col-md-6">
+                                    <TextArea
+                                        readonly={ctx.props().readonly}
+                                        label={"Major Effects"}
+                                        value={self.edit_item.effects.join("\n")}
+                                        onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                                    />
+                                </div>
+                                <div class="col-md-6">
+                                    <TextArea
+                                        readonly={ctx.props().readonly}
+                                        label={"Minor Effects"}
+                                        value={self.edit_item.effects_minor.join("\n")}
+                                        onchange={ ctx.link().callback( EditHindranceMessage::UpdateMinorEffects ) }
+                                    />
+                                </div>
+                            </div>
+                        } else {
+                            <TextArea
+                                readonly={ctx.props().readonly}
+                                label={"Effects"}
+                                value={self.edit_item.effects.join("\n")}
+                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                            />
+                        }
                     </fieldset>
                     </div>
                 }
@@ -211,27 +311,67 @@ impl Component for EditHindrance {
             _ => {
                 set_local_storage_string( &self.local_storage_page_name, "general".to_owned());
                 html! {
-                    <div>
+                    <div class="edit-form">
                         {header}
                         <fieldset class={"fieldset"}>
                                 <legend>{"General"}</legend>
                                 <div class="row full-width">
                                     <div class="col-md-6">
                                         <InputText
+                                            readonly={ctx.props().readonly}
                                             label={"Name"}
                                             value={(self.edit_item.name).to_owned()}
                                             onchange={ ctx.link().callback( EditHindranceMessage::UpdateName) }
                                         />
 
+
+                                        <InputCheckbox
+                                            label="Major Hindrance"
+                                            checked={self.edit_item.major}
+                                            onchange={ctx.link().callback( EditHindranceMessage::SetMajorHindrance )}
+                                        />
+                                        <InputCheckbox
+                                            label="Minor or Major Hindrance"
+                                            checked={self.edit_item.minor_or_major}
+                                            onchange={ctx.link().callback( EditHindranceMessage::SetMinorOrMajorHindrance )}
+                                        />
+
+                                        if self.edit_item.minor_or_major {
+
+                                            <InputText
+                                                readonly={ctx.props().readonly}
+                                                label={"Major Summary"}
+                                                value={(self.edit_item.summary).to_owned()}
+                                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                                            />
+                                            <InputText
+                                                readonly={ctx.props().readonly}
+                                                label={"Minor Summary"}
+                                                value={(self.edit_item.summary_minor).to_owned()}
+                                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummaryMinor) }
+                                            />
+                                        } else {
+                                            <InputText
+                                                readonly={ctx.props().readonly}
+                                                label={"Summary"}
+                                                value={(self.edit_item.summary).to_owned()}
+                                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                                            />
+                                        }
+
+
+
                                         <InputText
-                                            label={"Summary"}
-                                            value={(self.edit_item.summary).to_owned()}
-                                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                                            label={"UUID"}
+                                            readonly={true}
+                                            value={(self.edit_item.uuid.to_string()).to_owned()}
                                         />
                                     </div>
                                     <div class="col-md-6">
                                         <MarkdownEditor
+                                            readonly={ctx.props().readonly}
                                             label={"Description"}
+                                            starting_height={175}
                                             value={(self.edit_item.description).to_owned()}
                                             onchange={ ctx.link().callback( EditHindranceMessage::UpdateDescription) }
                                         />

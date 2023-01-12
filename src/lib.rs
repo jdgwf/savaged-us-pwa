@@ -1,4 +1,4 @@
-use pages::user::user_router::UserRouter;
+use pages::user::UserRouter;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
@@ -19,7 +19,8 @@ use crate::pages::main_home::MainHome;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::register::Register;
-use crate::pages::info::info_router::InfoRouter;
+use crate::pages::info::InfoRouter;
+use crate::pages::admin::AdminRouter;
 // use serde_json::Error;
 // use standard_components::ui::nbsp::Nbsp;
 // use gloo_console::log;
@@ -49,6 +50,8 @@ pub enum MainServerRoute {
     Register,
     #[at("/info/*")]
     InfoRouter,
+    #[at("/admin/*")]
+    AdminRouter,
     // #[at("/todos")]
     // ToDos,
     // #[at("/tech")]
@@ -117,7 +120,7 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    on_logout_action={Callback::noop()}
+                    // on_logout_action={Callback::noop()}
                     update_global_vars={Callback::noop()}
                     open_confirmation_dialog={Callback::noop()}
                 />
@@ -141,7 +144,18 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    on_logout_action={Callback::noop()}
+                    // on_logout_action={Callback::noop()}
+                    update_global_vars={Callback::noop()}
+                    open_confirmation_dialog={Callback::noop()}
+                />
+            }
+        },
+
+        MainServerRoute::AdminRouter => {
+            html! {
+                <AdminRouter
+                    global_vars={global_vars}
+                    // on_logout_action={Callback::noop()}
                     update_global_vars={Callback::noop()}
                     open_confirmation_dialog={Callback::noop()}
                 />

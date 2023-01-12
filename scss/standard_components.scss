@@ -9,6 +9,7 @@ body {
 
         textarea {
             width: 100%;
+            resize: vertical;
             min-height: 100px;
         }
 
@@ -26,11 +27,21 @@ body {
         input[type=text],
         input[type=password] {
             width: 100%;
+            border: 0;
+            outline: none !important;
+        }
+
+        input[type=email]:read-only,
+        input[type=text]:read-only,
+        input[type=password]:read-only {
+            background: #999;
+
         }
 
         input[type=checkbox] {
             padding: 0;
             margin: 0 .5rem 0 0;
+            outline: none !important;
         }
         .check-image {
             display: none;
@@ -214,6 +225,17 @@ body {
                 color: #fff;
                 background-color: #157347;
                 border-color: #146c43;
+            }
+        }
+
+        &.btn-info {
+            color: #fff;
+            background-color: #194c87;
+            border-color: #194c87;
+            &:hover {
+                color: #fff;
+                background-color: #1f5ba0;
+                border-color: #1f5ba0;
             }
         }
 

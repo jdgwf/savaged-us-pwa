@@ -17,7 +17,7 @@ use crate::components::tertiary_menu::{
     TertiaryMenu
 };
 
-use crate::pages::user::saves::saves_router::UserSavesRoute;
+use crate::pages::user::saves::UserSavesRoute;
 use crate::components::ui_page::UIPage;
 use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
@@ -563,8 +563,8 @@ impl Component for UserSavesList {
                         }
                     }
 
-                    log!( format!("s co {:?}", save.created_on));
-                    log!( format!("s uo {:?}", save.updated_on));
+                    // log!( format!("s co {:?}", save.created_on));
+                    // log!( format!("s uo {:?}", save.updated_on));
 
                     html!{
                         <div

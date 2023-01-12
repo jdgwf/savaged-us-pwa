@@ -9,7 +9,7 @@ use crate::libs::fetch_api::update_user;
 use serde_json;
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::hidden_banner::HiddenBanner;
-use super::user_router::UserRoute;
+use super::UserRoute;
 use gloo_console::error;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
@@ -432,7 +432,7 @@ impl Component for SettingsPrivate {
                                 disabled={your_info_save_disabled}
                                 onclick={ctx.link().callback( SettingsPrivateMessage::ResetInfo )}
                             >
-                                {"Cancel"}
+                                <i class="fa fa-cancel" /><Nbsp />{"Cancel"}
                             </button>
                             <Nbsp />
                             <button
@@ -440,7 +440,7 @@ impl Component for SettingsPrivate {
                                 disabled={your_info_save_disabled}
                                 onclick={ctx.link().callback( SettingsPrivateMessage::SaveInfo )}
                             >
-                                {"Save"}
+                                <i class="fa fa-floppy-disk" /><Nbsp />{"Save"}
                             </button>
                         </div>
                     </fieldset>
@@ -490,14 +490,14 @@ impl Component for SettingsPrivate {
                                     class="btn btn-secondary"
                                     onclick={ctx.link().callback( SettingsPrivateMessage::ResetPasswords )}
                                 >
-                                    {"Cancel"}
+                                    <i class="fa fa-cancel" /><Nbsp />{"Cancel"}
                                 </button>
                                 <Nbsp />
                                 <button
                                     class="btn btn-primary"
                                     onclick={ctx.link().callback( SettingsPrivateMessage::SavePasswords )}
                                 >
-                                    {"Save"}
+                                    <i class="fa fa-floppy-disk" /><Nbsp />{"Save"}
                                 </button>
                             </div>
                         }

@@ -11,13 +11,18 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::clear_local_storage;
+
 use crate::local_storage::clear_all_local_data;
-use crate::pages::info::info_router::InfoRouter;
+use crate::pages::info::InfoRoute;
+use crate::pages::info::InfoRouter;
 
 use crate::web_sockets::connect_to_websocket;
 use gloo_console::error;
 use gloo_console::log;
 use crate::pages::main_home::MainHome;
+use crate::pages::admin::AdminRouter;
+use crate::pages::admin::home::AdminHome;
 
 
 use crate::pages::main_playground::MainPlayground;
@@ -35,8 +40,8 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
 use crate::libs::global_vars::GlobalVars;
 
-use crate::pages::user::user_router::UserRoute;
-use crate::pages::user::user_router::UserRouter;
+use crate::pages::user::UserRoute;
+use crate::pages::user::UserRouter;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 
 use savaged_libs::user::User;
@@ -48,6 +53,11 @@ pub enum MainRoute {
     #[at("/")]
     Home,
 
+    #[at("/admin/*")]
+    AdminRouter,
+    #[at("/admin")]
+    AdminHome,
+
     #[at("/me/*")]
     UserRouter,
     #[at("/me")]
@@ -58,6 +68,9 @@ pub enum MainRoute {
     ForgotPassword,
     #[at("/register")]
     Register,
+
+    #[at("/info")]
+    InfoRouterRedirect,
     #[at("/info/*")]
     InfoRouter,
 
@@ -145,7 +158,7 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    on_logout_action={on_logout_action}
+                    // on_logout_action={on_logout_action}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
                 />
@@ -155,6 +168,37 @@ fn content_switch(
 
             html! {
                 <Redirect<UserRoute> to={UserRoute::SettingsPrivate} />
+            }
+        },
+
+        MainRoute::InfoRouterRedirect => {
+
+            html! {
+                <Redirect<InfoRoute> to={InfoRoute::InfoAbout} />
+            }
+        },
+
+        MainRoute::AdminRouter => {
+
+            html! {
+                <AdminRouter
+                    global_vars={global_vars}
+                    // on_logout_action={on_logout_action}
+                    update_global_vars={base_update_global_vars}
+                    open_confirmation_dialog={open_confirmation_dialog}
+                />
+            }
+        },
+
+        MainRoute::AdminHome => {
+
+            html! {
+                <AdminHome
+                    global_vars={global_vars}
+                    // on_logout_action={on_logout_action}
+                    // update_global_vars={base_update_global_vars}
+                    // open_confirmation_dialog={open_confirmation_dialog}
+                />
             }
         },
         // MainRoute::Tech => {
@@ -189,7 +233,7 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    on_logout_action={on_logout_action}
+                    // on_logout_action={on_logout_action}
                     update_global_vars={base_update_global_vars}
                     open_confirmation_dialog={open_confirmation_dialog}
 
@@ -395,7 +439,7 @@ impl Component for MainApp {
 
 
                 self.global_vars.user_loading = false;
-                set_local_storage_string( "login_token", "".to_owned() );
+                clear_local_storage();
 
                 let mut logout = WebSocketMessage::default();
                 logout.kind = WebsocketMessageType::Logout;

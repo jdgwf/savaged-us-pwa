@@ -3,10 +3,9 @@ use yew::{Html, html};
 use yew_router::prelude::Link;
 use savaged_libs::user::User;
 use crate::libs::global_vars::GlobalVars;
-use crate::{main_app::MainRoute, pages::{user::user_router::UserRoute}};
-use crate::pages::info::info_router::{
-    InfoRoute,
-};
+use crate::pages::admin::AdminRoute;
+use crate::{main_app::MainRoute, pages::{user::UserRoute}};
+use crate::pages::info::InfoRoute;
 #[derive(Debug, Clone)]
 pub struct MenuItem {
     pub html: Option<Html>,
@@ -35,7 +34,7 @@ pub fn get_menu_items(
     global_vars: &GlobalVars,
 ) -> Vec<MenuItem> {
 
-    return vec!(
+    let mut menu = vec!(
         MenuItem {
 
             hardcoded: false,
@@ -344,6 +343,12 @@ pub fn get_menu_items(
         },
 
 
+    );
+
+    menu = _add_admin_tab( &global_vars, menu );
+
+    menu.push(
+
         MenuItem {
             hardcoded: true,
 
@@ -566,9 +571,107 @@ pub fn get_menu_items(
         },
     );
 
+    return menu;
 }
 
 
+fn _add_admin_tab(
+    global_vars: &GlobalVars,
+    mut menu: Vec<MenuItem>,
+) -> Vec<MenuItem> {
+
+    if global_vars.current_user.has_developer_access() {
+        menu.push(
+            MenuItem {
+                hardcoded: false,
+                html: Some( html!{
+                    <Link<AdminRoute>
+                        to={AdminRoute::AdminHome}
+                    >
+                        <i class="fa fa-lock" /><Nbsp />
+                        {"Admin"}
+                    </Link<AdminRoute>>
+                }),
+                registered_only: false,
+                wildcard_only: false,
+                developer_only: false,
+                admin_only: false,
+                link_class: None,
+
+                submenu_tag: Some("admin".to_string()),
+
+
+                title: "The Administration Section".to_owned(),
+                icon_class: None, // "fa fa-house".to_owned(),
+                label: "About".to_owned(),
+                url: None,
+                menu_tag: "main-admin".to_owned(),
+                sub_menu_tag: "".to_owned(),
+
+                submenu: Some(
+                    vec![
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<AdminRoute>
+                                    to={AdminRoute::AdminHome}
+                                >
+                                    <i class="fa fa-lock" /><Nbsp />
+                                    {"Home"}
+                                </Link<AdminRoute>>
+                            }),
+                            registered_only: false,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+                            link_class: None,
+
+                            submenu_tag: None,
+                            submenu: None,
+
+                            title: "Administration Home".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Administration Home".to_owned(),
+                            url: None,
+                            menu_tag: "admin-home".to_owned(),
+                            sub_menu_tag: "admin-home".to_owned(),
+                        },
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<AdminRoute>
+                                    to={AdminRoute::AdminUsersList}
+                                >
+                                    <i class="fa fa-users" /><Nbsp />
+                                    {"Users"}
+                                </Link<AdminRoute>>
+                            }),
+                            registered_only: false,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+                            link_class: None,
+
+                            submenu_tag: None,
+                            submenu: None,
+
+                            title: "Users Administration".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Users".to_owned(),
+                            url: None,
+                            menu_tag: "admin-users".to_owned(),
+                            sub_menu_tag: "admin-users".to_owned(),
+                        },
+                    ]
+                ),
+
+            },
+
+        );
+    }
+
+    return menu;
+}
 
 pub fn user_can_see_menu_item(
     user: &User,

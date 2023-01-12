@@ -572,7 +572,7 @@ impl Component for SettingsPublic {
                                     disabled={&self.edit_username == &self.global_vars.current_user.username && self.edit_show_user_page == self.global_vars.current_user.show_user_page}
                                     onclick={ctx.link().callback( SettingsPublicMessage::ResetYourInformation )}
                                 >
-                                    {"Cancel"}
+                                    <i class="fa fa-cancel" /><Nbsp />{"Cancel"}
                                 </button>
                                 <Nbsp />
                                 <button
@@ -580,7 +580,7 @@ impl Component for SettingsPublic {
                                     disabled={!self.update_username_can_save}
                                     onclick={ctx.link().callback( SettingsPublicMessage::SaveYourInformation )}
                                 >
-                                    {"Save"}
+                                    <i class="fa fa-floppy-disk" /><Nbsp />{"Save"}
                                 </button>
                             </div>
 
@@ -633,7 +633,7 @@ impl Component for SettingsPublic {
                                 disabled={share_settings_save_disabled}
                                 onclick={ctx.link().callback( SettingsPublicMessage::ResetShareSettings )}
                             >
-                                {"Cancel"}
+                                <i class="fa fa-cancel" /><Nbsp />{"Cancel"}
                             </button>
                             <Nbsp />
                             <button
@@ -641,7 +641,7 @@ impl Component for SettingsPublic {
                                 disabled={share_settings_save_disabled}
                                 onclick={ctx.link().callback( SettingsPublicMessage::SaveShareSettings )}
                             >
-                                {"Save"}
+                                <i class="fa fa-floppy-disk" /><Nbsp />{"Save"}
                             </button>
                         </div>
 

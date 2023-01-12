@@ -1,3 +1,4 @@
+use savaged_libs::admin_libs::FetchAdminParameters;
 use yew::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -32,6 +33,37 @@ pub async fn fetch_api(
             }}",
             &api_key,
             &login_token).as_ref()
+    ) ));
+    opts.mode(RequestMode::Cors);
+    let request = Request::new_with_str_and_init(&endpoint, &opts)?;
+
+    request
+        .headers()
+        .set("Accept", "application/vnd.github.v3+json")?;
+
+    request.headers().set("Content-Type", "application/json" )?;
+
+    let window = web_sys::window().unwrap();
+    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
+
+    assert!(resp_value.is_instance_of::<Response>());
+    let resp: Response = resp_value.dyn_into().unwrap();
+
+    // Convert this other `Promise` into a rust `Future`.
+    let json = JsFuture::from(resp.json()?).await?;
+
+    Ok(json)
+}
+
+pub async fn fetch_admin_api(
+    endpoint: String,
+    paging: FetchAdminParameters,
+) -> Result<JsValue, JsValue> {
+
+    let mut opts = RequestInit::new();
+    opts.method("POST");
+    opts.body(Some(&wasm_bindgen::JsValue::from_str(
+        serde_json::to_string(&paging).unwrap().as_str()
     ) ));
     opts.mode(RequestMode::Cors);
     let request = Request::new_with_str_and_init(&endpoint, &opts)?;

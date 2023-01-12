@@ -4,7 +4,7 @@ use yew_router::prelude::Link;
 use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
-use crate::pages::user::user_router::UserRoute;
+use crate::pages::user::UserRoute;
 use crate::components::lds_roller::LDSRoller;
 use crate::components::lds_spinner::LDSSpinner;
 // use gloo_console::log;
