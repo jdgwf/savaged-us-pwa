@@ -338,7 +338,7 @@ pub fn get_menu_items(
             icon_class: None, // "fa fa-house".to_owned(),
             label: "About".to_owned(),
             url: None,
-            menu_tag: "main-inforouter".to_owned(),
+            menu_tag: "main-info".to_owned(),
             sub_menu_tag: "".to_owned(),
         },
 
@@ -661,6 +661,32 @@ fn _add_admin_tab(
                             url: None,
                             menu_tag: "admin-users".to_owned(),
                             sub_menu_tag: "admin-users".to_owned(),
+                        },
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<AdminRoute>
+                                    to={AdminRoute::AdminGameDataHome}
+                                >
+                                    <i class="fa fa-dice" /><Nbsp />
+                                    {"Game Data"}
+                                </Link<AdminRoute>>
+                            }),
+                            registered_only: false,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+                            link_class: None,
+
+                            submenu_tag: None,
+                            submenu: None,
+
+                            title: "Game Data Administration".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Game Data".to_owned(),
+                            url: None,
+                            menu_tag: "admin-game-data".to_owned(),
+                            sub_menu_tag: "admin-game-data".to_owned(),
                         },
                     ]
                 ),

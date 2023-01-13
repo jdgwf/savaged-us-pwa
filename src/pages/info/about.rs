@@ -14,6 +14,7 @@ pub fn info_about(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
+    global_vars.current_menu = "main-info".to_owned();
     global_vars.current_sub_menu = "info-about".to_owned();
 
     html! {

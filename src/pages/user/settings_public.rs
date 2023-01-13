@@ -521,7 +521,6 @@ impl Component for SettingsPublic {
                 share_settings_save_disabled = false;
             }
 
-
         global_vars.current_sub_menu = "settings_public".to_owned();
 
         html! {

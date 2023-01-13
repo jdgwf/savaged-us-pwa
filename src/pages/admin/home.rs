@@ -14,6 +14,7 @@ pub fn admin_home(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
+    global_vars.current_menu = "main-admin".to_owned();
     global_vars.current_sub_menu = "admin-home".to_owned();
 
     html! {

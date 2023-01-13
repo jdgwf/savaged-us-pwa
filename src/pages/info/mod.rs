@@ -68,11 +68,7 @@ fn content_switch(
 
     let mut global_vars = global_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_sub_menu = "user".to_owned();
-    } else {
-        global_vars.current_sub_menu = "".to_owned();
-    }
+
 
     match routes {
 

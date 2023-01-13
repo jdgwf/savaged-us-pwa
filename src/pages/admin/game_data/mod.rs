@@ -1,17 +1,13 @@
 pub mod home;
-pub mod users;
-pub mod game_data;
+pub mod hindrances;
 
 use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
+
 use yew::{function_component, html};
 
-use home::AdminHome;
-
-use crate::pages::admin::users::AdminUsersRouter;
-use crate::pages::admin::game_data::AdminGameDataRouter;
-use crate::pages::admin::game_data::home::AdminGameDataHome;
+// use savaged_libs::user::User;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
@@ -33,34 +29,22 @@ use crate::libs::global_vars::GlobalVars;
 // use super::notifications::UserNotifications;
 use gloo_console::log;
 
-use self::users::list::AdminUsersList;
+use self::hindrances::AdminGameDataHindrances;
 
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
 
 #[derive(Clone, Routable, PartialEq)]
-pub enum AdminRoute {
-    #[at("/admin/")]
-    AdminHome,
-
-    #[at("/admin/users/*")]
-    AdminUsersRouter,
-
-    #[at("/admin/users/")]
-    AdminUsersList,
-
-    #[at("/admin/game-data/")]
-    AdminGameDataHome,
-
-    #[at("/admin/game-data/*")]
-    AdminGameDataRouter,
+pub enum AdminGameDataRoute {
+    #[at("/admin/game-data/hindrances")]
+    Hindrances,
 
     #[at("/404")]
     NotFound,
 }
 
 fn content_switch(
-    routes: AdminRoute,
+    routes: AdminGameDataRoute,
     global_vars: GlobalVars,
     update_global_vars: Callback<GlobalVars>,
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
@@ -69,62 +53,30 @@ fn content_switch(
 
     let mut global_vars = global_vars.clone();
 
-
-
-    if !global_vars.current_user.has_developer_access() {
-        return html! { <h1>{ "Access Denied" }</h1> }
+    if global_vars.current_user.id > 0 {
+        global_vars.current_sub_menu = "user".to_owned();
+    } else {
+        global_vars.current_sub_menu = "".to_owned();
     }
+
     match routes {
 
-        AdminRoute::AdminUsersRouter => html! {
-            <AdminUsersRouter
+        AdminGameDataRoute::Hindrances => html! {
+            <AdminGameDataHindrances
                 update_global_vars={update_global_vars}
                 global_vars={global_vars}
                 open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
-        AdminRoute::AdminUsersList => html! {
-            <AdminUsersList
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
 
-        AdminRoute::AdminGameDataHome => html! {
-            <AdminGameDataHome
-                // update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-
-        AdminRoute::AdminGameDataRouter => html! {
-            <AdminGameDataRouter
-                update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
-            />
-        },
-        AdminRoute::AdminHome => html! {
-            <AdminHome
-                // update_global_vars={update_global_vars}
-                global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
-            />
-
-
-        },
-
-
-        AdminRoute::NotFound => html! { <h1>{ "AdminRoute 404" }</h1> },
+        AdminGameDataRoute::NotFound => html! { <h1>{ "AdminGameDataRoute 404" }</h1> },
     }
 }
 
 
 #[derive(Properties, PartialEq)]
-pub struct AdminRouterProps {
+pub struct AdminGameDataRouterProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
@@ -133,20 +85,20 @@ pub struct AdminRouterProps {
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub enum AdminRouterMessage {
+pub enum AdminGameDataRouterMessage {
 
 }
-pub struct AdminRouter {
+pub struct AdminGameDataRouter {
     global_vars: GlobalVars,
 }
 
-impl Component for AdminRouter {
-    type Message = AdminRouterMessage;
-    type Properties = AdminRouterProps;
+impl Component for AdminGameDataRouter {
+    type Message = AdminGameDataRouterMessage;
+    type Properties = AdminGameDataRouterProps;
 
     fn create(ctx: &Context<Self>) -> Self {
 
-        AdminRouter {
+        AdminGameDataRouter {
             global_vars: ctx.props().global_vars.clone(),
         }
     }
@@ -154,17 +106,17 @@ impl Component for AdminRouter {
 
     fn update(
         &mut self, ctx: &Context<Self>,
-        msg: AdminRouterMessage
+        msg: AdminGameDataRouterMessage
     ) -> bool {
 
 
         match msg {
-            // AdminRouterMessage::ChangeFilter( filter_type ) => {
+            // AdminGameDataRouterMessage::ChangeFilter( filter_type ) => {
             //     // log!("ChangeFilter", filter_type);
             //     set_local_storage_string( "saves_filter", filter_type);
             // }
 
-            // AdminRouterMessage::ChangeFolder( folder_name ) => {
+            // AdminGameDataRouterMessage::ChangeFolder( folder_name ) => {
             //     // log!("ChangeFolder", folder);
             //     set_local_storage_string( "saves_folder", folder_name);
             // }
@@ -176,7 +128,7 @@ impl Component for AdminRouter {
     fn changed(
         &mut self,
         ctx: &Context<Self>,
-        _props: &AdminRouterProps,
+        _props: &AdminGameDataRouterProps,
     ) -> bool {
         // log!("main_home changed called" );
         self.global_vars = ctx.props().global_vars.clone();
@@ -205,7 +157,7 @@ impl Component for AdminRouter {
                     history={history}
                 >
                     <div class={"main-content"}>
-                        <Switch<AdminRoute>
+                        <Switch<AdminGameDataRoute>
                             render={
                                 move |routes|
                                 content_switch(
@@ -225,7 +177,7 @@ impl Component for AdminRouter {
 
                 <BrowserRouter>
                     <div class={"main-content"}>
-                        <Switch<AdminRoute>
+                        <Switch<AdminGameDataRoute>
                             render={
                                 move |routes|
                                 content_switch(

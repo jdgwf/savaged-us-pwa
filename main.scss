@@ -338,7 +338,7 @@ body {
                     }
                 }
 
-                a {
+                > a {
                     border-top-left-radius: 0.5rem;
                     border-top-right-radius: 0.5rem;
                     cursor: pointer;
@@ -376,21 +376,27 @@ body {
                 .user-login-badge {
                     display: block;
                     position: absolute;
-                    top: -3.75rem;
+                    // top: -3.75rem;
+                    bottom: -2.4rem;
                     right: 0;
-                    padding: 1rem 0 0 0;
-                    height: 6rem;
+                    padding: 1.5rem 1rem 0 0;
+                    height: 4.5rem;
+                    background-color: var(--borders-color);
+                    width: 5rem;
+                    border-top-left-radius: 0.5rem;
+                    border-top-right-radius: 0.5rem;
 
-                    height: 6rem;
+
                     a {
                         margin: 0;
                     }
 
                     .unread-notifications {
                         display: block;
-                        top: 1rem;
+                        top: 0rem;
+                        left: 0;
                         margin: 0;
-                        left: -.5rem;
+                        // left: -.5rem;
                         z-index: 100;
                         height: 1.5rem;
                         width: 1.5rem;
@@ -399,6 +405,9 @@ body {
 
 
                     img {
+                        top: .25rem;
+                        right: .5rem;
+                        position: absolute;
                         z-index: 1;
                         cursor: pointer;
                         max-height: 4rem;
@@ -407,46 +416,46 @@ body {
                         border: solid 2px var(--body-font-color);
                     }
 
-                    .user-menu {
-                        z-index: 100;
-                        position: absolute;
-                        top: 5rem;
-                        right: 0rem;
-                        display: none;
-                        background: #000;
-                        border: solid 2px var(--borders-color);
-                        padding: .25rem .5rem;
-                        word-wrap: none;
-                        white-space: nowrap;
-                        &.show {
-                            display: inline-block;
-                        }
-                        li {
-                            display: block;
-                            // a {
-                            //     cursor: pointer;
-                            //     display: block;
-                            //     margin: 0.125rem 0;
-                            //     padding: 0.25rem 0.75rem;
-                            //     text-decoration: none;
-                            //     white-space: nowrap;
-                            //     text-align: left;
-                            //     color: var(--body-font-color);
-                            //     border-radius: .5rem;
+                    // .user-menu {
+                    //     z-index: 100;
+                    //     position: absolute;
+                    //     top: 5rem;
+                    //     right: 0rem;
+                    //     display: none;
+                    //     background: #000;
+                    //     border: solid 2px var(--borders-color);
+                    //     padding: .25rem .5rem;
+                    //     word-wrap: none;
+                    //     white-space: nowrap;
+                    //     &.show {
+                    //         display: inline-block;
+                    //     }
+                    //     li {
+                    //         display: block;
+                    //         // a {
+                    //         //     cursor: pointer;
+                    //         //     display: block;
+                    //         //     margin: 0.125rem 0;
+                    //         //     padding: 0.25rem 0.75rem;
+                    //         //     text-decoration: none;
+                    //         //     white-space: nowrap;
+                    //         //     text-align: left;
+                    //         //     color: var(--body-font-color);
+                    //         //     border-radius: .5rem;
 
-                            //     &:hover {
-                            //         background-color: var(--borders-color-lighten) !important;
-                            //     }
-                            // }
-                            // &.active {
-                            //     a {
-                            //         background-color: var(--borders-color);
+                    //         //     &:hover {
+                    //         //         background-color: var(--borders-color-lighten) !important;
+                    //         //     }
+                    //         // }
+                    //         // &.active {
+                    //         //     a {
+                    //         //         background-color: var(--borders-color);
 
-                            //     }
-                            // }
-                        }
+                    //         //     }
+                    //         // }
+                    //     }
 
-                    }
+                    // }
                 }
             }
         }

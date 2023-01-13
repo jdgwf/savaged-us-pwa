@@ -14,6 +14,7 @@ pub fn info_privacy_policy(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
+    global_vars.current_menu = "main-info".to_owned();
     global_vars.current_sub_menu = "info-privacy-policy".to_owned();
 
     html! {

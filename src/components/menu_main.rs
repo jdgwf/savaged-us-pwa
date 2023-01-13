@@ -59,8 +59,8 @@ pub fn menu_main(
                                         return html! {
                                             <li class={li_class} title={sub_item.title}>
                                             {html}
-                   //                         <br />{&sub_item.sub_menu_tag}
-                   //                         <br />{&props.global_vars.current_sub_menu}
+                                        //    <br />{&sub_item.sub_menu_tag}
+                                        //    <br />{&props.global_vars.current_sub_menu}
                                             </li>
                                         };
                                     }
@@ -141,7 +141,7 @@ pub fn menu_main(
                             return html! {
                                 <li class={li_class} title={menu.title}>
                                     {html}
-                                    // {menu.menu_tag.clone()}{" / "}{props.global_vars.current_menu.clone()}
+                                    // {menu.menu_tag.clone()}<br/>{props.global_vars.current_menu.clone()}<br />
                                 </li>
                             };
                         }
@@ -167,15 +167,17 @@ pub fn menu_main(
                     }
                     if props.global_vars.current_user.id > 0 && !props.global_vars.offline {
                         <div class="user-login-badge">
-                        <Link<UserRoute> to={UserRoute::SettingsPrivate}>
-                            if props.global_vars.current_user.unread_notifications > 0 {
-                                <div class={"unread-notifications"}>{props.global_vars.current_user.unread_notifications}</div>
-                            }
-                            <img
-                            src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
-                            />
 
-                        </Link<UserRoute>>
+                            if props.global_vars.current_user.unread_notifications > 0 {
+                                <Link<UserRoute> to={UserRoute::Notifications}>
+                                    <div class={"unread-notifications"}>{props.global_vars.current_user.unread_notifications}</div>
+                                </Link<UserRoute>>
+                            }
+                            <Link<UserRoute> to={UserRoute::SettingsPrivate}><img
+                            src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
+                            /></Link<UserRoute>>
+
+
                         </div>
                     } else {
                         <>
