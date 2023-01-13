@@ -61,6 +61,7 @@ impl Component for AdminGameDataHindrances {
 
         paging_sorting_and_filter.login_token = Some(login_token);
         paging_sorting_and_filter.number_per_page = get_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
+        paging_sorting_and_filter.filter_book = get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
         let paging = paging_sorting_and_filter.clone();
         spawn_local (
             async move {
@@ -184,6 +185,12 @@ impl Component for AdminGameDataHindrances {
         global_vars.current_menu = "main-admin".to_owned();
         global_vars.current_sub_menu = "admin-game-data".to_owned();
 
+        let mut show_book_column = true;
+
+        if self.paging_sorting_and_filter.filter_book > 0 {
+            show_book_column = false;
+        }
+
         html! {
         <UIPage
             global_vars={global_vars.clone()}
@@ -195,6 +202,7 @@ impl Component for AdminGameDataHindrances {
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
+                stats={self.paging_data.clone()}
             />
         </div>
                 <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances List TODO"}</h2>
@@ -202,11 +210,14 @@ impl Component for AdminGameDataHindrances {
                     <table class="admin-table">
                     <thead>
                         <tr>
-                            // <th>
-                            //     {"Active"}
-                            // </th>
+
+                            if show_book_column {
+                                <th class="min-width">
+                                    {"Book"}
+                                </th>
+                            }
                             <th>
-                                {"Book"}
+                                {"Active"}
                             </th>
                             <th>
                                 {"Name"}
@@ -215,7 +226,7 @@ impl Component for AdminGameDataHindrances {
                             //     {"Email"}
                             // </th>
                             <th>
-                                {"Idjit"}
+                                {"Last Updated"}
                             </th>
                             <th class="min-width"></th>
                         </tr>
@@ -255,15 +266,17 @@ impl Component for AdminGameDataHindrances {
                             {self.items.clone().into_iter().map( move |row| {
                                 html!{<tr>
 
-                                    // <AdminTableFieldBool
-                                    //     value={row.active}
-                                    //     td_class="min-width text-center"
-                                    // />
 
-                                    <AdminTableFieldText
-                                        value={row.book_short_name.unwrap_or("???".to_owned())}
+
+                                    if show_book_column {
+                                        <AdminTableFieldText
+                                            value={row.book_short_name.unwrap_or("???".to_owned())}
+                                        />
+                                    }
+                                    <AdminTableFieldBool
+                                        value={row.active}
+                                        td_class="min-width text-center"
                                     />
-
                                     <AdminTableFieldText
                                         value={row.name}
                                     />
@@ -275,17 +288,21 @@ impl Component for AdminGameDataHindrances {
                                     // <AdminTableFieldText
                                     //     value={row.username}
                                     // />
-                                    <td>
+                                    <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
                                             global_vars={self.global_vars.clone()}
 
                                             created_by={row.created_by_obj}
                                             created_on={row.created_on}
 
+                                            updated_by={row.updated_by_obj}
+                                            updated_on={row.updated_on}
+
                                             deleted_by={row.deleted_by_obj}
                                             deleted_on={row.deleted_on}
                                         />
                                     </td>
+
                                     <td>
                                         <EditViewDeleteButtons
                                             id={row.id}
@@ -340,7 +357,21 @@ async fn _get_data(
 
                     let mut rv: Vec<Hindrance> = Vec::new();
                     for data in vec_val.into_iter() {
-                        rv.push( data.to_hindrance().unwrap() )
+                        // log!("data", format!("{:?}", data) );
+                        let hind = data.to_hindrance().unwrap();
+                        // log!("data.updated_on", data.updated_on);
+                        // log!("data.created_on", data.created_on);
+
+                        // log!("hind.updated_on", hind.updated_on);
+                        // log!("hind.created_on", hind.created_on);
+                        // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
+                        // log!("data.updated_by", data.updated_by);
+                        // log!("data.created_by", data.created_by);
+
+                        // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
+                        // log!("hind.updated_by", hind.updated_by);
+                        // log!("hind.created_by", hind.created_by);
+                        rv.push( hind )
                     }
                     set_items.emit( rv );
                 }

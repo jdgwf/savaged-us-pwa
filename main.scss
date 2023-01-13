@@ -21,7 +21,7 @@ html {
 body {
     --borders-color: #666;
     --borders-color-lighten: #777;
-
+    --header-bg-color: #000;
     --body-font-color: #eee;
     --body-bg-color: #333333;
     --label-bg-color: #292929;
@@ -94,7 +94,7 @@ body {
         position: relative;
     }
     .mobile-menu {
-        background: #000;
+        background: var(--header-bg-color);
         border-right: solid 2px var(--borders-color);
         border-bottom: solid 2px var(--borders-color);
         border-bottom-right-radius: 1rem;
@@ -291,7 +291,7 @@ body {
     header {
         margin: 0;
         padding: .5rem 0 .2rem 0;
-        background: #000;
+        background: var(--header-bg-color);
         display: block;
         position: relative;
         z-index: 100;
@@ -422,7 +422,7 @@ body {
                     //     top: 5rem;
                     //     right: 0rem;
                     //     display: none;
-                    //     background: #000;
+                    //     background: var(--header-bg-color);
                     //     border: solid 2px var(--borders-color);
                     //     padding: .25rem .5rem;
                     //     word-wrap: none;
@@ -615,8 +615,8 @@ body {
                 padding: 0;
                 a {
                     display: block;
-                    background: #000;
-                    border: solid 2px #000;
+                    background: var(--header-bg-color);
+                    border: solid 2px var(--header-bg-color);
                     border-bottom-right-radius: 1rem;
                     border-bottom-left-radius: 1rem;
                     cursor: pointer;

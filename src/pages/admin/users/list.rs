@@ -56,6 +56,7 @@ impl Component for AdminUsersList {
 
         paging_sorting_and_filter.login_token = Some(login_token);
         paging_sorting_and_filter.number_per_page = get_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
+        paging_sorting_and_filter.filter_book = get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
         let paging = paging_sorting_and_filter.clone();
         spawn_local (
             async move {
@@ -190,6 +191,7 @@ impl Component for AdminUsersList {
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
+                stats={self.paging_data.clone()}
             />
         </div>
                 <h2><i class="fa fa-users" /><Nbsp />{"Admin Users List TODO"}</h2>

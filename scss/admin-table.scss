@@ -26,7 +26,7 @@ body {
     }
     .admin-table {
         width: 100%;
-        background: var(--borders-color);
+        background: var(--header-bg-color);
         thead {
             tr {
                 th {
@@ -38,6 +38,11 @@ body {
             tr {
                 td {
                     background: var(--body-bg-color);
+                }
+                &:hover {
+                    td {
+                        background: var(--borders-color);
+                    }
                 }
             }
         }

@@ -90,7 +90,7 @@ pub fn edit_view_delete_buttons(
 
             let mut number_per_page: Vec<u32> = Vec::new();
 
-            for count in 0..number_of_pages {
+            for count in 0..number_of_pages + 1 {
                 number_per_page.push( count );
             }
             return html!{
@@ -106,7 +106,7 @@ pub fn edit_view_delete_buttons(
                         </select>
                     </div>
                     <div class="paging">
-                        if paging_stats.filtered_count > 0 {
+                        if number_per_page.len() > 0 {
                     <div class="btn-ph text-right">
                         if props.paging_sorting_and_filter.current_page > 0 {
                             <button
@@ -123,8 +123,14 @@ pub fn edit_view_delete_buttons(
                             onchange={callback_set_current_page}
                         >
                             {number_per_page.into_iter().map( |count | {
-                                html! {
-                                    <option selected={props.paging_sorting_and_filter.current_page == count} value={count.to_string()}>{count+1}</option>
+                                if props.paging_sorting_and_filter.current_page == count {
+                                    html! {
+                                        <option selected={true} value={count.to_string()}>{count+1}</option>
+                                    }
+                                } else {
+                                    html! {
+                                        <option value={count.to_string()}>{count+1}</option>
+                                    }
                                 }
                             }).collect::<Html>()}
                         </select>
@@ -139,7 +145,7 @@ pub fn edit_view_delete_buttons(
                             </button>
                         }
                     </div>
-                        } 
+                        }
                     </div>
                     <div class="total">
                         if paging_stats.filtered_count != paging_stats.non_filtered_count {
