@@ -365,7 +365,7 @@ impl Component for UserNotifications {
         ctx: &Context<Self>,
         _props: &UserNotificationsProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
         true
     }

@@ -1,3 +1,4 @@
+use yew::virtual_dom::VNode;
 // use web_sys::MouseEvent;
 use yew::{function_component, Properties, Html, html, Children};
 use crate::components::menu_main::MenuMain;
@@ -16,6 +17,9 @@ pub struct UIPageProps {
 
     #[prop_or_default]
     pub children: Children,
+
+    #[prop_or_default]
+    pub modal: Option<VNode>,
 
 }
 #[function_component(UIPage)]
@@ -46,9 +50,17 @@ pub fn ui_page(
         mobile_active_class = "mobile-menu show-mobile-menu";
     }
 
+    let mut modal_html = html!{<></>};
+    match &props.modal {
+        Some( modal ) => {
+            modal_html = modal.clone();
+        }
+        None => {}
+    }
     html! {
 
         <>
+        {modal_html}
         <header>
             <div class={"width-limit"}>
             <img src="/images/svgd-us.webp" class={"main-logo"} />

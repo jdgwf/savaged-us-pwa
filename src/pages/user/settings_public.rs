@@ -460,7 +460,7 @@ impl Component for SettingsPublic {
         ctx: &Context<Self>,
         _props: &SettingsPublicProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
         self.edit_username = self.global_vars.current_user.username.clone();

@@ -130,7 +130,7 @@ impl Component for AdminGameDataRouter {
         ctx: &Context<Self>,
         _props: &AdminGameDataRouterProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
         // read_notifications: self.global_vars.current_user.unread_notifications,

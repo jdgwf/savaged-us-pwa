@@ -14,6 +14,9 @@ use crate::{components::admin::admin_table_field::text::AdminTableFieldText, lib
 use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::ui_page::UIPage;
+use crate::components::standard_modal::StandardModal;
+use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
+use crate::components::edit_forms::hindrance::EditHindrance;
 use crate::libs::global_vars::GlobalVars;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use gloo_utils::format::JsValueSerdeExt;
@@ -36,6 +39,10 @@ pub enum AdminGameDataHindrancesMessage {
     SetItems(Vec<Hindrance>),
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
+    UpdateHindrance(Hindrance),
+    ViewItem( u32 ),
+    EditItem( u32 ),
+    Cancel(bool),
 }
 pub struct AdminGameDataHindrances {
     global_vars: GlobalVars,
@@ -43,6 +50,9 @@ pub struct AdminGameDataHindrances {
     paging_data: Option<AdminPagingStatistics>,
     paging_sorting_and_filter: FetchAdminParameters,
     loading: bool,
+    editing_item: Option<Hindrance>,
+    is_adding: bool,
+    is_editing: bool,
 }
 
 impl Component for AdminGameDataHindrances {
@@ -82,6 +92,9 @@ impl Component for AdminGameDataHindrances {
             items: Vec::new(),
             paging_data: None,
             loading: true,
+            editing_item: None,
+            is_adding: false,
+            is_editing: false,
         }
     }
 
@@ -94,6 +107,42 @@ impl Component for AdminGameDataHindrances {
 
 
         match msg {
+
+            AdminGameDataHindrancesMessage::ViewItem( id ) => {
+                // self.editing_item = None;
+                for item in self.items.clone().into_iter() {
+                    if item.id == id {
+                        self.editing_item = Some(item.clone());
+                        self.is_editing = false;
+                        self.is_adding = false;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            AdminGameDataHindrancesMessage::EditItem( id ) => {
+                // self.editing_item = None;
+                for item in self.items.clone().into_iter() {
+                    if item.id == id {
+                        self.editing_item = Some(item.clone());
+                        self.is_editing = false;
+                        self.is_adding = false;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            AdminGameDataHindrancesMessage::Cancel( new_value ) => {
+                self.editing_item = None;
+            }
+
+            AdminGameDataHindrancesMessage::UpdateHindrance( new_value ) => {
+                self.editing_item = Some(new_value);
+
+            }
+
             AdminGameDataHindrancesMessage::SetItems( new_value ) => {
                 self.items = new_value;
                 self.loading = false;
@@ -114,8 +163,6 @@ impl Component for AdminGameDataHindrances {
                 let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
                 let set_paging = ctx.link().callback(AdminGameDataHindrancesMessage::SetPagingStats);
 
-
-
                 set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
 
                 paging_sorting_and_filter.login_token = Some(login_token);
@@ -135,10 +182,6 @@ impl Component for AdminGameDataHindrances {
 
             }
 
-            // AdminGameDataHindrancesMessage::ChangeFolder( folder_name ) => {
-            //     // log!("ChangeFolder", folder);
-            //     set_local_storage_string( "saves_folder", folder_name);
-            // }
         }
         true
     }
@@ -149,7 +192,7 @@ impl Component for AdminGameDataHindrances {
         ctx: &Context<Self>,
         _props: &AdminGameDataHindrancesProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
 
@@ -191,12 +234,59 @@ impl Component for AdminGameDataHindrances {
             show_book_column = false;
         }
 
+
+
+        let mut edit_modal = html!{<></>};
+        match &self.editing_item {
+            Some( editing_item ) => {
+                let mut editing_title = "Viewing Hindrance";
+
+                let mut save_callback:Option<Callback<bool>> = Some( Callback::noop() );
+                let mut add_callback: Option<Callback<bool>>= None;
+                let mut save_as_new_callback: Option<Callback<bool>>= None;
+
+                if self.is_adding {
+                    editing_title = "Adding Hindrance";
+                }
+                if self.is_editing {
+                    editing_title = "Editing Hindrance";
+                }
+                edit_modal = html!{
+                <StandardModal
+                    xl={true}
+                >
+                    <EditHindrance
+                        global_vars={ctx.props().global_vars.clone()}
+                        // edit_save={save.clone()}
+                        readonly={false}
+                        edit_item={editing_item.clone()}
+                        form_title={editing_title}
+                        on_changed_callback={ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindrance).clone()}
+                    />
+
+                    <StandardFormSaveButtons
+                        close_cancel_callback={ctx.link().callback(AdminGameDataHindrancesMessage::Cancel).clone()}
+                        save_callback={save_callback}
+                        add_callback={add_callback}
+                        save_as_new_callback={save_as_new_callback}
+                    />
+                </StandardModal>
+                };
+            }
+            None => {}
+        }
+
+
         html! {
         <UIPage
             global_vars={global_vars.clone()}
             page_title="Admin Hindrances"
             submenu_tag={"admin".to_owned()}
+            modal={Some(edit_modal)}
         >
+
+
+
 
         <div class="pull-right">
             <AdminTableFilterSearch
@@ -264,6 +354,8 @@ impl Component for AdminGameDataHindrances {
                                 }
                             } else {
                             {self.items.clone().into_iter().map( move |row| {
+                                let mut callback_edit_item: Option<Callback<u32>> = None;
+                                callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItem));
                                 html!{<tr>
 
 
@@ -306,6 +398,12 @@ impl Component for AdminGameDataHindrances {
                                     <td>
                                         <EditViewDeleteButtons
                                             id={row.id}
+
+                                            view_callback={Some(ctx.link().callback(AdminGameDataHindrancesMessage::ViewItem))}
+                                            edit_callback={callback_edit_item}
+
+                                            // callback_add_item
+                                            // callback_delete_item
                                         />
                                     </td>
 
@@ -378,7 +476,7 @@ async fn _get_data(
                 Err( err ) => {
                     let err_string: String = format!("get_items Serde Err(): {}", &err);
                     set_items.emit( Vec::new() );
-                    error!( &err_string  );
+                    error!( &err_string );
                 }
             }
 

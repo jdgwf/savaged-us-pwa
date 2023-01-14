@@ -63,7 +63,7 @@ impl Component for UserCampaigns {
         ctx: &Context<Self>,
         _props: &UserCampaignsProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
         // let submenu_data =

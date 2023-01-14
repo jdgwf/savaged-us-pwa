@@ -144,7 +144,7 @@ impl Component for AdminUsersList {
         ctx: &Context<Self>,
         _props: &AdminUsersListProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
 

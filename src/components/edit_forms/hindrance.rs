@@ -19,7 +19,10 @@ use crate::libs::global_vars::GlobalVars;
 pub struct EditHindranceProps {
     pub global_vars: GlobalVars,
     pub edit_item: Hindrance,
-    pub edit_save: SaveDBRow,
+
+    #[prop_or_default]
+    // pub edit_save: Option<SaveDBRow>,
+
     pub on_changed_callback: Callback< Hindrance >,
     pub form_title: String,
 
@@ -48,7 +51,7 @@ pub enum EditHindranceMessage {
 pub struct EditHindrance {
     edit_item: Hindrance,
     global_vars: GlobalVars,
-    edit_save: SaveDBRow,
+    // edit_save: Option<SaveDBRow>,
     local_storage_page_name: String,
 }
 
@@ -63,7 +66,7 @@ impl Component for EditHindrance {
         EditHindrance {
             edit_item: ctx.props().edit_item.clone(),
             global_vars: ctx.props().global_vars.clone(),
-            edit_save: ctx.props().edit_save.clone(),
+            // edit_save: ctx.props().edit_save.clone(),
             local_storage_page_name: "hindrance_edit_form_page".to_owned(),
         }
     }
@@ -74,7 +77,7 @@ impl Component for EditHindrance {
         _props: &EditHindranceProps,
     ) -> bool {
         self.global_vars = ctx.props().global_vars.clone();
-        self.edit_save = ctx.props().edit_save.clone();
+        // self.edit_save = ctx.props().edit_save.clone();
         // self.image_name = ctx.props().image_name.clone();
         // self.upload_url = ctx.props().upload_url.clone();
 

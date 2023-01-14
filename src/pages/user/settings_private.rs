@@ -293,7 +293,7 @@ impl Component for SettingsPrivate {
         ctx: &Context<Self>,
         _props: &SettingsPrivateProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
         self.first_name = self.global_vars.current_user.first_name.to_owned();

@@ -309,7 +309,7 @@ impl Component for UserSavesEdit {
         ctx: &Context<Self>,
         _props: &UserSavesEditProps,
     ) -> bool {
-        // log!("main_home changed called" );
+
         self.global_vars = ctx.props().global_vars.clone();
 
         // self.global_vars = ctx.props().global_vars.clone();
@@ -480,7 +480,7 @@ impl Component for UserSavesEdit {
                             <>
                             <EditHindrance
                                 global_vars={ctx.props().global_vars.clone()}
-                                edit_save={save.clone()}
+                                // edit_save={Some(save.clone())}
                                 readonly={false}
                                 edit_item={hindrance.clone()}
                                 form_title={"Editing Hindrance"}
