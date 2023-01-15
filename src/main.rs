@@ -39,7 +39,7 @@ fn App() -> Html {
             offline: false,
             send_websocket: Callback::noop(),
             hide_popup_menus_callback: Callback::noop(),
-            chargen_data: None,
+            game_data: None,
             saves: None,
             show_mobile_menu: false,
             logout_callback: Callback::noop(),

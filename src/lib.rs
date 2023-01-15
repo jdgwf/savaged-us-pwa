@@ -224,7 +224,7 @@ pub fn ServerApp(
             send_websocket: Callback::noop(),
             saves: None,
             show_mobile_menu: false,
-            chargen_data: None,
+            game_data: None,
             logout_callback: Callback::noop(),
             toggle_mobile_menu_callback: Callback::noop(),
             current_menu: "".to_string(),

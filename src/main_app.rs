@@ -331,9 +331,9 @@ impl Component for MainApp {
         // msg.token = login_token_send;
         // msg.kind = WebsocketMessageType::Online;
 
-        // global_vars.chargen_data = None;
+        // global_vars.game_data = None;
 
-        global_vars.chargen_data = None;
+        global_vars.game_data = None;
         // // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
 
         // global_vars.send_websocket.emit( msg );
@@ -425,7 +425,7 @@ impl Component for MainApp {
                 self.global_vars.current_user = User::default();
                 self.show_mobile_menu = false;
                 self.global_vars.saves = None;
-                self.global_vars.chargen_data = None;
+                self.global_vars.game_data = None;
 
                 self.global_vars.user_loading = false;
                 clear_local_storage();
@@ -442,7 +442,7 @@ impl Component for MainApp {
                     async move {
                         clear_all_local_data().await;
                         let mut msg = WebSocketMessage::default();
-                        msg.kind = WebsocketMessageType::ChargenData;
+                        msg.kind = WebsocketMessageType::GameDataPackage;
                         send_websocket.emit( msg );
                     }
                 );

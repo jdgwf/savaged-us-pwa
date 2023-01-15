@@ -98,12 +98,12 @@ impl Component for UserLogin {
                     }
                 );
 
-                // request user and chargen data
+                // request user and game data data
 
                 let mut msg = WebSocketMessage::default();
 
                 msg.token = Some(login_result.login_token.to_owned());
-                msg.kind = WebsocketMessageType::ChargenData;
+                msg.kind = WebsocketMessageType::GameDataPackage;
 
                 self.global_vars.send_websocket.emit( msg );
 

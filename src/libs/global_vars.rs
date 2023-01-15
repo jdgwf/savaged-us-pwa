@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use yew::prelude::*;
-use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::chargen_data::ChargenData};
+use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::game_data_package::GameDataPackage};
 use yew_router::history::{AnyHistory};
 
 use gloo_net::websocket::{
@@ -23,7 +23,7 @@ pub struct GlobalVars {
 
     // pub update_global_vars: Callback<GlobalVars>,
     pub send_websocket: Callback<WebSocketMessage>,
-    pub chargen_data: Option<ChargenData>,
+    pub game_data: Option<GameDataPackage>,
     pub saves: Option<Vec<SaveDBRow>>,
 
     pub current_menu: String,
@@ -54,7 +54,7 @@ impl Default for GlobalVars {
             hide_popup_menus_callback: Callback::noop(),
             toggle_mobile_menu_callback: Callback::noop(),
             logout_callback: Callback::noop(),
-            chargen_data: None,
+            game_data: None,
             saves: None,
 
             current_menu: "".to_owned(),

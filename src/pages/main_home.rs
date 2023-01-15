@@ -42,19 +42,19 @@ impl Component for MainHome {
         // let global_vars2 = ctx.props().global_vars.clone();
 
         let mut saves_html = html!{<></>};
-        let mut chargen_html = html!{<></>};
+        let mut game_data_html = html!{<></>};
 
-        match &global_vars.chargen_data {
-            Some( chargen_data ) => {
-                chargen_html = html!{
+        match &global_vars.game_data {
+            Some( game_data ) => {
+                game_data_html = html!{
                     <>
-                    {"Books: "}{chargen_data.books.len()}<br />
-                    {"Edges: "}{chargen_data.edges.len()}<br />
-                    {"Hindrances: "}{chargen_data.hindrances.len()}<br />
+                    {"Books: "}{game_data.books.len()}<br />
+                    {"Edges: "}{game_data.edges.len()}<br />
+                    {"Hindrances: "}{game_data.hindrances.len()}<br />
                     <br />
-                    {"Gear: "}{chargen_data.gear.len()}<br />
-                    {"Armor: "}{chargen_data.armor.len()}<br />
-                    {"Weapons: "}{chargen_data.weapons.len()}<br />
+                    {"Gear: "}{game_data.gear.len()}<br />
+                    {"Armor: "}{game_data.armor.len()}<br />
+                    {"Weapons: "}{game_data.weapons.len()}<br />
                     </>
                 };
             }
@@ -99,12 +99,12 @@ impl Component for MainHome {
                 //         let mut msg = WebSocketMessage::default();
 
                 //         msg.token = login_token_send;
-                //         msg.kind = WebsocketMessageType::ChargenData;
+                //         msg.kind = WebsocketMessageType::GameDataPackage;
 
                 //         global_vars.send_websocket.emit( msg );
                 //     }}
                 // >
-                //     {"Request Chargen Data"}
+                //     {"Request GameData Data"}
                 // </button>
 
                 // if global_vars2.current_user.id > 0 {
@@ -131,8 +131,8 @@ impl Component for MainHome {
 
                 <div class="row">
                     <div class="col-6">
-                        <h4>{"Chargen Data Counts"}</h4>
-                        {chargen_html}
+                        <h4>{"GameData Data Counts"}</h4>
+                        {game_data_html}
                     </div>
                     <div class="col-6">
                         <h4>{"Saves Count"}</h4>
