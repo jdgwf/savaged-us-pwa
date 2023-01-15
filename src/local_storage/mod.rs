@@ -68,7 +68,6 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
 
 }
 
-
 // pub async fn check_and_upgrade_index_db_stores() {
 //     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 //     log!("check_and_upgrade_index_db_stores called");
@@ -89,7 +88,6 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
 //                 log!("Created indexed_db store", "chargen_hindrances");
 //             }
 
-
 //             if let None = db.object_store_names().find(|n| n == INDEX_DB_SAVES_STORE_NAME ) {
 //                 let _ = db.create_object_store(INDEX_DB_SAVES_STORE_NAME).unwrap();
 //                 log!("Created indexed_db store", INDEX_DB_SAVES_STORE_NAME);
@@ -97,7 +95,6 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
 
 //         }
 //         Err( _err ) => {
-
 
 //         }
 //     }
@@ -119,7 +116,6 @@ pub async fn index_db_put_save(
         Ok( mut db_req ) => {
 
             _create_tables( &mut db_req ).await;
-
 
             /* Saves */
             let db: IdbDatabase = db_req.into_future().await.unwrap();
@@ -199,7 +195,6 @@ pub async fn index_db_put_save(
 
     // log!("index_db_save_saves 1");
 
-
     return update_stats;
 }
 
@@ -217,7 +212,6 @@ pub async fn index_db_save_saves(
         Ok( mut db_req ) => {
 
             _create_tables( &mut db_req ).await;
-
 
             /* Saves */
             let db: IdbDatabase = db_req.into_future().await.unwrap();
@@ -292,14 +286,12 @@ pub async fn index_db_save_saves(
             db.close();
         }
 
-
         Err( _ ) => {
 
         }
     }
 
     // log!("index_db_save_saves 1");
-
 
     return update_stats;
 }
@@ -321,7 +313,6 @@ pub async fn index_db_save_chargen_data(
 
             _create_tables( &mut db_req ).await;
 
-
             /* Books */
             let db: IdbDatabase = db_req.into_future().await.unwrap();
 
@@ -342,7 +333,6 @@ pub async fn index_db_save_chargen_data(
                         IdbTransactionMode::Readwrite
                     ).unwrap();
 
-
                 let store_result: Result<IdbObjectStore, DomException> = tx.object_store(INDEX_DB_BOOKS_STORE_NAME);
 
                 match store_result {
@@ -356,8 +346,6 @@ pub async fn index_db_save_chargen_data(
                     }
                 }
 
-
-
                 update_stats.books += 1;
             }
             db.close();
@@ -368,7 +356,6 @@ pub async fn index_db_save_chargen_data(
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
     match db_req_result {
         Ok( mut db_req ) => {
-
 
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_chargen_data 3");
@@ -504,9 +491,7 @@ pub async fn index_db_save_chargen_data(
 
 pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
 
-
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
-
 
     match db_req_result {
         Ok( mut db_req ) => {
@@ -525,7 +510,6 @@ pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
                 .unwrap()
                 .await
                 .unwrap();
-
 
             tx.await.into_result().unwrap();
 
@@ -635,13 +619,11 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
                 .await
                 .unwrap();
 
-
             tx.await.into_result().unwrap();
 
             let iterator_result = js_sys::try_iter(&result).unwrap().ok_or_else(|| {
                 "need to pass iterable JS values!"
             });
-
 
             match iterator_result {
                 Ok( iterator ) => {
@@ -689,19 +671,16 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
             let tx = db.transaction_on_one("chargen_edges").unwrap();
             let store = tx.object_store("chargen_edges").unwrap();
 
-
             let result = store.get_all()
                 .unwrap()
                 .await
                 .unwrap();
-
 
             tx.await.into_result().unwrap();
 
             let iterator = js_sys::try_iter(&result).unwrap().ok_or_else(|| {
                 "need to pass iterable JS values!"
             }).unwrap();
-
 
             for row_result in iterator {
                 match row_result {
@@ -741,12 +720,10 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
             let tx = db.transaction_on_one("chargen_hindrances").unwrap();
             let store = tx.object_store("chargen_hindrances").unwrap();
 
-
             let result = store.get_all()
                 .unwrap()
                 .await
                 .unwrap();
-
 
             tx.await.into_result().unwrap();
 
@@ -782,8 +759,6 @@ pub async fn get_chargen_data_from_index_db() -> Option<ChargenData> {
             return None;
         }
     }
-
-
 
     return Some( chargen_data );
 }

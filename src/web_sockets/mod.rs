@@ -38,7 +38,6 @@ impl WebsocketService {
             .replace("https://", "wss://")
             + &"/_ws".to_owned();
 
-
         // log!("server_root", &server_root);
         // log!("wss_url", &wss_url);
         let ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
@@ -46,7 +45,6 @@ impl WebsocketService {
         let (mut write, mut read) = ws.split();
 
         let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);
-
 
         let websocket_offline_callback_send = websocket_offline_callback.clone();
         spawn_local(async move {
@@ -67,7 +65,6 @@ impl WebsocketService {
         let websocket_offline_callback = websocket_offline_callback.clone();
         spawn_local(async move {
 
-
             while let Some(msg) = read.next().await {
                 match msg {
                     Ok(Message::Text(val)) => {
@@ -81,7 +78,6 @@ impl WebsocketService {
                         if let Ok(val) = decoded {
 
                             received_message_callback.emit( val.to_string()  );
-
 
                             websocket_offline_callback.emit( false );
                         }
@@ -125,7 +121,6 @@ impl WebsocketService {
     }
 
 }
-
 
 pub fn connect_to_websocket<'ping>(
     server_root: String,

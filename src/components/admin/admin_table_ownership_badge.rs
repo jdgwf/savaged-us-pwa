@@ -41,7 +41,6 @@ pub fn admin_table_ownership_badge(
     // let created_on: Option<DateTime<Utc>> = props.created_on.clone();
     // let updated_on: Option<DateTime<Utc>> = props.updated_on.clone();
 
-
     // match props.created_by.clone() {
     //     Some( user ) => {
     //         created_by_html = html!{ <>{user.name}</>}
@@ -90,10 +89,7 @@ pub fn admin_table_ownership_badge(
             {updated_by_html}<br />
             {updated_on_html}<br />
 
-
         </div>
     };
-
-
 
 }

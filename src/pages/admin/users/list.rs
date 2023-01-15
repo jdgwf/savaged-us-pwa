@@ -18,14 +18,12 @@ use wasm_bindgen_futures::spawn_local;
 use crate::libs::fetch_api::fetch_api;
 use gloo_console::{ error, log };
 
-
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersListProps {
     pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
-
 
 pub enum AdminUsersListMessage {
     SetUsers(Vec<User>),
@@ -70,7 +68,6 @@ impl Component for AdminUsersList {
             }
         );
 
-
         AdminUsersList {
             paging_sorting_and_filter: paging,
             global_vars: ctx.props().global_vars.clone(),
@@ -80,13 +77,11 @@ impl Component for AdminUsersList {
         }
     }
 
-
     fn update(
         &mut self,
         ctx: &Context<Self>,
         msg: AdminUsersListMessage
     ) -> bool {
-
 
         match msg {
             AdminUsersListMessage::SetUsers( new_value ) => {
@@ -108,8 +103,6 @@ impl Component for AdminUsersList {
                 let login_token = global_vars.login_token.clone();
                 let set_users = ctx.link().callback(AdminUsersListMessage::SetUsers);
                 let set_paging = ctx.link().callback(AdminUsersListMessage::SetPagingStats);
-
-
 
                 set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
 
@@ -138,7 +131,6 @@ impl Component for AdminUsersList {
         true
     }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -147,12 +139,10 @@ impl Component for AdminUsersList {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-
         self.global_vars.current_sub_menu = "admin-users".to_owned();
 
         true
     }
-
 
     fn view(
         &self,
@@ -161,7 +151,6 @@ impl Component for AdminUsersList {
 
         let callback_fetch_admin_params = ctx.link().callback( AdminUsersListMessage::SetFetchAdminParams ).clone();
         let callback_fetch_admin_params_2 = ctx.link().callback( AdminUsersListMessage::SetFetchAdminParams ).clone();
-
 
         let mut non_filtered_count: u32 = 0;
         let mut filtered_count: u32= 0;
@@ -194,7 +183,7 @@ impl Component for AdminUsersList {
                 stats={self.paging_data.clone()}
             />
         </div>
-                <h2><i class="fa fa-users" /><Nbsp />{"Admin Users List TODO"}</h2>
+                <h2><i class="fa fa-users" /><Nbsp />{"Admin Users"}</h2>
 
                     <table class="admin-table">
                     <thead>
@@ -247,6 +236,7 @@ impl Component for AdminUsersList {
                                 }
                             } else {
                             {self.users.clone().into_iter().map( move |row| {
+                                let row_name = &row.get_admin_name().to_owned();
                                 html!{<tr>
 
                                     <AdminTableFieldBool
@@ -269,6 +259,7 @@ impl Component for AdminUsersList {
                                     <td>
                                         <EditViewDeleteButtons
                                             id={row.id}
+                                            name={row_name.to_owned()}
                                         />
                                     </td>
                                 </tr>
@@ -293,7 +284,6 @@ impl Component for AdminUsersList {
         }
     }
 }
-
 
 async fn _get_data(
     global_vars: GlobalVars,

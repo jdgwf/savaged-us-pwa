@@ -23,7 +23,6 @@ use crate::libs::global_vars::GlobalVars;
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
 
-
 #[derive(Properties, PartialEq)]
 pub struct UserCampaignsProps {
     // #[prop_or_default]
@@ -57,7 +56,6 @@ impl Component for UserCampaigns {
     //     true
     // }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -75,7 +73,6 @@ impl Component for UserCampaigns {
 
         true
     }
-
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
@@ -112,8 +109,6 @@ impl Component for UserCampaigns {
                 }
             }
 
-
-
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-campaigns".to_owned();
 
@@ -128,5 +123,4 @@ impl Component for UserCampaigns {
         }
     }
 }
-
 

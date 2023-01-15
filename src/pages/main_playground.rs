@@ -95,15 +95,12 @@ impl Component for MainPlayground {
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
                 // let item = target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap();
 
-
-
                 // let id: String = item.
                 // if let Some(input) = input {
                 //     input_value_handle.set(input.value());
                 // }
                 // self.dragging_item = Some( item.id().to_owned() );
                 log!("MouseDrop");
-
 
                 if self.under_element_id == "drop-alpha".to_owned() {
                     self.dropped_items.push( self.moving_item.clone().unwrap().id() );
@@ -121,7 +118,6 @@ impl Component for MainPlayground {
                 // target.
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
                 let item = target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap();
-
 
                 // let left = touch.client_x() - current_mover.client_width() / 2;
                 // let right = touch.client_y() - current_mover.client_height() / 2;
@@ -172,10 +168,7 @@ impl Component for MainPlayground {
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
                 // let item = target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap();
 
-
                 self.moving_item = Some(target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap());
-
-
 
                 match self.moving_item.clone() {
                     Some( moving_item ) => {
@@ -195,12 +188,10 @@ impl Component for MainPlayground {
                         self.moving_item_height = moving_item.client_height();
                         self.moving_item_width = moving_item.client_width();
 
-
                         style = style + &";z-index: 100".to_owned();
                         style = style + &";position: fixed".to_owned();
                         style = style + &";width: ".to_owned() + &self.moving_item_width.to_string() + &"px";
                         style = style + &";height: ".to_owned() + &self.moving_item_height.to_string() + &"px";
-
 
                         let _ = moving_item.set_attribute( "style", style.as_str());
                         // moving_item.style.height = moving_item.client_height();
@@ -230,8 +221,6 @@ impl Component for MainPlayground {
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
                 // self.moving_item = Some(target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap());
 
-
-
                 match self.moving_item.clone() {
                     Some( moving_item ) => {
 
@@ -242,7 +231,6 @@ impl Component for MainPlayground {
                     }
                     None => {}
                 }
-
 
                 log!("TouchDrop ", self.moving_item.clone().unwrap().id());
 
@@ -259,7 +247,6 @@ impl Component for MainPlayground {
 
                 let document = web_sys::window().unwrap().document().unwrap();
 
-
                 match self.moving_item.clone() {
                     Some( current_mover ) => {
 
@@ -272,7 +259,6 @@ impl Component for MainPlayground {
                         // let event_client_x = e.page_x();
                         // let event_client_y = e.page_y();
 
-
                         // if (event_client_x) {
                         //     // mousemove
 
@@ -282,23 +268,17 @@ impl Component for MainPlayground {
 
                             let changed_touches = e.changed_touches();
 
-
                             // changed_touches
                             let touch_option = changed_touches.item( 0 );
 
                             // let touch = changed_touches[0];
 
-
-
                             // log!( format!("web_sys::TouchList touch_option {:?} {:?}", touch, changed_touches) );
                             match touch_option {
-
-
 
                                 Some( touch ) => {
                                     let left = touch.client_x() - current_mover.client_width() / 2;
                                     let right = touch.client_y() - current_mover.client_height() / 2;
-
 
                                     let element_option = document.element_from_point(touch.client_x() as f32, touch.client_y() as f32);
                                     self.under_element_id = "".to_owned();
@@ -325,7 +305,6 @@ impl Component for MainPlayground {
                             // // moving.style.left = event.changedTouches[0].clientX - moving.client_width()/2;
                             // // moving.style.top = event.changedTouches[0].clientY - moving.client_height()/2;
 
-
                             // }
                             // touchmove - assuming a single touchpoint
                             // moving.style.left = event.changedTouches[0].clientX - moving.client_width()/2;
@@ -334,9 +313,6 @@ impl Component for MainPlayground {
                             // style = style + &";left: ".to_owned() + &(changed_touches[0]. - self.moving_item.client_width()/2).to_string();
                             // style = style + &";top: ".to_owned() + &(event_client_y - self.moving_item.client_height()/2).to_string();
                         // }
-
-
-
 
                         let _ = current_mover.set_attribute( "style", style.as_str());
                         // self.moving_item = Some( current_mover );
@@ -358,8 +334,6 @@ impl Component for MainPlayground {
                 // e.data_transfer().unwrap().set_data("text", id.as_ref());
                 self.moving_item = Some(target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap());
 
-
-
                 match self.moving_item.clone() {
                     Some( moving_item ) => {
 
@@ -378,12 +352,10 @@ impl Component for MainPlayground {
                         self.moving_item_height = moving_item.client_height();
                         self.moving_item_width = moving_item.client_width();
 
-
                         style = style + &";z-index: 100".to_owned();
                         style = style + &";position: fixed".to_owned();
                         style = style + &";width: ".to_owned() + &self.moving_item_width.to_string() + &"px";
                         style = style + &";height: ".to_owned() + &self.moving_item_height.to_string() + &"px";
-
 
                         let _ = moving_item.set_attribute( "style", style.as_str());
                         // moving_item.style.height = moving_item.client_height();
@@ -392,7 +364,6 @@ impl Component for MainPlayground {
                     }
                     None => {}
                 }
-
 
                 // let id: String = item.
                 // if let Some(input) = input {
@@ -411,8 +382,6 @@ impl Component for MainPlayground {
             //     // e.data_transfer().unwrap().set_data("text", id.as_ref());
             //     let item = target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap();
 
-
-
             //     // let id: String = item.
             //     // if let Some(input) = input {
             //     //     input_value_handle.set(input.value());
@@ -430,8 +399,6 @@ impl Component for MainPlayground {
             //     // target.
             //     // e.data_transfer().unwrap().set_data("text", id.as_ref());
             //     let item = target.and_then(|t| t.dyn_into::<HtmlElement>().ok()).unwrap();
-
-
 
             //     // let id: String = item.
             //     // if let Some(input) = input {
@@ -469,7 +436,6 @@ impl Component for MainPlayground {
 
         // let global_vars = ctx.props().global_vars.clone();
 
-
     let mut item_list: Vec<TestItem> = Vec::new();
     item_list.push(
         TestItem{
@@ -501,7 +467,6 @@ impl Component for MainPlayground {
             name: "Item 5".to_owned(),
         }
     );
-
 
         html! {
             <div
@@ -559,7 +524,6 @@ impl Component for MainPlayground {
                                     {"Drop an item here"}
                                 </div>
                                 }
-
 
                         }
                             {self.dropped_items.clone().into_iter().map(

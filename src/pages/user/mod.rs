@@ -59,8 +59,6 @@ pub enum UserRoute {
     #[at("/me/saves")]
     UserSavesList,
 
-
-
     #[at("/me/campaigns")]
     UserCampaigns,
 
@@ -74,7 +72,6 @@ fn content_switch(
     update_global_vars: Callback<GlobalVars>,
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
-
 
     let mut global_vars = global_vars.clone();
 
@@ -156,7 +153,6 @@ fn content_switch(
         UserRoute::NotFound => html! { <h1>{ "UserRoute 404" }</h1> },
     }
 }
-
 
 #[derive(Properties, PartialEq)]
 pub struct UserRouterProps {

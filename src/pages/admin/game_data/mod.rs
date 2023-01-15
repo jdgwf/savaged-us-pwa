@@ -12,7 +12,6 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
-
 use crate::components::tertiary_menu::{
     TertiaryMenuItem,
     TertiaryMenu
@@ -50,7 +49,6 @@ fn content_switch(
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
-
     let mut global_vars = global_vars.clone();
 
     if global_vars.current_user.id > 0 {
@@ -69,11 +67,9 @@ fn content_switch(
             />
         },
 
-
         AdminGameDataRoute::NotFound => html! { <h1>{ "AdminGameDataRoute 404" }</h1> },
     }
 }
-
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataRouterProps {
@@ -103,12 +99,10 @@ impl Component for AdminGameDataRouter {
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: AdminGameDataRouterMessage
     ) -> bool {
-
 
         match msg {
             // AdminGameDataRouterMessage::ChangeFilter( filter_type ) => {
@@ -124,7 +118,6 @@ impl Component for AdminGameDataRouter {
         true
     }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -138,7 +131,6 @@ impl Component for AdminGameDataRouter {
 
         true
     }
-
 
     fn view(
         &self,

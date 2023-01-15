@@ -7,7 +7,6 @@ use standard_components::ui::nbsp::Nbsp;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 
-
 #[derive(Properties, PartialEq)]
 pub struct MainHomeProps {
     pub global_vars: GlobalVars,
@@ -44,7 +43,6 @@ impl Component for MainHome {
 
         let mut saves_html = html!{<></>};
         let mut chargen_html = html!{<></>};
-
 
         match &global_vars.chargen_data {
             Some( chargen_data ) => {

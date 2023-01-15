@@ -155,7 +155,6 @@ pub fn edit_view_delete_buttons(
                         }
                     </div>
 
-
                 </div>
             };
         }
@@ -163,7 +162,5 @@ pub fn edit_view_delete_buttons(
             return html!{<></>};
         }
     }
-
-
 
 }

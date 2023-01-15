@@ -2,7 +2,6 @@ pub mod edit;
 pub mod view;
 pub mod list;
 
-
 use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
@@ -15,7 +14,6 @@ use yew::{function_component, html};
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
 
 use crate::components::tertiary_menu::{
     TertiaryMenuItem,
@@ -56,7 +54,6 @@ fn content_switch(
     update_global_vars: Callback<GlobalVars>,
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
-
 
     let mut global_vars = global_vars.clone();
 
@@ -108,7 +105,6 @@ fn content_switch(
     }
 }
 
-
 #[derive(Properties, PartialEq)]
 pub struct UserSavesRouterProps {
     // #[prop_or_default]
@@ -138,12 +134,10 @@ impl Component for UserSavesRouter {
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: UserSavesRouterMessage
     ) -> bool {
-
 
         match msg {
             UserSavesRouterMessage::ChangeFilter( filter_type ) => {
@@ -159,7 +153,6 @@ impl Component for UserSavesRouter {
         true
     }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -173,7 +166,6 @@ impl Component for UserSavesRouter {
 
         true
     }
-
 
     fn view(
         &self,

@@ -3,7 +3,6 @@ use yew::prelude::*;
 use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::chargen_data::ChargenData};
 use yew_router::history::{AnyHistory};
 
-
 use gloo_net::websocket::{
     Message,
     futures::WebSocket,

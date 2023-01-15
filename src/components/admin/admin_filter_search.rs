@@ -1,4 +1,4 @@
-use savaged_libs::admin_libs::{AdminPagingStatistics, FetchAdminParameters, BookList};
+use savaged_libs::{admin_libs::{AdminPagingStatistics, FetchAdminParameters}, book::Book};
 use standard_components::{ui::{nbsp::Nbsp, input_text::InputText}, libs::local_storage_shortcuts::set_local_storage_u32};
 use stdweb::web::event::SelectionChangeEvent;
 use web_sys::HtmlSelectElement;
@@ -25,7 +25,6 @@ pub fn edit_view_delete_buttons(
     let search_value_opt = props.paging_sorting_and_filter.filter.clone();
     let search_value = search_value_opt.unwrap_or("".to_owned());
 
-
     let callback_text_new_changed = Callback::from(
         move |new_value: String | {
 
@@ -39,15 +38,20 @@ pub fn edit_view_delete_buttons(
         }
     );
 
-    let mut book_list: Vec<BookList> = Vec::new();
+    let mut book_list: Vec<Book> = Vec::new();
 
     match &props.stats {
         Some( stats ) => {
-            book_list = stats.book_list.clone();
+            match &stats.book_list {
+                Some( bl ) => {
+                    book_list = bl.clone();
+                }
+                None => {}
+            }
+            // book_list = Some(stats.book_list.clone());
         }
         None => {}
     }
-
 
     let callback_set_filter_book= Callback::from(
         move |e: Event | {
@@ -117,10 +121,7 @@ pub fn edit_view_delete_buttons(
                 value={search_value}
             />
 
-
         </div>
     };
-
-
 
 }

@@ -36,6 +36,10 @@ body {
         width: 100%;
     }
 
+    .no-margins {
+        margin: 0 !important;
+    }
+
     .abs-right {
         position: absolute;
         right: 0;

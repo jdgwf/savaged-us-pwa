@@ -342,7 +342,6 @@ pub fn get_menu_items(
             sub_menu_tag: "".to_owned(),
         },
 
-
     );
 
     menu = _add_admin_tab( &global_vars, menu );
@@ -574,7 +573,6 @@ pub fn get_menu_items(
     return menu;
 }
 
-
 fn _add_admin_tab(
     global_vars: &GlobalVars,
     mut menu: Vec<MenuItem>,
@@ -599,7 +597,6 @@ fn _add_admin_tab(
                 link_class: None,
 
                 submenu_tag: Some("admin".to_string()),
-
 
                 title: "The Administration Section".to_owned(),
                 icon_class: None, // "fa fa-house".to_owned(),

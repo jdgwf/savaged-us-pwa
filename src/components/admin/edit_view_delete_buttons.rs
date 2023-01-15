@@ -5,6 +5,8 @@ pub struct EditViewDeleteButtonsProps {
 
     pub id: u32,
 
+    pub name: String,
+
     #[prop_or_default]
     pub view_callback: Option<Callback<u32>>,
 
@@ -16,8 +18,6 @@ pub struct EditViewDeleteButtonsProps {
 
     #[prop_or_default]
     pub duplicate_callback: Option<Callback<u32>>,
-
-
 
 }
 
@@ -42,15 +42,21 @@ pub fn edit_view_delete_buttons(
         duplicate_callback == None
     {
         return html!{
-            <div class="text-center small-text">{"EditViewDeleteButtons error: no callbacks defined."}</div>
+            <div class="text-center small-text">{"No Access!"}</div>
         };
     }
+
+    let delete_title = "Click here to delete '".to_owned() + &props.name + "'. You will be asked to verify this action.";
+    let edit_title = "Click here to delete '".to_owned() + &props.name + "'.";
+    let duplicate_title = "Click here to duplicate '".to_owned() + &props.name + "'. You will be asked to verify this action.";
+    let view_title = "Click here to view '".to_owned() + &props.name + "'.";
 
     return html!{
         <td class="text-center no-wrap">
             if view_callback != None {
                 <button
                     class="btn btn-sm btn-info"
+                    title={view_title}
                     onclick={move |e: MouseEvent| {
                         let view_callback = view_callback.clone();
                         e.prevent_default();
@@ -63,6 +69,7 @@ pub fn edit_view_delete_buttons(
 
             if edit_callback != None {
                 <button
+                    title={edit_title}
                     class="btn btn-sm btn-success"
                     onclick={move |e: MouseEvent| {
                         let edit_callback = edit_callback.clone();
@@ -77,6 +84,7 @@ pub fn edit_view_delete_buttons(
             if duplicate_callback != None {
                 <button
                     class="btn btn-sm btn-success"
+                    title={duplicate_title}
                     onclick={move |e: MouseEvent| {
                         let duplicate_callback = duplicate_callback.clone();
                         e.prevent_default();
@@ -89,6 +97,7 @@ pub fn edit_view_delete_buttons(
 
             if delete_callback != None {
                 <button
+                    title={delete_title}
                     class="btn btn-sm btn-danger"
                     onclick={move |e: MouseEvent| {
                         let delete_callback = delete_callback.clone();
@@ -99,7 +108,6 @@ pub fn edit_view_delete_buttons(
                     <i class="fa fa-trash" />
                 </button>
             }
-
 
         </td>
     };

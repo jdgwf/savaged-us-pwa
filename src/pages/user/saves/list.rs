@@ -62,12 +62,10 @@ impl Component for UserSavesList {
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: UserSavesListMessage
     ) -> bool {
-
 
         match msg {
             UserSavesListMessage::ChangeFilter( filter_type ) => {
@@ -82,7 +80,6 @@ impl Component for UserSavesList {
         }
         true
     }
-
 
     fn changed(
         &mut self,
@@ -102,7 +99,6 @@ impl Component for UserSavesList {
 
         let mut global_vars = ctx.props().global_vars.clone();
 
-
         let mut filter_type = "character".to_owned();
 
         if !ctx.props().global_vars.server_side_renderer {
@@ -110,7 +106,6 @@ impl Component for UserSavesList {
         }
 
         if self.global_vars.user_loading {
-
 
             return html! {
             <UIPage
@@ -143,8 +138,6 @@ impl Component for UserSavesList {
             }
         }
 
-
-
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
@@ -164,7 +157,6 @@ impl Component for UserSavesList {
 
         let mut current_available_folders: Vec<String> = Vec::new();
         let mut current_folder_counts: HashMap< String, u32> = HashMap::new();
-
 
         let filter_by_type = | save: &SaveDBRow | {
             let filter_type= filter_type.to_owned();
@@ -211,7 +203,6 @@ impl Component for UserSavesList {
         let mut bestiary_count = 0;
         let mut trash_count = 0;
 
-
         for item in global_vars.clone().saves.unwrap_or(Vec::new()) {
 
             if item.deleted {
@@ -257,7 +248,6 @@ impl Component for UserSavesList {
                 }
             }
 
-
         }
 
         let mut current_folder = get_local_storage_string("saves_folder", "".to_string());
@@ -269,9 +259,6 @@ impl Component for UserSavesList {
         let filter_by = | save: &SaveDBRow | {
             let filter_type= filter_type.to_owned();
             // let mut current_folder= current_folder.to_owned();
-
-
-
 
             if save.deleted {
                 return false;
@@ -468,7 +455,6 @@ impl Component for UserSavesList {
                     let folder1 = folder.to_owned();
                     let folder2 = folder.to_owned();
 
-
                     html! {
                         <div
                             class="folder"
@@ -493,7 +479,6 @@ impl Component for UserSavesList {
                                 <h3>{&folder}</h3>
                             </div>
                             <div class={"controls"}>
-
 
                             <button
                                 class="btn btn-success"

@@ -24,12 +24,13 @@ pub struct EditHindranceProps {
     // pub edit_save: Option<SaveDBRow>,
 
     pub on_changed_callback: Callback< Hindrance >,
-    pub form_title: String,
+
+    #[prop_or_default]
+    pub form_title: Option<String>,
 
     #[prop_or_default]
     pub readonly: bool,
 }
-
 
 pub enum EditHindranceMessage {
     ChangePage(String),
@@ -154,7 +155,6 @@ impl Component for EditHindrance {
                     nv.push( val.to_owned() );
                 }
 
-
                 self.edit_item.effects_minor = nv;
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 true
@@ -177,7 +177,6 @@ impl Component for EditHindrance {
     ) -> Html {
 
         let current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
-
 
         let on_changed_callback = ctx.props().on_changed_callback.clone();
 
@@ -225,6 +224,13 @@ impl Component for EditHindrance {
             );
         }
         let change_page_callback_form = ctx.link().callback(EditHindranceMessage::ChangePage);
+        let mut title = html!{<></>};
+        match &ctx.props().form_title {
+            Some( form_title ) => {
+                title = html!{<h3 class="text-center no-margins">{form_title.to_owned()}</h3>};
+            }
+            None => {}
+        }
         let header = html!{
             <>
                 <TertiaryMenu
@@ -234,12 +240,11 @@ impl Component for EditHindrance {
                     local_storage_variable={self.local_storage_page_name.to_owned()}
                 />
 
-                <h3 class="text-center no-margins">{ctx.props().form_title.to_owned()}</h3>
+                {title}
 
             </>
         };
         match current_page.as_str() {
-
 
             "admin" => {
                 html!{
@@ -269,7 +274,6 @@ impl Component for EditHindrance {
                     </div>
                 }
             }
-
 
             "effects" => {
                 html!{
@@ -327,7 +331,6 @@ impl Component for EditHindrance {
                                             onchange={ ctx.link().callback( EditHindranceMessage::UpdateName) }
                                         />
 
-
                                         <InputCheckbox
                                             label="Major Hindrance"
                                             checked={self.edit_item.major}
@@ -361,8 +364,6 @@ impl Component for EditHindrance {
                                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
                                             />
                                         }
-
-
 
                                         <InputText
                                             label={"UUID"}

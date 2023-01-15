@@ -507,7 +507,6 @@ impl Component for UserNotifications {
             }
         }
 
-
         let mut global_vars = self.global_vars.clone();
 
         global_vars.current_sub_menu = "settings_notifications".to_owned();

@@ -36,7 +36,6 @@ pub fn handle_message(
                 }
             }
 
-
             if new_global_vars.current_user.id > 0 {
                 let mut global_vars_future = new_global_vars.clone();
                 spawn_local(async move {
@@ -87,7 +86,6 @@ pub fn handle_message(
 
             // spawn_local(async move {
 
-
             //     update_global_vars.emit(global_vars_future);
             // });
             // log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
@@ -107,7 +105,6 @@ pub fn handle_message(
             let mut new_global_vars = global_vars.clone();
             new_global_vars.chargen_data = msg.chargen_data.clone();
 
-
             let chargen_data_level = get_local_storage_string("chargen_data_level", "".to_owned() );
             let chargen_data_last_updated = get_local_storage_string("chargen_data_last_updated", "".to_owned() );
 
@@ -126,13 +123,10 @@ pub fn handle_message(
                 None => {}
             }
 
-
-
             update_global_vars.emit( new_global_vars );
         }
 
         WebsocketMessageType::Saves => {
-
 
             let mut new_global_vars = global_vars.clone();
             let server_root = global_vars.server_root.to_owned();

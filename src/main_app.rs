@@ -24,7 +24,6 @@ use crate::pages::main_home::MainHome;
 use crate::pages::admin::AdminRouter;
 use crate::pages::admin::home::AdminHome;
 
-
 use crate::pages::main_playground::MainPlayground;
 // use crate::local_storage::check_and_upgrade_index_db_stores;
 use crate::components::ui_page::UIPage;
@@ -293,9 +292,6 @@ impl Component for MainApp {
         ctx: &Context<Self>
     ) -> Self {
 
-
-
-
         let ( global_vars_context, _global_vars_context_handler ) = ctx
             .link()
             .context::<GlobalVarsContext>(
@@ -313,15 +309,12 @@ impl Component for MainApp {
         // global_vars.update_global_vars = base_update_global_vars;
         global_vars.send_websocket = send_websocket;
 
-
-
         let login_token = global_vars.login_token.to_owned();
 
         let mut login_token_send: Option<String> = None;
         if !login_token.is_empty() {
             login_token_send = Some(login_token);
         }
-
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
@@ -385,8 +378,6 @@ impl Component for MainApp {
         msg: MainAppMessage,
     ) -> bool {
 
-
-
         // let global_vars = self.global_vars.clone();
 
         match msg {
@@ -400,7 +391,6 @@ impl Component for MainApp {
                 self.global_vars.show_mobile_menu = false;
                 return true;
             }
-
 
             MainAppMessage::CloseConfirmationDialog( _event ) => {
                 self.confirmation_dialog_open = false;
@@ -436,7 +426,6 @@ impl Component for MainApp {
                 self.show_mobile_menu = false;
                 self.global_vars.saves = None;
                 self.global_vars.chargen_data = None;
-
 
                 self.global_vars.user_loading = false;
                 clear_local_storage();
@@ -517,7 +506,6 @@ impl Component for MainApp {
                     );
                 }
 
-
                 return false;
             }
 
@@ -547,7 +535,6 @@ impl Component for MainApp {
                 }
             }
 
-
         }
     }
 
@@ -560,8 +547,6 @@ impl Component for MainApp {
         // // log!("main_app view", self.global_vars.current_user.unread_notifications);
         // let submenu = self.submenu.clone();
         // let mobile_submenu = self.submenu.clone();
-
-
 
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
@@ -596,7 +581,6 @@ impl Component for MainApp {
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
 
-
         html! {
 
             <>
@@ -607,7 +591,6 @@ impl Component for MainApp {
                         definition={self.confirmation_dialog_properties.clone()}
                     />
                 }
-
 
                 <BrowserRouter>
 

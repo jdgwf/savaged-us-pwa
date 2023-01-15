@@ -7,7 +7,6 @@ pub mod contact_us;
 
 use std::f32::consts::E;
 
-
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 
 use yew_router::prelude::*;
@@ -68,8 +67,6 @@ fn content_switch(
 
     let mut global_vars = global_vars.clone();
 
-
-
     match routes {
 
         InfoRoute::InfoAbout => html! {
@@ -124,7 +121,6 @@ fn content_switch(
     }
 }
 
-
 #[derive(Properties, PartialEq)]
 pub struct InfoRouterProps {
     #[prop_or_default]
@@ -168,13 +164,11 @@ impl Component for InfoRouter {
         let update_global_vars = ctx.props().update_global_vars.clone();
         let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
 
-
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
             let global_vars = ctx.props().global_vars.clone();
 
             html! {
-
 
                 <Router
                     history={history}
@@ -199,7 +193,6 @@ impl Component for InfoRouter {
             let global_vars = ctx.props().global_vars.clone();
 
             html! {
-
 
                 <BrowserRouter>
                     <div class={"main-content"}>

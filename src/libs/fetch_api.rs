@@ -391,8 +391,6 @@ pub async fn upload_user_image(
         .headers()
         .set("Accept", "application/vnd.github.v3+json")?;
 
-
-
     // opts.body( Some(&wasm_bindgen::JsValue::from_str("") ) );
 
     let window = web_sys::window().unwrap();
@@ -431,7 +429,6 @@ pub async fn upload_user_image(
         }
     }
 
-
     return Ok( JsValue::from_str("") );
 }
 
@@ -441,7 +438,6 @@ pub struct FileUploadResults {
     pub message: String,
     pub image_url: String,
 }
-
 
 pub async fn fetch_api_with_value(
     endpoint: String,

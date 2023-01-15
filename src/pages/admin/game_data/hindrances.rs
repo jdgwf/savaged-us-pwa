@@ -1,31 +1,29 @@
-use std::vec;
-
+use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
+use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
+use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
+use crate::components::admin::admin_table_paging::AdminTablePaging;
+use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
+use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::edit_forms::hindrance::EditHindrance;
+use crate::components::standard_modal::StandardModal;
+use crate::components::ui_page::UIPage;
+use crate::libs::fetch_api::fetch_api;
+use crate::libs::global_vars::GlobalVars;
+use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
+use gloo_console::{ error, log };
+use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::book::Book;
 use savaged_libs::admin_libs::AdminPagingStatistics;
 use savaged_libs::game_data::GameData;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
-use standard_components::libs::local_storage_shortcuts::{set_local_storage_string, get_local_storage_u32, set_local_storage_u32};
-use yew_router::prelude::*;
-use yew::prelude::*;
-use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_paging::AdminTablePaging;
-use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
-use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
-use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
-use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
-use crate::components::ui_page::UIPage;
-use crate::components::standard_modal::StandardModal;
-use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
-use crate::components::edit_forms::hindrance::EditHindrance;
-use crate::libs::global_vars::GlobalVars;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Error;
+use standard_components::libs::local_storage_shortcuts::{set_local_storage_string, get_local_storage_u32, set_local_storage_u32};
 use standard_components::ui::nbsp::Nbsp;
+use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 use wasm_bindgen_futures::spawn_local;
-use crate::libs::fetch_api::fetch_api;
-use gloo_console::{ error, log };
-
+use yew::prelude::*;
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHindrancesProps {
@@ -34,7 +32,6 @@ pub struct AdminGameDataHindrancesProps {
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-
 pub enum AdminGameDataHindrancesMessage {
     SetItems(Vec<Hindrance>),
     SetPagingStats(Option<AdminPagingStatistics>),
@@ -42,7 +39,10 @@ pub enum AdminGameDataHindrancesMessage {
     UpdateHindrance(Hindrance),
     ViewItem( u32 ),
     EditItem( u32 ),
+    DeleteItem( u32 ),
+    DuplicateItem( u32 ),
     Cancel(bool),
+    AddItem(bool),
 }
 pub struct AdminGameDataHindrances {
     global_vars: GlobalVars,
@@ -70,6 +70,7 @@ impl Component for AdminGameDataHindrances {
         let mut paging_sorting_and_filter = new_fetch_admin_params();
 
         paging_sorting_and_filter.login_token = Some(login_token);
+        paging_sorting_and_filter.needs_book_list = true;
         paging_sorting_and_filter.number_per_page = get_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
         paging_sorting_and_filter.filter_book = get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
         let paging = paging_sorting_and_filter.clone();
@@ -80,11 +81,11 @@ impl Component for AdminGameDataHindrances {
                     paging_sorting_and_filter,
                     set_items,
                     set_paging,
+
                 ).await;
 
             }
         );
-
 
         AdminGameDataHindrances {
             paging_sorting_and_filter: paging,
@@ -98,13 +99,11 @@ impl Component for AdminGameDataHindrances {
         }
     }
 
-
     fn update(
         &mut self,
         ctx: &Context<Self>,
         msg: AdminGameDataHindrancesMessage
     ) -> bool {
-
 
         match msg {
 
@@ -126,7 +125,7 @@ impl Component for AdminGameDataHindrances {
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
                         self.editing_item = Some(item.clone());
-                        self.is_editing = false;
+                        self.is_editing = true;
                         self.is_adding = false;
                         return true;
                     }
@@ -134,7 +133,20 @@ impl Component for AdminGameDataHindrances {
                 return false;
             }
 
+            AdminGameDataHindrancesMessage::AddItem( _nv ) => {
+                log!("AdminGameDataHindrancesMessage::AddItem");
+            }
+
+            AdminGameDataHindrancesMessage::DeleteItem( id ) => {
+                log!("AdminGameDataHindrancesMessage::DeleteItem ", id);
+            }
+
+            AdminGameDataHindrancesMessage::DuplicateItem( id ) => {
+                log!("AdminGameDataHindrancesMessage::DuplicateItem", id);
+            }
+
             AdminGameDataHindrancesMessage::Cancel( new_value ) => {
+                log!("AdminGameDataHindrancesMessage::Cancel");
                 self.editing_item = None;
             }
 
@@ -149,8 +161,33 @@ impl Component for AdminGameDataHindrances {
             }
 
             AdminGameDataHindrancesMessage::SetPagingStats( new_value ) => {
-                self.paging_data = new_value;
+
+                match new_value {
+                    Some(mut nv) => {
+
+                        match nv.book_list {
+                            Some( bl) => {
+                                nv.book_list = Some(bl);
+                            }
+                            None => {
+                                match &self.paging_data {
+                                    Some( pg ) => {
+                                        nv.book_list = pg.book_list.clone();
+                                    }
+                                    None => {}
+                                }
+                            }
+                        }
+                        self.paging_data = Some(nv.clone());
+
+                    }
+                    None => {
+                        self.paging_data = None;
+                    }
+                }
+
                 self.loading = false;
+
             }
 
             AdminGameDataHindrancesMessage::SetFetchAdminParams( new_value ) => {
@@ -166,8 +203,21 @@ impl Component for AdminGameDataHindrances {
                 set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
 
                 paging_sorting_and_filter.login_token = Some(login_token);
-                let paging = paging_sorting_and_filter.clone();
 
+                paging_sorting_and_filter.needs_book_list = true;
+                match &self.paging_data {
+                    Some( paging ) => {
+                        match &paging.book_list {
+                            Some( book_list ) => {
+                                if book_list.len() > 0 {
+                                    paging_sorting_and_filter.needs_book_list = false;
+                                }
+                            }
+                            None => {}
+                        }
+                    }
+                    None => {}
+                }
                 spawn_local (
                     async move {
                         _get_data(
@@ -186,7 +236,6 @@ impl Component for AdminGameDataHindrances {
         true
     }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -195,12 +244,10 @@ impl Component for AdminGameDataHindrances {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-
         self.global_vars.current_sub_menu = "admin-items".to_owned();
 
         true
     }
-
 
     fn view(
         &self,
@@ -210,14 +257,14 @@ impl Component for AdminGameDataHindrances {
         let callback_fetch_admin_params = ctx.link().callback( AdminGameDataHindrancesMessage::SetFetchAdminParams ).clone();
         let callback_fetch_admin_params_2 = ctx.link().callback( AdminGameDataHindrancesMessage::SetFetchAdminParams ).clone();
 
-
-
         let mut non_filtered_count: u32 = 0;
         let mut filtered_count: u32= 0;
+        let mut current_book_id: u32 = 0;
         match &self.paging_data {
             Some( paging_data ) => {
                 non_filtered_count = paging_data.non_filtered_count;
                 filtered_count = paging_data.filtered_count;
+
             }
             None => {
 
@@ -232,35 +279,50 @@ impl Component for AdminGameDataHindrances {
 
         if self.paging_sorting_and_filter.filter_book > 0 {
             show_book_column = false;
+            current_book_id = self.paging_sorting_and_filter.filter_book;
+        } else {
+            current_book_id = 0;
         }
 
 
 
+        let mut book_list: Option<Vec<Book>> = None;
+
+        match &self.paging_data {
+            Some( pg ) => {
+                book_list = pg.book_list.clone();
+            }
+            None => {}
+        }
+
         let mut edit_modal = html!{<></>};
         match &self.editing_item {
             Some( editing_item ) => {
-                let mut editing_title = "Viewing Hindrance";
+                let mut editing_title = Some("Viewing Hindrance".to_owned());
 
                 let mut save_callback:Option<Callback<bool>> = Some( Callback::noop() );
                 let mut add_callback: Option<Callback<bool>>= None;
                 let mut save_as_new_callback: Option<Callback<bool>>= None;
 
+                let mut read_only = true;
                 if self.is_adding {
-                    editing_title = "Adding Hindrance";
+                    editing_title = Some("Adding Hindrance".to_owned());
+                    read_only = false;
                 }
                 if self.is_editing {
-                    editing_title = "Editing Hindrance";
+                    editing_title = Some("Editing Hindrance".to_owned());
+                    read_only = false;
                 }
                 edit_modal = html!{
                 <StandardModal
                     xl={true}
+                    title={editing_title}
                 >
                     <EditHindrance
                         global_vars={ctx.props().global_vars.clone()}
-                        // edit_save={save.clone()}
-                        readonly={false}
+                        readonly={read_only}
                         edit_item={editing_item.clone()}
-                        form_title={editing_title}
+
                         on_changed_callback={ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindrance).clone()}
                     />
 
@@ -276,6 +338,7 @@ impl Component for AdminGameDataHindrances {
             None => {}
         }
 
+        let add_item = ctx.link().callback(AdminGameDataHindrancesMessage::AddItem);
 
         html! {
         <UIPage
@@ -285,9 +348,6 @@ impl Component for AdminGameDataHindrances {
             modal={Some(edit_modal)}
         >
 
-
-
-
         <div class="pull-right">
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
@@ -295,7 +355,7 @@ impl Component for AdminGameDataHindrances {
                 stats={self.paging_data.clone()}
             />
         </div>
-                <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances List TODO"}</h2>
+                <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances"}</h2>
 
                     <table class="admin-table">
                     <thead>
@@ -316,9 +376,26 @@ impl Component for AdminGameDataHindrances {
                             //     {"Email"}
                             // </th>
                             <th>
-                                {"Last Updated"}
+                                {"Updated"}
                             </th>
-                            <th class="min-width"></th>
+                            <th class="min-width">
+                            if global_vars.current_user.admin_can_write_book(
+                                &book_list,
+                                &current_book_id,
+                            ) {
+
+                                <button
+                                    class="btn btn-xs full-width no-margins btn-success"
+                                    onclick={move |e: MouseEvent| {
+                                        let add_item = add_item.clone();
+                                        e.prevent_default();
+                                        add_item.emit(true);
+                                    }}
+                                >
+                                    <i class="fa fa-plus" /><Nbsp />{"Add"}
+                                </button>
+                            }
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -355,10 +432,38 @@ impl Component for AdminGameDataHindrances {
                             } else {
                             {self.items.clone().into_iter().map( move |row| {
                                 let mut callback_edit_item: Option<Callback<u32>> = None;
-                                callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItem));
+                                let mut callback_view_item: Option<Callback<u32>> = None;
+                                let mut callback_delete_item: Option<Callback<u32>> = None;
+                                let mut callback_duplicate_item: Option<Callback<u32>> = None;
+
+
+                                let row_name = &row.name.to_owned();
+
+
+
+                                if global_vars.current_user.admin_can_read_item (
+                                    &book_list,
+                                    &row.created_by,
+                                    &row.book_id,
+                                ) {
+                                    callback_view_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::ViewItem));
+                                }
+                                if global_vars.current_user.admin_can_write_item (
+                                    &book_list,
+                                    &row.created_by,
+                                    &row.book_id,
+                                ) {
+                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItem));
+                                    callback_duplicate_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DuplicateItem));
+                                }
+                                if global_vars.current_user.admin_can_delete_item (
+                                    &book_list,
+                                    &row.created_by,
+                                    &row.book_id,
+                                ) {
+                                    callback_delete_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DeleteItem));
+                                }
                                 html!{<tr>
-
-
 
                                     if show_book_column {
                                         <AdminTableFieldText
@@ -398,9 +503,12 @@ impl Component for AdminGameDataHindrances {
                                     <td>
                                         <EditViewDeleteButtons
                                             id={row.id}
+                                            name={row_name.to_owned()}
 
-                                            view_callback={Some(ctx.link().callback(AdminGameDataHindrancesMessage::ViewItem))}
+                                            view_callback={callback_view_item}
                                             edit_callback={callback_edit_item}
+                                            delete_callback={callback_delete_item}
+                                            duplicate_callback={callback_duplicate_item}
 
                                             // callback_add_item
                                             // callback_delete_item
@@ -430,20 +538,18 @@ impl Component for AdminGameDataHindrances {
     }
 }
 
-
 async fn _get_data(
     global_vars: GlobalVars,
     paging_sorting_and_filter: FetchAdminParameters,
     set_items: Callback<Vec<Hindrance>>,
     set_paging: Callback<Option<AdminPagingStatistics>>,
-
 ) {
     let api_root = global_vars.api_root.clone();
-    let paging_sorting_and_filter = paging_sorting_and_filter.clone();
+    let mut paging_sorting_and_filter = paging_sorting_and_filter.clone();
+
     let result = fetch_admin_api(
         (api_root.to_owned() + "/admin/game-data/hindrances/get").to_owned(),
         paging_sorting_and_filter.clone(),
-
     ).await;
 
     match result {

@@ -85,8 +85,6 @@ pub fn ui_page(
 
             <div class={active_class}>
 
-
-
                 <div class={"main-content"}>
 
                     { for props.children.iter() }

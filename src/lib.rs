@@ -80,7 +80,6 @@ pub struct SubmenuData {
 //     UpdateGlobalVars( GlobalVars ),
 //     LogOut( String ),
 
-
 // }
 
 pub struct MainServerApp {
@@ -192,7 +191,6 @@ fn content_switch(
             }
         },
 
-
         MainServerRoute::NotFound => {
             // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
             html! { <h1>{ "MainServerRoute 404" }</h1> }
@@ -206,7 +204,6 @@ fn content_switch(
 pub fn ServerApp(
     props: &ServerAppProps
 ) -> Html {
-
 
     // let server_root = "http://localhost:5001".to_owned();
     let server_root = "https://v4/savaged.us".to_owned();
@@ -256,7 +253,6 @@ pub fn ServerApp(
             )
         }
     ;
-
 
     html! {
 

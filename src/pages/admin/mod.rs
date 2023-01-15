@@ -16,7 +16,6 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
-
 use crate::components::tertiary_menu::{
     TertiaryMenuItem,
     TertiaryMenu
@@ -66,10 +65,7 @@ fn content_switch(
     open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
-
     let mut global_vars = global_vars.clone();
-
-
 
     if !global_vars.current_user.has_developer_access() {
         return html! { <h1>{ "Access Denied" }</h1> }
@@ -114,14 +110,11 @@ fn content_switch(
                 // open_confirmation_dialog={open_confirmation_dialog}
             />
 
-
         },
-
 
         AdminRoute::NotFound => html! { <h1>{ "AdminRoute 404" }</h1> },
     }
 }
-
 
 #[derive(Properties, PartialEq)]
 pub struct AdminRouterProps {
@@ -151,12 +144,10 @@ impl Component for AdminRouter {
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: AdminRouterMessage
     ) -> bool {
-
 
         match msg {
             // AdminRouterMessage::ChangeFilter( filter_type ) => {
@@ -169,9 +160,8 @@ impl Component for AdminRouter {
             //     set_local_storage_string( "saves_folder", folder_name);
             // }
         }
-        true
+        // true
     }
-
 
     fn changed(
         &mut self,
@@ -186,7 +176,6 @@ impl Component for AdminRouter {
 
         true
     }
-
 
     fn view(
         &self,

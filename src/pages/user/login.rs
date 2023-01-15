@@ -89,7 +89,6 @@ impl Component for UserLogin {
                 self.global_vars.login_token = login_result.login_token.clone();
                 self.global_vars.user_loading = false;
 
-
                 ctx.props().update_global_vars.emit( self.global_vars.clone() );
 
                 // clear out local data
@@ -120,7 +119,6 @@ impl Component for UserLogin {
 
                 return true;
             }
-
 
             UserLoginMessage::UpdateLoginMessage( new_value ) => {
 
@@ -159,7 +157,6 @@ impl Component for UserLogin {
         let update_password = ctx.link().callback(UserLoginMessage::UpdatePassword);
         let update_current_user_from_login = ctx.link().callback(UserLoginMessage::UpdateCurrentUser);
         let set_login_message =  ctx.link().callback(UserLoginMessage::UpdateLoginMessage);
-
 
         let username = self.username.to_owned();
         let password = self.password.to_owned();
@@ -205,7 +202,6 @@ impl Component for UserLogin {
                                         update_current_user_from_login.emit( vec_val.clone() );
                                     }
 
-
                                 }
                                 Err( err ) => {
                                     let err_string: String = format!("savaged_login Serde Err(): {}", &err);
@@ -239,7 +235,6 @@ impl Component for UserLogin {
             </UIPage>
     )
         } else {
-
 
             html! {
             <UIPage

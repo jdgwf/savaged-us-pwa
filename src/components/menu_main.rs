@@ -22,7 +22,6 @@ pub fn menu_main(
     props: &MenuMainProps,
 ) -> Html {
 
-
     let mut submenu = html!{<></>};
 
     let mut show_submenu = false;
@@ -176,7 +175,6 @@ pub fn menu_main(
                             <Link<UserRoute> to={UserRoute::SettingsPrivate}><img
                             src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
                             /></Link<UserRoute>>
-
 
                         </div>
                     } else {

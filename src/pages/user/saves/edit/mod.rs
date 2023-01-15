@@ -248,7 +248,6 @@ impl Component for UserSavesEdit {
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: UserSavesEditMessage
@@ -303,7 +302,6 @@ impl Component for UserSavesEdit {
         true
     }
 
-
     fn changed(
         &mut self,
         ctx: &Context<Self>,
@@ -317,7 +315,6 @@ impl Component for UserSavesEdit {
         // read_notifications: self.global_vars.current_user.unread_notifications,
         //     };
         // let mut save: Option<SaveDBRow> = None;
-
 
         // let mut save_option: Option<SaveDBRow> = None;
 
@@ -453,7 +450,6 @@ impl Component for UserSavesEdit {
         match &self.save {
             Some( save ) => {
 
-
                 form = html!{<>
                     <h2>{"Unhandled Save"}</h2>
                     <strong>{"Save UUID:"}</strong><Nbsp />{&save.uuid}<br />
@@ -483,7 +479,7 @@ impl Component for UserSavesEdit {
                                 // edit_save={Some(save.clone())}
                                 readonly={false}
                                 edit_item={hindrance.clone()}
-                                form_title={"Editing Hindrance"}
+                                form_title={Some("Editing Hindrance")}
                                 on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateHindrance)}
                             />
 
@@ -508,7 +504,6 @@ impl Component for UserSavesEdit {
                         page_title={page_title}
                         submenu_tag={"user-data".to_owned()}
                     >
-
 
                         {form}
 

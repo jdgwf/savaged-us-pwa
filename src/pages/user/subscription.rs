@@ -113,8 +113,6 @@ impl Component for UserSubscription {
             }
         }
 
-
-
         global_vars.current_sub_menu = "settings_subscription".to_owned();
 
         html! {

@@ -13,7 +13,6 @@ pub fn menu_mobile(
     props: &MenuMobileProps,
 ) -> Html {
 
-
     let active_class = "".to_owned();
 
     html! {
@@ -67,7 +66,6 @@ pub fn menu_mobile(
         </div>
     }
 }
-
 
 fn make_submenu(
     menu: MenuItem,

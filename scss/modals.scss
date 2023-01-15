@@ -16,16 +16,16 @@ body {
             background: var(--body-bg-color);
             color: #fff;
             border: solid 2px #fff;
-            .modal-header {
-                background: --var();
+            .modal-head {
+                background: var(--header-bg-color);
                 padding: 1rem;
             }
             .modal-body {
                 background: var(--body-bg-color);
                 padding: 1rem;
             }
-            .modal-footer {
-                background: #333;
+            .modal-foot {
+                background: var(--header-bg-color);
                 padding: 1rem;
                 text-align: right;
             }

@@ -70,19 +70,16 @@ impl Component for UserSavesView {
             }
         }
 
-
         UserSavesView {
             global_vars: ctx.props().global_vars.clone(),
             save: save,
         }
     }
 
-
     fn update(
         &mut self, ctx: &Context<Self>,
         msg: UserSavesViewMessage
     ) -> bool {
-
 
         match msg {
             UserSavesViewMessage::ChangeFilter( filter_type ) => {
@@ -97,7 +94,6 @@ impl Component for UserSavesView {
         }
         true
     }
-
 
     fn changed(
         &mut self,
@@ -134,9 +130,7 @@ impl Component for UserSavesView {
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
-
         if self.global_vars.user_loading {
-
 
             return html! {
             <UIPage
@@ -168,7 +162,6 @@ impl Component for UserSavesView {
                 </UIPage>
             }
         }
-
 
         match &self.save {
             Some( save ) => {
@@ -243,7 +236,6 @@ impl Component for UserSavesView {
                 }
             }
         }
-
 
     }
 }

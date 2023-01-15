@@ -341,7 +341,6 @@ impl Component for SettingsDeviceLineItem {
                                 </div>
                             } else {
 
-
                                 <InputText
                                     label_class={"plain"}
                                     value={self.friendly_name.clone()}
