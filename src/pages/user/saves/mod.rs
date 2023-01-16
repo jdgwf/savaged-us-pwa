@@ -51,8 +51,6 @@ pub enum UserSavesRoute {
 fn content_switch(
     routes: UserSavesRoute,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
-    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
     let mut global_vars = global_vars.clone();
@@ -67,18 +65,14 @@ fn content_switch(
 
         UserSavesRoute::List => html! {
             <UserSavesList
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserSavesRoute::Edit {uuid} => html! {
             <UserSavesEdit
                 uuid={uuid}
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
@@ -86,18 +80,14 @@ fn content_switch(
             <UserSavesEdit
                 uuid={""}
                 new_save_type={Some(save_type)}
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserSavesRoute::View {uuid} => html! {
             <UserSavesView
                 uuid={uuid}
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
@@ -107,12 +97,7 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesRouterProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserSavesRouterMessage {
@@ -161,9 +146,6 @@ impl Component for UserSavesRouter {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-        // read_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
-
         true
     }
 
@@ -171,8 +153,8 @@ impl Component for UserSavesRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        let update_global_vars = ctx.props().update_global_vars.clone();
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
+        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
@@ -190,8 +172,6 @@ impl Component for UserSavesRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />
@@ -210,8 +190,6 @@ impl Component for UserSavesRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />

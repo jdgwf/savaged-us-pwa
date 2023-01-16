@@ -1,32 +1,29 @@
-use chrono::{DateTime, TimeZone};
+use blob;
 use chrono::offset::{Utc};
-use gloo_console::__macro::Array;
+use chrono::{DateTime, TimeZone};
+use gloo_console::log;
 use indexed_db_futures::js_sys::Uint8Array;
-use savaged_libs::book::Book;
+use indexed_db_futures::{prelude::*, js_sys};
 use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::save_db_row::SaveDBRow;
-use wasm_bindgen::{JsValue, JsCast};
-use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use indexed_db_futures::{prelude::*, js_sys};
-use gloo_console::log;
-use gloo_console::error;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{JsValue, JsCast};
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{Request, RequestInit, RequestMode, Response, DomException, FileReader};
-use blob;
+use web_sys::{Request, RequestInit, Response, DomException};
 
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
 static INDEX_DB_SAVES_STORE_NAME: &str = "saves";
-static INDEX_DB_VERSION: u32 = 6;
+static INDEX_DB_VERSION: u32 = 8;
 
 #[derive(Debug)]
 pub struct GameDataSyncUpdateResults {
     books: u32,
     edges: u32,
     hindrances: u32,
+    gear: u32,
+    armor: u32,
+    weapons: u32,
     latest_updated_on: DateTime<Utc>,
 }
 
@@ -53,6 +50,24 @@ async fn _create_tables( db_req: &mut OpenDbRequest ) {
             if let None = evt.db().object_store_names().find(|n| n == "game_data_hindrances" ) {
                 let _ = evt.db().create_object_store("game_data_hindrances");
                 log!("Created indexed_db store", "game_data_hindrances");
+
+            }
+
+            if let None = evt.db().object_store_names().find(|n| n == "game_data_gear" ) {
+                let _ = evt.db().create_object_store("game_data_gear");
+                log!("Created indexed_db store", "game_data_gear");
+
+            }
+
+            if let None = evt.db().object_store_names().find(|n| n == "game_data_armor" ) {
+                let _ = evt.db().create_object_store("game_data_armor");
+                log!("Created indexed_db store", "game_data_armor");
+
+            }
+
+            if let None = evt.db().object_store_names().find(|n| n == "game_data_weapons" ) {
+                let _ = evt.db().create_object_store("game_data_weapons");
+                log!("Created indexed_db store", "game_data_weapons");
 
             }
 
@@ -302,6 +317,9 @@ pub async fn index_db_save_game_data(
     let mut update_stats: GameDataSyncUpdateResults = GameDataSyncUpdateResults {
         books: 0,
         edges: 0,
+        gear: 0,
+        armor: 0,
+        weapons: 0,
         hindrances: 0,
         latest_updated_on: Utc.with_ymd_and_hms(1990, 1, 1, 0, 0, 0).unwrap(),
     };
@@ -355,7 +373,7 @@ pub async fn index_db_save_game_data(
     /* Edges */
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
     match db_req_result {
-        Ok( mut db_req ) => {
+        Ok( db_req ) => {
 
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_game_data 3");
@@ -397,7 +415,7 @@ pub async fn index_db_save_game_data(
     /* Hindrances */
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
     match db_req_result {
-        Ok( mut db_req ) => {
+        Ok( db_req ) => {
 
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_game_data 4");
@@ -437,7 +455,137 @@ pub async fn index_db_save_game_data(
         Err( _err ) => {}
     }
 
-    set_local_storage_string("game_data_level",  format!("{:?}", &game_data.data_level ).to_owned() );
+    /* weapons */
+    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result {
+        Ok( db_req ) => {
+
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            // log!("index_db_save_game_data 4");
+            for  item in &game_data.weapons {
+
+                let tx: IdbTransaction = db
+                    .transaction_on_one_with_mode(
+                        "game_data_weapons",
+                        IdbTransactionMode::Readwrite
+                    ).unwrap();
+                    let store_result: Result<IdbObjectStore, DomException> = tx.object_store("game_data_weapons");
+
+                match store_result {
+                    Ok( store ) => {
+                        match item.updated_on {
+                            Some( updated_on ) => {
+                                if update_stats.latest_updated_on < updated_on {
+                                    update_stats.latest_updated_on = updated_on;
+                                }
+                            }
+                            None => {}
+                        }
+
+                        let value_to_put: JsValue = serde_json::to_string(&item).unwrap().into();
+                        let _ = store.put_key_val_owned(item.id, &value_to_put);
+                        let _ = tx.await.into_result();
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+                update_stats.weapons += 1;
+            }
+            db.close();
+        }
+        Err( _err ) => {}
+    }
+
+    /* armor */
+    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result {
+        Ok( db_req ) => {
+
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            // log!("index_db_save_game_data armor 4");
+            for  item in &game_data.armor {
+
+                let tx: IdbTransaction = db
+                    .transaction_on_one_with_mode(
+                        "game_data_armor",
+                        IdbTransactionMode::Readwrite
+                    ).unwrap();
+                    let store_result: Result<IdbObjectStore, DomException> = tx.object_store("game_data_armor");
+
+                match store_result {
+                    Ok( store ) => {
+                        match item.updated_on {
+                            Some( updated_on ) => {
+                                if update_stats.latest_updated_on < updated_on {
+                                    update_stats.latest_updated_on = updated_on;
+                                }
+                            }
+                            None => {}
+                        }
+                        // log!(format!("index_db_save_game_data armor 5 {} {} {}",  &item.id, &item.uuid, &item.name) );
+
+                        let value_to_put: JsValue = serde_json::to_string(&item).unwrap().into();
+                        let _ = store.put_key_val_owned(item.id, &value_to_put);
+                        let _ = tx.await.into_result();
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+                update_stats.armor += 1;
+            }
+            db.close();
+        }
+        Err( _err ) => {}
+    }
+
+    /* gear */
+    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result {
+        Ok( db_req ) => {
+
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            // log!("index_db_save_game_data 4");
+            for  item in &game_data.gear {
+
+                let tx: IdbTransaction = db
+                    .transaction_on_one_with_mode(
+                        "game_data_gear",
+                        IdbTransactionMode::Readwrite
+                    ).unwrap();
+                    let store_result: Result<IdbObjectStore, DomException> = tx.object_store("game_data_gear");
+
+                match store_result {
+                    Ok( store ) => {
+                        match item.updated_on {
+                            Some( updated_on ) => {
+                                if update_stats.latest_updated_on < updated_on {
+                                    update_stats.latest_updated_on = updated_on;
+                                }
+                            }
+                            None => {}
+                        }
+
+                        let value_to_put: JsValue = serde_json::to_string(&item).unwrap().into();
+                        let _ = store.put_key_val_owned(item.id, &value_to_put);
+                        let _ = tx.await.into_result();
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+                update_stats.gear += 1;
+            }
+            db.close();
+        }
+        Err( _err ) => {}
+    }
+
+    set_local_storage_string("game_data_user_level",  format!("{:?}", &game_data.data_level ).to_owned() );
     set_local_storage_string("game_data_last_updated",  update_stats.latest_updated_on.to_string() );
 
     // log!("index_db_save_game_data 5", format!("{:?}", &game_data.data_level ).to_owned());
@@ -563,7 +711,7 @@ pub async fn clear_data_store( store_name: &str ) {
 
     // log!("clear_data_store called", store_name);
     match db_req_result {
-        Ok( mut db_req ) => {
+        Ok( db_req ) => {
 
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // let tx = db.transaction_on_one(store_name).unwrap();
@@ -595,6 +743,9 @@ pub async fn clear_game_data_local_data() {
     clear_data_store( INDEX_DB_BOOKS_STORE_NAME ).await;
     clear_data_store( "game_data_edges" ).await;
     clear_data_store( "game_data_hindrances" ).await;
+    clear_data_store( "game_data_gear" ).await;
+    clear_data_store( "game_data_weapons" ).await;
+    clear_data_store( "game_data_armor" ).await;
 }
 
 pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
@@ -739,6 +890,159 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                         match item_result {
                             Ok( item ) => {
                                 game_data.hindrances.push( item );
+                            }
+                            Err( _err ) => {
+                                return None;
+                            }
+                        }
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+            }
+            db.close();
+
+        }
+
+        Err (_err) => {
+            return None;
+        }
+    }
+
+
+    let db_req_result4 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+
+    match db_req_result4 {
+        Ok( mut db_req ) => {
+            _create_tables( &mut db_req ).await;
+            // Hindrances.
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            let tx = db.transaction_on_one("game_data_armor").unwrap();
+            let store = tx.object_store("game_data_armor").unwrap();
+
+            let result = store.get_all()
+                .unwrap()
+                .await
+                .unwrap();
+
+            tx.await.into_result().unwrap();
+
+            let iterator = js_sys::try_iter(&result).unwrap().ok_or_else(|| {
+                "need to pass iterable JS values!"
+            }).unwrap();
+
+            for row_result in iterator {
+                match row_result {
+                    Ok( row ) => {
+                        let val = row.as_string().unwrap();
+                        let item_result = serde_json::from_str(val.as_str() );
+                        match item_result {
+                            Ok( item ) => {
+                                game_data.armor.push( item );
+                            }
+                            Err( _err ) => {
+                                return None;
+                            }
+                        }
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+            }
+            db.close();
+
+        }
+
+        Err (_err) => {
+            return None;
+        }
+    }
+
+
+    let db_req_result5 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+
+    match db_req_result5 {
+        Ok( mut db_req ) => {
+            _create_tables( &mut db_req ).await;
+            // Hindrances.
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            let tx = db.transaction_on_one("game_data_weapons").unwrap();
+            let store = tx.object_store("game_data_weapons").unwrap();
+
+            let result = store.get_all()
+                .unwrap()
+                .await
+                .unwrap();
+
+            tx.await.into_result().unwrap();
+
+            let iterator = js_sys::try_iter(&result).unwrap().ok_or_else(|| {
+                "need to pass iterable JS values!"
+            }).unwrap();
+
+            for row_result in iterator {
+                match row_result {
+                    Ok( row ) => {
+                        let val = row.as_string().unwrap();
+                        let item_result = serde_json::from_str(val.as_str() );
+                        match item_result {
+                            Ok( item ) => {
+                                game_data.weapons.push( item );
+                            }
+                            Err( _err ) => {
+                                return None;
+                            }
+                        }
+                    }
+                    Err( _err ) => {
+
+                    }
+                }
+
+            }
+            db.close();
+
+        }
+
+        Err (_err) => {
+            return None;
+        }
+    }
+
+
+    let db_req_result6 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+
+    match db_req_result6 {
+        Ok( mut db_req ) => {
+            _create_tables( &mut db_req ).await;
+            // Hindrances.
+            let db: IdbDatabase = db_req.into_future().await.unwrap();
+            let tx = db.transaction_on_one("game_data_gear").unwrap();
+            let store = tx.object_store("game_data_gear").unwrap();
+
+            let result = store.get_all()
+                .unwrap()
+                .await
+                .unwrap();
+
+            tx.await.into_result().unwrap();
+
+            let iterator = js_sys::try_iter(&result).unwrap().ok_or_else(|| {
+                "need to pass iterable JS values!"
+            }).unwrap();
+
+            for row_result in iterator {
+                match row_result {
+                    Ok( row ) => {
+                        let val = row.as_string().unwrap();
+                        let item_result = serde_json::from_str(val.as_str() );
+                        match item_result {
+                            Ok( item ) => {
+                                game_data.gear.push( item );
                             }
                             Err( _err ) => {
                                 return None;

@@ -16,8 +16,6 @@ use crate::components::ui_page::UIPage;
 #[derive(Properties, PartialEq)]
 pub struct SettingsDevicesProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum  SettingsDevicesMessages {
@@ -56,7 +54,7 @@ impl Component for SettingsDevices {
 
                 global_vars.current_user.login_tokens = login_tokens.clone();
 
-                ctx.props().update_global_vars.emit( global_vars );
+                ctx.props().global_vars.update_global_vars.emit( global_vars );
 
                 return true;
             }
@@ -116,8 +114,8 @@ impl Component for SettingsDevices {
             }
         }
 
-        // let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
-        // let update_global_vars = ctx.props().update_global_vars.clone();
+        // let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+        // let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
         // let global_vars = ctx.props().global_vars.clone();
 
         let update_login_tokens = ctx.link().callback(SettingsDevicesMessages::UpdateLoginItems);
@@ -155,8 +153,8 @@ impl Component for SettingsDevices {
                         html! {
                             <SettingsDeviceLineItem
                                 global_vars={ctx.props().global_vars.clone()}
-                                // update_global_vars={ctx.props().update_global_vars.clone()}
-                                open_confirmation_dialog={ctx.props().open_confirmation_dialog.clone()}
+                                // update_global_vars={ctx.props().global_vars.update_global_vars.clone()}
+                                open_confirmation_dialog={ctx.props().global_vars.open_confirmation_dialog.clone()}
                                 token={device}
                                 update_login_tokens={update_login_tokens.clone()}
                             />
@@ -326,7 +324,9 @@ impl Component for SettingsDeviceLineItem {
                 <tr>
                     <td class={"no-wrap"}>
                         <div class={"flex"}>
+                        <form>
                             <div class="flex-grow">
+
                             if device.logged_out {
                                 <div class="text-center">
                                 if !self.friendly_name.is_empty() {
@@ -352,13 +352,16 @@ impl Component for SettingsDeviceLineItem {
                             </div>
                             if !device.logged_out {
                             <button
+                                type="submit"
                                 class={"btn btn-primary"}
                                 disabled={self.friendly_name == ctx.props().token.friendly_name}
                                 onclick={ctx.link().callback( SettingsDeviceLineItemMessage::SaveDeviceName )}
                             >
                                 <i class={"fa fa-save"} />
                             </button>
+
                             }
+                            </form>
                         </div>
                     </td>
                     <td class={"min-width no-wrap"}>{ctx.props().global_vars.current_user.format_datetime( device.registered.clone(), false, false, false)}</td>

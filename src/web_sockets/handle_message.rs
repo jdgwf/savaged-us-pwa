@@ -105,10 +105,10 @@ pub fn handle_message(
             let mut new_global_vars = global_vars.clone();
             new_global_vars.game_data = msg.game_data.clone();
 
-            let game_data_level = get_local_storage_string("game_data_level", "".to_owned() );
+            let game_data_user_level = get_local_storage_string("game_data_user_level", "".to_owned() );
             let game_data_last_updated = get_local_storage_string("game_data_last_updated", "".to_owned() );
 
-            log!( format!("handle_message GameDataPackage game_data_level {}", game_data_level) );
+            log!( format!("handle_message GameDataPackage game_data_user_level {}", game_data_user_level) );
             log!( format!("handle_message GameDataPackage game_data_last_updated {}", game_data_last_updated) );
             // new_global_vars.user_loading = false;
 
@@ -128,9 +128,9 @@ pub fn handle_message(
 
         WebsocketMessageType::Saves => {
 
-            let mut new_global_vars = global_vars.clone();
+            let new_global_vars = global_vars.clone();
             let server_root = global_vars.server_root.to_owned();
-            // new_global_vars.saves = msg.saves.clone();
+
 
             match msg.saves {
                 Some( saves ) => {

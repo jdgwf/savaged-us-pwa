@@ -22,7 +22,6 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 #[derive(Properties, PartialEq)]
 pub struct RegisterProps {
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum RegisterMessage {

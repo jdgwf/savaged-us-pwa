@@ -45,8 +45,6 @@ pub enum AdminGameDataRoute {
 fn content_switch(
     routes: AdminGameDataRoute,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
-    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
     let mut global_vars = global_vars.clone();
@@ -61,9 +59,7 @@ fn content_switch(
 
         AdminGameDataRoute::Hindrances => html! {
             <AdminGameDataHindrances
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
@@ -73,12 +69,8 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataRouterProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
+
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum AdminGameDataRouterMessage {
@@ -115,7 +107,7 @@ impl Component for AdminGameDataRouter {
             //     set_local_storage_string( "saves_folder", folder_name);
             // }
         }
-        true
+
     }
 
     fn changed(
@@ -126,8 +118,7 @@ impl Component for AdminGameDataRouter {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-        // read_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
+
 
         true
     }
@@ -136,8 +127,6 @@ impl Component for AdminGameDataRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        let update_global_vars = ctx.props().update_global_vars.clone();
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
@@ -155,8 +144,6 @@ impl Component for AdminGameDataRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />
@@ -175,8 +162,6 @@ impl Component for AdminGameDataRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />

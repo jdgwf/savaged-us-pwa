@@ -9,58 +9,55 @@ use gloo_net::websocket::{
 
 };
 
+use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct GlobalVars {
-    pub login_token: String,
-    pub current_user: User,
-    pub user_loading: bool,
     pub api_root: String,
-    pub server_root: String,
-    pub site_title: String,
-
-    pub server_side_renderer: bool,
-    pub offline: bool,
-
-    // pub update_global_vars: Callback<GlobalVars>,
-    pub send_websocket: Callback<WebSocketMessage>,
-    pub game_data: Option<GameDataPackage>,
-    pub saves: Option<Vec<SaveDBRow>>,
-
     pub current_menu: String,
     pub current_sub_menu: String,
+    pub current_user: User,
+    pub game_data: Option<GameDataPackage>,
     pub hide_popup_menus_callback: Callback<MouseEvent>,
-    pub toggle_mobile_menu_callback: Callback<MouseEvent>,
+    pub login_token: String,
     pub logout_callback: Callback<MouseEvent>,
-
-    pub show_mobile_menu: bool,
-
+    pub offline: bool,
+    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
+    pub saves: Option<Vec<SaveDBRow>>,
+    pub send_websocket: Callback<WebSocketMessage>,
+    pub server_root: String,
+    pub server_side_renderer: bool,
     pub server_side_renderer_history: Option<AnyHistory>,
+    pub show_mobile_menu: bool,
+    pub site_title: String,
+    pub toggle_mobile_menu_callback: Callback<MouseEvent>,
+    pub update_global_vars: Callback<GlobalVars>,
+    pub user_loading: bool,
 }
 
 impl Default for GlobalVars {
     fn default() -> Self {
         Self {
-            current_user: User::default(),
-            login_token: "".to_owned(),
-            user_loading: true,
-            offline: true,
             api_root: "".to_owned(),
-            server_root: "".to_owned(),
-            site_title: "".to_owned(),
-            show_mobile_menu: false,
-            server_side_renderer: false,
-            // update_global_vars: Callback::noop(),
-            send_websocket: Callback::noop(),
-            hide_popup_menus_callback: Callback::noop(),
-            toggle_mobile_menu_callback: Callback::noop(),
-            logout_callback: Callback::noop(),
-            game_data: None,
-            saves: None,
-
             current_menu: "".to_owned(),
             current_sub_menu: "".to_owned(),
-
+            current_user: User::default(),
+            game_data: None,
+            hide_popup_menus_callback: Callback::noop(),
+            login_token: "".to_owned(),
+            logout_callback: Callback::noop(),
+            offline: true,
+            open_confirmation_dialog: Callback::noop(),
+            saves: None,
+            send_websocket: Callback::noop(),
+            server_root: "".to_owned(),
+            server_side_renderer: false,
             server_side_renderer_history: None,
+            show_mobile_menu: false,
+            site_title: "".to_owned(),
+            toggle_mobile_menu_callback: Callback::noop(),
+            update_global_vars: Callback::noop(),
+            user_loading: true,
         }
     }
 }

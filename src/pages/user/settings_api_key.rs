@@ -24,8 +24,6 @@ use crate::components::ui_page::UIPage;
 #[derive(Properties, PartialEq)]
 pub struct SettingsAPIKeyProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum SettingsAPIKeyMessage {
@@ -67,7 +65,7 @@ impl Component for SettingsAPIKey {
                     let login_token = self.global_vars.login_token.to_owned();
                     let api_root = self.global_vars.api_root.to_owned();
                     let mut global_vars = self.global_vars.clone();
-                    let update_global_vars = ctx.props().update_global_vars.clone();
+                    let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                     spawn_local (
                         async move {
@@ -125,15 +123,15 @@ impl Component for SettingsAPIKey {
             SettingsAPIKeyMessage::RegenerateAPIKey( _ ) => {
 
                 let dialog = ConfirmationDialogDefinition {
-                    title: "API Key Regeneration Confirmation".to_string(),
+                    title: Some("API Key Regeneration Confirmation".to_string()),
                     callback: ctx.link().callback(SettingsAPIKeyMessage::ConfirmYes),
-                    html: html! { <> </> },
-                    text: "Remember: any attached apps will lose access if you regenerate your API key. Are you sure you want to do this?".to_string(),
-                    label_yes: "Yes".to_string(),
-                    label_no: "No, thank you".to_string(),
+                    html: None,
+                    text: Some("Remember: any attached apps will lose access if you regenerate your API key. Are you sure you want to do this?".to_string()),
+                    label_yes: None,
+                    label_no: None,
                 };
 
-                ctx.props().open_confirmation_dialog.emit( dialog );
+                ctx.props().global_vars.open_confirmation_dialog.emit( dialog );
 
                 return true;
             }
@@ -239,6 +237,7 @@ impl Component for SettingsAPIKey {
                 <p>{"Click the following button if you need to regenerate your API key. Don't do this unless you feel your data has been compromised, as any attached apps will lose access."}</p>
                 <div class={"text-center"}>
                     <button
+                        type="button"
                         class="btn btn-primary"
                         onclick={ctx.link().callback( SettingsAPIKeyMessage::RegenerateAPIKey )}
                     >

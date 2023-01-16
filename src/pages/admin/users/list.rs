@@ -1,7 +1,6 @@
 use savaged_libs::admin_libs::AdminPagingStatistics;
 use savaged_libs::{user::User, admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
-use standard_components::libs::local_storage_shortcuts::{set_local_storage_string, get_local_storage_u32, set_local_storage_u32};
-use yew_router::prelude::*;
+use standard_components::libs::local_storage_shortcuts::{ get_local_storage_u32, set_local_storage_u32};
 use yew::prelude::*;
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
@@ -10,19 +9,15 @@ use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Error;
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
-use crate::libs::fetch_api::fetch_api;
-use gloo_console::{ error, log };
+use gloo_console::{ error };
 
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersListProps {
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum AdminUsersListMessage {
@@ -107,7 +102,7 @@ impl Component for AdminUsersList {
                 set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
 
                 paging_sorting_and_filter.login_token = Some(login_token);
-                let paging = paging_sorting_and_filter.clone();
+                // let paging = paging_sorting_and_filter.clone();
 
                 spawn_local (
                     async move {
@@ -181,6 +176,7 @@ impl Component for AdminUsersList {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
+                global_vars={ctx.props().global_vars.clone()}
             />
         </div>
                 <h2><i class="fa fa-users" /><Nbsp />{"Admin Users"}</h2>

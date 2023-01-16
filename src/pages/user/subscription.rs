@@ -19,8 +19,6 @@ use crate::libs::global_vars::GlobalVars;
 #[derive(Properties, PartialEq)]
 pub struct UserSubscriptionProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserSubscriptionMessage {

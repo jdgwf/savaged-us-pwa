@@ -23,8 +23,6 @@ use serde_json::Error;
 #[derive(Properties, PartialEq)]
 pub struct UserNotificationsProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserNotificationsMessage {
@@ -393,7 +391,7 @@ impl Component for UserNotifications {
 
                 // log!("SetNotifications updated_user", updated_user.id, new_count);
                 if self.global_vars.current_user.id > 0 {
-                    let update_global_vars = ctx.props().update_global_vars.clone();
+                    let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                     update_global_vars.emit( self.global_vars.clone() );
                 }
 
@@ -522,6 +520,7 @@ impl Component for UserNotifications {
 
                     <div class="width-50-perc">
                         <button
+                            type="button"
                             class={"btn btn-primary"}
                             onclick={ctx.link().callback(move |_| UserNotificationsMessage::MarkAllRead())}
                         >
@@ -533,6 +532,7 @@ impl Component for UserNotifications {
                 if ctx.props().global_vars.current_user.is_admin {
                     <div class="width-50-perc text-right">
                         <button
+                            type="button"
                             class={"btn btn-primary"}
                             onclick={ctx.link().callback(move |_| UserNotificationsMessage::DeleteBasicAdmin())}
                         >
@@ -590,6 +590,7 @@ impl Component for UserNotifications {
                                         <th>{msg.subject}</th>
                                         <th class={"min-width text-center"}>
                                             <button
+                                                type="button"
                                                 class={"btn btn-danger"}
                                                 onclick={ctx.link().callback(move |_| UserNotificationsMessage::DeleteMessage(msg.id))}
                                             >

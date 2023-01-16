@@ -1,38 +1,20 @@
 pub mod about;
-pub mod todos;
-pub mod tech;
+pub mod contact_us;
 pub mod partners;
 pub mod privacy_policy;
-pub mod contact_us;
+pub mod tech;
+pub mod todos;
 
-use std::f32::consts::E;
-
-use yew_router::history::{AnyHistory, History, MemoryHistory};
-
-use yew_router::prelude::*;
-use yew::prelude::*;
-
-use yew::{function_component, html};
-
-// use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-use crate::main_app::SubmenuData;
-use standard_components::ui::nbsp::Nbsp;
-use crate::libs::global_vars::GlobalVars;
-use privacy_policy::InfoPrivacyPolicy;
-use partners::InfoPartners;
-use contact_us::InfoContactUs;
-use tech::InfoTech;
 use about::InfoAbout;
+use contact_us::InfoContactUs;
+use crate::libs::global_vars::GlobalVars;
+use partners::InfoPartners;
+use privacy_policy::InfoPrivacyPolicy;
+use tech::InfoTech;
 use todos::InfoTodos;
-
-// use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use yew::prelude::*;
+use yew::{ html};
+use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum InfoRoute {
@@ -61,59 +43,46 @@ pub enum InfoRoute {
 fn content_switch(
     routes: InfoRoute,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
-    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
-    let mut global_vars = global_vars.clone();
+    // let mut global_vars = global_vars.clone();
 
     match routes {
 
         InfoRoute::InfoAbout => html! {
             <InfoAbout
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         InfoRoute::InfoTech => html! {
             <InfoTech
                 global_vars={global_vars}
-                // update_global_vars={update_global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
+
             />
         },
 
         InfoRoute::InfoTodos => html! {
             <InfoTodos
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         InfoRoute::InfoContactUs => html! {
             <InfoContactUs
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         InfoRoute::InfoPrivacyPolicy => html! {
             <InfoPrivacyPolicy
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         InfoRoute::InfoPartners => html! {
             <InfoPartners
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
@@ -123,15 +92,10 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct InfoRouterProps {
-    #[prop_or_default]
-    // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub struct InfoRouterMessage {
-
 }
 
 pub struct InfoRouter {
@@ -142,27 +106,25 @@ impl Component for InfoRouter {
     type Properties = InfoRouterProps;
 
     fn create(
-        ctx: &Context<Self>
+        _ctx: &Context<Self>
     ) -> Self {
 
         InfoRouter {
         }
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &InfoRouterProps,
-    ) -> bool {
-        true
-    }
+    // fn changed(
+    //     &mut self,
+    //     ctx: &Context<Self>,
+    //     _props: &InfoRouterProps,
+    // ) -> bool {
+    //     true
+    // }
 
     fn view(
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        let update_global_vars = ctx.props().update_global_vars.clone();
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
@@ -180,8 +142,6 @@ impl Component for InfoRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />
@@ -202,8 +162,6 @@ impl Component for InfoRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />

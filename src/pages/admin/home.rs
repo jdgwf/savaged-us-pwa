@@ -1,8 +1,8 @@
-use yew::{function_component, Properties, Html, html};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-
 use standard_components::ui::nbsp::Nbsp;
+use yew::{function_component, Properties, Html, html};
+
 #[derive(Properties, PartialEq)]
 pub struct AdminHomeProps {
     pub global_vars: GlobalVars,

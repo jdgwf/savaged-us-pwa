@@ -11,6 +11,7 @@ body {
             width: 100%;
             resize: vertical;
             min-height: 100px;
+            border: 0;
         }
 
         .markdown-edit-preview {
@@ -31,6 +32,7 @@ body {
             outline: none !important;
         }
 
+        textarea:read-only,
         input[type=email]:read-only,
         input[type=text]:read-only,
         input[type=password]:read-only {
@@ -207,13 +209,13 @@ body {
         }
 
         &.btn-warning {
-            color: #000;
-            background-color: #ffc107;
-            border-color: #ffc107;
+            color: #fff;
+            background-color: #daa405;
+            border-color: #daa405;
             &:hover {
-                color: #000;
-                background-color: #ffca2c;
-                border-color: #ffc720;
+                color: #fff;
+                background-color: #deb128;
+                border-color: #deb128;
             }
         }
 

@@ -7,29 +7,25 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::edit_forms::hindrance::EditHindrance;
 use crate::components::standard_modal::StandardModal;
 use crate::components::ui_page::UIPage;
-use crate::libs::fetch_api::fetch_api;
+use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
 use crate::libs::global_vars::GlobalVars;
 use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
 use gloo_console::{ error, log };
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::book::Book;
-use savaged_libs::admin_libs::AdminPagingStatistics;
-use savaged_libs::game_data::GameData;
+use savaged_libs::admin_libs::{AdminPagingStatistics, AdminSavePackage, AdminSaveReturn, AdminDeletePackage};
+use savaged_libs::game_data_row::GameDataRow;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
 use serde_json::Error;
-use standard_components::libs::local_storage_shortcuts::{set_local_storage_string, get_local_storage_u32, set_local_storage_u32};
+use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, set_local_storage_u32};
 use standard_components::ui::nbsp::Nbsp;
-use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHindrancesProps {
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum AdminGameDataHindrancesMessage {
@@ -37,12 +33,17 @@ pub enum AdminGameDataHindrancesMessage {
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
     UpdateHindrance(Hindrance),
+
     ViewItem( u32 ),
-    EditItem( u32 ),
+    EditItemDialog( u32 ),
     DeleteItem( u32 ),
     DuplicateItem( u32 ),
+
+    AddItemDialog(bool),
+
     Cancel(bool),
-    AddItem(bool),
+    SaveItemAndLeaveOpen(bool),
+    SaveItem(bool),
 }
 pub struct AdminGameDataHindrances {
     global_vars: GlobalVars,
@@ -120,7 +121,7 @@ impl Component for AdminGameDataHindrances {
                 return false;
             }
 
-            AdminGameDataHindrancesMessage::EditItem( id ) => {
+            AdminGameDataHindrancesMessage::EditItemDialog( id ) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -133,25 +134,419 @@ impl Component for AdminGameDataHindrances {
                 return false;
             }
 
-            AdminGameDataHindrancesMessage::AddItem( _nv ) => {
-                log!("AdminGameDataHindrancesMessage::AddItem");
+            AdminGameDataHindrancesMessage::AddItemDialog( _nv ) => {
+                log!("AdminGameDataHindrancesMessage::AddItemDialog");
+                let mut new_hind = Hindrance::new();
+                new_hind.book_id = self.paging_sorting_and_filter.filter_book;
+                self.editing_item = Some( new_hind );
+
+                self.is_editing = false;
+                self.is_adding = true;
+                return true;
+            }
+
+            AdminGameDataHindrancesMessage::SaveItem( as_new ) => {
+                log!("AdminGameDataHindrancesMessage::SaveItem");
+                let self_editing_item = self.editing_item.clone();
+                let self_is_adding = self.is_adding;
+                match self_editing_item {
+                    Some( mut editing_item ) => {
+                        if as_new || self_is_adding {
+                            editing_item.id = 0;
+                        }
+                        let req = AdminSavePackage {
+                            id: editing_item.id,
+                            fetch_parameters: self.paging_sorting_and_filter.clone(),
+                            data: serde_json::to_string(&editing_item).unwrap(),
+                            login_token: Some(self.global_vars.login_token.to_owned()),
+                            api_key: None,
+                        };
+
+
+                        let api_root = self.global_vars.api_root.to_owned();
+                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        spawn_local (
+                            async move {
+                                let result = fetch_api_save_game_data_row(
+                                    (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                    req,
+
+                                ).await;
+
+                                match result {
+                                    Ok( value ) => {
+                                        let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
+                                        match save_result {
+                                            Ok( save_result_data) => {
+                                                match save_result_data.game_data {
+                                                    Some( vec_val ) => {
+
+                                                        let mut rv: Vec<Hindrance> = Vec::new();
+                                                        for mut data in vec_val.into_iter() {
+                                                            data.created_by_user = None;
+                                                            data.updated_by_user = None;
+                                                            data.updated_by_user = None;
+
+                                                            // log!("data", format!("{:?}", data) );
+                                                            let hind = data.to_hindrance().unwrap();
+                                                            // log!("data.updated_on", data.updated_on);
+                                                            // log!("data.created_on", data.created_on);
+
+                                                            // log!("hind.updated_on", hind.updated_on);
+                                                            // log!("hind.created_on", hind.created_on);
+                                                            // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
+                                                            // log!("data.updated_by", data.updated_by);
+                                                            // log!("data.created_by", data.created_by);
+
+                                                            // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
+                                                            // log!("hind.updated_by", hind.updated_by);
+                                                            // log!("hind.created_by", hind.created_by);
+                                                            rv.push( hind )
+                                                        }
+                                                        set_items.emit( rv );
+                                                    }
+
+                                                    None => {
+                                                        set_items.emit( Vec::new() );
+                                                        // error!("get_items Err()", &err );
+                                                    }
+                                                }
+                                            }
+                                            Err( err ) => {
+                                                let err_string: String = format!("SaveItem Serde Err(): {}", &err);
+                                                // set_paging.emit( None );
+                                                set_items.emit( Vec::new() );
+                                                error!( &err_string  );
+                                            }
+                                        }
+
+                                    }
+
+                                    Err( err ) => {
+                                        set_items.emit( Vec::new() );
+                                        error!("get_items paging Err()", &err );
+                                    }
+                                }
+                            }
+                        );
+
+
+                        self.editing_item = None;
+                    }
+                    None => {}
+                }
+            }
+
+            AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen( as_new ) => {
+                log!("AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen");
+                let self_editing_item = self.editing_item.clone();
+                let self_is_adding = self.is_adding;
+                match self_editing_item {
+                    Some( mut editing_item ) => {
+                        if as_new || self_is_adding {
+                            editing_item.id = 0;
+                        }
+                        let req = AdminSavePackage {
+                            id: editing_item.id,
+                            fetch_parameters: self.paging_sorting_and_filter.clone(),
+                            data: serde_json::to_string(&editing_item).unwrap(),
+                            login_token: Some(self.global_vars.login_token.to_owned()),
+                            api_key: None,
+                        };
+
+
+                        let api_root = self.global_vars.api_root.to_owned();
+                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        spawn_local (
+                            async move {
+                                let result = fetch_api_save_game_data_row(
+                                    (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                    req,
+
+                                ).await;
+
+                                match result {
+                                    Ok( value ) => {
+                                        let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
+                                        match save_result {
+                                            Ok( save_result_data) => {
+                                                match save_result_data.game_data {
+                                                    Some( vec_val ) => {
+
+                                                        let mut rv: Vec<Hindrance> = Vec::new();
+                                                        for mut data in vec_val.into_iter() {
+                                                            data.created_by_user = None;
+                                                            data.updated_by_user = None;
+                                                            data.updated_by_user = None;
+
+                                                            // log!("data", format!("{:?}", data) );
+                                                            let hind = data.to_hindrance().unwrap();
+                                                            // log!("data.updated_on", data.updated_on);
+                                                            // log!("data.created_on", data.created_on);
+
+                                                            // log!("hind.updated_on", hind.updated_on);
+                                                            // log!("hind.created_on", hind.created_on);
+                                                            // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
+                                                            // log!("data.updated_by", data.updated_by);
+                                                            // log!("data.created_by", data.created_by);
+
+                                                            // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
+                                                            // log!("hind.updated_by", hind.updated_by);
+                                                            // log!("hind.created_by", hind.created_by);
+                                                            rv.push( hind )
+                                                        }
+                                                        set_items.emit( rv );
+                                                    }
+
+                                                    None => {
+                                                        set_items.emit( Vec::new() );
+                                                        // error!("get_items Err()", &err );
+                                                    }
+                                                }
+                                            }
+                                            Err( err ) => {
+                                                let err_string: String = format!("SaveItem Serde Err(): {}", &err);
+                                                // set_paging.emit( None );
+                                                set_items.emit( Vec::new() );
+                                                error!( &err_string  );
+                                            }
+                                        }
+
+                                    }
+
+                                    Err( err ) => {
+                                        set_items.emit( Vec::new() );
+                                        error!("get_items paging Err()", &err );
+                                    }
+                                }
+                            }
+                        );
+
+
+                        // self.editing_item = None;
+                    }
+                    None => {}
+                }
             }
 
             AdminGameDataHindrancesMessage::DeleteItem( id ) => {
                 log!("AdminGameDataHindrancesMessage::DeleteItem ", id);
+
+                for item in self.items.clone().into_iter() {
+                    if item.id == id {
+                        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+
+                        let api_root = self.global_vars.api_root.to_owned();
+                        let login_token = Some(self.global_vars.login_token.to_owned());
+                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
+
+
+                        let dialog = ConfirmationDialogDefinition {
+                            title: Some("Deletion Confirmation".to_owned()),
+
+                            html: None,
+                            text: Some( "Are you sure you would like to delete '".to_owned() + &item.name + &"'?" ),
+                            label_yes: None,
+                            label_no: None,
+                            callback: Callback::from( move |_clicked_yes| {
+
+
+
+                                let api_root = api_root.to_owned();
+                                let login_token = login_token.clone();
+                                let set_items = set_items.clone();
+                                let paging_sorting_and_filter = paging_sorting_and_filter.clone();
+
+                                let mut editing_item = item.clone();
+
+                                editing_item.id = 0;
+
+                                let req = AdminDeletePackage {
+                                    id: id,
+                                    fetch_parameters: paging_sorting_and_filter,
+                                    login_token: login_token,
+                                    api_key: None,
+                                };
+
+                                spawn_local (
+                                    async move {
+                                        let result = fetch_api_delete_game_data_row(
+                                            (api_root + "/admin/game-data/hindrances/delete").to_owned(),
+                                            req,
+                                        ).await;
+
+                                        match result {
+                                            Ok( value ) => {
+                                                let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
+                                                match save_result {
+                                                    Ok( save_result_data) => {
+                                                        match save_result_data.game_data {
+                                                            Some( vec_val ) => {
+
+                                                                let mut rv: Vec<Hindrance> = Vec::new();
+                                                                for mut data in vec_val.into_iter() {
+                                                                    data.created_by_user = None;
+                                                                    data.updated_by_user = None;
+                                                                    data.updated_by_user = None;
+
+                                                                    let hind = data.to_hindrance().unwrap();
+
+                                                                    rv.push( hind )
+                                                                }
+                                                                set_items.emit( rv );
+                                                            }
+
+                                                            None => {
+                                                                set_items.emit( Vec::new() );
+                                                                // error!("get_items Err()", &err );
+                                                            }
+                                                        }
+                                                    }
+                                                    Err( err ) => {
+                                                        let err_string: String = format!("SaveItem Serde Err(): {}", &err);
+                                                        // set_paging.emit( None );
+                                                        set_items.emit( Vec::new() );
+                                                        error!( &err_string  );
+                                                    }
+                                                }
+
+                                            }
+
+                                            Err( err ) => {
+                                                set_items.emit( Vec::new() );
+                                                error!("get_items paging Err()", &err );
+                                            }
+                                        }
+                                    }
+                                );
+                                // return false;
+                            }),
+                        };
+
+
+                        open_confirmation_dialog.emit( dialog );
+                    }
+                }
             }
 
             AdminGameDataHindrancesMessage::DuplicateItem( id ) => {
                 log!("AdminGameDataHindrancesMessage::DuplicateItem", id);
+
+                for item in self.items.clone().into_iter() {
+                    if item.id == id {
+                        // self.editing_item = Some(item.clone());
+                        // self.is_editing = false;
+                        // self.is_adding = false;
+                        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+
+                        let api_root = self.global_vars.api_root.to_owned();
+                        let login_token = Some(self.global_vars.login_token.to_owned());
+                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
+                        let item = item.clone();
+
+                        let dialog = ConfirmationDialogDefinition {
+                            title: Some("Duplication Confirmation".to_owned()),
+
+                            html: None,
+                            text: Some( "Are you sure you would like to duplicate '".to_owned() + &item.name + &"'?" ),
+                            label_yes: None,
+                            label_no: None,
+                            callback: Callback::from( move |_clicked_yes| {
+
+
+
+                                let api_root = api_root.to_owned();
+                                let login_token = login_token.clone();
+                                let set_items = set_items.clone();
+                                let paging_sorting_and_filter = paging_sorting_and_filter.clone();
+
+                                let mut editing_item = item.clone();
+
+                                editing_item.id = 0;
+
+                                let req = AdminSavePackage {
+                                    id: editing_item.id,
+                                    fetch_parameters: paging_sorting_and_filter,
+                                    data: serde_json::to_string(&editing_item).unwrap(),
+                                    login_token: login_token,
+                                    api_key: None,
+                                };
+
+                                spawn_local (
+                                    async move {
+                                        let result = fetch_api_save_game_data_row(
+                                            (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                            req,
+
+                                        ).await;
+
+                                        match result {
+                                            Ok( value ) => {
+                                                let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
+                                                match save_result {
+                                                    Ok( save_result_data) => {
+                                                        match save_result_data.game_data {
+                                                            Some( vec_val ) => {
+
+                                                                let mut rv: Vec<Hindrance> = Vec::new();
+                                                                for mut data in vec_val.into_iter() {
+                                                                    data.created_by_user = None;
+                                                                    data.updated_by_user = None;
+                                                                    data.updated_by_user = None;
+
+                                                                    let hind = data.to_hindrance().unwrap();
+
+                                                                    rv.push( hind )
+                                                                }
+                                                                set_items.emit( rv );
+                                                            }
+
+                                                            None => {
+                                                                set_items.emit( Vec::new() );
+                                                                // error!("get_items Err()", &err );
+                                                            }
+                                                        }
+                                                    }
+                                                    Err( err ) => {
+                                                        let err_string: String = format!("SaveItem Serde Err(): {}", &err);
+                                                        // set_paging.emit( None );
+                                                        set_items.emit( Vec::new() );
+                                                        error!( &err_string  );
+                                                    }
+                                                }
+
+                                            }
+
+                                            Err( err ) => {
+                                                set_items.emit( Vec::new() );
+                                                error!("get_items paging Err()", &err );
+                                            }
+                                        }
+                                    }
+                                );
+                                // return false;
+                            }),
+                        };
+
+
+                        open_confirmation_dialog.emit( dialog );
+
+                        return false;
+                    }
+                }
+
             }
 
-            AdminGameDataHindrancesMessage::Cancel( new_value ) => {
+            AdminGameDataHindrancesMessage::Cancel( _new_value ) => {
                 log!("AdminGameDataHindrancesMessage::Cancel");
                 self.editing_item = None;
             }
 
             AdminGameDataHindrancesMessage::UpdateHindrance( new_value ) => {
                 self.editing_item = Some(new_value);
+                return false;
 
             }
 
@@ -244,8 +639,6 @@ impl Component for AdminGameDataHindrances {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-        self.global_vars.current_sub_menu = "admin-items".to_owned();
-
         true
     }
 
@@ -259,7 +652,7 @@ impl Component for AdminGameDataHindrances {
 
         let mut non_filtered_count: u32 = 0;
         let mut filtered_count: u32= 0;
-        let mut current_book_id: u32 = 0;
+
         match &self.paging_data {
             Some( paging_data ) => {
                 non_filtered_count = paging_data.non_filtered_count;
@@ -277,14 +670,11 @@ impl Component for AdminGameDataHindrances {
 
         let mut show_book_column = true;
 
+        let mut current_book_id: u32 = 0;
         if self.paging_sorting_and_filter.filter_book > 0 {
             show_book_column = false;
             current_book_id = self.paging_sorting_and_filter.filter_book;
-        } else {
-            current_book_id = 0;
         }
-
-
 
         let mut book_list: Option<Vec<Book>> = None;
 
@@ -300,45 +690,64 @@ impl Component for AdminGameDataHindrances {
             Some( editing_item ) => {
                 let mut editing_title = Some("Viewing Hindrance".to_owned());
 
-                let mut save_callback:Option<Callback<bool>> = Some( Callback::noop() );
+                let mut save_callback:Option<Callback<bool>> = None;
                 let mut add_callback: Option<Callback<bool>>= None;
                 let mut save_as_new_callback: Option<Callback<bool>>= None;
+                let mut save_and_leave_open_callback: Option<Callback<bool>>= None;
 
                 let mut read_only = true;
+
                 if self.is_adding {
                     editing_title = Some("Adding Hindrance".to_owned());
+                    add_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
+                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen).clone());
                     read_only = false;
                 }
+
                 if self.is_editing {
                     editing_title = Some("Editing Hindrance".to_owned());
+                    save_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
+                    save_as_new_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
+                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen).clone());
                     read_only = false;
                 }
+
+                let mut book_list: Vec<Book> = Vec::new();
+
+                match self.paging_data.clone() {
+                    Some( paging_data ) => {
+                        book_list = paging_data.book_list.unwrap_or( Vec::new() );
+                    }
+                    None => {}
+                }
+
                 edit_modal = html!{
                 <StandardModal
                     xl={true}
                     title={editing_title}
+                    close_cancel_callback={Some(ctx.link().callback(AdminGameDataHindrancesMessage::Cancel).clone())}
+                    save_callback={save_callback}
+                    add_callback={add_callback}
+                    save_as_new_callback={save_as_new_callback}
+                    save_and_leave_open_callback={save_and_leave_open_callback}
                 >
                     <EditHindrance
+                        for_admin={true}
                         global_vars={ctx.props().global_vars.clone()}
                         readonly={read_only}
                         edit_item={editing_item.clone()}
-
+                        book_list={book_list}
                         on_changed_callback={ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindrance).clone()}
                     />
 
-                    <StandardFormSaveButtons
-                        close_cancel_callback={ctx.link().callback(AdminGameDataHindrancesMessage::Cancel).clone()}
-                        save_callback={save_callback}
-                        add_callback={add_callback}
-                        save_as_new_callback={save_as_new_callback}
-                    />
+
                 </StandardModal>
                 };
             }
             None => {}
         }
 
-        let add_item = ctx.link().callback(AdminGameDataHindrancesMessage::AddItem);
+        let add_item = ctx.link().callback(AdminGameDataHindrancesMessage::AddItemDialog);
 
         html! {
         <UIPage
@@ -353,6 +762,7 @@ impl Component for AdminGameDataHindrances {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
+                global_vars={ctx.props().global_vars.clone()}
             />
         </div>
                 <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances"}</h2>
@@ -381,10 +791,11 @@ impl Component for AdminGameDataHindrances {
                             <th class="min-width">
                             if global_vars.current_user.admin_can_write_book(
                                 &book_list,
-                                &current_book_id,
+                                current_book_id,
                             ) {
 
                                 <button
+                                    type="button"
                                     class="btn btn-xs full-width no-margins btn-success"
                                     onclick={move |e: MouseEvent| {
                                         let add_item = add_item.clone();
@@ -443,23 +854,23 @@ impl Component for AdminGameDataHindrances {
 
                                 if global_vars.current_user.admin_can_read_item (
                                     &book_list,
-                                    &row.created_by,
-                                    &row.book_id,
+                                    row.created_by,
+                                    row.book_id,
                                 ) {
                                     callback_view_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::ViewItem));
                                 }
                                 if global_vars.current_user.admin_can_write_item (
                                     &book_list,
-                                    &row.created_by,
-                                    &row.book_id,
+                                    row.created_by,
+                                    row.book_id,
                                 ) {
-                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItem));
+                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItemDialog));
                                     callback_duplicate_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DuplicateItem));
                                 }
                                 if global_vars.current_user.admin_can_delete_item (
                                     &book_list,
-                                    &row.created_by,
-                                    &row.book_id,
+                                    row.created_by,
+                                    row.book_id,
                                 ) {
                                     callback_delete_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DeleteItem));
                                 }
@@ -545,7 +956,6 @@ async fn _get_data(
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
     let api_root = global_vars.api_root.clone();
-    let mut paging_sorting_and_filter = paging_sorting_and_filter.clone();
 
     let result = fetch_admin_api(
         (api_root.to_owned() + "/admin/game-data/hindrances/get").to_owned(),
@@ -554,27 +964,14 @@ async fn _get_data(
 
     match result {
         Ok( value ) => {
-            // let vec_val_result = value.into_serde::< Vec<GameData> >();
-            let vec_val_result: Result<Vec<GameData>, Error> = JsValueSerdeExt::into_serde(&value);
+            // let vec_val_result = value.into_serde::< Vec<GameDataRow> >();
+            let vec_val_result: Result<Vec<GameDataRow>, Error> = JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok( vec_val ) => {
 
                     let mut rv: Vec<Hindrance> = Vec::new();
                     for data in vec_val.into_iter() {
-                        // log!("data", format!("{:?}", data) );
                         let hind = data.to_hindrance().unwrap();
-                        // log!("data.updated_on", data.updated_on);
-                        // log!("data.created_on", data.created_on);
-
-                        // log!("hind.updated_on", hind.updated_on);
-                        // log!("hind.created_on", hind.created_on);
-                        // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
-                        // log!("data.updated_by", data.updated_by);
-                        // log!("data.created_by", data.created_by);
-
-                        // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
-                        // log!("hind.updated_by", hind.updated_by);
-                        // log!("hind.created_by", hind.created_by);
                         rv.push( hind )
                     }
                     set_items.emit( rv );
@@ -601,7 +998,7 @@ async fn _get_data(
 
     match result {
         Ok( value ) => {
-            // let vec_val_result = value.into_serde::< Vec<GameData> >();
+            // let vec_val_result = value.into_serde::< Vec<GameDataRow> >();
             let vec_val_result: Result<AdminPagingStatistics, Error> = JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok( vec_val ) => {

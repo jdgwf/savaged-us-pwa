@@ -1,19 +1,15 @@
-use std::ops::Deref;
-
+use crate::components::admin::book_select::BookSelect;
+use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
+use crate::libs::global_vars::GlobalVars;
+use savaged_libs::book::Book;
 use savaged_libs::player_character::hindrance::Hindrance;
-use savaged_libs::save_db_row::SaveDBRow;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
 use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
-use web_sys::File;
-use standard_components::ui::input_text::InputText;
-use chrono::Utc;
-use wasm_bindgen_futures::spawn_local;
-use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
-use crate::libs::global_vars::GlobalVars;
 
 #[derive(Properties, PartialEq)]
 pub struct EditHindranceProps {
@@ -21,7 +17,7 @@ pub struct EditHindranceProps {
     pub edit_item: Hindrance,
 
     #[prop_or_default]
-    // pub edit_save: Option<SaveDBRow>,
+    pub book_list: Vec<Book>,
 
     pub on_changed_callback: Callback< Hindrance >,
 
@@ -30,6 +26,9 @@ pub struct EditHindranceProps {
 
     #[prop_or_default]
     pub readonly: bool,
+
+    #[prop_or_default]
+    pub for_admin: bool,
 }
 
 pub enum EditHindranceMessage {
@@ -47,12 +46,12 @@ pub enum EditHindranceMessage {
 
     UpdateMinorEffects( String ),
     UpdateSummaryMinor( String ),
+
+    UpdateBookID( u32 ),
 }
 
 pub struct EditHindrance {
     edit_item: Hindrance,
-    global_vars: GlobalVars,
-    // edit_save: Option<SaveDBRow>,
     local_storage_page_name: String,
 }
 
@@ -66,24 +65,8 @@ impl Component for EditHindrance {
 
         EditHindrance {
             edit_item: ctx.props().edit_item.clone(),
-            global_vars: ctx.props().global_vars.clone(),
-            // edit_save: ctx.props().edit_save.clone(),
             local_storage_page_name: "hindrance_edit_form_page".to_owned(),
         }
-    }
-
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &EditHindranceProps,
-    ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
-        // self.edit_save = ctx.props().edit_save.clone();
-        // self.image_name = ctx.props().image_name.clone();
-        // self.upload_url = ctx.props().upload_url.clone();
-
-        self.edit_item = ctx.props().edit_item.clone();
-        true
     }
 
     fn update(
@@ -96,16 +79,19 @@ impl Component for EditHindrance {
                 set_local_storage_string( &self.local_storage_page_name, new_value);
                 true
             }
+
             EditHindranceMessage::UpdateName( new_value ) => {
                 self.edit_item.name = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 true
             }
+
             EditHindranceMessage::UpdateSummary( new_value ) => {
                 self.edit_item.summary = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 true
             }
+
             EditHindranceMessage::UpdateDescription( new_value ) => {
                 self.edit_item.description = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
@@ -136,6 +122,7 @@ impl Component for EditHindrance {
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 true
             }
+
             EditHindranceMessage::UpdateEffects( new_value ) => {
                 let mut nv: Vec<String> = Vec::new();
 
@@ -147,6 +134,7 @@ impl Component for EditHindrance {
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 true
             }
+
             EditHindranceMessage::UpdateMinorEffects( new_value ) => {
 
                 let mut nv: Vec<String> = Vec::new();
@@ -159,14 +147,19 @@ impl Component for EditHindrance {
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 true
             }
+
             EditHindranceMessage::UpdateSummaryMinor( new_value ) => {
                 self.edit_item.summary_minor = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 true
             }
-            _ => {
-                false
+
+            EditHindranceMessage::UpdateBookID( new_value ) => {
+                self.edit_item.book_id = new_value;
+                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                true
             }
+
         }
 
     }
@@ -177,8 +170,6 @@ impl Component for EditHindrance {
     ) -> Html {
 
         let current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
-
-        let on_changed_callback = ctx.props().on_changed_callback.clone();
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
@@ -210,7 +201,7 @@ impl Component for EditHindrance {
             },
         ];
 
-        if ctx.props().global_vars.current_user.has_admin_access() {
+        if ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
             sub_menu_items.push(
                 TertiaryMenuItem {
                     tag: "admin".to_owned(),
@@ -244,6 +235,8 @@ impl Component for EditHindrance {
 
             </>
         };
+
+        let book_list = ctx.props().book_list.clone();
         match current_page.as_str() {
 
             "admin" => {
@@ -253,6 +246,14 @@ impl Component for EditHindrance {
                     <fieldset class={"fieldset"}>
                         <legend>{"Admin"}</legend>
                         {"Admin Page"}
+                        <BookSelect
+                            readonly={ctx.props().readonly}
+                            global_vars={ctx.props().global_vars.clone()}
+                            book_list={book_list}
+                            label={"Book"}
+                            value={self.edit_item.book_id}
+                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateBookID) }
+                        />
                     </fieldset>
                     </div>
                 }
@@ -333,11 +334,13 @@ impl Component for EditHindrance {
 
                                         <InputCheckbox
                                             label="Major Hindrance"
+                                            readonly={ctx.props().readonly}
                                             checked={self.edit_item.major}
                                             onchange={ctx.link().callback( EditHindranceMessage::SetMajorHindrance )}
                                         />
                                         <InputCheckbox
                                             label="Minor or Major Hindrance"
+                                            readonly={ctx.props().readonly}
                                             checked={self.edit_item.minor_or_major}
                                             onchange={ctx.link().callback( EditHindranceMessage::SetMinorOrMajorHindrance )}
                                         />
@@ -360,6 +363,7 @@ impl Component for EditHindrance {
                                             <InputText
                                                 readonly={ctx.props().readonly}
                                                 label={"Summary"}
+
                                                 value={(self.edit_item.summary).to_owned()}
                                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
                                             />

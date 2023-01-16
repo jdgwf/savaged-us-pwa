@@ -55,6 +55,7 @@ pub fn edit_view_delete_buttons(
         <td class="text-center no-wrap">
             if view_callback != None {
                 <button
+                    type="button"
                     class="btn btn-sm btn-info"
                     title={view_title}
                     onclick={move |e: MouseEvent| {
@@ -69,6 +70,7 @@ pub fn edit_view_delete_buttons(
 
             if edit_callback != None {
                 <button
+                    type="button"
                     title={edit_title}
                     class="btn btn-sm btn-success"
                     onclick={move |e: MouseEvent| {
@@ -83,7 +85,8 @@ pub fn edit_view_delete_buttons(
 
             if duplicate_callback != None {
                 <button
-                    class="btn btn-sm btn-success"
+                    type="button"
+                    class="btn btn-sm btn-warning"
                     title={duplicate_title}
                     onclick={move |e: MouseEvent| {
                         let duplicate_callback = duplicate_callback.clone();
@@ -97,6 +100,7 @@ pub fn edit_view_delete_buttons(
 
             if delete_callback != None {
                 <button
+                    type="button"
                     title={delete_title}
                     class="btn btn-sm btn-danger"
                     onclick={move |e: MouseEvent| {

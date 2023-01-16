@@ -16,8 +16,6 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 #[derive(Properties, PartialEq)]
 pub struct SettingsPrivateProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum SettingsPrivateMessage {
@@ -121,7 +119,7 @@ impl Component for SettingsPrivate {
                 let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::UpdateInformationSaved).clone();
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                 update_user(
                     global_vars,
@@ -146,7 +144,7 @@ impl Component for SettingsPrivate {
                 let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::PasswordsUpdated).clone();
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
                     global_vars,
                     update_global_vars,
@@ -163,7 +161,7 @@ impl Component for SettingsPrivate {
 
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
                     global_vars,
                     update_global_vars,
@@ -179,7 +177,7 @@ impl Component for SettingsPrivate {
                 self.global_vars.current_user.turn_off_advance_limits = new_value;
 
                 let global_vars = self.global_vars.clone();
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                 update_user(
                     global_vars,
@@ -266,7 +264,7 @@ impl Component for SettingsPrivate {
                         self.global_vars.current_user.hidden_banners = string_value.clone();
                         let global_vars = self.global_vars.clone();
 
-                        let update_global_vars = ctx.props().update_global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                         update_user(
                             global_vars,
@@ -428,6 +426,7 @@ impl Component for SettingsPrivate {
                         }
                         <div class="text-right">
                             <button
+                                type="button"
                                 class="btn btn-secondary"
                                 disabled={your_info_save_disabled}
                                 onclick={ctx.link().callback( SettingsPrivateMessage::ResetInfo )}
@@ -436,6 +435,7 @@ impl Component for SettingsPrivate {
                             </button>
                             <Nbsp />
                             <button
+                                type="button"
                                 class="btn btn-primary"
                                 disabled={your_info_save_disabled}
                                 onclick={ctx.link().callback( SettingsPrivateMessage::SaveInfo )}
@@ -487,6 +487,7 @@ impl Component for SettingsPrivate {
                         {
                             <div class="text-right">
                                 <button
+                                    type="button"
                                     class="btn btn-secondary"
                                     onclick={ctx.link().callback( SettingsPrivateMessage::ResetPasswords )}
                                 >
@@ -494,6 +495,7 @@ impl Component for SettingsPrivate {
                                 </button>
                                 <Nbsp />
                                 <button
+                                    type="button"
                                     class="btn btn-primary"
                                     onclick={ctx.link().callback( SettingsPrivateMessage::SavePasswords )}
                                 >
@@ -522,6 +524,7 @@ impl Component for SettingsPrivate {
                                 html!{
                                     <li key={hidden_banner.id}>
                                         <button
+                                            type="button"
                                             class={"btn btn-danger btn-xs"}
                                             onclick={ctx.link().callback( move |_| SettingsPrivateMessage::RemoveHiddenBanner( hidden_banner.id ) )}
                                         >

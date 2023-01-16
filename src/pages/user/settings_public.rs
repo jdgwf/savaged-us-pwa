@@ -23,8 +23,6 @@ use chrono_tz::TZ_VARIANTS;
 #[derive(Properties, PartialEq)]
 pub struct SettingsPublicProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum SettingsPublicMessage {
@@ -126,7 +124,7 @@ impl Component for SettingsPublic {
 
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 let username = self.edit_username.clone();
                 let edit_share_display_name = self.edit_share_display_name.clone();
                 spawn_local (
@@ -205,7 +203,7 @@ impl Component for SettingsPublic {
 
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
                     global_vars,
                     update_global_vars,
@@ -229,7 +227,7 @@ impl Component for SettingsPublic {
 
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
                     global_vars,
                     update_global_vars,
@@ -330,7 +328,7 @@ impl Component for SettingsPublic {
 
                 self.global_vars = global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_global_vars.emit( global_vars.clone() );
 
                 update_user(
@@ -421,7 +419,7 @@ impl Component for SettingsPublic {
 
                 let global_vars = self.global_vars.clone();
 
-                let update_global_vars = ctx.props().update_global_vars.clone();
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                 update_user(
                     global_vars,
@@ -567,6 +565,7 @@ impl Component for SettingsPublic {
 
                             <div class="text-right">
                                 <button
+                                    type="button"
                                     class="btn btn-secondary"
                                     disabled={&self.edit_username == &self.global_vars.current_user.username && self.edit_show_user_page == self.global_vars.current_user.show_user_page}
                                     onclick={ctx.link().callback( SettingsPublicMessage::ResetYourInformation )}
@@ -575,6 +574,7 @@ impl Component for SettingsPublic {
                                 </button>
                                 <Nbsp />
                                 <button
+                                    type="button"
                                     class="btn btn-primary"
                                     disabled={!self.update_username_can_save}
                                     onclick={ctx.link().callback( SettingsPublicMessage::SaveYourInformation )}
@@ -628,6 +628,7 @@ impl Component for SettingsPublic {
 
                         <div class="text-right">
                             <button
+                                type="button"
                                 class="btn btn-secondary"
                                 disabled={share_settings_save_disabled}
                                 onclick={ctx.link().callback( SettingsPublicMessage::ResetShareSettings )}
@@ -636,6 +637,7 @@ impl Component for SettingsPublic {
                             </button>
                             <Nbsp />
                             <button
+                                type="button"
                                 class="btn btn-primary"
                                 disabled={share_settings_save_disabled}
                                 onclick={ctx.link().callback( SettingsPublicMessage::SaveShareSettings )}

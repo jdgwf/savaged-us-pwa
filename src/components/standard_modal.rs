@@ -1,4 +1,5 @@
-use yew::{function_component, Properties, Html, html, Children};
+use yew::{function_component, Properties, Html, html, Children, Callback};
+use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 
 #[derive(Properties, PartialEq)]
 pub struct StandardModalProps {
@@ -11,6 +12,29 @@ pub struct StandardModalProps {
     #[prop_or_default]
     pub title: Option<String>,
 
+    #[prop_or_default]
+    pub close_cancel_callback: Option<Callback<bool>>,
+
+    #[prop_or_default]
+    pub add_callback: Option<Callback<bool>>,
+
+    #[prop_or_default]
+    pub save_callback: Option<Callback<bool>>,
+
+    #[prop_or_default]
+    pub save_as_new_callback: Option<Callback<bool>>,
+
+    #[prop_or_default]
+    pub add_label: Option<String>,
+
+    #[prop_or_default]
+    pub save_label: Option<String>,
+
+    #[prop_or_default]
+    pub save_as_new_label: Option<String>,
+
+    #[prop_or_default]
+    pub save_and_leave_open_callback: Option<Callback<bool>>,
 }
 
 #[function_component(StandardModal)]
@@ -35,14 +59,38 @@ pub fn standard_modal(
         None => {}
 
     }
+
+
+
+    let mut modal_footer = html!(<></>);
+
+    match &props.close_cancel_callback {
+        Some( _close_cancel_callback ) => {
+            modal_footer = html!{
+                <div class="modal-foot">
+                    <StandardFormSaveButtons
+                        close_cancel_callback={_close_cancel_callback.clone()}
+                        save_callback={props.save_callback.clone()}
+                        add_callback={props.add_callback.clone()}
+                        save_as_new_callback={props.save_as_new_callback.clone()}
+                        save_and_leave_open_callback={props.save_and_leave_open_callback.clone()}
+                    />
+                </div>
+            }
+        }
+        None => {}
+    }
     html! {
 
         <div class={class}>
             <div class="modal-dialog">
+            <form>
                 {modal_header}
                 <div class="modal-body">
                     { for props.children.iter() }
                 </div>
+                {modal_footer}
+            </form>
             </div>
         </div>
     }

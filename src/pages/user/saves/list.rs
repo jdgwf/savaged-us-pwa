@@ -5,7 +5,7 @@ use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
 
-use yew::{function_component, html};
+use yew::{html};
 
 // use savaged_libs::user::User;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
@@ -19,7 +19,7 @@ use crate::components::tertiary_menu::{
 
 use crate::pages::user::saves::UserSavesRoute;
 use crate::components::ui_page::UIPage;
-use crate::main_app::SubmenuData;
+// use crate::main_app::SubmenuData;
 use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
 // use super::settings_public::SettingsPublic;
@@ -28,7 +28,7 @@ use crate::libs::global_vars::GlobalVars;
 // use super::settings_api_key::SettingsAPIKey;
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
-use gloo_console::log;
+// use gloo_console::log;
 
 // use super::subscription::UserSubscription;
 // use super::notifications::UserNotifications;
@@ -38,9 +38,7 @@ pub struct UserSavesListProps {
     // #[prop_or_default]
     // pub set_submenu: Callback<SubmenuData>,
     // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserSavesListMessage {
@@ -89,8 +87,7 @@ impl Component for UserSavesList {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-        // read_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
+
 
         true
     }
@@ -395,7 +392,7 @@ impl Component for UserSavesList {
         let change_folder_callback1 = change_folder_callback.clone();
         let change_folder_callback2 = change_folder_callback.clone();
 
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
+        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
         html! {
             <UIPage
                 global_vars={global_vars.clone()}
@@ -481,6 +478,7 @@ impl Component for UserSavesList {
                             <div class={"controls"}>
 
                             <button
+                                type="button"
                                 class="btn btn-success"
                                 // onclick={ move | _event | {
                                 //     let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
@@ -494,6 +492,7 @@ impl Component for UserSavesList {
                                 <i class={"fa fa-edit"} />
                             </button>
                             <button
+                                type="button"
                                 class="btn btn-danger"
                                 // onclick={ move | _event | {
                                 //     let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
@@ -592,10 +591,11 @@ impl Component for UserSavesList {
                                     </span>
                                 </Link<UserSavesRoute>>
                                 <button
+                                    type="button"
                                     class="btn btn-danger"
                                     onclick={ move | _event | {
                                         let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
-                                        conf_def.text = format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name);
+                                        conf_def.text = Some(format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name));
                                         conf_def.callback = Callback::noop();
                                         open_confirmation_dialog.emit(
                                             conf_def

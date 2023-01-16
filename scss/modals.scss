@@ -23,6 +23,7 @@ body {
             .modal-body {
                 background: var(--body-bg-color);
                 padding: 1rem;
+
             }
             .modal-foot {
                 background: var(--header-bg-color);
@@ -36,6 +37,9 @@ body {
                 min-width: 90%;
                 max-width: 90%;
                 margin: 1rem auto;
+                .modal-body {
+                    min-height: 70vh;
+                }
             }
         }
     }

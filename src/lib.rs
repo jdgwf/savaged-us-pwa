@@ -1,34 +1,25 @@
-use pages::user::UserRouter;
-use yew::prelude::*;
-use yew_router::prelude::*;
-use yew_router::history::{AnyHistory, History, MemoryHistory};
-
-mod pages;
-mod main_app;
-mod web_sockets;
-mod libs;
 mod components;
-mod menu_items;
+mod libs;
 mod local_storage;
-use std::collections::HashMap;
-use crate::pages::main_home::MainHome;
-// use crate::pages::main_about::MainAbout;
-// use crate::pages::main_tech::MainTech;
+mod main_app;
+mod menu_items;
+mod pages;
+mod web_sockets;
 
-// use crate::pages::main_todos::MainTodos;
-use crate::pages::user::login::UserLogin;
-use crate::pages::user::forgot_password::ForgotPassword;
-use crate::pages::user::register::Register;
-use crate::pages::info::InfoRouter;
-use crate::pages::admin::AdminRouter;
-// use serde_json::Error;
-// use standard_components::ui::nbsp::Nbsp;
-// use gloo_console::log;
-// use main_app_server::MainServerApp;
-use crate::libs::global_vars::GlobalVars;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use crate::libs::global_vars::GlobalVars;
+use crate::pages::admin::AdminRouter;
+use crate::pages::info::InfoRouter;
+use crate::pages::main_home::MainHome;
+use crate::pages::user::forgot_password::ForgotPassword;
+use crate::pages::user::login::UserLogin;
+use crate::pages::user::register::Register;
+use pages::user::UserRouter;
 use savaged_libs::user::User;
+use std::collections::HashMap;
+use yew::prelude::*;
+use yew_router::history::{AnyHistory, History, MemoryHistory};
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq, Eq, Debug)]
 pub struct ServerAppProps {
@@ -52,10 +43,6 @@ pub enum MainServerRoute {
     InfoRouter,
     #[at("/admin/*")]
     AdminRouter,
-    // #[at("/todos")]
-    // ToDos,
-    // #[at("/tech")]
-    // Tech,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -72,32 +59,15 @@ pub struct SubmenuData {
     pub unread_notifications: u32,
 }
 
-// #[derive(Debug)]
-// pub enum MainServerAppMessage {
-//     SetSubmenu( SubmenuData ),
-//     ToggleMobileMenu(bool),
-//     HidePopupMenus(bool),
-//     UpdateGlobalVars( GlobalVars ),
-//     LogOut( String ),
-
-// }
-
 pub struct MainServerApp {
 
 }
 
 fn content_switch(
     routes: MainServerRoute,
-    // submenu_callback: &Callback<SubmenuData>,
     global_vars: GlobalVars,
-    // on_logout_action: &Callback<MouseEvent>,
-    update_global_vars: &Callback<GlobalVars>,
-    // open_confirmation_dialog: &Callback<ConfirmationDialogDefinition>,
-    // _show_mobile_menu: bool,
-
 ) -> Html {
 
-    let open_confirmation_dialog = Callback::noop();
     match routes {
         // MainServerRoute::Tech => {
         //     html!(
@@ -119,9 +89,6 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    // on_logout_action={Callback::noop()}
-                    update_global_vars={Callback::noop()}
-                    open_confirmation_dialog={Callback::noop()}
                 />
             }
         },
@@ -143,9 +110,6 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    // on_logout_action={Callback::noop()}
-                    update_global_vars={Callback::noop()}
-                    open_confirmation_dialog={Callback::noop()}
                 />
             }
         },
@@ -154,23 +118,14 @@ fn content_switch(
             html! {
                 <AdminRouter
                     global_vars={global_vars}
-                    // on_logout_action={Callback::noop()}
-                    update_global_vars={Callback::noop()}
-                    open_confirmation_dialog={Callback::noop()}
                 />
             }
         },
-        // MainServerRoute::TestSheetRouterRedirect => {
-        //     html! {
-        //         <Redirect<MainServerRoute> to={MainServerRoute::TestSheetRouter { sub_route: "home".to_owned() }} />
-        //     }
-        // }
+
         MainServerRoute::UserLogin => {
             html! {
                 <UserLogin
                     global_vars={global_vars}
-                    update_global_vars={update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
                 />
             }
         },
@@ -178,7 +133,7 @@ fn content_switch(
             html! {
                 <ForgotPassword
                     global_vars={global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -186,13 +141,12 @@ fn content_switch(
             html! {
                 <Register
                     global_vars={global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
 
         MainServerRoute::NotFound => {
-            // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
             html! { <h1>{ "MainServerRoute 404" }</h1> }
         }
 
@@ -205,35 +159,32 @@ pub fn ServerApp(
     props: &ServerAppProps
 ) -> Html {
 
-    // let server_root = "http://localhost:5001".to_owned();
     let server_root = "https://v4/savaged.us".to_owned();
-    // let server_root = "https://savaged.us".to_owned();
-    // let server_root = "https://staging.savaged.us".to_owned();
 
     let global_vars_state = use_reducer(
         || GlobalVars {
-            login_token:  "".to_owned(),
-            current_user: User::default(),
-            user_loading: false,
-            server_root: server_root.to_owned(),
-            api_root: server_root + &"/_api",
-            site_title: "v4.savaged.us".to_owned(),
-            hide_popup_menus_callback: Callback::noop(),
-            server_side_renderer: true,
-            offline: true,
-            send_websocket: Callback::noop(),
-            saves: None,
-            show_mobile_menu: false,
-            game_data: None,
-            logout_callback: Callback::noop(),
-            toggle_mobile_menu_callback: Callback::noop(),
+            api_root: server_root.to_owned() + &"/_api",
             current_menu: "".to_string(),
             current_sub_menu: "".to_string(),
+            current_user: User::default(),
+            game_data: None,
+            hide_popup_menus_callback: Callback::noop(),
+            login_token: "".to_owned(),
+            logout_callback: Callback::noop(),
+            offline: true,
+            open_confirmation_dialog: Callback::noop(),
+            saves: None,
+            send_websocket: Callback::noop(),
+            server_root: server_root.to_owned(),
+            server_side_renderer: true,
             server_side_renderer_history: None,
+            show_mobile_menu: false,
+            site_title: "v4.savaged.us".to_owned(),
+            toggle_mobile_menu_callback: Callback::noop(),
+            update_global_vars: Callback::noop(),
+            user_loading: false,
         }
     );
-
-    // let active_class = "content-pane";
 
     let history = AnyHistory::from(MemoryHistory::new());
     let blank_hs: HashMap<String, String> = HashMap::new();
@@ -249,7 +200,6 @@ pub fn ServerApp(
             content_switch(
                 routes,
                 global_vars.clone(),
-                &Callback::noop(),
             )
         }
     ;

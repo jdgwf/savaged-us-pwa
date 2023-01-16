@@ -17,8 +17,6 @@ use gloo_console::error;
 use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use crate::libs::global_vars::GlobalVars;
-
-use savaged_libs::user::User;
 use savaged_libs::user::LoginTokenResult;
 use gloo_console::log;
 use crate::main_app::MainRoute;
@@ -26,8 +24,6 @@ use crate::main_app::MainRoute;
 #[derive(Properties, PartialEq)]
 pub struct UserLoginProps {
     pub global_vars: GlobalVars,
-    pub update_global_vars: Callback<GlobalVars>,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserLoginMessage {
@@ -89,7 +85,7 @@ impl Component for UserLogin {
                 self.global_vars.login_token = login_result.login_token.clone();
                 self.global_vars.user_loading = false;
 
-                ctx.props().update_global_vars.emit( self.global_vars.clone() );
+                ctx.props().global_vars.update_global_vars.emit( self.global_vars.clone() );
 
                 // clear out local data
                 spawn_local (
@@ -162,7 +158,7 @@ impl Component for UserLogin {
         let password = self.password.to_owned();
         let api_root = ctx.props().global_vars.api_root.to_owned();
 
-        let update_global_vars = ctx.props().update_global_vars.clone();
+        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
         let do_login_submit = move |e: SubmitEvent | {
             // log!("trying do_login_submit");

@@ -21,7 +21,6 @@ use crate::components::ui_page::UIPage;
 #[derive(Properties, PartialEq)]
 pub struct ForgotPasswordProps {
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum ForgotPasswordMessage {

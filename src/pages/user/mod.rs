@@ -69,8 +69,6 @@ pub enum UserRoute {
 fn content_switch(
     routes: UserRoute,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
-    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
     let mut global_vars = global_vars.clone();
@@ -85,69 +83,51 @@ fn content_switch(
 
         UserRoute::UserCampaigns => html! {
             <UserCampaigns
-                // update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         UserRoute::UserSavesList => html! {
             <UserSavesList
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         UserRoute::UserSavesRouter => html! {
             <UserSavesRouter
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         UserRoute::SettingsAPIKey => html! {
             <SettingsAPIKey
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserRoute::SettingsPrivate => html! {
             <SettingsPrivate
                 global_vars={global_vars}
-                update_global_vars={update_global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserRoute::SettingsPublic => html! {
             <SettingsPublic
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserRoute::Devices => html! {
             <SettingsDevices
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
 
         UserRoute::Notifications => html! {
             <UserNotifications
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         UserRoute::Subscription => html! {
             <UserSubscription
-                update_global_vars={update_global_vars}
                 global_vars={global_vars}
-                open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         UserRoute::NotFound => html! { <h1>{ "UserRoute 404" }</h1> },
@@ -158,9 +138,7 @@ fn content_switch(
 pub struct UserRouterProps {
     #[prop_or_default]
     // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub struct UserRouterMessage {
@@ -201,8 +179,8 @@ impl Component for UserRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        let update_global_vars = ctx.props().update_global_vars.clone();
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
+        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
@@ -220,8 +198,6 @@ impl Component for UserRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />
@@ -240,8 +216,6 @@ impl Component for UserRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />

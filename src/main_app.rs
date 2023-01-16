@@ -1,51 +1,34 @@
-
-
+pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
+use crate::components::confirmation_dialog::ConfirmationDialog;
+use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::ui_page::UIPage;
+use crate::libs::global_vars::GlobalVars;
+use crate::local_storage::clear_all_local_data;
+use crate::pages::admin::AdminRouter;
+use crate::pages::admin::home::AdminHome;
+use crate::pages::info::InfoRoute;
+use crate::pages::info::InfoRouter;
+use crate::pages::main_home::MainHome;
+use crate::pages::user::UserRoute;
+use crate::pages::user::UserRouter;
+use crate::pages::user::forgot_password::ForgotPassword;
+use crate::pages::user::login::UserLogin;
+use crate::pages::user::register::Register;
+use crate::web_sockets::WebsocketService;
+use crate::web_sockets::connect_to_websocket;
+use crate::web_sockets::handle_message::handle_message;
+use gloo_console::error;
+use gloo_console::log;
+use savaged_libs::user::User;
 use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
-// use wasm_bindgen_futures::spawn_local;
-
+use serde_json::Error;
+use standard_components::libs::local_storage_shortcuts::clear_local_storage;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
-
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::clear_local_storage;
-
-use crate::local_storage::clear_all_local_data;
-use crate::pages::info::InfoRoute;
-use crate::pages::info::InfoRouter;
-
-use crate::web_sockets::connect_to_websocket;
-use gloo_console::error;
-use gloo_console::log;
-use crate::pages::main_home::MainHome;
-use crate::pages::admin::AdminRouter;
-use crate::pages::admin::home::AdminHome;
-
-use crate::pages::main_playground::MainPlayground;
-// use crate::local_storage::check_and_upgrade_index_db_stores;
-use crate::components::ui_page::UIPage;
-
-use crate::pages::user::login::UserLogin;
-use crate::pages::user::forgot_password::ForgotPassword;
-use crate::pages::user::register::Register;
-use crate::web_sockets::WebsocketService;
-use crate::web_sockets::handle_message::handle_message;
-use serde_json::Error;
-use crate::components::confirmation_dialog::ConfirmationDialog;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-use crate::libs::global_vars::GlobalVars;
-
-use crate::pages::user::UserRoute;
-use crate::pages::user::UserRouter;
-pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
-
-use savaged_libs::user::User;
-
-use gloo_timers::callback::Interval;
 
 #[derive(Clone, Routable, PartialEq, Debug)]
 pub enum MainRoute {
@@ -73,8 +56,7 @@ pub enum MainRoute {
     #[at("/info/*")]
     InfoRouter,
 
-    #[at("/playground")]
-    Playground,
+
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -111,12 +93,9 @@ pub enum MainAppMessage {
 }
 
 pub struct MainApp {
-    submenu: Html,
     show_mobile_menu: bool,
     global_vars_context: GlobalVarsContext,
     global_vars: GlobalVars,
-    current_unread_notifications: u32,
-    current_sub_menu: String,
 
     confirmation_dialog_open: bool,
     confirmation_dialog_properties: ConfirmationDialogDefinition,
@@ -128,8 +107,6 @@ fn content_switch(
     routes: MainRoute,
     global_vars: GlobalVars,
     on_logout_action: &Callback<MouseEvent>,
-    base_update_global_vars: &Callback<GlobalVars>,
-    open_confirmation_dialog: &Callback<ConfirmationDialogDefinition>,
     _show_mobile_menu: bool,
     on_click_hide_popup_menus: &Callback<MouseEvent>,
     toggle_mobile_menu_callback: &Callback<MouseEvent>,
@@ -157,9 +134,7 @@ fn content_switch(
             html! {
                 <InfoRouter
                     global_vars={global_vars}
-                    // on_logout_action={on_logout_action}
-                    update_global_vars={base_update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -182,9 +157,7 @@ fn content_switch(
             html! {
                 <AdminRouter
                     global_vars={global_vars}
-                    // on_logout_action={on_logout_action}
-                    update_global_vars={base_update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
                 />
             }
         },
@@ -194,47 +167,17 @@ fn content_switch(
             html! {
                 <AdminHome
                     global_vars={global_vars}
-                    // on_logout_action={on_logout_action}
-                    // update_global_vars={base_update_global_vars}
-                    // open_confirmation_dialog={open_confirmation_dialog}
-                />
-            }
-        },
-        // MainRoute::Tech => {
 
-        //     html! {
-        //         <MainTech
-        //             global_vars={global_vars}
-
-        //         />
-        //     }
-        // },
-
-        // MainRoute::ToDos => {
-
-        //     html! {
-        //         <MainTodos
-        //             global_vars={global_vars}
-
-        //         />
-        //     }
-        // },
-        MainRoute::Playground => {
-
-            html! {
-                <MainPlayground
-                    global_vars={global_vars}
 
                 />
             }
         },
+
         MainRoute::UserRouter => {
             html! {
                 <UserRouter
                     global_vars={global_vars}
-                    // on_logout_action={on_logout_action}
-                    update_global_vars={base_update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
 
                 />
             }
@@ -244,8 +187,7 @@ fn content_switch(
             html! {
                 <UserLogin
                     global_vars={global_vars}
-                    update_global_vars={base_update_global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
 
                 />
             }
@@ -254,7 +196,7 @@ fn content_switch(
             html! {
                 <ForgotPassword
                     global_vars={global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
 
                 />
             }
@@ -263,7 +205,7 @@ fn content_switch(
             html! {
                 <Register
                     global_vars={global_vars}
-                    open_confirmation_dialog={open_confirmation_dialog}
+
 
                 />
             }
@@ -301,23 +243,19 @@ impl Component for MainApp {
 
         let mut global_vars = (*global_vars_context).clone();
 
-        // let login_token = global_vars.login_token.to_owned();
-        // let api_root = global_vars.api_root.to_owned();
-
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
-        // let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
-        // global_vars.update_global_vars = base_update_global_vars;
         global_vars.send_websocket = send_websocket;
+        global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
 
-        let login_token = global_vars.login_token.to_owned();
-
-        let mut login_token_send: Option<String> = None;
-        if !login_token.is_empty() {
-            login_token_send = Some(login_token);
-        }
+        // let login_token = global_vars.login_token.to_owned();
+        // let mut login_token_send: Option<String> = None;
+        // if !login_token.is_empty() {
+        //     login_token_send = Some(login_token);
+        // }
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+        global_vars.open_confirmation_dialog = ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
 
         let wss = connect_to_websocket(
             global_vars.server_root.to_owned(),
@@ -326,31 +264,13 @@ impl Component for MainApp {
             global_vars.login_token.to_owned(),
         );
 
-        // let mut msg = WebSocketMessage::default();
-
-        // msg.token = login_token_send;
-        // msg.kind = WebsocketMessageType::Online;
-
-        // global_vars.game_data = None;
 
         global_vars.game_data = None;
-        // // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
-
-        // global_vars.send_websocket.emit( msg );
-
-        // spawn_local(
-        //     async move {
-        //         check_and_upgrade_index_db_stores().await;
-        //     }
-        // );
 
         MainApp {
             global_vars_context: global_vars_context,
             global_vars: global_vars,
-            submenu: html! { <></> },
             show_mobile_menu: false,
-            current_sub_menu: "".to_owned(),
-            current_unread_notifications: 0,
             confirmation_dialog_open: false,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
             wss: wss,
@@ -358,27 +278,11 @@ impl Component for MainApp {
         }
     }
 
-    // fn changed(
-    //     &mut self,
-    //     _ctx: &Context<Self>,
-    //     _props: &MainAppProps,
-    // ) -> bool {
-
-    //     self.global_vars = (*self.global_vars_context).clone();
-
-    //     log!("main_app changed called" );
-    //     // self.reconnect_interval();
-
-    //     true
-    // }
-
-    fn update(
+      fn update(
         &mut self,
         ctx: &Context<Self>,
         msg: MainAppMessage,
     ) -> bool {
-
-        // let global_vars = self.global_vars.clone();
 
         match msg {
             MainAppMessage::ToggleMobileMenu( _new_value ) => {
@@ -551,8 +455,8 @@ impl Component for MainApp {
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
         let logout_action = ctx.link().callback(MainAppMessage::LogOut);
-        let base_update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
-        let open_confirmation_dialog = ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
+
+
         let close_confirmation_dialog = ctx.link().callback(MainAppMessage::CloseConfirmationDialog);
 
         let on_logout_action =  Callback::from( move | _e: MouseEvent | {
@@ -600,8 +504,6 @@ impl Component for MainApp {
                                     routes,
                                     global_vars3.clone(),
                                     &on_logout_action,
-                                    &base_update_global_vars,
-                                    &open_confirmation_dialog,
                                     show_mobile_menu,
                                     &on_click_hide_popup_menus,
                                     &on_click_toggle_mobile_menu,

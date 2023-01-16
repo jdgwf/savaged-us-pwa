@@ -1,34 +1,9 @@
 pub mod list;
 
-use savaged_libs::save_db_row::SaveDBRow;
-use yew_router::prelude::*;
-use yew::prelude::*;
-
-use yew::{function_component, html};
-
-// use savaged_libs::user::User;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-use crate::components::tertiary_menu::{
-    TertiaryMenuItem,
-    TertiaryMenu
-};
-use crate::components::ui_page::UIPage;
-use crate::main_app::SubmenuData;
-use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use yew::prelude::*;
+use yew::{html};
+use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminUsersRoute {
@@ -42,8 +17,6 @@ pub enum AdminUsersRoute {
 fn content_switch(
     routes: AdminUsersRoute,
     global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
-    open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 ) -> Html {
 
     let mut global_vars = global_vars.clone();
@@ -70,12 +43,7 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersRouterProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum AdminUsersRouterMessage {
@@ -97,7 +65,8 @@ impl Component for AdminUsersRouter {
     }
 
     fn update(
-        &mut self, ctx: &Context<Self>,
+        &mut self,
+        _ctx: &Context<Self>,
         msg: AdminUsersRouterMessage
     ) -> bool {
 
@@ -112,7 +81,7 @@ impl Component for AdminUsersRouter {
             //     set_local_storage_string( "saves_folder", folder_name);
             // }
         }
-        true
+
     }
 
     fn changed(
@@ -123,9 +92,6 @@ impl Component for AdminUsersRouter {
 
         self.global_vars = ctx.props().global_vars.clone();
 
-        // read_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
-
         true
     }
 
@@ -133,9 +99,6 @@ impl Component for AdminUsersRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        let update_global_vars = ctx.props().update_global_vars.clone();
-        let open_confirmation_dialog = ctx.props().open_confirmation_dialog.clone();
-
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
             let global_vars = ctx.props().global_vars.clone();
@@ -152,8 +115,6 @@ impl Component for AdminUsersRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />
@@ -172,8 +133,6 @@ impl Component for AdminUsersRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
-                                    update_global_vars.clone(),
-                                    open_confirmation_dialog.clone(),
                                 )
                             }
                         />

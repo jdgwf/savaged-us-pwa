@@ -1,12 +1,12 @@
 use savaged_libs::{admin_libs::{AdminPagingStatistics, FetchAdminParameters}, book::Book};
-use standard_components::{ui::{nbsp::Nbsp, input_text::InputText}, libs::local_storage_shortcuts::set_local_storage_u32};
-use stdweb::web::event::SelectionChangeEvent;
-use web_sys::HtmlSelectElement;
+use standard_components::{ui::{input_text::InputText}, libs::local_storage_shortcuts::set_local_storage_u32};
+use crate::{components::admin::book_select::BookSelect, libs::global_vars::GlobalVars};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableFilterSearchProps {
 
+    pub global_vars: GlobalVars,
     pub paging_sorting_and_filter: FetchAdminParameters,
     pub callback_fetch_admin_params: Callback<FetchAdminParameters>,
     #[prop_or_default]
@@ -53,15 +53,13 @@ pub fn edit_view_delete_buttons(
         None => {}
     }
 
-    let callback_set_filter_book= Callback::from(
-        move |e: Event | {
-            e.prevent_default();
+    let callback_set_filter_book = Callback::from(
+        move | new_value: u32 | {
+
 
             let mut nv = paging_sorting_and_filter_2.clone();
 
-            let input: HtmlSelectElement = e.target_unchecked_into();
-
-            nv.filter_book = input.value().parse().unwrap_or(0);
+            nv.filter_book = new_value;
             nv.current_page = 0;
 
             set_local_storage_u32("admin_selected_book", nv.filter_book);
@@ -71,48 +69,18 @@ pub fn edit_view_delete_buttons(
         }
     );
 
+    let global_vars = props.global_vars.clone();
+
     return html!{
 
         <div class="admin-filter">
             if book_list.len() > 0 {
-                <select
+                <BookSelect
+                    global_vars={global_vars}
                     onchange={callback_set_filter_book}
-                >
-                    <option selected={props.paging_sorting_and_filter.filter_book == 0} value="0">{"- All Books -"}</option>
-                    <optgroup label="Core Books">
-                    {book_list.clone().into_iter().map( |book | {
-                        if book.primary {
-                            html! {
-                                <option selected={props.paging_sorting_and_filter.filter_book == book.id} value={book.id.to_string()}>{book.name}</option>
-                            }
-                        } else {
-                            html! {<></>}
-                        }
-                    }).collect::<Html>()}
-                    </optgroup>
-                    <optgroup label="Companion Books">
-                    {book_list.clone().into_iter().map( |book | {
-                        if book.core && !book.primary {
-                            html! {
-                                <option selected={props.paging_sorting_and_filter.filter_book == book.id} value={book.id.to_string()}>{book.name}</option>
-                            }
-                        } else {
-                            html! {<></>}
-                        }
-                    }).collect::<Html>()}
-                    </optgroup>
-                    <optgroup label="Setting Books">
-                    {book_list.clone().into_iter().map( |book | {
-                        if !book.core && !book.primary {
-                            html! {
-                                <option selected={props.paging_sorting_and_filter.filter_book == book.id} value={book.id.to_string()}>{book.name}</option>
-                            }
-                        } else {
-                            html! {<></>}
-                        }
-                    }).collect::<Html>()}
-                    </optgroup>
-                </select>
+                    value={props.paging_sorting_and_filter.filter_book}
+                    book_list={book_list}
+                />
             }
             <InputText
                 placeholder="Filter Results"

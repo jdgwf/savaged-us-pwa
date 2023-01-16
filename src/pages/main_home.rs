@@ -1,7 +1,3 @@
-use savaged_libs::websocket_message::{
-    WebSocketMessage,
-    WebsocketMessageType,
-};
 use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
 use crate::components::ui_page::UIPage;
@@ -104,7 +100,7 @@ impl Component for MainHome {
                 //         global_vars.send_websocket.emit( msg );
                 //     }}
                 // >
-                //     {"Request GameData Data"}
+                //     {"Request GameDataRow Data"}
                 // </button>
 
                 // if global_vars2.current_user.id > 0 {
@@ -131,7 +127,7 @@ impl Component for MainHome {
 
                 <div class="row">
                     <div class="col-6">
-                        <h4>{"GameData Data Counts"}</h4>
+                        <h4>{"GameDataRow Data Counts"}</h4>
                         {game_data_html}
                     </div>
                     <div class="col-6">

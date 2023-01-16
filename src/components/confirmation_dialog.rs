@@ -4,22 +4,22 @@ use crate::libs::global_vars::GlobalVars;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ConfirmationDialogDefinition {
-    pub title: String,
+    pub title: Option<String>,
     pub callback: Callback<bool>,
-    pub html: Html,
-    pub text: String,
-    pub label_yes: String,
-    pub label_no: String,
+    pub html: Option<Html>,
+    pub text: Option<String>,
+    pub label_yes: Option<String>,
+    pub label_no: Option<String>,
 }
 impl Default for ConfirmationDialogDefinition {
     fn default() -> Self {
         ConfirmationDialogDefinition {
-            title: "Confirmation Required".to_owned(),
+            title: Some("Confirmation Required".to_owned()),
             callback: Callback::noop(),
-            html: html! {<></>},
-            text: "Are you sure you want to do this?".to_owned(),
-            label_yes: "Yes".to_owned(),
-            label_no: "No".to_owned(),
+            html: None,
+            text: None,
+            label_yes: None,
+            label_no: None,
         }
     }
 
@@ -64,37 +64,65 @@ impl Component for ConfirmationDialog {
         let yes_cancel_action = ctx.props().close_confirmation_dialog.clone();
         let yes_callback = ctx.props().definition.callback.clone();
 
+        let mut definition_title = "".to_owned();
+        let mut definition_html = html!{<></>};
+        let mut definition_text = "Are you sure you want to do this?".to_owned();
+        match &ctx.props().definition.title {
+            Some( title ) => {
+                definition_title = title.clone();
+            }
+            None => {}
+        }
+        match &ctx.props().definition.html {
+            Some( html ) => {
+                definition_html = html.clone();
+            }
+            None => {}
+        }
+        match &ctx.props().definition.text {
+            Some( html ) => {
+                definition_text = html.clone();
+            }
+            None => {}
+        }
+
+        let definition_label_yes = ctx.props().definition.label_yes.clone().unwrap_or("Yes".to_owned() );
+        let definition_label_no = ctx.props().definition.label_no.clone().unwrap_or("No, thank you".to_owned() );
+
         html! {
             <div class={"modal-container"}>
 
                 <div class={"modal-dialog"}>
-                    <div class={"modal-header"}>
-                        {&ctx.props().definition.title}
-                    </div>
+                    if !definition_title.is_empty() {
+                        <div class={"modal-head"}>
+                            <h3 class="text-center">{definition_title}</h3>
+                        </div>
+                    }
                     <div class={"modal-body"}>
-                    if ctx.props().definition.text.is_empty() {
-                        {ctx.props().definition.html.clone()}
-                    } else {
-                        {ctx.props().definition.text.clone()}
+                    {definition_html}
+                    if !definition_text.is_empty() {
+                        <p>{definition_text}</p>
                     }
                     </div>
-                    <div class={"modal-footer"}>
+                    <div class={"modal-foot"}>
                         <button
                             class="btn btn-secondary"
+                            type="button"
                             onclick={cancel_action}
                         >
-                            {&ctx.props().definition.label_no}
+                            {definition_label_no}
                         </button>
                         <Nbsp />
                         <button
                             class="btn btn-primary"
+                            type="submit"
                             onclick={move |e| {
 
                                 yes_callback.emit( true );
                                 yes_cancel_action.emit( e );
                             }}
                         >
-                            {&ctx.props().definition.label_yes}
+                            {definition_label_yes}
                         </button>
                     </div>
                 </div>

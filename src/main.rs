@@ -1,16 +1,17 @@
-use yew::prelude::*;
-mod pages;
-mod main_app;
+mod components;
 mod libs;
 mod local_storage;
-mod components;
-mod web_sockets;
+mod main_app;
 mod menu_items;
-use main_app::MainApp;
-use crate::libs::global_vars::GlobalVars;
+mod pages;
+mod web_sockets;
+
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use crate::libs::global_vars::GlobalVars;
+use main_app::MainApp;
 use savaged_libs::{user::User};
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use yew::prelude::*;
 
 #[function_component]
 fn App() -> Html {
@@ -29,24 +30,26 @@ fn App() -> Html {
 
     let global_vars_state = use_reducer(
         || GlobalVars {
-            login_token:  login_token,
-            current_user: User::default(),
-            user_loading: user_loading,
-            server_root: server_root.to_owned(),
-            api_root: server_root + &"/_api",
-            site_title: "v4.savaged.us".to_owned(),
-            server_side_renderer: false,
-            offline: false,
-            send_websocket: Callback::noop(),
-            hide_popup_menus_callback: Callback::noop(),
-            game_data: None,
-            saves: None,
-            show_mobile_menu: false,
-            logout_callback: Callback::noop(),
-            toggle_mobile_menu_callback: Callback::noop(),
+            api_root: server_root.to_owned() + &"/_api",
             current_menu: "".to_owned(),
             current_sub_menu: "".to_owned(),
+            current_user: User::default(),
+            game_data: None,
+            hide_popup_menus_callback: Callback::noop(),
+            login_token: login_token,
+            logout_callback: Callback::noop(),
+            offline: false,
+            open_confirmation_dialog: Callback::noop(),
+            saves: None,
+            send_websocket: Callback::noop(),
+            server_root: server_root.to_owned(),
+            server_side_renderer: false,
             server_side_renderer_history: None,
+            show_mobile_menu: false,
+            site_title: "v4.savaged.us".to_owned(),
+            toggle_mobile_menu_callback: Callback::noop(),
+            update_global_vars: Callback::noop(),
+            user_loading: user_loading,
         }
     );
 

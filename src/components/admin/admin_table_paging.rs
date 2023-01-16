@@ -93,6 +93,7 @@ pub fn edit_view_delete_buttons(
             for count in 0..number_of_pages + 1 {
                 number_per_page.push( count );
             }
+
             return html!{
                 <div class="admin-paging">
                     <div class="row_count">
@@ -100,6 +101,8 @@ pub fn edit_view_delete_buttons(
                             onchange={callback_set_page_count}
                         >
                             <option selected={props.paging_sorting_and_filter.number_per_page == 10} value={10}>{10}</option>
+                            <option selected={props.paging_sorting_and_filter.number_per_page == 25} value={15}>{15}</option>
+                            <option selected={props.paging_sorting_and_filter.number_per_page == 25} value={20}>{20}</option>
                             <option selected={props.paging_sorting_and_filter.number_per_page == 25} value={25}>{25}</option>
                             <option selected={props.paging_sorting_and_filter.number_per_page == 50} value={50}>{50}</option>
                             <option selected={props.paging_sorting_and_filter.number_per_page == 100} value={100}>{100}</option>
@@ -110,6 +113,7 @@ pub fn edit_view_delete_buttons(
                     <div class="btn-ph text-right">
                         if props.paging_sorting_and_filter.current_page > 0 {
                             <button
+                                type="button"
                                 onclick={callback_previous_page}
                                 class="btn btn-primary btn-sm"
                             >
@@ -138,6 +142,7 @@ pub fn edit_view_delete_buttons(
                     <div class="btn-ph text-left">
                         if props.paging_sorting_and_filter.current_page < number_of_pages {
                             <button
+                                type="button"
                                 onclick={callback_next_page}
                                 class="btn btn-primary btn-sm"
                             >

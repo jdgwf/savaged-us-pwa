@@ -1,45 +1,23 @@
-
-
 use chrono::Utc;
-use savaged_libs::player_character::hindrance::Hindrance;
-use savaged_libs::player_character::edge::Edge;
-use savaged_libs::player_character::weapon::Weapon;
+use crate::components::edit_forms::hindrance::EditHindrance;
+use crate::components::ui_page::UIPage;
+use crate::libs::global_vars::GlobalVars;
+use crate::local_storage::{index_db_put_save, get_saves_from_index_db};
+use crate::pages::user::UserRoute;
+use gloo_console::log;
 use savaged_libs::player_character::armor::Armor;
+use savaged_libs::player_character::edge::Edge;
 use savaged_libs::player_character::gear::Gear;
+use savaged_libs::player_character::hindrance::Hindrance;
+use savaged_libs::player_character::weapon::Weapon;
 use savaged_libs::save_db_row::SaveDBRow;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::ui::nbsp::Nbsp;
 use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 use wasm_bindgen_futures::spawn_local;
-use yew_router::prelude::*;
+use yew::html;
 use yew::prelude::*;
-
-use yew::{function_component, html};
-
-// use savaged_libs::user::User;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-use crate::components::tertiary_menu::{
-    TertiaryMenuItem,
-    TertiaryMenu
-};
-use crate::components::ui_page::UIPage;
-use crate::local_storage::{index_db_put_save, get_saves_from_index_db};
-use crate::main_app::SubmenuData;
-use crate::components::edit_forms::hindrance::EditHindrance;
-use crate::pages::user::UserRoute;
-use standard_components::ui::nbsp::Nbsp;
-use crate::libs::global_vars::GlobalVars;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesEditProps {
@@ -50,9 +28,7 @@ pub struct UserSavesEditProps {
     pub new_save_type: Option<String>,
 
     pub uuid: String,
-    pub update_global_vars: Callback<GlobalVars>,
     pub global_vars: GlobalVars,
-    pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
 pub enum UserSavesEditMessage {
@@ -267,7 +243,7 @@ impl Component for UserSavesEdit {
                         let item = editing_hindrance.clone();
                         let server_root = self.global_vars.server_root.clone();
                         let mut global_vars = self.global_vars.clone();
-                        let update_global_vars = ctx.props().update_global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on =  Some(Utc::now());
@@ -286,7 +262,7 @@ impl Component for UserSavesEdit {
                     None => {}
                 }
             }
-            UserSavesEditMessage::AddHindrance( new_value ) => {
+            UserSavesEditMessage::AddHindrance( _new_value ) => {
                 // log!("AddHindrance");
                 // self.editing_hindrance = Some(new_value);
             }
@@ -309,14 +285,6 @@ impl Component for UserSavesEdit {
     ) -> bool {
 
         self.global_vars = ctx.props().global_vars.clone();
-
-        // self.global_vars = ctx.props().global_vars.clone();
-
-        // read_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
-        // let mut save: Option<SaveDBRow> = None;
-
-        // let mut save_option: Option<SaveDBRow> = None;
 
         self.editing_hindrance = None;
         self.editing_edge = None;
@@ -445,11 +413,11 @@ impl Component for UserSavesEdit {
             }
         }
 
-        let mut form = html!{<></>};
+
         let mut page_title = "Unhandled Save".to_owned();
         match &self.save {
             Some( save ) => {
-
+                let mut form = html!{<></>};
                 form = html!{<>
                     <h2>{"Unhandled Save"}</h2>
                     <strong>{"Save UUID:"}</strong><Nbsp />{&save.uuid}<br />
@@ -476,7 +444,6 @@ impl Component for UserSavesEdit {
                             <>
                             <EditHindrance
                                 global_vars={ctx.props().global_vars.clone()}
-                                // edit_save={Some(save.clone())}
                                 readonly={false}
                                 edit_item={hindrance.clone()}
                                 form_title={Some("Editing Hindrance")}
@@ -504,9 +471,7 @@ impl Component for UserSavesEdit {
                         page_title={page_title}
                         submenu_tag={"user-data".to_owned()}
                     >
-
                         {form}
-
                     </UIPage>
                 }
             }
