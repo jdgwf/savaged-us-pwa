@@ -52,6 +52,7 @@ pub enum MainServerRoute {
 pub struct MainServerAppProps {
     // pub global_vars: GlobalVars,
 }
+
 #[derive(Clone, Debug)]
 pub struct SubmenuData {
     pub html: Html,
@@ -172,6 +173,7 @@ pub fn ServerApp(
             login_token: "".to_owned(),
             logout_callback: Callback::noop(),
             offline: true,
+            add_alert: Callback::noop(),
             open_confirmation_dialog: Callback::noop(),
             saves: None,
             send_websocket: Callback::noop(),

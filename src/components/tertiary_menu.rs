@@ -126,9 +126,11 @@ impl Component for TertiaryMenu {
                                     set_dd_menu.emit( false);
                                 }
                                 None => {
-                                    set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
-                                    menu_changed_callback.emit(item.tag.to_owned());
-                                    set_dd_menu.emit( false);
+                                    if item.tag != "__all__".to_owned() {
+                                        set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
+                                        menu_changed_callback.emit(item.tag.to_owned());
+                                        set_dd_menu.emit( false);
+                                    }
                                 }
                             }
 
@@ -193,9 +195,11 @@ impl Component for TertiaryMenu {
                                     set_dd_menu.emit( false );
                                 }
                                 None => {
-                                    set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
-                                    menu_changed_callback.emit(item.tag.to_owned());
-                                    set_dd_menu.emit( false );
+                                    if item.tag != "__all__".to_owned() {
+                                        set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
+                                        menu_changed_callback.emit(item.tag.to_owned());
+                                        set_dd_menu.emit( false );
+                                    }
                                 }
                             }
 
@@ -239,7 +243,9 @@ impl Component for TertiaryMenu {
                         let item_callback = item.callback.clone();
                         e.prevent_default();
 
-                        set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
+                        if item.tag != "__all__".to_owned() {
+                            set_local_storage_string( local_storage_variable.as_str(), item.tag.clone());
+                        }
                         match item_callback {
                             Some( the_callback ) => {
                                 the_callback.emit( item.tag.to_owned());

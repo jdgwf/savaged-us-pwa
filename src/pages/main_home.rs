@@ -2,6 +2,8 @@ use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::components::alerts::AlertDefinition;
+use savaged_libs::alert_level::AlertLevel;
 
 #[derive(Properties, PartialEq)]
 pub struct MainHomeProps {
@@ -67,6 +69,7 @@ impl Component for MainHome {
             None => {}
         }
 
+        let global_vars_copy = ctx.props().global_vars.clone();
         html! {
             <UIPage
                 global_vars={ctx.props().global_vars.clone()}
@@ -81,6 +84,21 @@ impl Component for MainHome {
                     {"This is good, because this is a ground-up rewrite and there certainly will be breaking changes to our data - especially this early in development."}
                 </div>
                 // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
+                <hr />
+                <button
+                    class="btn"
+                        onclick={ move |_e| {
+                        global_vars_copy.add_alert.emit(
+                            AlertDefinition {
+                                level: AlertLevel::Info,
+                                text: Some("Hello!".to_owned()),
+                                ..Default::default()
+                            }
+                        );
+                    }}
+                >
+                    {"Add Alert"}
+                </button>
                 <hr />
                 // <h3>{"Data Retrieval Event Buttons"}</h3>
                 // <button

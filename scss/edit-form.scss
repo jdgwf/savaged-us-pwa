@@ -3,5 +3,11 @@ body {
         h3 {
             margin: -.5rem 0 .5rem 0;
         }
+        .flex-body {
+            display: flex;
+            fieldset {
+                flex-grow: 1;
+            }
+        }
     }
 }

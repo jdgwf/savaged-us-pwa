@@ -1,6 +1,8 @@
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
+use crate::components::alerts::AlertDefinition;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::alerts::Alerts;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
@@ -19,11 +21,16 @@ use crate::web_sockets::connect_to_websocket;
 use crate::web_sockets::handle_message::handle_message;
 use gloo_console::error;
 use gloo_console::log;
+use gloo_timers::callback::Timeout;
+use gloo_timers::future::TimeoutFuture;
+use indexed_db_futures::js_sys::global;
 use savaged_libs::user::User;
 use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
+use yew_hooks::prelude::*;
+use uuid::{Uuid};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
 use wasm_bindgen_futures::spawn_local;
@@ -90,13 +97,18 @@ pub enum MainAppMessage {
         ConfirmationDialogDefinition,
     ),
     CloseConfirmationDialog( MouseEvent ),
+    AddAlert( AlertDefinition ),
+    RemoveAlert( Uuid ),
+    AlertFadeIn( Uuid ),
+    AlertDisplayNone( Uuid ),
+    AlertFadeOut( Uuid ),
 }
 
 pub struct MainApp {
     show_mobile_menu: bool,
     global_vars_context: GlobalVarsContext,
     global_vars: GlobalVars,
-
+    alerts: Vec<AlertDefinition>,
     confirmation_dialog_open: bool,
     confirmation_dialog_properties: ConfirmationDialogDefinition,
 
@@ -246,7 +258,7 @@ impl Component for MainApp {
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
         global_vars.send_websocket = send_websocket;
         global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
-
+        global_vars.add_alert = ctx.link().callback(MainAppMessage::AddAlert);
         // let login_token = global_vars.login_token.to_owned();
         // let mut login_token_send: Option<String> = None;
         // if !login_token.is_empty() {
@@ -270,6 +282,7 @@ impl Component for MainApp {
         MainApp {
             global_vars_context: global_vars_context,
             global_vars: global_vars,
+            alerts: Vec::new(),
             show_mobile_menu: false,
             confirmation_dialog_open: false,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
@@ -310,6 +323,119 @@ impl Component for MainApp {
             MainAppMessage::OpenConfirmationDialog( dialog_props ) => {
                 self.confirmation_dialog_open = true;
                 self.confirmation_dialog_properties = dialog_props.clone();
+                return true;
+            }
+
+            MainAppMessage::AddAlert( alert_def ) => {
+
+
+                let alert_fade_in = ctx.link().callback(MainAppMessage::AlertFadeIn);
+                let alert_fade_out = ctx.link().callback(MainAppMessage::AlertFadeOut);
+                let alert_remove = ctx.link().callback(MainAppMessage::RemoveAlert);
+                let alert_display_none = ctx.link().callback(MainAppMessage::AlertDisplayNone);
+
+                let uuid1 = alert_def.uuid.to_owned();
+                let uuid2 = alert_def.uuid.to_owned();
+                let uuid3 = alert_def.uuid.to_owned();
+
+                self.alerts.insert(
+                    0,
+                    alert_def.clone(),
+                );
+
+                // log!("Added Alert", &uuid1.to_string(), self.alerts.len());
+
+                spawn_local(async move {
+                    // log!("Spawn1");
+                    let alert_fade_in = alert_fade_in.clone();
+                    let alert_fade_out = alert_fade_out.clone();
+                    let alert_display_none = alert_display_none.clone();
+                    let alert_remove = alert_remove.clone();
+
+                    // log!( format!("Spawn2 {}", uuid1.to_owned() ));
+                    TimeoutFuture::new(50).await;
+                    alert_fade_in.emit( uuid1 );
+
+                    // log!( format!("Spawn3 {}", uuid1.to_owned() ));
+                    TimeoutFuture::new(3000).await;
+                    alert_fade_out.emit( uuid2 );
+
+                    TimeoutFuture::new(350).await;
+                    alert_display_none.emit( uuid2 );
+
+                    // log!( format!("Spawn4 {}", uuid1.to_owned() ));
+                    TimeoutFuture::new(1000).await;
+                    alert_remove.emit( uuid3 );
+
+                    // log!("SpawnEnd");
+
+                });
+
+                return true;
+            }
+
+            MainAppMessage::RemoveAlert( uuid ) => {
+                // log!("RemoveAlert", uuid.to_string(), self.alerts.len());
+
+                let mut new_alerts: Vec<AlertDefinition> = Vec::new();
+                for mut alert in self.alerts.clone().into_iter() {
+                    if alert.uuid != uuid {
+                        new_alerts.push( alert );
+                    }
+                }
+
+                // log!("RemoveAlert CLONE", uuid.to_string(), self.alerts.len(), new_alerts.len());
+                self.alerts = new_alerts.clone();
+                return true;
+            }
+
+            MainAppMessage::AlertDisplayNone( uuid ) => {
+                // log!("AlertFadeIn", uuid.to_string(), self.alerts.len());
+
+                let mut new_alerts: Vec<AlertDefinition> = Vec::new();
+                for mut alert in self.alerts.clone().into_iter() {
+                    if alert.uuid == uuid {
+                        alert.active_class = "display-none".to_owned();
+                    }
+                    new_alerts.push( alert );
+
+                }
+
+                // log!("AlertFadeIn CLONE", uuid.to_string(), self.alerts.len(), new_alerts.len());
+                self.alerts = new_alerts.clone();
+                return true;
+            }
+            MainAppMessage::AlertFadeIn( uuid ) => {
+                // log!("AlertFadeIn", uuid.to_string(), self.alerts.len());
+
+                let mut new_alerts: Vec<AlertDefinition> = Vec::new();
+                for mut alert in self.alerts.clone().into_iter() {
+                    if alert.uuid == uuid {
+                        alert.active_class = "visible".to_owned();
+                    }
+                    new_alerts.push( alert );
+
+                }
+
+                // log!("AlertFadeIn CLONE", uuid.to_string(), self.alerts.len(), new_alerts.len());
+                self.alerts = new_alerts.clone();
+                return true;
+            }
+
+            MainAppMessage::AlertFadeOut( uuid ) => {
+                // log!("AlertFadeOut", uuid.to_string(), self.alerts.len());
+
+                let mut new_alerts: Vec<AlertDefinition> = Vec::new();
+                for mut alert in self.alerts.clone().into_iter() {
+                    if alert.uuid == uuid {
+                        alert.active_class = "".to_owned();
+                    }
+                    new_alerts.push( alert );
+
+                }
+
+                // log!("AlertFadeOut CLONE", uuid.to_string(), self.alerts.len(), new_alerts.len());
+                self.alerts = new_alerts.clone();
                 return true;
             }
 
@@ -481,7 +607,7 @@ impl Component for MainApp {
         // }
 
         // let global_vars1 = self.global_vars.clone();
-        // let global_vars2 = self.global_vars.clone();
+        let global_vars2 = self.global_vars.clone();
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
 
@@ -495,6 +621,11 @@ impl Component for MainApp {
                         definition={self.confirmation_dialog_properties.clone()}
                     />
                 }
+
+                <Alerts
+                    global_vars={global_vars2}
+                    alerts={self.alerts.clone()}
+                />
 
                 <BrowserRouter>
 

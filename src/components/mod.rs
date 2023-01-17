@@ -9,3 +9,4 @@ pub mod tertiary_menu;
 pub mod edit_forms;
 pub mod admin;
 pub mod standard_modal;
+pub mod alerts;

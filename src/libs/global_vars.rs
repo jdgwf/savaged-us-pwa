@@ -9,7 +9,7 @@ use gloo_net::websocket::{
 
 };
 
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::{confirmation_dialog::ConfirmationDialogDefinition, alerts::AlertDefinition};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GlobalVars {
@@ -23,6 +23,7 @@ pub struct GlobalVars {
     pub logout_callback: Callback<MouseEvent>,
     pub offline: bool,
     pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
+    pub add_alert: Callback<AlertDefinition>,
     pub saves: Option<Vec<SaveDBRow>>,
     pub send_websocket: Callback<WebSocketMessage>,
     pub server_root: String,
@@ -48,6 +49,7 @@ impl Default for GlobalVars {
             logout_callback: Callback::noop(),
             offline: true,
             open_confirmation_dialog: Callback::noop(),
+            add_alert: Callback::noop(),
             saves: None,
             send_websocket: Callback::noop(),
             server_root: "".to_owned(),

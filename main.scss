@@ -1,3 +1,4 @@
+@import "scss/fonts";
 @import "scss/flex-grid";
 @import "scss/utils";
 @import "scss/alerts";
@@ -11,6 +12,7 @@
 @import "scss/lds_spinner";
 @import "scss/edit-form";
 @import "scss/admin-table";
+
 html {
     box-sizing: border-box;
 }
@@ -209,6 +211,7 @@ body {
     }
 
     h1, h2, h3, h4, legend {
+        font-family: AudiowideRegular;
         font-variant: small-caps;
     }
 
@@ -308,6 +311,7 @@ body {
             font-variant: small-caps;
             margin: 0;
             padding: 0;
+            font-size: 1.7rem;
         }
 
         .top-menu-bottom {
@@ -633,10 +637,25 @@ body {
                 }
 
                 &.active {
+
                     a {
                         background: var(--borders-color);
                         &:hover {
                             background: var(--borders-color-lighten);
+                        }
+                    }
+                }
+                &.all-pages {
+                    position: absolute;
+                    right: 0;
+                    a {
+                        color: #fff;
+                        background-color: #194c87;
+                        border-color: #194c87;
+                        &:hover {
+                            color: #fff;
+                            background-color: #1f5ba0;
+                            border-color: #1f5ba0;
                         }
                     }
                 }

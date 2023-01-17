@@ -3,17 +3,19 @@ use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
+use crate::components::alerts::AlertDefinition;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::edit_forms::hindrance::EditHindrance;
 use crate::components::standard_modal::StandardModal;
 use crate::components::ui_page::UIPage;
 use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
+use savaged_libs::alert_level::AlertLevel;
 use crate::libs::global_vars::GlobalVars;
 use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
 use gloo_console::{ error, log };
 use gloo_utils::format::JsValueSerdeExt;
-use savaged_libs::book::Book;
 use savaged_libs::admin_libs::{AdminPagingStatistics, AdminSavePackage, AdminSaveReturn, AdminDeletePackage};
+use savaged_libs::book::Book;
 use savaged_libs::game_data_row::GameDataRow;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
@@ -30,6 +32,7 @@ pub struct AdminGameDataHindrancesProps {
 
 pub enum AdminGameDataHindrancesMessage {
     SetItems(Vec<Hindrance>),
+    NewItem( u32 ),
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
     UpdateHindrance(Hindrance),
@@ -138,6 +141,7 @@ impl Component for AdminGameDataHindrances {
                 log!("AdminGameDataHindrancesMessage::AddItemDialog");
                 let mut new_hind = Hindrance::new();
                 new_hind.book_id = self.paging_sorting_and_filter.filter_book;
+                new_hind.active = true;
                 self.editing_item = Some( new_hind );
 
                 self.is_editing = false;
@@ -158,12 +162,16 @@ impl Component for AdminGameDataHindrances {
                             id: editing_item.id,
                             fetch_parameters: self.paging_sorting_and_filter.clone(),
                             data: serde_json::to_string(&editing_item).unwrap(),
+                            name: editing_item.name,
+                            book_id: editing_item.book_id,
                             login_token: Some(self.global_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
 
                         let api_root = self.global_vars.api_root.to_owned();
+                        let global_vars = self.global_vars.clone();
+                        // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
                         spawn_local (
                             async move {
@@ -204,12 +212,23 @@ impl Component for AdminGameDataHindrances {
                                                             rv.push( hind )
                                                         }
                                                         set_items.emit( rv );
+
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: save_result_data.level,
+                                                            text: Some( save_result_data.message ),
+                                                            ..Default::default()
+                                                        };
+                                                        global_vars.add_alert.emit( alert_def );
                                                     }
 
                                                     None => {
                                                         set_items.emit( Vec::new() );
-                                                        // error!("get_items Err()", &err );
-                                                    }
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: save_result_data.level,
+                                                            text: Some( save_result_data.message ),
+                                                            ..Default::default()
+                                                        };
+                                                        global_vars.add_alert.emit( alert_def );                                                    }
                                                 }
                                             }
                                             Err( err ) => {
@@ -217,6 +236,13 @@ impl Component for AdminGameDataHindrances {
                                                 // set_paging.emit( None );
                                                 set_items.emit( Vec::new() );
                                                 error!( &err_string  );
+                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                    level: AlertLevel::Danger,
+                                                    text: Some( format!("{:?}", err ) ),
+                                                    ..Default::default()
+                                                };
+
+                                                global_vars.add_alert.emit( alert_def );
                                             }
                                         }
 
@@ -225,6 +251,13 @@ impl Component for AdminGameDataHindrances {
                                     Err( err ) => {
                                         set_items.emit( Vec::new() );
                                         error!("get_items paging Err()", &err );
+                                        let alert_def: AlertDefinition = AlertDefinition {
+                                            level: AlertLevel::Danger,
+                                            text: Some( format!("{:?}", err ) ),
+                                            ..Default::default()
+                                        };
+
+                                        global_vars.add_alert.emit( alert_def );
                                     }
                                 }
                             }
@@ -237,26 +270,56 @@ impl Component for AdminGameDataHindrances {
                 }
             }
 
-            AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen( as_new ) => {
+
+            AdminGameDataHindrancesMessage::NewItem( book_id ) => {
+                let self_editing_item = self.editing_item.clone();
+                let mut hind = Hindrance::new();
+                match self_editing_item {
+                    Some( mut editing_item ) => {
+                        hind.active = editing_item.active;
+                        hind.book_id = editing_item.book_id;
+                    }
+                    None => {
+                        hind.active = true;
+                        hind.book_id = book_id;
+                    }
+                }
+
+
+                self.editing_item = Some(hind);
+
+                return true;
+            }
+
+            AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen( _unused ) => {
                 log!("AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
+
                 match self_editing_item {
                     Some( mut editing_item ) => {
-                        if as_new || self_is_adding {
+                        if self_is_adding {
                             editing_item.id = 0;
                         }
+                        let editing_item_name = editing_item.name.clone();
                         let req = AdminSavePackage {
                             id: editing_item.id,
                             fetch_parameters: self.paging_sorting_and_filter.clone(),
                             data: serde_json::to_string(&editing_item).unwrap(),
+                            name: editing_item_name,
+                            book_id: editing_item.book_id,
                             login_token: Some(self.global_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
+                        let edit_item_id = editing_item.id;
+                        let edit_item_book_id = editing_item.book_id;
 
                         let api_root = self.global_vars.api_root.to_owned();
+                        let global_vars = self.global_vars.clone();
+                        // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        let new_item_callback = ctx.link().callback(AdminGameDataHindrancesMessage::NewItem);
                         spawn_local (
                             async move {
                                 let result = fetch_api_save_game_data_row(
@@ -273,14 +336,20 @@ impl Component for AdminGameDataHindrances {
                                                 match save_result_data.game_data {
                                                     Some( vec_val ) => {
 
+                                                        if edit_item_id == 0 {
+                                                            new_item_callback.emit( edit_item_book_id );
+                                                        }
+
                                                         let mut rv: Vec<Hindrance> = Vec::new();
                                                         for mut data in vec_val.into_iter() {
                                                             data.created_by_user = None;
                                                             data.updated_by_user = None;
                                                             data.updated_by_user = None;
 
-                                                            // log!("data", format!("{:?}", data) );
                                                             let hind = data.to_hindrance().unwrap();
+
+                                                            // log!("data", format!("{:?}", data) );
+
                                                             // log!("data.updated_on", data.updated_on);
                                                             // log!("data.created_on", data.created_on);
 
@@ -296,12 +365,24 @@ impl Component for AdminGameDataHindrances {
                                                             rv.push( hind )
                                                         }
                                                         set_items.emit( rv );
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: save_result_data.level,
+                                                            text: Some( save_result_data.message ),
+                                                            ..Default::default()
+                                                        };
+                                                        global_vars.add_alert.emit( alert_def );
+
+
                                                     }
 
                                                     None => {
                                                         set_items.emit( Vec::new() );
-                                                        // error!("get_items Err()", &err );
-                                                    }
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: save_result_data.level,
+                                                            text: Some( save_result_data.message ),
+                                                            ..Default::default()
+                                                        };
+                                                        global_vars.add_alert.emit( alert_def );                                                    }
                                                 }
                                             }
                                             Err( err ) => {
@@ -309,6 +390,14 @@ impl Component for AdminGameDataHindrances {
                                                 // set_paging.emit( None );
                                                 set_items.emit( Vec::new() );
                                                 error!( &err_string  );
+                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                    level: AlertLevel::Danger,
+                                                    text: Some( format!("{:?}", err ) ),
+                                                    ..Default::default()
+                                                };
+
+                                                global_vars.add_alert.emit( alert_def );
+
                                             }
                                         }
 
@@ -317,6 +406,13 @@ impl Component for AdminGameDataHindrances {
                                     Err( err ) => {
                                         set_items.emit( Vec::new() );
                                         error!("get_items paging Err()", &err );
+                                        let alert_def: AlertDefinition = AlertDefinition {
+                                            level: AlertLevel::Danger,
+                                            text: Some( format!("{:?}", err ) ),
+                                            ..Default::default()
+                                        };
+
+                                        global_vars.add_alert.emit( alert_def );
                                     }
                                 }
                             }
@@ -332,28 +428,32 @@ impl Component for AdminGameDataHindrances {
             AdminGameDataHindrancesMessage::DeleteItem( id ) => {
                 log!("AdminGameDataHindrancesMessage::DeleteItem ", id);
 
+                let api_root = self.global_vars.api_root.to_owned();
+                let global_vars = self.global_vars.clone();
+                let login_token = Some(self.global_vars.login_token.to_owned());
+                let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
+
+
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
                         let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
-
-                        let api_root = self.global_vars.api_root.to_owned();
-                        let login_token = Some(self.global_vars.login_token.to_owned());
-                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
-                        let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
-
-
+                        let global_vars = global_vars.clone();
+                        let set_items = set_items.clone();
+                        let api_root = api_root.clone();
+                        let paging_sorting_and_filter = paging_sorting_and_filter.clone();
+                        let login_token = login_token.clone();
                         let dialog = ConfirmationDialogDefinition {
                             title: Some("Deletion Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to delete '".to_owned() + &item.name + &"'?" ),
+                            text: Some( "Are you sure you would like to delete the hindrance '".to_owned() + &item.name + &"'?" ),
                             label_yes: None,
                             label_no: None,
                             callback: Callback::from( move |_clicked_yes| {
 
-
-
                                 let api_root = api_root.to_owned();
+                                let global_vars = global_vars.clone();
                                 let login_token = login_token.clone();
                                 let set_items = set_items.clone();
                                 let paging_sorting_and_filter = paging_sorting_and_filter.clone();
@@ -365,10 +465,12 @@ impl Component for AdminGameDataHindrances {
                                 let req = AdminDeletePackage {
                                     id: id,
                                     fetch_parameters: paging_sorting_and_filter,
+                                    name: editing_item.name,
                                     login_token: login_token,
                                     api_key: None,
                                 };
 
+                                // let item_name = editing_item.name.to_owned();
                                 spawn_local (
                                     async move {
                                         let result = fetch_api_delete_game_data_row(
@@ -395,11 +497,23 @@ impl Component for AdminGameDataHindrances {
                                                                     rv.push( hind )
                                                                 }
                                                                 set_items.emit( rv );
+                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                                    level: save_result_data.level,
+                                                                    text: Some(save_result_data.message),
+                                                                    ..Default::default()
+                                                                };
+                                                                global_vars.add_alert.emit( alert_def );
                                                             }
 
                                                             None => {
                                                                 set_items.emit( Vec::new() );
                                                                 // error!("get_items Err()", &err );
+                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                                    level: save_result_data.level,
+                                                                    text: Some(save_result_data.message),
+                                                                    ..Default::default()
+                                                                };
+                                                                global_vars.add_alert.emit( alert_def );
                                                             }
                                                         }
                                                     }
@@ -408,6 +522,13 @@ impl Component for AdminGameDataHindrances {
                                                         // set_paging.emit( None );
                                                         set_items.emit( Vec::new() );
                                                         error!( &err_string  );
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: AlertLevel::Danger,
+                                                            text: Some( format!("{:?}", err ) ),
+                                                            ..Default::default()
+                                                        };
+
+                                                        global_vars.add_alert.emit( alert_def );
                                                     }
                                                 }
 
@@ -416,6 +537,13 @@ impl Component for AdminGameDataHindrances {
                                             Err( err ) => {
                                                 set_items.emit( Vec::new() );
                                                 error!("get_items paging Err()", &err );
+                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                    level: AlertLevel::Danger,
+                                                    text: Some( format!("{:?}", err ) ),
+                                                    ..Default::default()
+                                                };
+
+                                                global_vars.add_alert.emit( alert_def );
                                             }
                                         }
                                     }
@@ -435,9 +563,7 @@ impl Component for AdminGameDataHindrances {
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
-                        // self.editing_item = Some(item.clone());
-                        // self.is_editing = false;
-                        // self.is_adding = false;
+
                         let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
                         let api_root = self.global_vars.api_root.to_owned();
@@ -445,17 +571,21 @@ impl Component for AdminGameDataHindrances {
                         let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
                         let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
                         let item = item.clone();
+                        let global_vars = ctx.props().global_vars.clone();
+                        let item_name = item.name.clone();
 
+                        // let editing_item_name = item.name.to_owned();
                         let dialog = ConfirmationDialogDefinition {
                             title: Some("Duplication Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to duplicate '".to_owned() + &item.name + &"'?" ),
+                            text: Some( "Are you sure you would like to duplicate the hindrance '".to_owned() + &item_name + &"'?" ),
                             label_yes: None,
                             label_no: None,
                             callback: Callback::from( move |_clicked_yes| {
 
-
+                                let global_vars = global_vars.clone();
+                                let item_name = item_name.clone();
 
                                 let api_root = api_root.to_owned();
                                 let login_token = login_token.clone();
@@ -467,15 +597,19 @@ impl Component for AdminGameDataHindrances {
                                 editing_item.id = 0;
 
                                 let req = AdminSavePackage {
-                                    id: editing_item.id,
+                                    id: 0,
                                     fetch_parameters: paging_sorting_and_filter,
+                                    name: item_name.to_owned(),
                                     data: serde_json::to_string(&editing_item).unwrap(),
+                                    book_id: editing_item.book_id,
                                     login_token: login_token,
                                     api_key: None,
                                 };
 
+
                                 spawn_local (
                                     async move {
+
                                         let result = fetch_api_save_game_data_row(
                                             (api_root + "/admin/game-data/hindrances/save").to_owned(),
                                             req,
@@ -490,6 +624,7 @@ impl Component for AdminGameDataHindrances {
                                                         match save_result_data.game_data {
                                                             Some( vec_val ) => {
 
+
                                                                 let mut rv: Vec<Hindrance> = Vec::new();
                                                                 for mut data in vec_val.into_iter() {
                                                                     data.created_by_user = None;
@@ -501,10 +636,24 @@ impl Component for AdminGameDataHindrances {
                                                                     rv.push( hind )
                                                                 }
                                                                 set_items.emit( rv );
+
+                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                                    level: save_result_data.level,
+                                                                    text: Some("Hindrance '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
+                                                                    ..Default::default()
+                                                                };
+                                                                global_vars.add_alert.emit( alert_def );
+
                                                             }
 
                                                             None => {
                                                                 set_items.emit( Vec::new() );
+                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                                    level: save_result_data.level,
+                                                                    text: Some("No Data received!!".to_owned()),
+                                                                    ..Default::default()
+                                                                };
+                                                                global_vars.add_alert.emit( alert_def );
                                                                 // error!("get_items Err()", &err );
                                                             }
                                                         }
@@ -513,6 +662,15 @@ impl Component for AdminGameDataHindrances {
                                                         let err_string: String = format!("SaveItem Serde Err(): {}", &err);
                                                         // set_paging.emit( None );
                                                         set_items.emit( Vec::new() );
+
+                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                            level: AlertLevel::Danger,
+                                                            text: Some( format!("{:?}", err ) ),
+                                                            ..Default::default()
+                                                        };
+
+                                                        global_vars.add_alert.emit( alert_def );
+
                                                         error!( &err_string  );
                                                     }
                                                 }
@@ -522,6 +680,13 @@ impl Component for AdminGameDataHindrances {
                                             Err( err ) => {
                                                 set_items.emit( Vec::new() );
                                                 error!("get_items paging Err()", &err );
+                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                    level: AlertLevel::Danger,
+                                                    text: Some( format!("{:?}", err ) ),
+                                                    ..Default::default()
+                                                };
+
+                                                global_vars.add_alert.emit( alert_def );
                                             }
                                         }
                                     }

@@ -23,8 +23,8 @@ fn App() -> Html {
         user_loading = false;
     }
 
-    // let server_root = "https://v4.savaged.us".to_owned();
-    let server_root = "http://localhost:5001".to_owned();
+    let server_root = "https://v4.savaged.us".to_owned();
+    // let server_root = "http://localhost:5001".to_owned();
     // let server_root = "https://savaged.us".to_owned();
     // let server_root = "https://staging.savaged.us".to_owned();
 
@@ -36,6 +36,7 @@ fn App() -> Html {
             current_user: User::default(),
             game_data: None,
             hide_popup_menus_callback: Callback::noop(),
+            add_alert: Callback::noop(),
             login_token: login_token,
             logout_callback: Callback::noop(),
             offline: false,
