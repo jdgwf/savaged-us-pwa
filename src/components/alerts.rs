@@ -90,10 +90,11 @@ pub fn alerts_component(
 
             html!{
                 <div id={alert.uuid.to_string()} class={alert_class}>
-                    {definition_text}
+
                     {definition_html}
-                    <hr />
-                    {alert.uuid.to_string()}
+                    {definition_text}
+                    // <hr />
+                    // {alert.uuid.to_string()}
                 </div>
             }
         }).collect::<Html>()}
