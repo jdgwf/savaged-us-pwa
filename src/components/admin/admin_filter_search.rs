@@ -76,7 +76,7 @@ pub fn edit_view_delete_buttons(
         <div class="admin-filter">
             if book_list.len() > 0 {
                 <BookSelect
-                    global_vars={global_vars}
+                    current_user={global_vars.current_user}
                     onchange={callback_set_filter_book}
                     value={props.paging_sorting_and_filter.filter_book}
                     book_list={book_list}

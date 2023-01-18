@@ -323,8 +323,9 @@ impl Component for SettingsDeviceLineItem {
             <tbody>
                 <tr>
                     <td class={"no-wrap"}>
+                    <form>
                         <div class={"flex"}>
-                        <form>
+
                             <div class="flex-grow">
 
                             if device.logged_out {
@@ -361,8 +362,9 @@ impl Component for SettingsDeviceLineItem {
                             </button>
 
                             }
-                            </form>
+
                         </div>
+                        </form>
                     </td>
                     <td class={"min-width no-wrap"}>{ctx.props().global_vars.current_user.format_datetime( device.registered.clone(), false, false, false)}</td>
                     <td class={"min-width no-wrap"}>{ctx.props().global_vars.current_user.format_datetime( device.last_seen.clone(), false, false, false)}</td>

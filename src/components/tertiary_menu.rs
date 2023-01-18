@@ -18,7 +18,7 @@ pub struct TertiaryMenuItem {
 #[derive(Properties, PartialEq)]
 pub struct TertiaryMenuProps {
     pub global_vars: GlobalVars,
-    pub local_storage_variable: String,
+    pub local_storage_variable: AttrValue,
     pub menu_items: Vec<TertiaryMenuItem>,
     pub menu_changed_callback: Callback<String>,
 }

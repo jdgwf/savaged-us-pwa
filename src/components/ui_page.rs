@@ -1,6 +1,6 @@
 use yew::virtual_dom::VNode;
 // use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html, Children};
+use yew::{function_component, Properties, Html, html, Children, AttrValue};
 use crate::components::menu_main::MenuMain;
 use crate::components::menu_mobile::MenuMobile;
 use crate::libs::global_vars::GlobalVars;
@@ -10,10 +10,10 @@ use standard_components::libs::set_document_title::set_document_title;
 #[derive(Properties, PartialEq)]
 pub struct UIPageProps {
     pub global_vars: GlobalVars,
-    pub page_title: String,
+    pub page_title: AttrValue,
 
     #[prop_or_default]
-    pub submenu_tag: String,
+    pub submenu_tag: AttrValue,
 
     #[prop_or_default]
     pub children: Children,
@@ -29,7 +29,7 @@ pub fn ui_page(
     if !props.global_vars.server_side_renderer {
         set_document_title(
             props.global_vars.site_title.to_owned(),
-            props.page_title.to_owned(),
+            props.page_title.to_string(),
             props.global_vars.server_side_renderer,
         );
     }

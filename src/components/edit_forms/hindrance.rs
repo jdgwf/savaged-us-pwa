@@ -334,7 +334,7 @@ impl Component for EditHindrance {
 
                     <BookSelect
                         readonly={ctx.props().readonly}
-                        global_vars={ctx.props().global_vars.clone()}
+                        current_user={ctx.props().global_vars.current_user.clone()}
                         book_list={book_list}
                         label={"Book"}
                         value={self.edit_item.book_id}

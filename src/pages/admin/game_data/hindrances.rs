@@ -24,6 +24,7 @@ use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, 
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use std::mem;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHindrancesProps {
@@ -1080,7 +1081,7 @@ impl Component for AdminGameDataHindrances {
                                     // />
                                     <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
-                                            global_vars={self.global_vars.clone()}
+                                            current_user={self.global_vars.current_user.clone()}
 
                                             created_by={row.created_by_obj}
                                             created_on={row.created_on}
@@ -1129,6 +1130,11 @@ impl Component for AdminGameDataHindrances {
             </UIPage>
         }
     }
+
+    fn destroy(&mut self, ctx: &Context<Self>) {
+        self.editing_item = None;
+        self.items = Vec::new();
+    }
 }
 
 async fn _get_data(
@@ -1146,7 +1152,6 @@ async fn _get_data(
 
     match result {
         Ok( value ) => {
-            // let vec_val_result = value.into_serde::< Vec<GameDataRow> >();
             let vec_val_result: Result<Vec<GameDataRow>, Error> = JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok( vec_val ) => {
@@ -1154,8 +1159,10 @@ async fn _get_data(
                     let mut rv: Vec<Hindrance> = Vec::new();
                     for data in vec_val.into_iter() {
                         let hind = data.to_hindrance().unwrap();
-                        rv.push( hind )
+                        log!( format!("hind {} {}", &hind.name, mem::size_of_val(&hind) ) );
+                        rv.push( hind );
                     }
+                    log!( format!("rv {}", mem::size_of_val(&rv) ) );
                     set_items.emit( rv );
                 }
                 Err( err ) => {
@@ -1184,6 +1191,8 @@ async fn _get_data(
             let vec_val_result: Result<AdminPagingStatistics, Error> = JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok( vec_val ) => {
+                    log!( format!("vec_val {}", mem::size_of_val(&vec_val) ) );
+                    log!( format!("vec_val.book_list {}", mem::size_of_val(&vec_val.book_list) ) );
                     set_paging.emit( Some(vec_val) );
                 }
                 Err( err ) => {

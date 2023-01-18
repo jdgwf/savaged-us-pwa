@@ -639,6 +639,7 @@ pub async fn index_db_save_game_data(
 
 pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
 
+    log!("get_saves_from_index_db called");
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
     match db_req_result {

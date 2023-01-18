@@ -1,5 +1,5 @@
 // use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, Properties, Html, html, AttrValue};
 use yew_router::prelude::Link;
 use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
@@ -15,7 +15,7 @@ pub struct MenuMainProps {
     // pub mobile_menu_callback: Callback<MouseEvent>,
 
     #[prop_or_default]
-    pub submenu_tag: String,
+    pub submenu_tag: AttrValue,
 }
 #[function_component(MenuMain)]
 pub fn menu_main(
@@ -31,7 +31,7 @@ pub fn menu_main(
             Some( submenu_tag ) => {
                 // log!("submenu_tag == &props.submenu_tag", submenu_tag, &props.submenu_tag);
                 if
-                    submenu_tag == &props.submenu_tag
+                    submenu_tag.as_str() == props.submenu_tag.as_str()
                     && user_can_see_menu_item( &props.global_vars.current_user, &menu)
                 {
                     match menu.submenu {

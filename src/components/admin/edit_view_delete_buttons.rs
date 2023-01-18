@@ -5,7 +5,7 @@ pub struct EditViewDeleteButtonsProps {
 
     pub id: u32,
 
-    pub name: String,
+    pub name: AttrValue,
 
     #[prop_or_default]
     pub view_callback: Option<Callback<u32>>,

@@ -1,12 +1,12 @@
 use chrono::prelude::*;
-use savaged_libs::public_user_info::PublicUserInfo;
+use savaged_libs::{public_user_info::PublicUserInfo, user::User};
 use yew::prelude::*;
 use crate::libs::global_vars::GlobalVars;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableOwnershipBadgeProps {
 
-    pub global_vars: GlobalVars,
+    pub current_user: User,
 
     #[prop_or_default]
     pub updated_on: Option<DateTime<Utc>>,
@@ -25,7 +25,7 @@ pub struct AdminTableOwnershipBadgeProps {
 }
 
 #[function_component(AdminTableOwnershipBadge)]
-pub fn admin_table_ownership_badge(
+pub fn admin_table_ownership_badge (
     props: &AdminTableOwnershipBadgeProps,
 ) -> Html {
 
@@ -65,7 +65,7 @@ pub fn admin_table_ownership_badge(
 
     match props.updated_on.clone() {
         Some( dt ) => {
-            updated_on_html = html!{ <>{props.global_vars.current_user.format_datetime(dt, false, true, false)}</>}
+            updated_on_html = html!{ <>{props.current_user.format_datetime(dt, false, true, false)}</>}
         }
         None => {
 

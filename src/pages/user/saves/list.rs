@@ -92,6 +92,8 @@ impl Component for UserSavesList {
         true
     }
 
+
+
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let mut global_vars = ctx.props().global_vars.clone();

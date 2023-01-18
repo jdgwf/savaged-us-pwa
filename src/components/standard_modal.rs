@@ -1,4 +1,4 @@
-use yew::{function_component, Properties, Html, html, Children, Callback};
+use yew::{function_component, Properties, Html, html, Children, Callback, AttrValue};
 use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 
 #[derive(Properties, PartialEq)]
@@ -10,7 +10,7 @@ pub struct StandardModalProps {
     pub xl: bool,
 
     #[prop_or_default]
-    pub title: Option<String>,
+    pub title: Option<AttrValue>,
 
     #[prop_or_default]
     pub close_cancel_callback: Option<Callback<bool>>,
@@ -25,13 +25,13 @@ pub struct StandardModalProps {
     pub save_as_new_callback: Option<Callback<bool>>,
 
     #[prop_or_default]
-    pub add_label: Option<String>,
+    pub add_label: Option<AttrValue>,
 
     #[prop_or_default]
-    pub save_label: Option<String>,
+    pub save_label: Option<AttrValue>,
 
     #[prop_or_default]
-    pub save_as_new_label: Option<String>,
+    pub save_as_new_label: Option<AttrValue>,
 
     #[prop_or_default]
     pub save_and_leave_open_callback: Option<Callback<bool>>,
