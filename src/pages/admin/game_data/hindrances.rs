@@ -36,6 +36,7 @@ pub enum AdminGameDataHindrancesMessage {
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
     UpdateHindrance(Hindrance),
+    UpdateHindranceAndRefresh(Hindrance),
 
     ViewItem( u32 ),
     EditItemDialog( u32 ),
@@ -313,13 +314,19 @@ impl Component for AdminGameDataHindrances {
                         };
 
                         let edit_item_id = editing_item.id;
+                        let edit_item_active = editing_item.active;
                         let edit_item_book_id = editing_item.book_id;
+                        let edit_item_book_page = editing_item.page.to_owned();
 
                         let api_root = self.global_vars.api_root.to_owned();
                         let global_vars = self.global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
                         let new_item_callback = ctx.link().callback(AdminGameDataHindrancesMessage::NewItem);
+
+
+                        let update_hindrance_callback = ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindranceAndRefresh);
+
                         spawn_local (
                             async move {
                                 let result = fetch_api_save_game_data_row(
@@ -372,6 +379,11 @@ impl Component for AdminGameDataHindrances {
                                                         };
                                                         global_vars.add_alert.emit( alert_def );
 
+                                                    let mut new_hind = Hindrance::new();
+                                                    new_hind.book_id = edit_item_book_id;
+                                                    new_hind.active = edit_item_active;
+                                                    new_hind.page = edit_item_book_page;
+                                                    update_hindrance_callback.emit( new_hind );
 
                                                     }
 
@@ -712,6 +724,11 @@ impl Component for AdminGameDataHindrances {
             AdminGameDataHindrancesMessage::UpdateHindrance( new_value ) => {
                 self.editing_item = Some(new_value);
                 return false;
+
+            }
+            AdminGameDataHindrancesMessage::UpdateHindranceAndRefresh( new_value ) => {
+                self.editing_item = Some(new_value);
+                return true;
 
             }
 

@@ -189,6 +189,15 @@ impl Component for EditHindrance {
 
     }
 
+    fn changed(
+        &mut self,
+        ctx: &Context<Self>,
+         _old_props: &Self::Properties
+    ) -> bool {
+        self.edit_item = ctx.props().edit_item.clone();
+        true
+    }
+
     fn view(
         &self,
         ctx: &Context<Self>,
