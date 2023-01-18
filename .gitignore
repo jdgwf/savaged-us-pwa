@@ -4,3 +4,4 @@ src/target
 /dist
 /public
 Cargo.lock
+.DS_Store
