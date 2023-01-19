@@ -5,7 +5,6 @@ use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLink
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::game_data::AdminGameDataRoute;
-use yew::Callback;
 use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHomeProps {

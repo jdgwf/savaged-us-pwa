@@ -2,7 +2,6 @@ use standard_components::libs::local_storage_shortcuts::{get_local_storage_strin
 use web_sys::MouseEvent;
 use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
-use crate::libs::global_vars::GlobalVars;
 
 #[derive(PartialEq, Clone)]
 pub struct TertiaryMenuItem {
@@ -36,7 +35,7 @@ impl Component for TertiaryMenu {
     type Message = TertiaryMenuMessage;
     type Properties = TertiaryMenuProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         TertiaryMenu {
             open_dropdown: false,

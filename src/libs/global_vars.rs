@@ -2,13 +2,6 @@ use std::rc::Rc;
 use yew::prelude::*;
 use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::game_data_package::GameDataPackage, banner::SimpleBanner, partner::Partner};
 use yew_router::history::{AnyHistory};
-
-use gloo_net::websocket::{
-    Message,
-    futures::WebSocket,
-
-};
-
 use crate::components::{confirmation_dialog::ConfirmationDialogDefinition, alerts::AlertDefinition};
 
 #[derive(Clone, Debug, PartialEq)]

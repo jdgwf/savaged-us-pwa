@@ -2,7 +2,6 @@ use yew::prelude::*;
 use crate::libs::{global_vars::GlobalVars};
 use savaged_libs::alert_level::AlertLevel;
 use uuid::{Uuid};
-use gloo_timers::callback::Timeout;
 
 
 #[derive(Clone, Debug, PartialEq)]
@@ -32,10 +31,6 @@ impl Default for AlertDefinition {
 pub struct AlertsProps {
     pub global_vars: GlobalVars,
     pub alerts: Vec<AlertDefinition>,
-}
-
-pub enum AlertsMessage {
-
 }
 
 #[function_component(Alerts)]

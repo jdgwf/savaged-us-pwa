@@ -61,7 +61,8 @@ impl Component for UserSavesList {
     }
 
     fn update(
-        &mut self, ctx: &Context<Self>,
+        &mut self,
+        _ctx: &Context<Self>,
         msg: UserSavesListMessage
     ) -> bool {
 
@@ -79,18 +80,6 @@ impl Component for UserSavesList {
         true
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserSavesListProps,
-    ) -> bool {
-
-        self.global_vars = ctx.props().global_vars.clone();
-
-
-
-        true
-    }
 
 
 
@@ -104,7 +93,7 @@ impl Component for UserSavesList {
             filter_type = get_local_storage_string( "saves_filter" , "character".to_string());
         }
 
-        if self.global_vars.user_loading {
+        if global_vars.user_loading {
 
             return html! {
             <UIPage
@@ -121,7 +110,7 @@ impl Component for UserSavesList {
         }
         }
 
-        if self.global_vars.current_user.id == 0 {
+        if global_vars.current_user.id == 0 {
             return html! {
                 <UIPage
                     global_vars={global_vars}
@@ -518,7 +507,7 @@ impl Component for UserSavesList {
                 {saves.into_iter().filter( filter_by ).map( |save| {
                     let mut image_style = "".to_owned();
                     let save_name = save.name.clone();
-                    let save_uuid = save.uuid.clone();
+                    // let save_uuid = save.uuid.clone();
                     let open_confirmation_dialog = open_confirmation_dialog.clone();
                     match save.image_base64 {
                         Some( image_base64 ) => {

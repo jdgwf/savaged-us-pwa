@@ -1,3 +1,4 @@
+use savaged_libs::user::User;
 use yew_router::prelude::*;
 use yew::prelude::*;
 use standard_components::ui::input_text::InputText;
@@ -11,7 +12,7 @@ use crate::libs::global_vars::GlobalVars;
 use savaged_libs::hidden_banner::HiddenBanner;
 use super::UserRoute;
 use gloo_console::error;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsPrivateProps {
@@ -36,7 +37,7 @@ pub enum SettingsPrivateMessage {
 }
 
 pub struct SettingsPrivate {
-    global_vars: GlobalVars,
+    current_user: User,
     first_name: String,
     last_name: String,
     email: String,
@@ -90,7 +91,7 @@ impl Component for SettingsPrivate {
 
         set_document_title(global_vars.site_title.to_owned(), "Private Settings".to_owned(), global_vars.server_side_renderer,);
         SettingsPrivate {
-            global_vars: global_vars.clone(),
+            current_user: global_vars.current_user.clone(),
             first_name: global_vars.current_user.first_name.to_owned(),
             last_name: global_vars.current_user.last_name.to_owned(),
             email: global_vars.current_user.email.to_owned(),
@@ -112,12 +113,14 @@ impl Component for SettingsPrivate {
 
             SettingsPrivateMessage::SaveInfo( _event ) => {
 
-                self.global_vars.current_user.first_name = self.first_name.to_owned();
-                self.global_vars.current_user.last_name = self.last_name.to_owned();
-                self.global_vars.current_user.email = self.email.to_owned();
+                self.current_user.first_name = self.first_name.to_owned();
+                self.current_user.last_name = self.last_name.to_owned();
+                self.current_user.email = self.email.to_owned();
 
                 let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::UpdateInformationSaved).clone();
-                let global_vars = self.global_vars.clone();
+                let mut global_vars = ctx.props().global_vars.clone();
+
+                global_vars.current_user = self.current_user.clone();
 
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
@@ -134,15 +137,17 @@ impl Component for SettingsPrivate {
 
             SettingsPrivateMessage::ResetInfo( _event ) => {
 
-                self.first_name = self.global_vars.current_user.first_name.to_owned();
-                self.last_name = self.global_vars.current_user.last_name.to_owned();
-                self.email = self.global_vars.current_user.email.to_owned();
+                self.first_name = self.current_user.first_name.to_owned();
+                self.last_name = self.current_user.last_name.to_owned();
+                self.email = self.current_user.email.to_owned();
                 true
             }
             SettingsPrivateMessage::SavePasswords( _event ) => {
 
                 let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::PasswordsUpdated).clone();
-                let global_vars = self.global_vars.clone();
+                let mut global_vars = ctx.props().global_vars.clone();
+
+                global_vars.current_user = self.current_user.clone();
 
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
@@ -157,9 +162,11 @@ impl Component for SettingsPrivate {
             }
 
             SettingsPrivateMessage::SetReceiveNotifications( new_value ) => {
-                self.global_vars.current_user.notify_email = new_value;
+                self.current_user.notify_email = new_value;
 
-                let global_vars = self.global_vars.clone();
+                let mut global_vars = ctx.props().global_vars.clone();
+
+                global_vars.current_user = self.current_user.clone();
 
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 update_user(
@@ -174,9 +181,12 @@ impl Component for SettingsPrivate {
             }
 
             SettingsPrivateMessage::SetTurnOffAdvanceOptions( new_value ) => {
-                self.global_vars.current_user.turn_off_advance_limits = new_value;
+                self.current_user.turn_off_advance_limits = new_value;
 
-                let global_vars = self.global_vars.clone();
+                let mut global_vars = ctx.props().global_vars.clone();
+
+                global_vars.current_user = self.current_user.clone();
+
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                 update_user(
@@ -242,7 +252,7 @@ impl Component for SettingsPrivate {
 
                 let mut hidden_banners: Vec<HiddenBanner> = Vec::new();
                 let mut new_hidden_banners: Vec<HiddenBanner> = Vec::new();
-                let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.global_vars.current_user.hidden_banners.as_ref() );
+                let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.current_user.hidden_banners.as_ref() );
                 match hidden_banners_result {
                     Ok( post_val ) => {
                         hidden_banners = post_val;
@@ -261,9 +271,10 @@ impl Component for SettingsPrivate {
                 let to_string_result = serde_json::to_string( &new_hidden_banners);
                 match to_string_result {
                     Ok( string_value ) => {
-                        self.global_vars.current_user.hidden_banners = string_value.clone();
-                        let global_vars = self.global_vars.clone();
+                        self.current_user.hidden_banners = string_value.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
 
+                        global_vars.current_user = self.current_user.clone();
                         let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                         update_user(
@@ -292,11 +303,11 @@ impl Component for SettingsPrivate {
         _props: &SettingsPrivateProps,
     ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
+        self.current_user = ctx.props().global_vars.current_user.clone();
 
-        self.first_name = self.global_vars.current_user.first_name.to_owned();
-        self.last_name = self.global_vars.current_user.last_name.to_owned();
-        self.email = self.global_vars.current_user.email.to_owned();
+        self.first_name = self.current_user.first_name.to_owned();
+        self.last_name = self.current_user.last_name.to_owned();
+        self.email = self.current_user.email.to_owned();
 
         true
     }
@@ -307,12 +318,13 @@ impl Component for SettingsPrivate {
     ) -> Html {
 
         // let global_vars = ctx.props().global_vars.clone();
-        let mut global_vars = self.global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_sub_menu = "settings_private".to_owned();
 
-        if self.global_vars.user_loading {
+        if ctx.props().global_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    global_vars={global_vars}
                     page_title="Settings"
                     submenu_tag={"user".to_owned()}
                 >
@@ -324,10 +336,10 @@ impl Component for SettingsPrivate {
             }
         }
 
-        if self.global_vars.current_user.id == 0 {
+        if ctx.props().global_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    global_vars={global_vars}
                     page_title="Settings"
                     submenu_tag={"user".to_owned()}
                 >
@@ -342,17 +354,17 @@ impl Component for SettingsPrivate {
         let mut your_info_save_disabled = true;
 
         if
-            self.first_name != self.global_vars.current_user.first_name
+            self.first_name != self.current_user.first_name
                 ||
-            self.last_name != self.global_vars.current_user.last_name
+            self.last_name != self.current_user.last_name
                 ||
-            self.email != self.global_vars.current_user.email
+            self.email != self.current_user.email
         {
             your_info_save_disabled = false;
         }
 
         let mut hidden_banners: Vec<HiddenBanner> = Vec::new();
-        let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.global_vars.current_user.hidden_banners.as_ref() );
+        let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.current_user.hidden_banners.as_ref() );
         match hidden_banners_result {
             Ok( post_val ) => {
                 hidden_banners = post_val;
@@ -362,7 +374,7 @@ impl Component for SettingsPrivate {
             }
         }
 
-        global_vars.current_sub_menu = "settings_private".to_owned();
+
 
         html! {
             <UIPage
@@ -448,7 +460,7 @@ impl Component for SettingsPrivate {
                         <legend>{"Email Notifications"}</legend>
                         <InputCheckbox
                             label="Receive Email Notifications"
-                            checked={self.global_vars.current_user.notify_email}
+                            checked={self.current_user.notify_email}
                             onchange={ctx.link().callback( SettingsPrivateMessage::SetReceiveNotifications )}
                         >
                             <div class="small-text">
@@ -508,7 +520,7 @@ impl Component for SettingsPrivate {
                         <legend>{"App Options"}</legend>
                         <InputCheckbox
                             label="Turn off Advance Limits"
-                            checked={self.global_vars.current_user.turn_off_advance_limits}
+                            checked={self.current_user.turn_off_advance_limits}
                             onchange={ctx.link().callback( SettingsPrivateMessage::SetTurnOffAdvanceOptions )}
                         >
                             <div class="small-text">

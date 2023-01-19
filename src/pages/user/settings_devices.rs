@@ -8,7 +8,7 @@ use crate::libs::fetch_api::fetch_api_send_token;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use wasm_bindgen_futures::spawn_local;
 use gloo_console::error;
-use gloo_console::log;
+// use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
 use crate::components::ui_page::UIPage;
@@ -23,7 +23,6 @@ pub enum  SettingsDevicesMessages {
 }
 
 pub struct SettingsDevices {
-    global_vars: GlobalVars,
 }
 
 impl Component for SettingsDevices {
@@ -38,7 +37,6 @@ impl Component for SettingsDevices {
 
         set_document_title(global_vars.site_title.to_owned(), "Device Login Tokens".to_owned(), global_vars.server_side_renderer,);
         SettingsDevices {
-            global_vars: global_vars,
         }
     }
 
@@ -61,14 +59,7 @@ impl Component for SettingsDevices {
         }
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &SettingsDevicesProps,
-    ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
-        return true;
-    }
+
 
     fn view(
         &self,
@@ -120,7 +111,7 @@ impl Component for SettingsDevices {
 
         let update_login_tokens = ctx.link().callback(SettingsDevicesMessages::UpdateLoginItems);
 
-        let mut global_vars = self.global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
 
         global_vars.current_sub_menu = "settings_devices".to_owned();
 

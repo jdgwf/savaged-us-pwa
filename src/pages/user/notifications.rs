@@ -6,12 +6,12 @@ use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::raw_html::RawHtml;
 use standard_components::ui::input_checkbox::InputCheckbox;
 use savaged_libs::utils::date_formatting::convert_utc_to_datetime;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
 use crate::libs::fetch_api::fetch_api;
 use crate::libs::fetch_api::fetch_api_for_id;
 use crate::libs::fetch_api::fetch_api_for_id_with_value;
-use gloo_console::{ error, log };
+use gloo_console::{ error };
 use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use crate::libs::global_vars::GlobalVars;
@@ -36,7 +36,6 @@ pub enum UserNotificationsMessage {
 pub struct UserNotifications {
     notifications: Vec<Notification>,
     loading: bool,
-    global_vars: GlobalVars,
 }
 
 fn get_notifications(
@@ -336,11 +335,11 @@ impl Component for UserNotifications {
     ) -> Self {
 
         let global_vars = ctx.props().global_vars.clone();
-        let login_token = ctx.props().global_vars.login_token.to_owned();
+        let login_token = global_vars.login_token.to_owned();
         let set_notifications = ctx.link().callback(
             UserNotificationsMessage::SetNotifications
         );
-        let api_root = ctx.props().global_vars.api_root.to_owned();
+        let api_root = global_vars.api_root.to_owned();
 
         if !global_vars.server_side_renderer {
             get_notifications(
@@ -354,19 +353,18 @@ impl Component for UserNotifications {
         UserNotifications {
             notifications: Vec::new(),
             loading: true,
-            global_vars: global_vars,
         }
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserNotificationsProps,
-    ) -> bool {
+    // fn changed(
+    //     &mut self,
+    //     ctx: &Context<Self>,
+    //     _props: &UserNotificationsProps,
+    // ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-        true
-    }
+    //     ctx.props().global_vars = ctx.props().global_vars.clone();
+    //     true
+    // }
 
     fn update(
         &mut self,
@@ -386,13 +384,14 @@ impl Component for UserNotifications {
                     }
                 }
 
-                // let mut updated_user = self.global_vars.current_user.clone();
-                self.global_vars.current_user.unread_notifications = new_count;
+                // let mut updated_user = ctx.props().global_vars.current_user.clone();
+                let mut global_vars = ctx.props().global_vars.clone();
+                global_vars.current_user.unread_notifications = new_count;
 
                 // log!("SetNotifications updated_user", updated_user.id, new_count);
-                if self.global_vars.current_user.id > 0 {
-                    let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
-                    update_global_vars.emit( self.global_vars.clone() );
+                if global_vars.current_user.id > 0 {
+                    let update_global_vars = global_vars.update_global_vars.clone();
+                    update_global_vars.emit( global_vars.clone() );
                 }
 
                 return true;
@@ -505,7 +504,7 @@ impl Component for UserNotifications {
             }
         }
 
-        let mut global_vars = self.global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
 
         global_vars.current_sub_menu = "settings_notifications".to_owned();
 

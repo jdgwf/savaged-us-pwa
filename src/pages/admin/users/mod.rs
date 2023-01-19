@@ -50,7 +50,6 @@ pub enum AdminUsersRouterMessage {
 
 }
 pub struct AdminUsersRouter {
-    global_vars: GlobalVars,
 }
 
 impl Component for AdminUsersRouter {
@@ -60,7 +59,6 @@ impl Component for AdminUsersRouter {
     fn create(ctx: &Context<Self>) -> Self {
 
         AdminUsersRouter {
-            global_vars: ctx.props().global_vars.clone(),
         }
     }
 
@@ -84,16 +82,7 @@ impl Component for AdminUsersRouter {
 
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &AdminUsersRouterProps,
-    ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-
-        true
-    }
 
     fn view(
         &self,

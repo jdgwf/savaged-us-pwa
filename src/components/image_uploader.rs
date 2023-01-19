@@ -24,7 +24,6 @@ pub struct ImageUploaderProps {
 }
 
 pub struct ImageUploader {
-    global_vars: GlobalVars,
     image_url: String,
     image_name: String,
     upload_url: String,
@@ -39,7 +38,6 @@ impl Component for ImageUploader {
         ctx: &Context<Self>,
     ) -> Self {
         ImageUploader {
-            global_vars: ctx.props().global_vars.clone(),
             image_url: ctx.props().image_url.clone(),
             image_name: ctx.props().image_name.clone(),
             upload_url: ctx.props().upload_url.clone(),
@@ -52,7 +50,6 @@ impl Component for ImageUploader {
         ctx: &Context<Self>,
         _props: &ImageUploaderProps,
     ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
         self.image_url = ctx.props().image_url.clone();
         self.image_name = ctx.props().image_name.clone();
         self.upload_url = ctx.props().upload_url.clone();
@@ -67,8 +64,8 @@ impl Component for ImageUploader {
         match msg {
             ImageUploaderMessage::SelectFile(file) => {
                 self.file = file.clone();
-                let api_root = self.global_vars.api_root.clone();
-                let login_token = self.global_vars.login_token.clone();
+                let api_root = ctx.props().global_vars.api_root.clone();
+                let login_token = ctx.props().global_vars.login_token.clone();
                 let file = file.clone();
                 let upload_url_callback = ctx.props().on_changed_callback.clone();
                 spawn_local (

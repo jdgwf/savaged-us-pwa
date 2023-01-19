@@ -41,7 +41,6 @@ pub enum UserSavesEditMessage {
 
 }
 pub struct UserSavesEdit {
-    global_vars: GlobalVars,
     save: Option<SaveDBRow>,
 
     editing_hindrance: Option<Hindrance>,
@@ -210,7 +209,6 @@ impl Component for UserSavesEdit {
         // log!( format!("editing_hindrance {:?}", editing_hindrance ));
 
         UserSavesEdit {
-            global_vars: ctx.props().global_vars.clone(),
             save: save_option,
 
             editing_hindrance: editing_hindrance,
@@ -241,8 +239,8 @@ impl Component for UserSavesEdit {
                 match editing_hindrance {
                     Some( editing_hindrance ) => {
                         let item = editing_hindrance.clone();
-                        let server_root = self.global_vars.server_root.clone();
-                        let mut global_vars = self.global_vars.clone();
+                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
                         let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
@@ -284,7 +282,7 @@ impl Component for UserSavesEdit {
         _props: &UserSavesEditProps,
     ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
+        // ctx.props().global_vars = ctx.props().global_vars.clone();
 
         self.editing_hindrance = None;
         self.editing_edge = None;
@@ -380,7 +378,7 @@ impl Component for UserSavesEdit {
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
-        if self.global_vars.user_loading {
+        if global_vars.user_loading {
 
             return html! {
                 <UIPage
@@ -397,7 +395,7 @@ impl Component for UserSavesEdit {
             }
         }
 
-        if self.global_vars.current_user.id == 0 {
+        if global_vars.current_user.id == 0 {
             return html! {
                 <UIPage
                     global_vars={global_vars}

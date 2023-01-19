@@ -1,5 +1,3 @@
-use standard_components::libs::local_storage_shortcuts::{get_local_storage_string, set_local_storage_string};
-use web_sys::MouseEvent;
 use yew::prelude::*;
 use standard_components::ui::nbsp::Nbsp;
 // use crate::libs::global_vars::GlobalVars;
@@ -32,7 +30,7 @@ impl Component for TertiaryLinksMenu {
     type Message = TertiaryLinksMenuMessage;
     type Properties = TertiaryLinksMenuProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         TertiaryLinksMenu {
             open_dropdown: false,
@@ -55,7 +53,7 @@ impl Component for TertiaryLinksMenu {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
 
-        let mut filter_type = ctx.props().current_tag.to_owned();
+        let filter_type = ctx.props().current_tag.to_owned();
 
         let menu_items = ctx.props().menu_items.clone();
         let mut class = "tertiary-menu-mobile".to_owned();
@@ -72,14 +70,7 @@ impl Component for TertiaryLinksMenu {
                 {menu_items.clone().into_iter().map(  | item | {
                     if item.tag.as_str() == &filter_type {
                         let set_dd_menu = set_dd_menu.clone();
-                        let mut icon = html!{<></>};
 
-                        match item.icon_class {
-                            Some( icon_class ) => {
-                                icon = html!{<><i class={icon_class} /><Nbsp /></>}
-                            }
-                            None => {}
-                        }
 
                         html!{<div
                             class={"current flex-grow-1"}
@@ -90,9 +81,6 @@ impl Component for TertiaryLinksMenu {
                             <i class="fa fa-arrow-down" />
                         </div>}
                     } else if item.separate {
-
-                        let set_dd_menu = set_dd_menu.clone();
-
 
 
                         let item_title = item.title.unwrap_or("".to_owned());
@@ -129,21 +117,12 @@ impl Component for TertiaryLinksMenu {
                         html!{<></>}
                     } else {
                         let filter_type = filter_type.to_owned();
-                        let set_dd_menu = set_dd_menu.clone();
                         let tag = item.tag.clone();
 
 
                         let base_class = "".to_owned();
 
                         let item_title = item.title.unwrap_or("".to_owned());
-
-                        let mut icon = html!{<></>};
-                        match item.icon_class {
-                            Some( icon_class ) => {
-                                icon = html!{<><i class={icon_class} /><Nbsp /></>}
-                            }
-                            None => {}
-                        }
 
                         html!{<li
                             class={class_is_active( filter_type, &tag.as_ref(), base_class)}
@@ -158,21 +137,13 @@ impl Component for TertiaryLinksMenu {
             </div>
             <ul class="tertiary-menu">
                 {menu_items.clone().into_iter().map( | item | {
-                    let mut filter_type = ctx.props().current_tag.to_owned();
+                    let filter_type = ctx.props().current_tag.to_owned();
                     let tag = item.tag.clone();
 
 
                     let base_class = item.class.unwrap_or("".to_owned());
 
                     let item_title = item.title.unwrap_or("".to_owned());
-
-                    let mut icon = html!{<></>};
-                    match item.icon_class {
-                        Some( icon_class ) => {
-                            icon = html!{<><i class={icon_class} /><Nbsp /></>}
-                        }
-                        None => {}
-                    }
 
                     html!{<li
                         class={class_is_active( filter_type, &tag.as_ref(), base_class)}

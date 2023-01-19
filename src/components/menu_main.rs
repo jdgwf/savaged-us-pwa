@@ -5,7 +5,7 @@ use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::UserRoute;
-use crate::components::lds_roller::LDSRoller;
+// use crate::components::lds_roller::LDSRoller;
 use crate::components::lds_spinner::LDSSpinner;
 // use gloo_console::log;
 // use standard_components::ui::nbsp::Nbsp;
@@ -22,11 +22,9 @@ pub fn menu_main(
     props: &MenuMainProps,
 ) -> Html {
 
-    let mut submenu = html!{<></>};
-
     let mut show_submenu = false;
 
-    submenu = get_menu_items(&props.global_vars).into_iter().map( | menu | {
+    let submenu = get_menu_items(&props.global_vars).into_iter().map( | menu | {
         match &menu.submenu_tag {
             Some( submenu_tag ) => {
                 // log!("submenu_tag == &props.submenu_tag", submenu_tag, &props.submenu_tag);

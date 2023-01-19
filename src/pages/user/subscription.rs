@@ -5,7 +5,7 @@ use crate::components::ui_page::UIPage;
 
 // use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 
 // use crate::lib::fetch_api::fetch_api;
 // use crate::lib::fetch_api::savaged_login;
@@ -27,7 +27,6 @@ pub enum UserSubscriptionMessage {
 
 pub struct UserSubscription {
 
-    global_vars: GlobalVars,
 }
 
 impl Component for UserSubscription {
@@ -42,7 +41,6 @@ impl Component for UserSubscription {
 
         set_document_title(global_vars.site_title.to_owned(), "Subscriptions and Purchases".to_owned(), global_vars.server_side_renderer,);
         UserSubscription {
-            global_vars: global_vars,
         }
     }
 
@@ -63,25 +61,17 @@ impl Component for UserSubscription {
 
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserSubscriptionProps,
-    ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-        true
-    }
 
     fn view(
         &self,
-        _ctx: &Context<Self>,
+        ctx: &Context<Self>,
     ) -> Html {
 
         // let global_vars = ctx.props().global_vars.clone();
-        let mut global_vars = self.global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
 
-        if self.global_vars.user_loading {
+        if global_vars.user_loading {
             return html! {
                 <UIPage
                     global_vars={global_vars.clone()}
@@ -96,7 +86,7 @@ impl Component for UserSubscription {
             }
         }
 
-        if self.global_vars.current_user.id == 0 {
+        if global_vars.current_user.id == 0 {
             return html! {
                 <UIPage
                     global_vars={global_vars.clone()}

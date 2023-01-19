@@ -8,7 +8,7 @@ use standard_components::ui::nbsp::Nbsp;
 
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
 use crate::local_storage::clear_all_local_data;
 use serde_json::Error;
@@ -34,7 +34,6 @@ pub enum UserLoginMessage {
 }
 
 pub struct UserLogin {
-    global_vars: GlobalVars,
 
     username: String,
     password: String,
@@ -54,22 +53,13 @@ impl Component for UserLogin {
 
         set_document_title(global_vars.site_title.to_owned(), "Login".to_owned(), global_vars.server_side_renderer,);
         UserLogin {
-            global_vars: global_vars,
             username: "".to_owned(),
             password: "".to_owned(),
             login_message: "".to_owned(),
         }
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserLoginProps,
-    ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-        true
-    }
 
     fn update(
         &mut self,
@@ -81,11 +71,12 @@ impl Component for UserLogin {
 
             UserLoginMessage::UpdateCurrentUser( login_result ) => {
                 // log!("UserLoginMessage::UpdateCurrentUser", login_result.success);
-                self.global_vars.current_user = login_result.user.clone();
-                self.global_vars.login_token = login_result.login_token.clone();
-                self.global_vars.user_loading = false;
+                let mut global_vars = ctx.props().global_vars.clone();
+                global_vars.current_user = login_result.user.clone();
+                global_vars.login_token = login_result.login_token.clone();
+                global_vars.user_loading = false;
 
-                ctx.props().global_vars.update_global_vars.emit( self.global_vars.clone() );
+                ctx.props().global_vars.update_global_vars.emit( global_vars );
 
                 // clear out local data
                 spawn_local (
@@ -101,14 +92,14 @@ impl Component for UserLogin {
                 msg.token = Some(login_result.login_token.to_owned());
                 msg.kind = WebsocketMessageType::GameDataPackage;
 
-                self.global_vars.send_websocket.emit( msg );
+                ctx.props().global_vars.send_websocket.emit( msg );
 
                 let mut msg_saves = WebSocketMessage::default();
 
                 msg_saves.token = Some(login_result.login_token.to_owned());
                 msg_saves.kind = WebsocketMessageType::Saves;
 
-                self.global_vars.send_websocket.emit( msg_saves );
+                ctx.props().global_vars.send_websocket.emit( msg_saves );
 
                 // set_local_storage_string( "saves_owner_id", login_result.user.id.to_string() );
                 set_local_storage_string( "login_token", login_result.login_token.to_owned() );
@@ -145,7 +136,6 @@ impl Component for UserLogin {
         ctx: &Context<Self>,
     ) -> Html {
 
-        // let global_vars = self.global_vars.clone();
         let global_vars = ctx.props().global_vars.clone();
         let global_vars_event = ctx.props().global_vars.clone();
 

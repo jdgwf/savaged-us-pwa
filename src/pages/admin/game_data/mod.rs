@@ -6,37 +6,16 @@ pub mod weapons;
 pub mod armor;
 pub mod gear;
 
-
-use gloo_console::log;
-// use savaged_libs::save_db_row::SaveDBRow;
 use yew_router::prelude::*;
 use yew::prelude::*;
 
 use yew::{html};
 
-// use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem};
 
-use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
-
-// use crate::components::tertiary_links_menu::{
-//     TertiaryLinksMenuItem,
-//     TertiaryLinksMenu
-// };
-// use crate::components::ui_page::UIPage;
-// use crate::main_app::SubmenuData;
-// use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRoute;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-// use gloo_console::log;
+
 
 use self::edges::AdminGameDataEdges;
 use self::gear::AdminGameDataGear;
@@ -44,8 +23,6 @@ use self::armor::AdminGameDataArmor;
 use self::weapons::AdminGameDataWeapons;
 use self::hindrances::AdminGameDataHindrances;
 
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminGameDataRoute {
@@ -138,10 +115,8 @@ pub struct AdminGameDataRouterProps {
 }
 
 pub enum AdminGameDataRouterMessage {
-    ChangedPage(String),
 }
 pub struct AdminGameDataRouter {
-    global_vars: GlobalVars,
 }
 
 impl Component for AdminGameDataRouter {
@@ -151,7 +126,6 @@ impl Component for AdminGameDataRouter {
     fn create(ctx: &Context<Self>) -> Self {
 
         AdminGameDataRouter {
-            global_vars: ctx.props().global_vars.clone(),
         }
     }
 
@@ -172,18 +146,7 @@ impl Component for AdminGameDataRouter {
     //     return true;
     // }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &AdminGameDataRouterProps,
-    ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-
-
-
-        true
-    }
 
     fn view(
         &self,

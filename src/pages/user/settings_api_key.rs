@@ -33,7 +33,6 @@ pub enum SettingsAPIKeyMessage {
 
 pub struct SettingsAPIKey {
 
-    global_vars: GlobalVars,
 }
 
 impl Component for SettingsAPIKey {
@@ -48,7 +47,6 @@ impl Component for SettingsAPIKey {
 
         set_document_title(global_vars.site_title.to_owned(), "API Key".to_owned(), global_vars.server_side_renderer,);
         SettingsAPIKey {
-            global_vars: global_vars,
         }
     }
 
@@ -62,9 +60,10 @@ impl Component for SettingsAPIKey {
 
             SettingsAPIKeyMessage::ConfirmYes( bool ) => {
                 if bool {
-                    let login_token = self.global_vars.login_token.to_owned();
-                    let api_root = self.global_vars.api_root.to_owned();
-                    let mut global_vars = self.global_vars.clone();
+
+                    let mut global_vars = ctx.props().global_vars.clone();
+                    let login_token = global_vars.login_token.to_owned();
+                    let api_root = global_vars.api_root.to_owned();
                     let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
                     spawn_local (
@@ -140,21 +139,13 @@ impl Component for SettingsAPIKey {
 
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &SettingsAPIKeyProps,
-    ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
-        true
-    }
-
     fn view(
         &self,
         ctx: &Context<Self>,
     ) -> Html {
 
-        let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_sub_menu = "settings_apikey".to_owned();
 
         if global_vars.user_loading {
             return html! {
@@ -200,9 +191,8 @@ impl Component for SettingsAPIKey {
                 </UIPage>
             }
         }
-        let mut global_vars = self.global_vars.clone();
 
-        global_vars.current_sub_menu = "settings_apikey".to_owned();
+
 
         html! {
             <UIPage

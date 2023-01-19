@@ -1,7 +1,6 @@
 use chrono::prelude::*;
 use savaged_libs::{public_user_info::PublicUserInfo, user::User};
 use yew::prelude::*;
-use crate::libs::global_vars::GlobalVars;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableOwnershipBadgeProps {

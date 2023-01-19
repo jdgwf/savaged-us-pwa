@@ -14,7 +14,6 @@ use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::user::UserUpdateResult;
 use gloo_console::error;
-use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
 use serde_json::Error;
 

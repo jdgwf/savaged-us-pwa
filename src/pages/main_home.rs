@@ -22,7 +22,7 @@ impl Component for MainHome {
     type Properties = MainHomeProps;
 
     fn create(
-        ctx: &Context<Self>
+        _ctx: &Context<Self>
     ) -> Self {
 
         // let global_vars = ctx.props().global_vars.clone();

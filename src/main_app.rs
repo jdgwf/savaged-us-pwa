@@ -21,15 +21,15 @@ use crate::web_sockets::connect_to_websocket;
 use crate::web_sockets::handle_message::handle_message;
 use gloo_console::error;
 use gloo_console::log;
-use gloo_timers::callback::Timeout;
+// use gloo_timers::callback::Timeout;
 use gloo_timers::future::TimeoutFuture;
-use indexed_db_futures::js_sys::global;
+// use indexed_db_futures::js_sys::global;
 use savaged_libs::user::User;
 use savaged_libs::websocket_message::{
     WebSocketMessage,
     WebsocketMessageType,
 };
-use yew_hooks::prelude::*;
+// use yew_hooks::prelude::*;
 use uuid::{Uuid};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
@@ -378,7 +378,7 @@ impl Component for MainApp {
                 // log!("RemoveAlert", uuid.to_string(), self.alerts.len());
 
                 let mut new_alerts: Vec<AlertDefinition> = Vec::new();
-                for mut alert in self.alerts.clone().into_iter() {
+                for alert in self.alerts.clone().into_iter() {
                     if alert.uuid != uuid {
                         new_alerts.push( alert );
                     }
@@ -667,7 +667,7 @@ impl MainApp {
         // if self.wss.ws.state() == State::Closed {
         //     log!("State Closed?!?")
         // }
-        // if self.global_vars.offline {
+        // if global_varsoffline {
         //     log!("reconnect_interval called");
 
         //     let login_token = self.global_vars.login_token.to_owned();
@@ -692,7 +692,7 @@ impl MainApp {
         //     web_sys::clear_interval_with_handle( self.interval );
         // }
 
-        // if self.global_vars.offline {
+        // if global_varsoffline {
         //     log!("We're disconnected, trying to reconnect...");
 
         //     // if self.interval.is_none() {

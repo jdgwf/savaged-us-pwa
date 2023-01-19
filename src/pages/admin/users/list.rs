@@ -26,7 +26,6 @@ pub enum AdminUsersListMessage {
     SetFetchAdminParams(FetchAdminParameters),
 }
 pub struct AdminUsersList {
-    global_vars: GlobalVars,
     users: Vec<User>,
     paging_data: Option<AdminPagingStatistics>,
     paging_sorting_and_filter: FetchAdminParameters,
@@ -65,7 +64,6 @@ impl Component for AdminUsersList {
 
         AdminUsersList {
             paging_sorting_and_filter: paging,
-            global_vars: ctx.props().global_vars.clone(),
             users: Vec::new(),
             paging_data: None,
             loading: true,
@@ -126,18 +124,6 @@ impl Component for AdminUsersList {
         true
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &AdminUsersListProps,
-    ) -> bool {
-
-        self.global_vars = ctx.props().global_vars.clone();
-
-        self.global_vars.current_sub_menu = "admin-users".to_owned();
-
-        true
-    }
 
     fn view(
         &self,

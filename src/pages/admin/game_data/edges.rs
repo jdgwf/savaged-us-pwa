@@ -55,7 +55,6 @@ pub enum AdminGameDataEdgesMessage {
     SaveItem(bool),
 }
 pub struct AdminGameDataEdges {
-    global_vars: GlobalVars,
     items: Vec<Edge>,
     paging_data: Option<AdminPagingStatistics>,
     paging_sorting_and_filter: FetchAdminParameters,
@@ -99,7 +98,6 @@ impl Component for AdminGameDataEdges {
 
         AdminGameDataEdges {
             paging_sorting_and_filter: paging,
-            global_vars: ctx.props().global_vars.clone(),
             items: Vec::new(),
             paging_data: None,
             loading: true,
@@ -170,13 +168,13 @@ impl Component for AdminGameDataEdges {
                             data: serde_json::to_string(&editing_item).unwrap(),
                             name: editing_item.name,
                             book_id: editing_item.book_id,
-                            login_token: Some(self.global_vars.login_token.to_owned()),
+                            login_token: Some(ctx.props().global_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
 
-                        let api_root = self.global_vars.api_root.to_owned();
-                        let global_vars = self.global_vars.clone();
+                        let api_root = ctx.props().global_vars.api_root.to_owned();
+                        let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                         spawn_local (
@@ -281,7 +279,7 @@ impl Component for AdminGameDataEdges {
                 let self_editing_item = self.editing_item.clone();
                 let mut hind = Edge::new();
                 match self_editing_item {
-                    Some( mut editing_item ) => {
+                    Some( editing_item ) => {
                         hind.active = editing_item.active;
                         hind.book_id = editing_item.book_id;
                     }
@@ -314,7 +312,7 @@ impl Component for AdminGameDataEdges {
                             data: serde_json::to_string(&editing_item).unwrap(),
                             name: editing_item_name,
                             book_id: editing_item.book_id,
-                            login_token: Some(self.global_vars.login_token.to_owned()),
+                            login_token: Some(ctx.props().global_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
@@ -323,8 +321,8 @@ impl Component for AdminGameDataEdges {
                         let edit_item_book_id = editing_item.book_id;
                         let edit_item_book_page = editing_item.page.to_owned();
 
-                        let api_root = self.global_vars.api_root.to_owned();
-                        let global_vars = self.global_vars.clone();
+                        let api_root = ctx.props().global_vars.api_root.to_owned();
+                        let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                         let new_item_callback = ctx.link().callback(AdminGameDataEdgesMessage::NewItem);
@@ -445,9 +443,9 @@ impl Component for AdminGameDataEdges {
             AdminGameDataEdgesMessage::DeleteItem( id ) => {
                 log!("AdminGameDataEdgesMessage::DeleteItem ", id);
 
-                let api_root = self.global_vars.api_root.to_owned();
-                let global_vars = self.global_vars.clone();
-                let login_token = Some(self.global_vars.login_token.to_owned());
+                let api_root = ctx.props().global_vars.api_root.to_owned();
+                let global_vars = ctx.props().global_vars.clone();
+                let login_token = Some(ctx.props().global_vars.login_token.to_owned());
                 let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                 let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
 
@@ -583,8 +581,8 @@ impl Component for AdminGameDataEdges {
 
                         let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
-                        let api_root = self.global_vars.api_root.to_owned();
-                        let login_token = Some(self.global_vars.login_token.to_owned());
+                        let api_root = ctx.props().global_vars.api_root.to_owned();
+                        let login_token = Some(ctx.props().global_vars.login_token.to_owned());
                         let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                         let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
                         let item = item.clone();
@@ -815,17 +813,6 @@ impl Component for AdminGameDataEdges {
             }
 
         }
-        true
-    }
-
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &AdminGameDataEdgesProps,
-    ) -> bool {
-
-        self.global_vars = ctx.props().global_vars.clone();
-
         true
     }
 
@@ -1093,7 +1080,7 @@ impl Component for AdminGameDataEdges {
                                     // />
                                     <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
-                                            current_user={self.global_vars.current_user.clone()}
+                                            current_user={ctx.props().global_vars.current_user.clone()}
 
                                             created_by={row.created_by_obj}
                                             created_on={row.created_on}
@@ -1143,10 +1130,7 @@ impl Component for AdminGameDataEdges {
         }
     }
 
-    fn destroy(&mut self, ctx: &Context<Self>) {
-        self.editing_item = None;
-        self.items = Vec::new();
-    }
+
 }
 
 async fn _get_data(

@@ -94,7 +94,6 @@ pub enum AdminRouterMessage {
 
 }
 pub struct AdminRouter {
-    global_vars: GlobalVars,
 }
 
 impl Component for AdminRouter {
@@ -104,7 +103,6 @@ impl Component for AdminRouter {
     fn create(ctx: &Context<Self>) -> Self {
 
         AdminRouter {
-            global_vars: ctx.props().global_vars.clone(),
         }
     }
 
@@ -133,7 +131,6 @@ impl Component for AdminRouter {
         _props: &AdminRouterProps,
     ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
 
         true
     }

@@ -21,7 +21,7 @@ pub enum UserSavesViewMessage {
     ChangeFolder(String),
 }
 pub struct UserSavesView {
-    global_vars: GlobalVars,
+    // global_vars: GlobalVars,
     save: Option<SaveDBRow>,
 }
 
@@ -47,7 +47,7 @@ impl Component for UserSavesView {
         }
 
         UserSavesView {
-            global_vars: ctx.props().global_vars.clone(),
+            // global_vars: ctx.props().global_vars.clone(),
             save: save,
         }
     }
@@ -73,32 +73,31 @@ impl Component for UserSavesView {
 
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserSavesViewProps,
-    ) -> bool {
-
-        self.global_vars = ctx.props().global_vars.clone();
+    // fn changed(
+    //     &mut self,
+    //     ctx: &Context<Self>,
+    //     _props: &UserSavesViewProps,
+    // ) -> bool {
 
 
-        let mut save: Option<SaveDBRow> = None;
 
-        match ctx.props().global_vars.clone().saves {
-            Some( local_saves ) => {
-                for item in local_saves {
-                    if item.uuid == ctx.props().uuid {
-                        self.save = Some(item.clone());
-                    }
-                }
-            }
-            None => {
+    //     let mut save: Option<SaveDBRow> = None;
 
-            }
-        }
+    //     match ctx.props().global_vars.clone().saves {
+    //         Some( local_saves ) => {
+    //             for item in local_saves {
+    //                 if item.uuid == ctx.props().uuid {
+    //                     self.save = Some(item.clone());
+    //                 }
+    //             }
+    //         }
+    //         None => {
 
-        true
-    }
+    //         }
+    //     }
+
+    //     true
+    // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
 
@@ -107,7 +106,7 @@ impl Component for UserSavesView {
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
-        if self.global_vars.user_loading {
+        if global_vars.user_loading {
 
             return html! {
             <UIPage
@@ -124,7 +123,7 @@ impl Component for UserSavesView {
         }
         }
 
-        if self.global_vars.current_user.id == 0 {
+        if global_vars.current_user.id == 0 {
             return html! {
                 <UIPage
                     global_vars={global_vars}

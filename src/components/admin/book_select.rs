@@ -40,8 +40,6 @@ pub fn book_select(
         move |e: Event | {
             e.prevent_default();
 
-            let nv = onchange.clone();
-
             let input: HtmlSelectElement = e.target_unchecked_into();
 
             let filter_book = input.value().parse().unwrap_or(0);

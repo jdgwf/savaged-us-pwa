@@ -37,7 +37,6 @@ pub struct UserCampaignsMessage {
 
 }
 pub struct UserCampaigns {
-    global_vars: GlobalVars,
 }
 
 impl Component for UserCampaigns {
@@ -47,7 +46,6 @@ impl Component for UserCampaigns {
     fn create(ctx: &Context<Self>) -> Self {
 
         UserCampaigns {
-            global_vars: ctx.props().global_vars.clone(),
         }
     }
 
@@ -56,27 +54,11 @@ impl Component for UserCampaigns {
     //     true
     // }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &UserCampaignsProps,
-    ) -> bool {
 
-        self.global_vars = ctx.props().global_vars.clone();
-
-        // let submenu_data =
-        //     SubmenuData {
-        //         html: html! (<></>),
-        //         menu: "user-menu-no-user".to_owned(),
-        //         unread_notifications: self.global_vars.current_user.unread_notifications,
-        //     };
-
-        true
-    }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
-        if self.global_vars.user_loading {
+        if global_vars.user_loading {
 
             return html! {
                 <UIPage
@@ -93,7 +75,7 @@ impl Component for UserCampaigns {
             }
             }
 
-            if self.global_vars.current_user.id == 0 {
+            if global_vars.current_user.id == 0 {
                 return html! {
                     <UIPage
                         global_vars={global_vars}
