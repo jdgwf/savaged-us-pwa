@@ -5,8 +5,10 @@ use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::alerts::AlertDefinition;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::edit_forms::hindrance::EditHindrance;
+use crate::components::edit_forms::edge::EditEdge;
 use crate::components::standard_modal::StandardModal;
+use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
+
 use crate::components::ui_page::UIPage;
 use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
 use savaged_libs::alert_level::AlertLevel;
@@ -17,7 +19,7 @@ use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::admin_libs::{AdminPagingStatistics, AdminSavePackage, AdminSaveReturn, AdminDeletePackage};
 use savaged_libs::book::Book;
 use savaged_libs::game_data_row::GameDataRow;
-use savaged_libs::player_character::hindrance::Hindrance;
+use savaged_libs::player_character::edge::Edge;
 use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, set_local_storage_u32};
@@ -25,22 +27,21 @@ use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use std::mem;
-use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
-
 
 #[derive(Properties, PartialEq)]
-pub struct AdminGameDataHindrancesProps {
+pub struct AdminGameDataEdgesProps {
     pub global_vars: GlobalVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
+
 }
 
-pub enum AdminGameDataHindrancesMessage {
-    SetItems(Vec<Hindrance>),
+pub enum AdminGameDataEdgesMessage {
+    SetItems(Vec<Edge>),
     NewItem( u32 ),
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
-    UpdateHindrance(Hindrance),
-    UpdateHindranceAndRefresh(Hindrance),
+    UpdateEdge(Edge),
+    UpdateEdgeAndRefresh(Edge),
 
     ViewItem( u32 ),
     EditItemDialog( u32 ),
@@ -53,28 +54,28 @@ pub enum AdminGameDataHindrancesMessage {
     SaveItemAndLeaveOpen(bool),
     SaveItem(bool),
 }
-pub struct AdminGameDataHindrances {
+pub struct AdminGameDataEdges {
     global_vars: GlobalVars,
-    items: Vec<Hindrance>,
+    items: Vec<Edge>,
     paging_data: Option<AdminPagingStatistics>,
     paging_sorting_and_filter: FetchAdminParameters,
     loading: bool,
-    editing_item: Option<Hindrance>,
+    editing_item: Option<Edge>,
     is_adding: bool,
     is_editing: bool,
 }
 
-impl Component for AdminGameDataHindrances {
-    type Message = AdminGameDataHindrancesMessage;
-    type Properties = AdminGameDataHindrancesProps;
+impl Component for AdminGameDataEdges {
+    type Message = AdminGameDataEdgesMessage;
+    type Properties = AdminGameDataEdgesProps;
 
     fn create(ctx: &Context<Self>) -> Self {
 
         let global_vars = ctx.props().global_vars.clone();
 
         let login_token = global_vars.login_token.clone();
-        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
-        let set_paging = ctx.link().callback(AdminGameDataHindrancesMessage::SetPagingStats);
+        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+        let set_paging = ctx.link().callback(AdminGameDataEdgesMessage::SetPagingStats);
 
         let mut paging_sorting_and_filter = new_fetch_admin_params();
 
@@ -96,7 +97,7 @@ impl Component for AdminGameDataHindrances {
             }
         );
 
-        AdminGameDataHindrances {
+        AdminGameDataEdges {
             paging_sorting_and_filter: paging,
             global_vars: ctx.props().global_vars.clone(),
             items: Vec::new(),
@@ -111,12 +112,12 @@ impl Component for AdminGameDataHindrances {
     fn update(
         &mut self,
         ctx: &Context<Self>,
-        msg: AdminGameDataHindrancesMessage
+        msg: AdminGameDataEdgesMessage
     ) -> bool {
 
         match msg {
 
-            AdminGameDataHindrancesMessage::ViewItem( id ) => {
+            AdminGameDataEdgesMessage::ViewItem( id ) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -129,7 +130,7 @@ impl Component for AdminGameDataHindrances {
                 return false;
             }
 
-            AdminGameDataHindrancesMessage::EditItemDialog( id ) => {
+            AdminGameDataEdgesMessage::EditItemDialog( id ) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -142,9 +143,9 @@ impl Component for AdminGameDataHindrances {
                 return false;
             }
 
-            AdminGameDataHindrancesMessage::AddItemDialog( _nv ) => {
-                log!("AdminGameDataHindrancesMessage::AddItemDialog");
-                let mut new_hind = Hindrance::new();
+            AdminGameDataEdgesMessage::AddItemDialog( _nv ) => {
+                log!("AdminGameDataEdgesMessage::AddItemDialog");
+                let mut new_hind = Edge::new();
                 new_hind.book_id = self.paging_sorting_and_filter.filter_book;
                 new_hind.active = true;
                 self.editing_item = Some( new_hind );
@@ -154,8 +155,8 @@ impl Component for AdminGameDataHindrances {
                 return true;
             }
 
-            AdminGameDataHindrancesMessage::SaveItem( as_new ) => {
-                log!("AdminGameDataHindrancesMessage::SaveItem");
+            AdminGameDataEdgesMessage::SaveItem( as_new ) => {
+                log!("AdminGameDataEdgesMessage::SaveItem");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
                 match self_editing_item {
@@ -177,11 +178,11 @@ impl Component for AdminGameDataHindrances {
                         let api_root = self.global_vars.api_root.to_owned();
                         let global_vars = self.global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
-                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                         spawn_local (
                             async move {
                                 let result = fetch_api_save_game_data_row(
-                                    (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                    (api_root + "/admin/game-data/edges/save").to_owned(),
                                     req,
 
                                 ).await;
@@ -194,14 +195,14 @@ impl Component for AdminGameDataHindrances {
                                                 match save_result_data.game_data {
                                                     Some( vec_val ) => {
 
-                                                        let mut rv: Vec<Hindrance> = Vec::new();
+                                                        let mut rv: Vec<Edge> = Vec::new();
                                                         for mut data in vec_val.into_iter() {
                                                             data.created_by_user = None;
                                                             data.updated_by_user = None;
                                                             data.updated_by_user = None;
 
                                                             // log!("data", format!("{:?}", data) );
-                                                            let hind = data.to_hindrance().unwrap();
+                                                            let hind = data.to_edge().unwrap();
                                                             // log!("data.updated_on", data.updated_on);
                                                             // log!("data.created_on", data.created_on);
 
@@ -276,9 +277,9 @@ impl Component for AdminGameDataHindrances {
             }
 
 
-            AdminGameDataHindrancesMessage::NewItem( book_id ) => {
+            AdminGameDataEdgesMessage::NewItem( book_id ) => {
                 let self_editing_item = self.editing_item.clone();
-                let mut hind = Hindrance::new();
+                let mut hind = Edge::new();
                 match self_editing_item {
                     Some( mut editing_item ) => {
                         hind.active = editing_item.active;
@@ -296,8 +297,8 @@ impl Component for AdminGameDataHindrances {
                 return true;
             }
 
-            AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen( _unused ) => {
-                log!("AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen");
+            AdminGameDataEdgesMessage::SaveItemAndLeaveOpen( _unused ) => {
+                log!("AdminGameDataEdgesMessage::SaveItemAndLeaveOpen");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
 
@@ -325,16 +326,16 @@ impl Component for AdminGameDataHindrances {
                         let api_root = self.global_vars.api_root.to_owned();
                         let global_vars = self.global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
-                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
-                        let new_item_callback = ctx.link().callback(AdminGameDataHindrancesMessage::NewItem);
+                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                        let new_item_callback = ctx.link().callback(AdminGameDataEdgesMessage::NewItem);
 
 
-                        let update_hindrance_callback = ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindranceAndRefresh);
+                        let update_edge_callback = ctx.link().callback(AdminGameDataEdgesMessage::UpdateEdgeAndRefresh);
 
                         spawn_local (
                             async move {
                                 let result = fetch_api_save_game_data_row(
-                                    (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                    (api_root + "/admin/game-data/edges/save").to_owned(),
                                     req,
 
                                 ).await;
@@ -351,13 +352,13 @@ impl Component for AdminGameDataHindrances {
                                                             new_item_callback.emit( edit_item_book_id );
                                                         }
 
-                                                        let mut rv: Vec<Hindrance> = Vec::new();
+                                                        let mut rv: Vec<Edge> = Vec::new();
                                                         for mut data in vec_val.into_iter() {
                                                             data.created_by_user = None;
                                                             data.updated_by_user = None;
                                                             data.updated_by_user = None;
 
-                                                            let hind = data.to_hindrance().unwrap();
+                                                            let hind = data.to_edge().unwrap();
 
                                                             // log!("data", format!("{:?}", data) );
 
@@ -383,11 +384,11 @@ impl Component for AdminGameDataHindrances {
                                                         };
                                                         global_vars.add_alert.emit( alert_def );
 
-                                                    let mut new_hind = Hindrance::new();
+                                                    let mut new_hind = Edge::new();
                                                     new_hind.book_id = edit_item_book_id;
                                                     new_hind.active = edit_item_active;
                                                     new_hind.page = edit_item_book_page;
-                                                    update_hindrance_callback.emit( new_hind );
+                                                    update_edge_callback.emit( new_hind );
 
                                                     }
 
@@ -441,13 +442,13 @@ impl Component for AdminGameDataHindrances {
                 }
             }
 
-            AdminGameDataHindrancesMessage::DeleteItem( id ) => {
-                log!("AdminGameDataHindrancesMessage::DeleteItem ", id);
+            AdminGameDataEdgesMessage::DeleteItem( id ) => {
+                log!("AdminGameDataEdgesMessage::DeleteItem ", id);
 
                 let api_root = self.global_vars.api_root.to_owned();
                 let global_vars = self.global_vars.clone();
                 let login_token = Some(self.global_vars.login_token.to_owned());
-                let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                 let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
 
 
@@ -463,7 +464,7 @@ impl Component for AdminGameDataHindrances {
                             title: Some("Deletion Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to delete the hindrance '".to_owned() + &item.name + &"'?" ),
+                            text: Some( "Are you sure you would like to delete the edge '".to_owned() + &item.name + &"'?" ),
                             label_yes: None,
                             label_no: None,
                             callback: Callback::from( move |_clicked_yes| {
@@ -490,7 +491,7 @@ impl Component for AdminGameDataHindrances {
                                 spawn_local (
                                     async move {
                                         let result = fetch_api_delete_game_data_row(
-                                            (api_root + "/admin/game-data/hindrances/delete").to_owned(),
+                                            (api_root + "/admin/game-data/edges/delete").to_owned(),
                                             req,
                                         ).await;
 
@@ -502,13 +503,13 @@ impl Component for AdminGameDataHindrances {
                                                         match save_result_data.game_data {
                                                             Some( vec_val ) => {
 
-                                                                let mut rv: Vec<Hindrance> = Vec::new();
+                                                                let mut rv: Vec<Edge> = Vec::new();
                                                                 for mut data in vec_val.into_iter() {
                                                                     data.created_by_user = None;
                                                                     data.updated_by_user = None;
                                                                     data.updated_by_user = None;
 
-                                                                    let hind = data.to_hindrance().unwrap();
+                                                                    let hind = data.to_edge().unwrap();
 
                                                                     rv.push( hind )
                                                                 }
@@ -574,8 +575,8 @@ impl Component for AdminGameDataHindrances {
                 }
             }
 
-            AdminGameDataHindrancesMessage::DuplicateItem( id ) => {
-                log!("AdminGameDataHindrancesMessage::DuplicateItem", id);
+            AdminGameDataEdgesMessage::DuplicateItem( id ) => {
+                log!("AdminGameDataEdgesMessage::DuplicateItem", id);
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -584,7 +585,7 @@ impl Component for AdminGameDataHindrances {
 
                         let api_root = self.global_vars.api_root.to_owned();
                         let login_token = Some(self.global_vars.login_token.to_owned());
-                        let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
+                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
                         let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
                         let item = item.clone();
                         let global_vars = ctx.props().global_vars.clone();
@@ -595,7 +596,7 @@ impl Component for AdminGameDataHindrances {
                             title: Some("Duplication Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to duplicate the hindrance '".to_owned() + &item_name + &"'?" ),
+                            text: Some( "Are you sure you would like to duplicate the edge '".to_owned() + &item_name + &"'?" ),
                             label_yes: None,
                             label_no: None,
                             callback: Callback::from( move |_clicked_yes| {
@@ -627,7 +628,7 @@ impl Component for AdminGameDataHindrances {
                                     async move {
 
                                         let result = fetch_api_save_game_data_row(
-                                            (api_root + "/admin/game-data/hindrances/save").to_owned(),
+                                            (api_root + "/admin/game-data/edges/save").to_owned(),
                                             req,
 
                                         ).await;
@@ -641,13 +642,13 @@ impl Component for AdminGameDataHindrances {
                                                             Some( vec_val ) => {
 
 
-                                                                let mut rv: Vec<Hindrance> = Vec::new();
+                                                                let mut rv: Vec<Edge> = Vec::new();
                                                                 for mut data in vec_val.into_iter() {
                                                                     data.created_by_user = None;
                                                                     data.updated_by_user = None;
                                                                     data.updated_by_user = None;
 
-                                                                    let hind = data.to_hindrance().unwrap();
+                                                                    let hind = data.to_edge().unwrap();
 
                                                                     rv.push( hind )
                                                                 }
@@ -655,7 +656,7 @@ impl Component for AdminGameDataHindrances {
 
                                                                 let alert_def: AlertDefinition = AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some("Hindrance '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
+                                                                    text: Some("Edge '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
                                                                     ..Default::default()
                                                                 };
                                                                 global_vars.add_alert.emit( alert_def );
@@ -720,28 +721,28 @@ impl Component for AdminGameDataHindrances {
 
             }
 
-            AdminGameDataHindrancesMessage::Cancel( _new_value ) => {
-                log!("AdminGameDataHindrancesMessage::Cancel");
+            AdminGameDataEdgesMessage::Cancel( _new_value ) => {
+                log!("AdminGameDataEdgesMessage::Cancel");
                 self.editing_item = None;
             }
 
-            AdminGameDataHindrancesMessage::UpdateHindrance( new_value ) => {
+            AdminGameDataEdgesMessage::UpdateEdge( new_value ) => {
                 self.editing_item = Some(new_value);
                 return false;
 
             }
-            AdminGameDataHindrancesMessage::UpdateHindranceAndRefresh( new_value ) => {
+            AdminGameDataEdgesMessage::UpdateEdgeAndRefresh( new_value ) => {
                 self.editing_item = Some(new_value);
                 return true;
 
             }
 
-            AdminGameDataHindrancesMessage::SetItems( new_value ) => {
+            AdminGameDataEdgesMessage::SetItems( new_value ) => {
                 self.items = new_value;
                 self.loading = false;
             }
 
-            AdminGameDataHindrancesMessage::SetPagingStats( new_value ) => {
+            AdminGameDataEdgesMessage::SetPagingStats( new_value ) => {
 
                 match new_value {
                     Some(mut nv) => {
@@ -771,15 +772,15 @@ impl Component for AdminGameDataHindrances {
 
             }
 
-            AdminGameDataHindrancesMessage::SetFetchAdminParams( new_value ) => {
+            AdminGameDataEdgesMessage::SetFetchAdminParams( new_value ) => {
                 let mut paging_sorting_and_filter = new_value.clone();
                 self.paging_sorting_and_filter = new_value.clone();
 
                 let global_vars = ctx.props().global_vars.clone();
 
                 let login_token = global_vars.login_token.clone();
-                let set_items = ctx.link().callback(AdminGameDataHindrancesMessage::SetItems);
-                let set_paging = ctx.link().callback(AdminGameDataHindrancesMessage::SetPagingStats);
+                let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                let set_paging = ctx.link().callback(AdminGameDataEdgesMessage::SetPagingStats);
 
                 set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
 
@@ -820,7 +821,7 @@ impl Component for AdminGameDataHindrances {
     fn changed(
         &mut self,
         ctx: &Context<Self>,
-        _props: &AdminGameDataHindrancesProps,
+        _props: &AdminGameDataEdgesProps,
     ) -> bool {
 
         self.global_vars = ctx.props().global_vars.clone();
@@ -833,8 +834,8 @@ impl Component for AdminGameDataHindrances {
         ctx: &Context<Self>
     ) -> Html {
 
-        let callback_fetch_admin_params = ctx.link().callback( AdminGameDataHindrancesMessage::SetFetchAdminParams ).clone();
-        let callback_fetch_admin_params_2 = ctx.link().callback( AdminGameDataHindrancesMessage::SetFetchAdminParams ).clone();
+        let callback_fetch_admin_params = ctx.link().callback( AdminGameDataEdgesMessage::SetFetchAdminParams ).clone();
+        let callback_fetch_admin_params_2 = ctx.link().callback( AdminGameDataEdgesMessage::SetFetchAdminParams ).clone();
 
         let mut non_filtered_count: u32 = 0;
         let mut filtered_count: u32= 0;
@@ -874,7 +875,7 @@ impl Component for AdminGameDataHindrances {
         let mut edit_modal = html!{<></>};
         match &self.editing_item {
             Some( editing_item ) => {
-                let mut editing_title = Some("Viewing Hindrance".to_owned());
+                let mut editing_title = Some("Viewing Edge".to_owned());
 
                 let mut save_callback:Option<Callback<bool>> = None;
                 let mut add_callback: Option<Callback<bool>>= None;
@@ -884,17 +885,17 @@ impl Component for AdminGameDataHindrances {
                 let mut read_only = true;
 
                 if self.is_adding {
-                    editing_title = Some("Adding Hindrance".to_owned());
-                    add_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
-                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen).clone());
+                    editing_title = Some("Adding Edge".to_owned());
+                    add_callback = Some(ctx.link().callback(AdminGameDataEdgesMessage::SaveItem).clone());
+                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataEdgesMessage::SaveItemAndLeaveOpen).clone());
                     read_only = false;
                 }
 
                 if self.is_editing {
-                    editing_title = Some("Editing Hindrance".to_owned());
-                    save_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
-                    save_as_new_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItem).clone());
-                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataHindrancesMessage::SaveItemAndLeaveOpen).clone());
+                    editing_title = Some("Editing Edge".to_owned());
+                    save_callback = Some(ctx.link().callback(AdminGameDataEdgesMessage::SaveItem).clone());
+                    save_as_new_callback = Some(ctx.link().callback(AdminGameDataEdgesMessage::SaveItem).clone());
+                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataEdgesMessage::SaveItemAndLeaveOpen).clone());
                     read_only = false;
                 }
 
@@ -911,19 +912,19 @@ impl Component for AdminGameDataHindrances {
                 <StandardModal
                     xl={true}
                     title={editing_title}
-                    close_cancel_callback={Some(ctx.link().callback(AdminGameDataHindrancesMessage::Cancel).clone())}
+                    close_cancel_callback={Some(ctx.link().callback(AdminGameDataEdgesMessage::Cancel).clone())}
                     save_callback={save_callback}
                     add_callback={add_callback}
                     save_as_new_callback={save_as_new_callback}
                     save_and_leave_open_callback={save_and_leave_open_callback}
                 >
-                    <EditHindrance
+                    <EditEdge
                         for_admin={true}
                         global_vars={ctx.props().global_vars.clone()}
                         readonly={read_only}
                         edit_item={editing_item.clone()}
                         book_list={book_list}
-                        on_changed_callback={ctx.link().callback(AdminGameDataHindrancesMessage::UpdateHindrance).clone()}
+                        on_changed_callback={ctx.link().callback(AdminGameDataEdgesMessage::UpdateEdge).clone()}
                     />
 
 
@@ -933,20 +934,22 @@ impl Component for AdminGameDataHindrances {
             None => {}
         }
 
-        let add_item = ctx.link().callback(AdminGameDataHindrancesMessage::AddItemDialog);
+        let add_item = ctx.link().callback(AdminGameDataEdgesMessage::AddItemDialog);
 
         html! {
         <UIPage
             global_vars={global_vars.clone()}
-            page_title="Admin Hindrances"
+            page_title="Admin Edges"
             submenu_tag={"admin".to_owned()}
             modal={Some(edit_modal)}
         >
+
+
         <TertiaryLinksMenu
             server_side_renderer={global_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
-            current_tag={"hindrances".to_owned()}
+            current_tag={"edges".to_owned()}
         />
 
         <div class="pull-right">
@@ -957,7 +960,7 @@ impl Component for AdminGameDataHindrances {
                 global_vars={ctx.props().global_vars.clone()}
             />
         </div>
-                <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances"}</h2>
+                <h2><i class="fa fa-items" /><Nbsp />{"Admin Edges"}</h2>
 
                     <table class="admin-table">
                     <thead>
@@ -1049,22 +1052,22 @@ impl Component for AdminGameDataHindrances {
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_view_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::ViewItem));
+                                    callback_view_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::ViewItem));
                                 }
                                 if global_vars.current_user.admin_can_write_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::EditItemDialog));
-                                    callback_duplicate_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DuplicateItem));
+                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::EditItemDialog));
+                                    callback_duplicate_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::DuplicateItem));
                                 }
                                 if global_vars.current_user.admin_can_delete_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_delete_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DeleteItem));
+                                    callback_delete_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::DeleteItem));
                                 }
                                 html!{<tr>
 
@@ -1149,13 +1152,13 @@ impl Component for AdminGameDataHindrances {
 async fn _get_data(
     global_vars: GlobalVars,
     paging_sorting_and_filter: FetchAdminParameters,
-    set_items: Callback<Vec<Hindrance>>,
+    set_items: Callback<Vec<Edge>>,
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
     let api_root = global_vars.api_root.clone();
 
     let result = fetch_admin_api(
-        (api_root.to_owned() + "/admin/game-data/hindrances/get").to_owned(),
+        (api_root.to_owned() + "/admin/game-data/edges/get").to_owned(),
         paging_sorting_and_filter.clone(),
     ).await;
 
@@ -1165,9 +1168,9 @@ async fn _get_data(
             match vec_val_result {
                 Ok( vec_val ) => {
 
-                    let mut rv: Vec<Hindrance> = Vec::new();
+                    let mut rv: Vec<Edge> = Vec::new();
                     for data in vec_val.into_iter() {
-                        let hind = data.to_hindrance().unwrap();
+                        let hind = data.to_edge().unwrap();
                         log!( format!("hind {} {}", &hind.name, mem::size_of_val(&hind) ) );
                         rv.push( hind );
                     }
@@ -1189,7 +1192,7 @@ async fn _get_data(
     }
 
     let result = fetch_admin_api(
-        (api_root + "/admin/game-data/hindrances/paging").to_owned(),
+        (api_root + "/admin/game-data/edges/paging").to_owned(),
         paging_sorting_and_filter.clone(),
 
     ).await;

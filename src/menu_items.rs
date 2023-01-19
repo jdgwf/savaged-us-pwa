@@ -675,8 +675,7 @@ fn _add_admin_tab(
                             admin_only: false,
                             link_class: None,
 
-                            submenu_tag: None,
-                            submenu: None,
+
 
                             title: "Game Data Administration".to_owned(),
                             icon_class: None, // "fa fa-house".to_owned(),
@@ -684,6 +683,10 @@ fn _add_admin_tab(
                             url: None,
                             menu_tag: "admin-game-data".to_owned(),
                             sub_menu_tag: "admin-game-data".to_owned(),
+
+
+                            submenu_tag: None,
+                            submenu: None,
                         },
                     ]
                 ),

@@ -15,6 +15,8 @@ use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::register::Register;
 use pages::user::UserRouter;
+use savaged_libs::banner::SimpleBanner;
+use savaged_libs::partner::Partner;
 use savaged_libs::user::User;
 use std::collections::HashMap;
 use yew::prelude::*;
@@ -24,6 +26,8 @@ use yew_router::prelude::*;
 #[derive(Properties, PartialEq, Eq, Debug)]
 pub struct ServerAppProps {
     pub url: AttrValue,
+    pub partners: Option<Vec<Partner>>,
+    pub banners: Option<Vec<SimpleBanner>>,
     // pub queries: HashMap<String, String>,
 }
 
@@ -181,10 +185,12 @@ pub fn ServerApp(
             server_side_renderer: true,
             server_side_renderer_history: None,
             show_mobile_menu: false,
-            site_title: "v4.savaged.us".to_owned(),
+            site_title: "Savaged.us v4".to_owned(),
             toggle_mobile_menu_callback: Callback::noop(),
             update_global_vars: Callback::noop(),
             user_loading: false,
+            partners: props.partners.clone(),
+            banners: props.banners.clone(),
         }
     );
 

@@ -402,7 +402,7 @@ impl Component for UserSavesList {
                 submenu_tag={"user-data".to_owned()}
             >
                 <TertiaryMenu
-                    global_vars={global_vars.clone()}
+                    server_side_renderer={global_vars.server_side_renderer}
                     menu_items={sub_menu_items}
                     menu_changed_callback={change_filter_callback_character}
                     local_storage_variable={"saves_filter".to_owned()}

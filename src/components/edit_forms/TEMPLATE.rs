@@ -40,14 +40,14 @@ pub enum EditHindranceMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
-    SetMinorOrMajorHindrance(bool),
-    SetMajorHindrance(bool),
+    // SetMinorOrMajorHindrance(bool),
+    // SetMajorHindrance(bool),
 
-    UpdateConflicts( String ),
-    UpdateEffects( String ),
+    // UpdateConflicts( String ),
+    // UpdateEffects( String ),
 
-    UpdateMinorEffects( String ),
-    UpdateSummaryMinor( String ),
+    // UpdateMinorEffects( String ),
+    // UpdateSummaryMinor( String ),
 
     UpdateBookID( u32 ),
     UpdatePage(String),
@@ -117,17 +117,17 @@ impl Component for EditHindrance {
                 return true;
             }
 
-            EditHindranceMessage::SetMinorOrMajorHindrance( new_value ) => {
-                self.edit_item.minor_or_major = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
-                return true;
-            }
+            // EditHindranceMessage::SetMinorOrMajorHindrance( new_value ) => {
+            //     self.edit_item.minor_or_major = new_value.to_owned();
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
+            //     return true;
+            // }
 
-            EditHindranceMessage::SetMajorHindrance( new_value ) => {
-                self.edit_item.major = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
-                return true;
-            }
+            // EditHindranceMessage::SetMajorHindrance( new_value ) => {
+            //     self.edit_item.major = new_value.to_owned();
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
+            //     return true;
+            // }
 
             EditHindranceMessage::UpdateActive( new_value ) => {
                 self.edit_item.active = new_value.to_owned();
@@ -135,49 +135,49 @@ impl Component for EditHindrance {
                 return true;
             }
 
-            EditHindranceMessage::UpdateConflicts( new_value ) => {
+            // EditHindranceMessage::UpdateConflicts( new_value ) => {
 
-                let mut nv: Vec<String> = Vec::new();
+            //     let mut nv: Vec<String> = Vec::new();
 
-                for val in new_value.as_str().split("\n") {
-                    nv.push( val.to_owned() );
-                }
+            //     for val in new_value.as_str().split("\n") {
+            //         nv.push( val.to_owned() );
+            //     }
 
-                self.edit_item.conflicts = nv;
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
-                return true;
-            }
+            //     self.edit_item.conflicts = nv;
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
+            //     return true;
+            // }
 
-            EditHindranceMessage::UpdateEffects( new_value ) => {
-                let mut nv: Vec<String> = Vec::new();
+            // EditHindranceMessage::UpdateEffects( new_value ) => {
+            //     let mut nv: Vec<String> = Vec::new();
 
-                for val in new_value.as_str().split("\n") {
-                    nv.push( val.to_owned() );
-                }
+            //     for val in new_value.as_str().split("\n") {
+            //         nv.push( val.to_owned() );
+            //     }
 
-                self.edit_item.effects = nv;
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
-                return true;
-            }
+            //     self.edit_item.effects = nv;
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
+            //     return true;
+            // }
 
-            EditHindranceMessage::UpdateMinorEffects( new_value ) => {
+            // EditHindranceMessage::UpdateMinorEffects( new_value ) => {
 
-                let mut nv: Vec<String> = Vec::new();
+            //     let mut nv: Vec<String> = Vec::new();
 
-                for val in new_value.as_str().split("\n") {
-                    nv.push( val.to_owned() );
-                }
+            //     for val in new_value.as_str().split("\n") {
+            //         nv.push( val.to_owned() );
+            //     }
 
-                self.edit_item.effects_minor = nv;
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
-                return true;
-            }
+            //     self.edit_item.effects_minor = nv;
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
+            //     return true;
+            // }
 
-            EditHindranceMessage::UpdateSummaryMinor( new_value ) => {
-                self.edit_item.summary_minor = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
-                return true;
-            }
+            // EditHindranceMessage::UpdateSummaryMinor( new_value ) => {
+            //     self.edit_item.summary_minor = new_value.to_owned();
+            //     ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+            //     return true;
+            // }
 
             EditHindranceMessage::UpdateBookID( new_value ) => {
                 self.edit_item.book_id = new_value;
@@ -366,42 +366,42 @@ impl Component for EditHindrance {
                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateName) }
                             />
 
-                            <InputCheckbox
-                                label="Major Hindrance"
-                                readonly={ctx.props().readonly}
-                                checked={self.edit_item.major}
-                                onchange={ctx.link().callback( EditHindranceMessage::SetMajorHindrance )}
-                            />
-                            <InputCheckbox
-                                label="Minor or Major Hindrance"
-                                readonly={ctx.props().readonly}
-                                checked={self.edit_item.minor_or_major}
-                                onchange={ctx.link().callback( EditHindranceMessage::SetMinorOrMajorHindrance )}
-                            />
+                            // <InputCheckbox
+                            //     label="Major Hindrance"
+                            //     readonly={ctx.props().readonly}
+                            //     checked={self.edit_item.major}
+                            //     onchange={ctx.link().callback( EditHindranceMessage::SetMajorHindrance )}
+                            // />
+                            // <InputCheckbox
+                            //     label="Minor or Major Hindrance"
+                            //     readonly={ctx.props().readonly}
+                            //     checked={self.edit_item.minor_or_major}
+                            //     onchange={ctx.link().callback( EditHindranceMessage::SetMinorOrMajorHindrance )}
+                            // />
 
-                            if self.edit_item.minor_or_major {
+                            // if self.edit_item.minor_or_major {
 
-                                <InputText
-                                    readonly={ctx.props().readonly}
-                                    label={"Major Summary"}
-                                    value={(self.edit_item.summary).to_owned()}
-                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
-                                />
-                                <InputText
-                                    readonly={ctx.props().readonly}
-                                    label={"Minor Summary"}
-                                    value={(self.edit_item.summary_minor).to_owned()}
-                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummaryMinor) }
-                                />
-                            } else {
-                                <InputText
-                                    readonly={ctx.props().readonly}
-                                    label={"Summary"}
+                            //     <InputText
+                            //         readonly={ctx.props().readonly}
+                            //         label={"Major Summary"}
+                            //         value={(self.edit_item.summary).to_owned()}
+                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                            //     />
+                            //     <InputText
+                            //         readonly={ctx.props().readonly}
+                            //         label={"Minor Summary"}
+                            //         value={(self.edit_item.summary_minor).to_owned()}
+                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummaryMinor) }
+                            //     />
+                            // } else {
+                            //     <InputText
+                            //         readonly={ctx.props().readonly}
+                            //         label={"Summary"}
 
-                                    value={(self.edit_item.summary).to_owned()}
-                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
-                                />
-                            }
+                            //         value={(self.edit_item.summary).to_owned()}
+                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                            //     />
+                            // }
 
                             <InputText
                                 label={"UUID"}
@@ -426,45 +426,45 @@ impl Component for EditHindrance {
                 <fieldset class={"fieldset"}>
                     <legend>{"Effects"}</legend>
 
-                    if self.edit_item.minor_or_major {
-                        <div class="row full-width">
-                            <div class="col-md-6">
-                                <TextArea
-                                    readonly={ctx.props().readonly}
-                                    label={"Major Effects"}
-                                    value={self.edit_item.effects.join("\n")}
-                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
-                                />
-                            </div>
-                            <div class="col-md-6">
-                                <TextArea
-                                    readonly={ctx.props().readonly}
-                                    label={"Minor Effects"}
-                                    value={self.edit_item.effects_minor.join("\n")}
-                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateMinorEffects ) }
-                                />
-                            </div>
-                        </div>
-                    } else {
-                        <TextArea
-                            readonly={ctx.props().readonly}
-                            label={"Effects"}
-                            value={self.edit_item.effects.join("\n")}
-                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
-                        />
-                    }
+                    // if self.edit_item.minor_or_major {
+                    //     <div class="row full-width">
+                    //         <div class="col-md-6">
+                    //             <TextArea
+                    //                 readonly={ctx.props().readonly}
+                    //                 label={"Major Effects"}
+                    //                 value={self.edit_item.effects.join("\n")}
+                    //                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                    //             />
+                    //         </div>
+                    //         <div class="col-md-6">
+                    //             <TextArea
+                    //                 readonly={ctx.props().readonly}
+                    //                 label={"Minor Effects"}
+                    //                 value={self.edit_item.effects_minor.join("\n")}
+                    //                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateMinorEffects ) }
+                    //             />
+                    //         </div>
+                    //     </div>
+                    // } else {
+                    //     <TextArea
+                    //         readonly={ctx.props().readonly}
+                    //         label={"Effects"}
+                    //         value={self.edit_item.effects.join("\n")}
+                    //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                    //     />
+                    // }
                 </fieldset>
             }
 
             if (current_page.as_str() == "selection" || current_page.as_str() == "__all__" ) {
                 <fieldset class={"fieldset"}>
                     <legend>{"Selection"}</legend>
-                    <TextArea
-                        readonly={ctx.props().readonly}
-                        label={"Conflicts"}
-                        value={self.edit_item.conflicts.join("\n")}
-                        onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
-                    />
+                    // <TextArea
+                    //     readonly={ctx.props().readonly}
+                    //     label={"Conflicts"}
+                    //     value={self.edit_item.conflicts.join("\n")}
+                    //     onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
+                    // />
                 </fieldset>
             }
                 </div>

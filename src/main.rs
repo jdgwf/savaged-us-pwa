@@ -51,6 +51,8 @@ fn App() -> Html {
             toggle_mobile_menu_callback: Callback::noop(),
             update_global_vars: Callback::noop(),
             user_loading: user_loading,
+            banners: None,
+            partners: None,
         }
     );
 

@@ -125,6 +125,7 @@ pub fn edit_view_delete_buttons(
                         {"Page: "}<Nbsp />
                         <select
                             onchange={callback_set_current_page}
+                            value={props.paging_sorting_and_filter.current_page.to_string()}
                         >
                             {number_per_page.into_iter().map( |count | {
                                 if props.paging_sorting_and_filter.current_page == count {

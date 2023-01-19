@@ -7,6 +7,7 @@ use crate::pages::admin::game_data::AdminGameDataRouter;
 use crate::pages::admin::game_data::home::AdminGameDataHome;
 use crate::pages::admin::users::AdminUsersRouter;
 use home::AdminHome;
+use self::game_data::get_game_data_submenu_items;
 use self::users::list::AdminUsersList;
 use yew::html;
 use yew::prelude::*;
@@ -56,10 +57,16 @@ fn content_switch(
             />
         },
 
-        AdminRoute::AdminGameDataHome => html! {
-            <AdminGameDataHome
-                global_vars={global_vars}
-            />
+        AdminRoute::AdminGameDataHome => {
+            let sub_menu_items = get_game_data_submenu_items();
+
+
+            html! {
+                <AdminGameDataHome
+                    global_vars={global_vars}
+                    sub_menu_items={sub_menu_items}
+                />
+            }
         },
 
         AdminRoute::AdminGameDataRouter => html! {

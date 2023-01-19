@@ -17,7 +17,8 @@ pub struct TertiaryMenuItem {
 
 #[derive(Properties, PartialEq)]
 pub struct TertiaryMenuProps {
-    pub global_vars: GlobalVars,
+    // pub global_vars: GlobalVars,
+    pub server_side_renderer: bool,
     pub local_storage_variable: AttrValue,
     pub menu_items: Vec<TertiaryMenuItem>,
     pub menu_changed_callback: Callback<String>,
@@ -27,7 +28,7 @@ pub enum TertiaryMenuMessage {
 }
 
 pub struct TertiaryMenu {
-    global_vars: GlobalVars,
+
     open_dropdown: bool,
 }
 
@@ -38,7 +39,6 @@ impl Component for TertiaryMenu {
     fn create(ctx: &Context<Self>) -> Self {
 
         TertiaryMenu {
-            global_vars: ctx.props().global_vars.clone(),
             open_dropdown: false,
         }
     }
@@ -57,21 +57,11 @@ impl Component for TertiaryMenu {
         true
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &TertiaryMenuProps,
-    ) -> bool {
-        self.global_vars = ctx.props().global_vars.clone();
-
-        true
-    }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let mut filter_type = "character".to_owned();
 
-        if !self.global_vars.server_side_renderer {
+        if !ctx.props().server_side_renderer {
             filter_type = get_local_storage_string( ctx.props().local_storage_variable.as_str(), "character".to_string());
         }
 

@@ -1,16 +1,20 @@
 use yew::{function_component, Properties, Html, html};
 use yew_router::prelude::Link;
+use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
+
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::game_data::AdminGameDataRoute;
-
+use yew::Callback;
 use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHomeProps {
     pub global_vars: GlobalVars,
+    pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
+
 }
 #[function_component(AdminGameDataHome)]
-pub fn info_partners(
+pub fn admin_game_data_home(
     props: &AdminGameDataHomeProps,
 ) -> Html {
 
@@ -23,9 +27,36 @@ pub fn info_partners(
         page_title="Game Data Administration"
         submenu_tag={"admin".to_owned()}
     >
+
+    <TertiaryLinksMenu
+        server_side_renderer={props.global_vars.server_side_renderer}
+        menu_items={props.sub_menu_items.clone()}
+
+        current_tag={"home".to_owned()}
+    />
             <h2><i class="fa fa-dice" /><Nbsp />{"Game Data Administration"}</h2>
 
-            <Link<AdminGameDataRoute> to={AdminGameDataRoute::Hindrances}>{"Hindrances"}</Link<AdminGameDataRoute>>
+            <div class="admin-home-links">
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Hindrances}>
+                    {"Hindrances"}
+                </Link<AdminGameDataRoute>>
+
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Edges}>
+                    {"Edges"}
+                </Link<AdminGameDataRoute>>
+
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Armor}>
+                    {"Armor"}
+                </Link<AdminGameDataRoute>>
+
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Gear}>
+                    {"Gear"}
+                </Link<AdminGameDataRoute>>
+
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Weapons}>
+                    {"Weapons"}
+                </Link<AdminGameDataRoute>>
+            </div>
         </UIPage>
     }
 }

@@ -8,6 +8,8 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::edit_forms::hindrance::EditHindrance;
 use crate::components::standard_modal::StandardModal;
 use crate::components::ui_page::UIPage;
+use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
+
 use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
 use savaged_libs::alert_level::AlertLevel;
 use crate::libs::global_vars::GlobalVars;
@@ -25,13 +27,12 @@ use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use std::mem;
-use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
-
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHindrancesProps {
     pub global_vars: GlobalVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
+
 }
 
 pub enum AdminGameDataHindrancesMessage {
@@ -942,13 +943,13 @@ impl Component for AdminGameDataHindrances {
             submenu_tag={"admin".to_owned()}
             modal={Some(edit_modal)}
         >
+
         <TertiaryLinksMenu
             server_side_renderer={global_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
             current_tag={"hindrances".to_owned()}
         />
-
         <div class="pull-right">
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}

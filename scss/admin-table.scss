@@ -1,4 +1,21 @@
 body {
+
+    .admin-home-links {
+        display: flex;
+        a {
+            display: block;
+            height: 80px;
+            width: 80px;
+            color: #fff;
+            margin: .5rem;
+            background: var(--header-bg-color);
+            border: solid 2px var(--header-bg-color);
+            &:hover {
+                background: var(--borders-color-lighten);
+            }
+        }
+    }
+
     .admin-filter {
         label {
             width: auto;
