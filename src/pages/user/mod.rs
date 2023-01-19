@@ -11,6 +11,7 @@ pub mod settings_private;
 pub mod settings_public;
 use campaigns::UserCampaigns;
 use crate::libs::global_vars::GlobalVars;
+use crate::pages::error404::Error404;
 use notifications::UserNotifications;
 use saves::UserSavesRouter;
 use saves::list::UserSavesList;
@@ -115,7 +116,11 @@ fn content_switch(
                 global_vars={global_vars}
             />
         },
-        UserRoute::NotFound => html! { <h1>{ "UserRoute 404" }</h1> },
+        UserRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 

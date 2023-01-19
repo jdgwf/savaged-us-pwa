@@ -3,11 +3,11 @@ use crate::components::alerts::AlertDefinition;
 use crate::components::alerts::Alerts;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
 use crate::pages::admin::AdminRouter;
 use crate::pages::admin::home::AdminHome;
+use crate::pages::error404::Error404;
 use crate::pages::info::InfoRoute;
 use crate::pages::info::InfoRouter;
 use crate::pages::main_home::MainHome;
@@ -211,15 +211,10 @@ fn content_switch(
             }
         },
         MainRoute::NotFound => {
-            // set_document_title(self.global_vars.site_title.to_owned(), " Not Found :(".to_owned());
             html! {
-                <UIPage
+                <Error404
                     global_vars={global_vars}
-                    page_title="Not Found 🥲"
-                    submenu_tag={"".to_owned()}
-                >
-                    <h1>{ "MainRoute 404" }</h1>
-                </UIPage>
+                />
             }
         }
     }
@@ -247,11 +242,6 @@ impl Component for MainApp {
         global_vars.send_websocket = send_websocket;
         global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
         global_vars.add_alert = ctx.link().callback(MainAppMessage::AddAlert);
-        // let login_token = global_vars.login_token.to_owned();
-        // let mut login_token_send: Option<String> = None;
-        // if !login_token.is_empty() {
-        //     login_token_send = Some(login_token);
-        // }
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);

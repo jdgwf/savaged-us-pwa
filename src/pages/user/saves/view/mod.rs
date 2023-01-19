@@ -1,8 +1,8 @@
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::save_db_row::SaveDBRow;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use yew::html;
 use yew::prelude::*;
@@ -17,8 +17,8 @@ pub struct UserSavesViewProps {
 }
 
 pub enum UserSavesViewMessage {
-    ChangeFilter(String),
-    ChangeFolder(String),
+    // ChangeFilter(String),
+    // ChangeFolder(String),
 }
 pub struct UserSavesView {
     // global_vars: GlobalVars,
@@ -58,17 +58,17 @@ impl Component for UserSavesView {
     ) -> bool {
 
         match msg {
-            UserSavesViewMessage::ChangeFilter( filter_type ) => {
-                // log!("ChangeFilter", filter_type);
-                set_local_storage_string( "saves_filter", filter_type);
-                true
-            }
+            // UserSavesViewMessage::ChangeFilter( filter_type ) => {
+            //     // log!("ChangeFilter", filter_type);
+            //     set_local_storage_string( "saves_filter", filter_type);
+            //     true
+            // }
 
-            UserSavesViewMessage::ChangeFolder( folder_name ) => {
-                // log!("ChangeFolder", folder);
-                set_local_storage_string( "saves_folder", folder_name);
-                true
-            }
+            // UserSavesViewMessage::ChangeFolder( folder_name ) => {
+            //     // log!("ChangeFolder", folder);
+            //     set_local_storage_string( "saves_folder", folder_name);
+            //     true
+            // }
         }
 
     }

@@ -2,10 +2,12 @@ pub mod game_data;
 pub mod home;
 pub mod users;
 
+use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::game_data::AdminGameDataRouter;
 use crate::pages::admin::game_data::home::AdminGameDataHome;
 use crate::pages::admin::users::AdminUsersRouter;
+use crate::pages::error404::Error404;
 use home::AdminHome;
 use self::game_data::get_game_data_submenu_items;
 use self::users::list::AdminUsersList;
@@ -39,8 +41,26 @@ fn content_switch(
     global_vars: GlobalVars,
 ) -> Html {
 
+    if global_vars.user_loading || global_vars.server_side_renderer {
+        return html! {
+            <UIPage
+                global_vars={global_vars}
+                page_title="Admin"
+            >
+                <h1>{ "Verifying user..." }</h1>
+            </UIPage>
+        }
+    }
+
     if !global_vars.current_user.has_developer_access() {
-        return html! { <h1>{ "Access Denied" }</h1> }
+        return html! {
+            <UIPage
+                global_vars={global_vars}
+                page_title="Admin"
+            >
+                <h1>{ "Access Denied" }</h1>
+            </UIPage>
+        }
     }
 
     match routes {
@@ -80,7 +100,11 @@ fn content_switch(
 
         },
 
-        AdminRoute::NotFound => html! { <h1>{ "AdminRoute 404" }</h1> },
+        AdminRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 

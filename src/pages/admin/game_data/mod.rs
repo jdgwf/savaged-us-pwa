@@ -8,6 +8,7 @@ pub mod weapons;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRoute;
+use crate::pages::error404::Error404;
 use self::armor::AdminGameDataArmor;
 use self::edges::AdminGameDataEdges;
 use self::gear::AdminGameDataGear;
@@ -96,7 +97,11 @@ fn content_switch(
             />
         },
 
-        AdminGameDataRoute::NotFound => html! { <h1>{ "AdminGameDataRoute 404" }</h1> },
+        AdminGameDataRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 

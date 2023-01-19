@@ -507,7 +507,23 @@ body {
 
     h1 {
         text-align: center;
+
     }
+
+    .error-404 {
+        max-width: 300px;
+        margin: 0 auto;
+        padding: 3rem 0;
+        h1 {
+            font-size: 6rem;
+            margin: 0 0 3rem 0;
+            line-height: 5rem;
+        }
+        p {
+            text-align: center;
+        }
+    }
+
 
     a {
         color: var(--body-anchor-color);

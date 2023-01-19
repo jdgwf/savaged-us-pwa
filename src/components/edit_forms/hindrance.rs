@@ -8,7 +8,7 @@ use standard_components::libs::local_storage_shortcuts::{get_local_storage_strin
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
-// use standard_components::ui::textarea::TextArea;
+use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

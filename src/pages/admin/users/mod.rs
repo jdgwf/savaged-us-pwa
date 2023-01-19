@@ -1,6 +1,7 @@
 pub mod list;
 
 use crate::libs::global_vars::GlobalVars;
+use crate::pages::error404::Error404;
 use yew::prelude::*;
 use yew::{html};
 use yew_router::prelude::*;
@@ -37,7 +38,11 @@ fn content_switch(
         //     />
         // },
 
-        AdminUsersRoute::NotFound => html! { <h1>{ "AdminUsersRoute 404" }</h1> },
+        AdminUsersRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 

@@ -2,12 +2,12 @@ pub mod edit;
 pub mod list;
 pub mod view;
 use crate::libs::global_vars::GlobalVars;
+use crate::pages::error404::Error404;
 use crate::pages::user::saves::edit::UserSavesEdit;
 use crate::pages::user::saves::list::UserSavesList;
 use crate::pages::user::saves::view::UserSavesView;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use yew::prelude::*;
-use yew::{html};
+use yew::html;
 use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
@@ -67,7 +67,11 @@ fn content_switch(
             />
         },
 
-        UserSavesRoute::NotFound => html! { <h1>{ "UserSavesRoute 404" }</h1> },
+        UserSavesRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 
@@ -86,7 +90,7 @@ impl Component for UserSavesRouter {
     type Message = UserSavesRouterMessage;
     type Properties = UserSavesRouterProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         UserSavesRouter {
             // global_vars: ctx.props().global_vars.clone(),

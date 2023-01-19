@@ -9,6 +9,7 @@ mod web_sockets;
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRouter;
+use crate::pages::error404::Error404;
 use crate::pages::info::InfoRouter;
 use crate::pages::main_home::MainHome;
 use crate::pages::user::forgot_password::ForgotPassword;
@@ -74,13 +75,7 @@ fn content_switch(
 ) -> Html {
 
     match routes {
-        // MainServerRoute::Tech => {
-        //     html!(
-        //         <MainTech
-        //             global_vars={global_vars}
-        //         />
-        //     )
-        // },
+
         MainServerRoute::Home => {
 
             html! {
@@ -97,20 +92,7 @@ fn content_switch(
                 />
             }
         },
-        // MainServerRoute::ToDos => {
 
-        //     html! {
-        //         <MainTodos
-        //             global_vars={global_vars}
-        //         />
-        //     }
-        // },
-        // MainServerRoute::UserRouterRedirect => {
-
-        //     html! {
-        //         <Redirect<MainServerRoute> to={MainServerRoute::SettingsPrivate} />
-        //     }
-        // },
         MainServerRoute::UserRouter => {
             html! {
                 <UserRouter
@@ -152,7 +134,11 @@ fn content_switch(
         },
 
         MainServerRoute::NotFound => {
-            html! { <h1>{ "MainServerRoute 404" }</h1> }
+            html! {
+                <Error404
+                    global_vars={global_vars}
+                />
+            }
         }
 
     }

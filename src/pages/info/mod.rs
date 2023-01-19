@@ -8,6 +8,7 @@ pub mod todos;
 use about::InfoAbout;
 use contact_us::InfoContactUs;
 use crate::libs::global_vars::GlobalVars;
+use crate::pages::error404::Error404;
 use partners::InfoPartners;
 use privacy_policy::InfoPrivacyPolicy;
 use tech::InfoTech;
@@ -86,7 +87,11 @@ fn content_switch(
             />
         },
 
-        InfoRoute::NotFound => html! { <h1>{ "InfoRoute 404" }</h1> },
+        InfoRoute::NotFound => html! {
+            <Error404
+                global_vars={global_vars}
+            />
+        },
     }
 }
 

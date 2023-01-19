@@ -714,8 +714,8 @@ impl Component for AdminGameDataHindrances {
             AdminGameDataHindrancesMessage::UpdateHindrance( new_value ) => {
                 self.editing_item = Some(new_value);
                 return false;
-
             }
+
             AdminGameDataHindrancesMessage::UpdateHindranceAndRefresh( new_value ) => {
                 self.editing_item = Some(new_value);
                 return true;
@@ -1149,6 +1149,7 @@ async fn _get_data(
             }
 
         }
+
         Err( err ) => {
             set_items.emit( Vec::new() );
             error!("get_items Err()", &err );
@@ -1179,6 +1180,7 @@ async fn _get_data(
             }
 
         }
+
         Err( err ) => {
             set_paging.emit( None );
             error!("get_items paging Err()", &err );
