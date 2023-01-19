@@ -60,7 +60,6 @@ fn content_switch(
         AdminRoute::AdminGameDataHome => {
             let sub_menu_items = get_game_data_submenu_items();
 
-
             html! {
                 <AdminGameDataHome
                     global_vars={global_vars}
@@ -100,39 +99,10 @@ impl Component for AdminRouter {
     type Message = AdminRouterMessage;
     type Properties = AdminRouterProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         AdminRouter {
         }
-    }
-
-    // fn update(
-    //     &mut self, ctx: &Context<Self>,
-    //     msg: AdminRouterMessage
-    // ) -> bool {
-
-    //     match msg {
-    //         // AdminRouterMessage::ChangeFilter( filter_type ) => {
-    //         //     // log!("ChangeFilter", filter_type);
-    //         //     set_local_storage_string( "saves_filter", filter_type);
-    //         // }
-
-    //         // AdminRouterMessage::ChangeFolder( folder_name ) => {
-    //         //     // log!("ChangeFolder", folder);
-    //         //     set_local_storage_string( "saves_folder", folder_name);
-    //         // }
-    //     }
-    //     // true
-    // }
-
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &AdminRouterProps,
-    ) -> bool {
-
-
-        true
     }
 
     fn view(

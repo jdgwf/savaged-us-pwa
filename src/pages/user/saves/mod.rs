@@ -1,38 +1,14 @@
 pub mod edit;
-pub mod view;
 pub mod list;
-
-// use savaged_libs::save_db_row::SaveDBRow;
-use yew_router::prelude::*;
-use yew::prelude::*;
-use crate::pages::user::saves::list::UserSavesList;
-use crate::pages::user::saves::edit::UserSavesEdit;
-use crate::pages::user::saves::view::UserSavesView;
-use yew::{html};
-
-// use savaged_libs::user::User;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-// use crate::components::tertiary_menu::{
-//     TertiaryMenuItem,
-//     TertiaryMenu
-// };
-// use crate::components::ui_page::UIPage;
-// use crate::main_app::SubmenuData;
-// use standard_components::ui::nbsp::Nbsp;
+pub mod view;
 use crate::libs::global_vars::GlobalVars;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-// use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use crate::pages::user::saves::edit::UserSavesEdit;
+use crate::pages::user::saves::list::UserSavesList;
+use crate::pages::user::saves::view::UserSavesView;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use yew::prelude::*;
+use yew::{html};
+use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum UserSavesRoute {
@@ -136,7 +112,6 @@ impl Component for UserSavesRouter {
     //     }
     //     true
     // }
-
 
     fn view(
         &self,

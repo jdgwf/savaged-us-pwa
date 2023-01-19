@@ -1,18 +1,17 @@
-use savaged_libs::user::User;
-use yew_router::prelude::*;
-use yew::prelude::*;
-use standard_components::ui::input_text::InputText;
-use standard_components::ui::input_checkbox::InputCheckbox;
-use standard_components::ui::nbsp::Nbsp;
-use standard_components::libs::set_document_title::set_document_title;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::update_user;
-use serde_json;
 use crate::libs::global_vars::GlobalVars;
-use savaged_libs::hidden_banner::HiddenBanner;
-use super::UserRoute;
 use gloo_console::error;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use savaged_libs::hidden_banner::HiddenBanner;
+use savaged_libs::user::User;
+use serde_json;
+use standard_components::libs::set_document_title::set_document_title;
+use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::input_text::InputText;
+use standard_components::ui::nbsp::Nbsp;
+use super::UserRoute;
+use yew::prelude::*;
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsPrivateProps {
@@ -373,8 +372,6 @@ impl Component for SettingsPrivate {
                 error!("view() hidden_banners_result data parse error", err.to_string());
             }
         }
-
-
 
         html! {
             <UIPage

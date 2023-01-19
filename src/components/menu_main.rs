@@ -1,19 +1,14 @@
-// use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html, AttrValue};
-use yew_router::prelude::Link;
+use crate::components::lds_spinner::LDSSpinner;
 use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::UserRoute;
-// use crate::components::lds_roller::LDSRoller;
-use crate::components::lds_spinner::LDSSpinner;
-// use gloo_console::log;
-// use standard_components::ui::nbsp::Nbsp;
+use yew::{function_component, Properties, Html, html, AttrValue};
+use yew_router::prelude::Link;
+
 #[derive(Properties, PartialEq)]
 pub struct MenuMainProps {
     pub global_vars: GlobalVars,
-    // pub mobile_menu_callback: Callback<MouseEvent>,
-
     #[prop_or_default]
     pub submenu_tag: AttrValue,
 }

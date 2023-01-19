@@ -1,6 +1,6 @@
+use crate::{components::admin::book_select::BookSelect, libs::global_vars::GlobalVars};
 use savaged_libs::{admin_libs::{AdminPagingStatistics, FetchAdminParameters}, book::Book};
 use standard_components::{ui::{input_text::InputText}, libs::local_storage_shortcuts::set_local_storage_u32};
-use crate::{components::admin::book_select::BookSelect, libs::global_vars::GlobalVars};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -55,7 +55,6 @@ pub fn edit_view_delete_buttons(
 
     let callback_set_filter_book = Callback::from(
         move | new_value: u32 | {
-
 
             let mut nv = paging_sorting_and_filter_2.clone();
 

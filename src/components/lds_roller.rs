@@ -2,7 +2,6 @@ use yew::{function_component, Properties, Html, html};
 
 #[derive(Properties, PartialEq)]
 pub struct LDSRollerProps {
-    // pub global_vars: GlobalVars,
 }
 
 #[function_component(LDSRoller)]

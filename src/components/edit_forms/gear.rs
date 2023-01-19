@@ -8,7 +8,7 @@ use standard_components::libs::local_storage_shortcuts::set_local_storage_string
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
-use standard_components::ui::textarea::TextArea;
+// use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -205,7 +205,6 @@ impl Component for EditGear {
 
         let all = get_local_storage_bool("edit_forms_one_page", false);
 
-
         let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
@@ -281,8 +280,6 @@ impl Component for EditGear {
             );
         }
 
-
-
         let change_page_callback_form = ctx.link().callback(EditGearMessage::ChangePage);
         let mut title = html!{<></>};
         match &ctx.props().form_title {
@@ -313,14 +310,11 @@ impl Component for EditGear {
         }
         let book_list = ctx.props().book_list.clone();
 
-
-
         html!{
             <div class="edit-form">
             {header}
             <div class="form-flex">
             if (current_page.as_str() == "admin" || current_page.as_str() == "__all__" ) && ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
-
 
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
@@ -341,8 +335,6 @@ impl Component for EditGear {
                         onchange={ ctx.link().callback( EditGearMessage::UpdateBookID) }
                     />
 
-
-
                     <InputText
                         readonly={ctx.props().readonly}
                         label={"Page Number"}
@@ -354,7 +346,7 @@ impl Component for EditGear {
 
             }
 
-            if (current_page.as_str() == "general" || current_page.as_str() == "__all__" ) {
+            if current_page.as_str() == "general" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
                     <legend>{"General"}</legend>
                     <div class="row full-width">
@@ -422,7 +414,7 @@ impl Component for EditGear {
                 </fieldset>
             }
 
-            if (current_page.as_str() == "effects" || current_page.as_str() == "__all__" ) {
+            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
                 <fieldset class={"fieldset"}>
                     <legend>{"Effects"}</legend>
 

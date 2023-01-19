@@ -56,7 +56,7 @@ impl Component for AdminUsersRouter {
     type Message = AdminUsersRouterMessage;
     type Properties = AdminUsersRouterProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         AdminUsersRouter {
         }
@@ -81,8 +81,6 @@ impl Component for AdminUsersRouter {
         }
 
     }
-
-
 
     fn view(
         &self,

@@ -44,7 +44,6 @@ pub fn book_select(
 
             let filter_book = input.value().parse().unwrap_or(0);
 
-
             onchange.emit( filter_book )
 
         }
@@ -137,7 +136,6 @@ pub fn book_select(
                 </select>
                 </label>
             }
-
 
         </>
     };

@@ -1,6 +1,6 @@
-use yew::prelude::*;
-use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
+use standard_components::ui::nbsp::Nbsp;
+use yew::prelude::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ConfirmationDialogDefinition {

@@ -73,32 +73,6 @@ impl Component for UserSavesView {
 
     }
 
-    // fn changed(
-    //     &mut self,
-    //     ctx: &Context<Self>,
-    //     _props: &UserSavesViewProps,
-    // ) -> bool {
-
-
-
-    //     let mut save: Option<SaveDBRow> = None;
-
-    //     match ctx.props().global_vars.clone().saves {
-    //         Some( local_saves ) => {
-    //             for item in local_saves {
-    //                 if item.uuid == ctx.props().uuid {
-    //                     self.save = Some(item.clone());
-    //                 }
-    //             }
-    //         }
-    //         None => {
-
-    //         }
-    //     }
-
-    //     true
-    // }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let mut global_vars = ctx.props().global_vars.clone();

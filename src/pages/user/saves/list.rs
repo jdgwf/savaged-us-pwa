@@ -1,37 +1,16 @@
-
-use std::collections::HashMap;
-
-use savaged_libs::save_db_row::SaveDBRow;
-use yew_router::prelude::*;
-use yew::prelude::*;
-
-use yew::{html};
-
-// use savaged_libs::user::User;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-use crate::components::tertiary_menu::{
-    TertiaryMenuItem,
-    TertiaryMenu
-};
-
-use crate::pages::user::saves::UserSavesRoute;
+use crate::components::tertiary_menu::{ TertiaryMenuItem, TertiaryMenu };
 use crate::components::ui_page::UIPage;
-// use crate::main_app::SubmenuData;
-use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-// use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use crate::pages::user::saves::UserSavesRoute;
+use savaged_libs::save_db_row::SaveDBRow;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::ui::nbsp::Nbsp;
+use std::collections::HashMap;
+use yew::prelude::*;
+use yew::{html};
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesListProps {
@@ -46,17 +25,15 @@ pub enum UserSavesListMessage {
     ChangeFolder(String),
 }
 pub struct UserSavesList {
-    global_vars: GlobalVars,
 }
 
 impl Component for UserSavesList {
     type Message = UserSavesListMessage;
     type Properties = UserSavesListProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         UserSavesList {
-            global_vars: ctx.props().global_vars.clone(),
         }
     }
 
@@ -79,9 +56,6 @@ impl Component for UserSavesList {
         }
         true
     }
-
-
-
 
     fn view(&self, ctx: &Context<Self>) -> Html {
 

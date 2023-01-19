@@ -113,14 +113,6 @@ impl Component for InfoRouter {
         }
     }
 
-    // fn changed(
-    //     &mut self,
-    //     ctx: &Context<Self>,
-    //     _props: &InfoRouterProps,
-    // ) -> bool {
-    //     true
-    // }
-
     fn view(
         &self,
         ctx: &Context<Self>

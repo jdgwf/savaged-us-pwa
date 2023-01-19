@@ -1,21 +1,21 @@
+use crate::libs::global_vars::GlobalVars;
+use gloo_console::error;
+use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::admin_libs::FetchAdminParameters;
-use yew::prelude::*;
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::JsFuture;
-use web_sys::{Request, RequestInit, RequestMode, Response};
 use savaged_libs::user::User;
+use savaged_libs::user::UserUpdateResult;
+use serde::{Serialize, Deserialize};
+use serde_json::Error;
 use serde_json;
+use wasm_bindgen::JsCast;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::JsFuture;
+use wasm_bindgen_futures::spawn_local;
+use web_sys::Blob;
 use web_sys::File;
 use web_sys::FormData;
-use web_sys::Blob;
-use serde::{Serialize, Deserialize};
-use wasm_bindgen_futures::spawn_local;
-use gloo_utils::format::JsValueSerdeExt;
-use savaged_libs::user::UserUpdateResult;
-use gloo_console::error;
-use crate::libs::global_vars::GlobalVars;
-use serde_json::Error;
+use web_sys::{Request, RequestInit, RequestMode, Response};
+use yew::prelude::*;
 
 pub async fn fetch_api(
     endpoint: String,
@@ -99,60 +99,58 @@ pub async fn update_current_user(
     let mut opts = RequestInit::new();
     opts.method("POST");
 
-    let mut current_user_string = "".to_owned();
-
     let current_user_convert = &serde_json::to_string( &current_user );
     match current_user_convert {
         Ok( value ) => {
-            current_user_string = value.to_owned();
+            let current_user_string = value.to_owned();
+
+            let post_val_convert : Result<serde_json::Value, serde_json::Error> = serde_json::from_str(  &current_user_string.as_ref() );
+            match post_val_convert {
+                Ok( mut post_val ) => {
+
+                    post_val["api_key"] = serde_json::Value::String(api_key.to_owned());
+                    post_val["login_token"] = serde_json::Value::String(login_token.to_owned());
+                    post_val["password"] = serde_json::Value::String(new_password.to_owned());
+                    post_val["repeat_password"] = serde_json::Value::String(repeat_password.to_owned());
+                    post_val["remove_image"] = serde_json::Value::Bool(remove_image);
+                    post_val["current_user"] = serde_json::Value::String( current_user_string.clone() );
+
+                    let post_val_string = post_val.to_string();
+
+                    let post_value = &wasm_bindgen::JsValue::from_str(
+                        &post_val_string
+                    );
+
+                    opts.body(
+                        Some(post_value),
+                    );
+                    opts.mode(RequestMode::Cors);
+                    let request = Request::new_with_str_and_init(&endpoint, &opts)?;
+
+                    request
+                        .headers()
+                        .set("Accept", "application/vnd.github.v3+json")?;
+
+                    request.headers().set("Content-Type", "application/json" )?;
+
+                    let window = web_sys::window().unwrap();
+                    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
+
+                    assert!(resp_value.is_instance_of::<Response>());
+                    let resp: Response = resp_value.dyn_into().unwrap();
+
+                    // Convert this other `Promise` into a rust `Future`.
+                    let json = JsFuture::from(resp.json()?).await?;
+
+                    // log!("XY", &json);
+                    return Ok(json);
+                }
+
+                Err( _ ) => {
+                    return Err(JsValue::default());
+                }
+            }
         }
-        Err( _ ) => {
-            return Err(JsValue::default());
-        }
-    }
-
-    let post_val_convert : Result<serde_json::Value, serde_json::Error> = serde_json::from_str(  &current_user_string.as_ref() );
-    match post_val_convert {
-        Ok( mut post_val ) => {
-
-            post_val["api_key"] = serde_json::Value::String(api_key.to_owned());
-            post_val["login_token"] = serde_json::Value::String(login_token.to_owned());
-            post_val["password"] = serde_json::Value::String(new_password.to_owned());
-            post_val["repeat_password"] = serde_json::Value::String(repeat_password.to_owned());
-            post_val["remove_image"] = serde_json::Value::Bool(remove_image);
-            post_val["current_user"] = serde_json::Value::String( current_user_string.clone() );
-
-            let post_val_string = post_val.to_string();
-
-            let post_value = &wasm_bindgen::JsValue::from_str(
-                &post_val_string
-            );
-
-            opts.body(
-                Some(post_value),
-            );
-            opts.mode(RequestMode::Cors);
-            let request = Request::new_with_str_and_init(&endpoint, &opts)?;
-
-            request
-                .headers()
-                .set("Accept", "application/vnd.github.v3+json")?;
-
-            request.headers().set("Content-Type", "application/json" )?;
-
-            let window = web_sys::window().unwrap();
-            let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
-
-            assert!(resp_value.is_instance_of::<Response>());
-            let resp: Response = resp_value.dyn_into().unwrap();
-
-            // Convert this other `Promise` into a rust `Future`.
-            let json = JsFuture::from(resp.json()?).await?;
-
-            // log!("XY", &json);
-            return Ok(json);
-        }
-
         Err( _ ) => {
             return Err(JsValue::default());
         }

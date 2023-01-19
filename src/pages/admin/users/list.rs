@@ -1,19 +1,19 @@
-use savaged_libs::admin_libs::AdminPagingStatistics;
-use savaged_libs::{user::User, admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
-use standard_components::libs::local_storage_shortcuts::{ get_local_storage_u32, set_local_storage_u32};
-use yew::prelude::*;
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_paging::AdminTablePaging;
-use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
 use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
+use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
+use gloo_console::{ error };
 use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::admin_libs::AdminPagingStatistics;
+use savaged_libs::{user::User, admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
 use serde_json::Error;
+use standard_components::libs::local_storage_shortcuts::{ get_local_storage_u32, set_local_storage_u32};
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
-use gloo_console::{ error };
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersListProps {
@@ -123,7 +123,6 @@ impl Component for AdminUsersList {
         }
         true
     }
-
 
     fn view(
         &self,

@@ -131,7 +131,6 @@ pub fn handle_message(
             let new_global_vars = global_vars.clone();
             let server_root = global_vars.server_root.to_owned();
 
-
             match msg.saves {
                 Some( saves ) => {
                     // log!( format!("handle_message Saves {:?}", &saves) );

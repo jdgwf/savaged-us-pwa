@@ -1,9 +1,9 @@
 use yew::prelude::*;
-use standard_components::ui::nbsp::Nbsp;
+use crate::components::alerts::AlertDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use crate::components::alerts::AlertDefinition;
 use savaged_libs::alert_level::AlertLevel;
+use standard_components::ui::nbsp::Nbsp;
 
 #[derive(Properties, PartialEq)]
 pub struct MainHomeProps {

@@ -1,25 +1,13 @@
 pub mod handle_message;
-// use std::thread::sleep;
-// use gloo_timers::callback::Timeout;
 use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
-use gloo_net::websocket::{
-    Message,
-    futures::WebSocket,
-    // State,
-};
-// use web_sys::EventListener;
-use gloo_console::log;
 use gloo_console::error;
+use gloo_console::log;
+use gloo_net::websocket::{ Message, futures::WebSocket,};
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
-// use savaged_libs::websocket_message::WebSocketMessage;
+use serde_json;
 use wasm_bindgen_futures::spawn_local;
 use yew::Callback;
-use serde_json;
-
-// use crate::pages::user::login;
-
-// use crate::libs::global_vars::GlobalVars;
 
 pub struct WebsocketService {
     pub tx: Sender<String>,
@@ -122,7 +110,7 @@ impl WebsocketService {
 
 }
 
-pub fn connect_to_websocket<'ping>(
+pub fn connect_to_websocket(
     server_root: String,
     received_message_callback: &Callback<String>,
     websocket_offline_callback: &Callback<bool>,

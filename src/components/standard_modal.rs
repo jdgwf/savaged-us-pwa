@@ -1,5 +1,5 @@
-use yew::{function_component, Properties, Html, html, Children, Callback, AttrValue};
 use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
+use yew::{function_component, Properties, Html, html, Children, Callback, AttrValue};
 
 #[derive(Properties, PartialEq)]
 pub struct StandardModalProps {
@@ -59,8 +59,6 @@ pub fn standard_modal(
         None => {}
 
     }
-
-
 
     let mut modal_footer = html!(<></>);
 

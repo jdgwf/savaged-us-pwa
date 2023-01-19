@@ -5,7 +5,6 @@ mod main_app;
 mod menu_items;
 mod pages;
 mod web_sockets;
-
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 use crate::libs::global_vars::GlobalVars;
 use main_app::MainApp;

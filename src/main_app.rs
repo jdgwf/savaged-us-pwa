@@ -1,8 +1,8 @@
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
 use crate::components::alerts::AlertDefinition;
+use crate::components::alerts::Alerts;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::alerts::Alerts;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
@@ -21,18 +21,12 @@ use crate::web_sockets::connect_to_websocket;
 use crate::web_sockets::handle_message::handle_message;
 use gloo_console::error;
 use gloo_console::log;
-// use gloo_timers::callback::Timeout;
 use gloo_timers::future::TimeoutFuture;
-// use indexed_db_futures::js_sys::global;
 use savaged_libs::user::User;
-use savaged_libs::websocket_message::{
-    WebSocketMessage,
-    WebsocketMessageType,
-};
-// use yew_hooks::prelude::*;
-use uuid::{Uuid};
+use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType,};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
+use uuid::{Uuid};
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -62,7 +56,6 @@ pub enum MainRoute {
     InfoRouterRedirect,
     #[at("/info/*")]
     InfoRouter,
-
 
     #[not_found]
     #[at("/404")]
@@ -180,7 +173,6 @@ fn content_switch(
                 <AdminHome
                     global_vars={global_vars}
 
-
                 />
             }
         },
@@ -189,7 +181,6 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-
 
                 />
             }
@@ -200,7 +191,6 @@ fn content_switch(
                 <UserLogin
                     global_vars={global_vars}
 
-
                 />
             }
         },
@@ -209,7 +199,6 @@ fn content_switch(
                 <ForgotPassword
                     global_vars={global_vars}
 
-
                 />
             }
         },
@@ -217,7 +206,6 @@ fn content_switch(
             html! {
                 <Register
                     global_vars={global_vars}
-
 
                 />
             }
@@ -276,7 +264,6 @@ impl Component for MainApp {
             global_vars.login_token.to_owned(),
         );
 
-
         global_vars.game_data = None;
 
         MainApp {
@@ -327,7 +314,6 @@ impl Component for MainApp {
             }
 
             MainAppMessage::AddAlert( alert_def ) => {
-
 
                 let alert_fade_in = ctx.link().callback(MainAppMessage::AlertFadeIn);
                 let alert_fade_out = ctx.link().callback(MainAppMessage::AlertFadeOut);
@@ -581,7 +567,6 @@ impl Component for MainApp {
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
         let logout_action = ctx.link().callback(MainAppMessage::LogOut);
-
 
         let close_confirmation_dialog = ctx.link().callback(MainAppMessage::CloseConfirmationDialog);
 

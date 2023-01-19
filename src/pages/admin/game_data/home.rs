@@ -1,11 +1,11 @@
-use yew::{function_component, Properties, Html, html};
-use yew_router::prelude::Link;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
-
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::game_data::AdminGameDataRoute;
 use standard_components::ui::nbsp::Nbsp;
+use yew::{function_component, Properties, Html, html};
+use yew_router::prelude::Link;
+
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHomeProps {
     pub global_vars: GlobalVars,

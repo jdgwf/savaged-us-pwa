@@ -912,7 +912,6 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
         }
     }
 
-
     let db_req_result4 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
     match db_req_result4 {
@@ -963,7 +962,6 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
         }
     }
 
-
     let db_req_result5 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
     match db_req_result5 {
@@ -1013,7 +1011,6 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
             return None;
         }
     }
-
 
     let db_req_result6 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 

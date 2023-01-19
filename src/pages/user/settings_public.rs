@@ -1,25 +1,24 @@
-use savaged_libs::user::User;
-use yew::prelude::*;
-use standard_components::ui::input_text::InputText;
-use standard_components::ui::markdown_editor::MarkdownEditor;
-use standard_components::ui::input_checkbox::InputCheckbox;
-use standard_components::ui::nbsp::Nbsp;
-use web_sys::{HtmlInputElement};
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::ui_page::UIPage;
 
-use standard_components::libs::set_document_title::set_document_title;
 use chrono::Utc;
-use serde_json::Error;
+use chrono_tz::TZ_VARIANTS;
+use crate::components::image_uploader::ImageUploader;
+use crate::components::ui_page::UIPage;
+use crate::libs::fetch_api::fetch_api_with_value;
+use crate::libs::fetch_api::update_user;
+use crate::libs::global_vars::GlobalVars;
 use gloo_console::error;
 use gloo_console::log;
-use wasm_bindgen_futures::spawn_local;
 use gloo_utils::format::JsValueSerdeExt;
-use crate::libs::global_vars::GlobalVars;
-use crate::libs::fetch_api::update_user;
-use crate::libs::fetch_api::fetch_api_with_value;
-use crate::components::image_uploader::ImageUploader;
-use chrono_tz::TZ_VARIANTS;
+use savaged_libs::user::User;
+use serde_json::Error;
+use standard_components::libs::set_document_title::set_document_title;
+use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::input_text::InputText;
+use standard_components::ui::markdown_editor::MarkdownEditor;
+use standard_components::ui::nbsp::Nbsp;
+use wasm_bindgen_futures::spawn_local;
+use web_sys::{HtmlInputElement};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsPublicProps {

@@ -36,7 +36,6 @@ pub enum UserSavesEditMessage {
     Cancel(bool),
 
     UpdateHindrance(Hindrance),
-    AddHindrance(bool),
     SaveHindrance(bool),
 
 }
@@ -260,10 +259,7 @@ impl Component for UserSavesEdit {
                     None => {}
                 }
             }
-            UserSavesEditMessage::AddHindrance( _new_value ) => {
-                // log!("AddHindrance");
-                // self.editing_hindrance = Some(new_value);
-            }
+
             UserSavesEditMessage::Cancel( _new_value ) => {
                 // log!("Cancel called");
                 self.close_and_cancel();
@@ -410,7 +406,6 @@ impl Component for UserSavesEdit {
                 </UIPage>
             }
         }
-
 
         let mut page_title = "Unhandled Save".to_owned();
         match &self.save {

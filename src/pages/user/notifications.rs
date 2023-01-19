@@ -1,24 +1,19 @@
-use yew::prelude::*;
-use standard_components::ui::nbsp::Nbsp;
-
 use crate::components::ui_page::UIPage;
-use standard_components::libs::set_document_title::set_document_title;
-use standard_components::ui::raw_html::RawHtml;
-use standard_components::ui::input_checkbox::InputCheckbox;
-use savaged_libs::utils::date_formatting::convert_utc_to_datetime;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
 use crate::libs::fetch_api::fetch_api;
 use crate::libs::fetch_api::fetch_api_for_id;
 use crate::libs::fetch_api::fetch_api_for_id_with_value;
-use gloo_console::{ error };
-use wasm_bindgen_futures::spawn_local;
-use gloo_utils::format::JsValueSerdeExt;
 use crate::libs::global_vars::GlobalVars;
-
-// use savaged_libs::utils::success_return::Vec<Notification>;
+use gloo_console::{ error };
+use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::notification::Notification;
+use savaged_libs::utils::date_formatting::convert_utc_to_datetime;
 use serde_json::Error;
+use standard_components::libs::set_document_title::set_document_title;
+use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::nbsp::Nbsp;
+use standard_components::ui::raw_html::RawHtml;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserNotificationsProps {
@@ -355,16 +350,6 @@ impl Component for UserNotifications {
             loading: true,
         }
     }
-
-    // fn changed(
-    //     &mut self,
-    //     ctx: &Context<Self>,
-    //     _props: &UserNotificationsProps,
-    // ) -> bool {
-
-    //     ctx.props().global_vars = ctx.props().global_vars.clone();
-    //     true
-    // }
 
     fn update(
         &mut self,

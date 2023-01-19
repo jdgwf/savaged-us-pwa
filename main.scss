@@ -73,7 +73,6 @@ body {
         position: relative;
     }
 
-
     // .row {
     //     &.equal-heights {
     //         display: grid;
@@ -214,7 +213,6 @@ body {
         font-family: AudiowideRegular;
         font-variant: small-caps;
     }
-
 
     .tertiary-menu {
         display: none;
@@ -390,7 +388,6 @@ body {
                     border-top-left-radius: 0.5rem;
                     border-top-right-radius: 0.5rem;
 
-
                     a {
                         margin: 0;
                     }
@@ -406,7 +403,6 @@ body {
                         width: 1.5rem;
                         font-size: .8rem;
                     }
-
 
                     img {
                         top: .25rem;
@@ -509,10 +505,6 @@ body {
         }
     }
 
-
-
-
-
     h1 {
         text-align: center;
     }
@@ -577,9 +569,7 @@ body {
             }
         }
 
-
 }
-
 
 @media screen and (min-width: 725px) {
     body {
@@ -661,7 +651,6 @@ body {
                 }
                 &.success-tab {
                     a {
-
 
                         color: #fff;
                         background-color: #198754;

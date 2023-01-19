@@ -1,17 +1,16 @@
-use savaged_libs::user::LoginToken;
-use yew::prelude::*;
-use gloo_utils::format::JsValueSerdeExt;
-use standard_components::ui::nbsp::Nbsp;
-use standard_components::ui::input_text::InputText;
-use standard_components::libs::set_document_title::set_document_title;
-use crate::libs::fetch_api::fetch_api_send_token;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use wasm_bindgen_futures::spawn_local;
-use gloo_console::error;
-// use gloo_console::log;
-use crate::libs::global_vars::GlobalVars;
-use serde_json::Error;
 use crate::components::ui_page::UIPage;
+use crate::libs::fetch_api::fetch_api_send_token;
+use crate::libs::global_vars::GlobalVars;
+use gloo_console::error;
+use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::user::LoginToken;
+use serde_json::Error;
+use standard_components::libs::set_document_title::set_document_title;
+use standard_components::ui::input_text::InputText;
+use standard_components::ui::nbsp::Nbsp;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsDevicesProps {
@@ -58,8 +57,6 @@ impl Component for SettingsDevices {
             }
         }
     }
-
-
 
     fn view(
         &self,

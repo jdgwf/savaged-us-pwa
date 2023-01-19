@@ -1,7 +1,7 @@
 use standard_components::libs::local_storage_shortcuts::{get_local_storage_string, set_local_storage_string};
+use standard_components::ui::nbsp::Nbsp;
 use web_sys::MouseEvent;
 use yew::prelude::*;
-use standard_components::ui::nbsp::Nbsp;
 
 #[derive(PartialEq, Clone)]
 pub struct TertiaryMenuItem {

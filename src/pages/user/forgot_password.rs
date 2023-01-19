@@ -1,22 +1,8 @@
-use yew::prelude::*;
-// use standard_components::ui::input_text::InputText;
-use standard_components::ui::nbsp::Nbsp;
-use crate::libs::global_vars::GlobalVars;
-
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::set_document_title::set_document_title;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
-
-// use crate::lib::fetch_api::fetch_api;
-// use crate::lib::fetch_api::savaged_login;
-
-// use web_sys::console;
-// use wasm_bindgen_futures::spawn_local;
-// use gloo_utils::format::JsValueSerdeExt;
-
-// use savaged_libs::user::User;
-// use savaged_libs::user::LoginTokenResult;
+use crate::libs::global_vars::GlobalVars;
+use standard_components::libs::set_document_title::set_document_title;
+use standard_components::ui::nbsp::Nbsp;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ForgotPasswordProps {

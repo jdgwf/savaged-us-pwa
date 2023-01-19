@@ -1,27 +1,7 @@
-// use yew_router::prelude::*;
-use yew::prelude::*;
-
-use yew::html;
-
-// use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
 use crate::components::ui_page::UIPage;
-// use crate::main_app::SubmenuData;
-// use standard_components::ui::nbsp::Nbsp;
 use crate::libs::global_vars::GlobalVars;
-// use super::settings_public::SettingsPublic;
-// use super::settings_private::SettingsPrivate;
-// use super::settings_devices::SettingsDevices;
-// use super::settings_api_key::SettingsAPIKey;
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
-// use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use yew::html;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserCampaignsProps {
@@ -43,7 +23,7 @@ impl Component for UserCampaigns {
     type Message = UserCampaignsMessage;
     type Properties = UserCampaignsProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         UserCampaigns {
         }
@@ -53,8 +33,6 @@ impl Component for UserCampaigns {
 
     //     true
     // }
-
-
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();

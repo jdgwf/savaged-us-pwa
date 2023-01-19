@@ -1,10 +1,10 @@
-use yew::prelude::*;
-use web_sys::File;
-use web_sys::HtmlInputElement;
 use chrono::Utc;
 use crate::libs::fetch_api::upload_user_image;
-use wasm_bindgen_futures::spawn_local;
 use crate::libs::global_vars::GlobalVars;
+use wasm_bindgen_futures::spawn_local;
+use web_sys::File;
+use web_sys::HtmlInputElement;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ImageUploaderProps {

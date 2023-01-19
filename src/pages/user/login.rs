@@ -1,25 +1,22 @@
+use crate::components::ui_page::UIPage;
+use crate::libs::fetch_api::savaged_login;
+use crate::libs::global_vars::GlobalVars;
+use crate::local_storage::clear_all_local_data;
+use crate::main_app::MainRoute;
+use gloo_console::error;
+use gloo_console::log;
+use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::user::LoginTokenResult;
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
-use yew::prelude::*;
-use yew_router::prelude::*;
-
-use standard_components::ui::input_text::InputText;
-use standard_components::ui::nbsp::Nbsp;
-
+use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::ui_page::UIPage;
-use crate::local_storage::clear_all_local_data;
-use serde_json::Error;
-use crate::libs::fetch_api::savaged_login;
-use gloo_console::error;
+use standard_components::ui::input_text::InputText;
+use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
-use gloo_utils::format::JsValueSerdeExt;
-use crate::libs::global_vars::GlobalVars;
-use savaged_libs::user::LoginTokenResult;
-use gloo_console::log;
-use crate::main_app::MainRoute;
+use yew::prelude::*;
+use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserLoginProps {
@@ -58,8 +55,6 @@ impl Component for UserLogin {
             login_message: "".to_owned(),
         }
     }
-
-
 
     fn update(
         &mut self,

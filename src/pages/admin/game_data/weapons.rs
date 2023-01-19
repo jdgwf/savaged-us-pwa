@@ -8,15 +8,14 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::edit_forms::weapon::EditWeapon;
 use crate::components::standard_modal::StandardModal;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
-
 use crate::components::ui_page::UIPage;
 use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
-use savaged_libs::alert_level::AlertLevel;
 use crate::libs::global_vars::GlobalVars;
 use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
 use gloo_console::{ error, log };
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::admin_libs::{AdminPagingStatistics, AdminSavePackage, AdminSaveReturn, AdminDeletePackage};
+use savaged_libs::alert_level::AlertLevel;
 use savaged_libs::book::Book;
 use savaged_libs::game_data_row::GameDataRow;
 use savaged_libs::player_character::weapon::Weapon;
@@ -24,9 +23,9 @@ use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admi
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, set_local_storage_u32};
 use standard_components::ui::nbsp::Nbsp;
+use std::mem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use std::mem;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataWeaponsProps {
@@ -172,7 +171,6 @@ impl Component for AdminGameDataWeapons {
                             api_key: None,
                         };
 
-
                         let api_root = ctx.props().global_vars.api_root.to_owned();
                         let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
@@ -267,13 +265,11 @@ impl Component for AdminGameDataWeapons {
                             }
                         );
 
-
                         self.editing_item = None;
                     }
                     None => {}
                 }
             }
-
 
             AdminGameDataWeaponsMessage::NewItem( book_id ) => {
                 let self_editing_item = self.editing_item.clone();
@@ -288,7 +284,6 @@ impl Component for AdminGameDataWeapons {
                         hind.book_id = book_id;
                     }
                 }
-
 
                 self.editing_item = Some(hind);
 
@@ -326,7 +321,6 @@ impl Component for AdminGameDataWeapons {
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataWeaponsMessage::SetItems);
                         let new_item_callback = ctx.link().callback(AdminGameDataWeaponsMessage::NewItem);
-
 
                         let update_weapon_callback = ctx.link().callback(AdminGameDataWeaponsMessage::UpdateWeaponAndRefresh);
 
@@ -433,7 +427,6 @@ impl Component for AdminGameDataWeapons {
                             }
                         );
 
-
                         // self.editing_item = None;
                     }
                     None => {}
@@ -448,7 +441,6 @@ impl Component for AdminGameDataWeapons {
                 let login_token = Some(ctx.props().global_vars.login_token.to_owned());
                 let set_items = ctx.link().callback(AdminGameDataWeaponsMessage::SetItems);
                 let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
-
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -567,7 +559,6 @@ impl Component for AdminGameDataWeapons {
                             }),
                         };
 
-
                         open_confirmation_dialog.emit( dialog );
                     }
                 }
@@ -621,7 +612,6 @@ impl Component for AdminGameDataWeapons {
                                     api_key: None,
                                 };
 
-
                                 spawn_local (
                                     async move {
 
@@ -638,7 +628,6 @@ impl Component for AdminGameDataWeapons {
                                                     Ok( save_result_data) => {
                                                         match save_result_data.game_data {
                                                             Some( vec_val ) => {
-
 
                                                                 let mut rv: Vec<Weapon> = Vec::new();
                                                                 for mut data in vec_val.into_iter() {
@@ -709,7 +698,6 @@ impl Component for AdminGameDataWeapons {
                                 // return false;
                             }),
                         };
-
 
                         open_confirmation_dialog.emit( dialog );
 
@@ -816,8 +804,6 @@ impl Component for AdminGameDataWeapons {
         true
     }
 
-
-
     fn view(
         &self,
         ctx: &Context<Self>
@@ -915,7 +901,6 @@ impl Component for AdminGameDataWeapons {
                         book_list={book_list}
                         on_changed_callback={ctx.link().callback(AdminGameDataWeaponsMessage::UpdateWeapon).clone()}
                     />
-
 
                 </StandardModal>
                 };
@@ -1029,10 +1014,7 @@ impl Component for AdminGameDataWeapons {
                                 let mut callback_delete_item: Option<Callback<u32>> = None;
                                 let mut callback_duplicate_item: Option<Callback<u32>> = None;
 
-
                                 let row_name = &row.name.to_owned();
-
-
 
                                 if global_vars.current_user.admin_can_read_item (
                                     &book_list,
@@ -1129,7 +1111,6 @@ impl Component for AdminGameDataWeapons {
             </UIPage>
         }
     }
-
 
 }
 

@@ -1,12 +1,10 @@
-use yew::virtual_dom::VNode;
-// use web_sys::MouseEvent;
-use yew::{function_component, Properties, Html, html, Children, AttrValue};
 use crate::components::menu_main::MenuMain;
 use crate::components::menu_mobile::MenuMobile;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::libs::set_document_title::set_document_title;
+use yew::virtual_dom::VNode;
+use yew::{function_component, Properties, Html, html, Children, AttrValue};
 
-// use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
 pub struct UIPageProps {
     pub global_vars: GlobalVars,

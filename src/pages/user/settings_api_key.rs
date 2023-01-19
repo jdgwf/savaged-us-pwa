@@ -1,25 +1,15 @@
-use yew::prelude::*;
+use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::fetch_api;
-// use standard_components::ui::input_text::InputText;
+use crate::libs::global_vars::GlobalVars;
+use gloo_console::error;
+use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::user::User;
+use serde_json::Error;
+use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::set_document_title::set_document_title;
-use savaged_libs::user::User;
-// use crate::lib::fetch_api::fetch_api;
-// use crate::lib::fetch_api::savaged_login;
-use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use serde_json::Error;
-// use gloo_console::log;
-use gloo_console::error;
-// use web_sys::console;
-// use wasm_bindgen_futures::spawn_local;
-// use gloo_utils::format::JsValueSerdeExt;
-use crate::libs::global_vars::GlobalVars;
-use gloo_utils::format::JsValueSerdeExt;
-use crate::components::ui_page::UIPage;
-
-// use savaged_libs::user::User;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsAPIKeyProps {
@@ -191,8 +181,6 @@ impl Component for SettingsAPIKey {
                 </UIPage>
             }
         }
-
-
 
         html! {
             <UIPage

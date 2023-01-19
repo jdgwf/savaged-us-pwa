@@ -1,42 +1,27 @@
-pub mod login;
-pub mod settings_public;
-pub mod settings_private;
-pub mod settings_devices;
-mod subscription;
 mod notifications;
-pub mod forgot_password;
-pub mod register;
-pub mod settings_api_key;
+mod subscription;
 pub mod campaigns;
+pub mod forgot_password;
+pub mod login;
+pub mod register;
 pub mod saves;
-
-use yew_router::prelude::*;
-use yew::prelude::*;
-// use yew_router::history::{AnyHistory, History, MemoryHistory};
-
-use yew::{ html};
-
-// use savaged_libs::user::User;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-// use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-
-// use crate::main_app::SubmenuData;
-// use standard_components::ui::nbsp::Nbsp;
-use crate::libs::global_vars::GlobalVars;
-use settings_public::SettingsPublic;
-use settings_private::SettingsPrivate;
-use settings_devices::SettingsDevices;
-use settings_api_key::SettingsAPIKey;
-use subscription::UserSubscription;
-use notifications::UserNotifications;
-use saves::list::UserSavesList;
-use saves::UserSavesRouter;
+pub mod settings_api_key;
+pub mod settings_devices;
+pub mod settings_private;
+pub mod settings_public;
 use campaigns::UserCampaigns;
-// use gloo_console::log;
-
-// use super::subscription::UserSubscription;
-// use super::notifications::UserNotifications;
+use crate::libs::global_vars::GlobalVars;
+use notifications::UserNotifications;
+use saves::UserSavesRouter;
+use saves::list::UserSavesList;
+use settings_api_key::SettingsAPIKey;
+use settings_devices::SettingsDevices;
+use settings_private::SettingsPrivate;
+use settings_public::SettingsPublic;
+use subscription::UserSubscription;
+use yew::prelude::*;
+use yew::{ html};
+use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum UserRoute {
@@ -153,15 +138,12 @@ impl Component for UserRouter {
     type Properties = UserRouterProps;
 
     fn create(
-        ctx: &Context<Self>
+        _ctx: &Context<Self>
     ) -> Self {
-
 
         UserRouter {
         }
     }
-
-
 
     fn view(
         &self,

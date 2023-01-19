@@ -1,32 +1,24 @@
-pub mod home;
-pub mod hindrances;
-pub mod edges;
-
-pub mod weapons;
 pub mod armor;
+pub mod edges;
 pub mod gear;
-
-use yew_router::prelude::*;
-use yew::prelude::*;
-
-use yew::{html};
+pub mod hindrances;
+pub mod home;
+pub mod weapons;
 
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem};
-
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRoute;
-
-
+use self::armor::AdminGameDataArmor;
 use self::edges::AdminGameDataEdges;
 use self::gear::AdminGameDataGear;
-use self::armor::AdminGameDataArmor;
-use self::weapons::AdminGameDataWeapons;
 use self::hindrances::AdminGameDataHindrances;
-
+use self::weapons::AdminGameDataWeapons;
+use yew::prelude::*;
+use yew::{html};
+use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminGameDataRoute {
-
 
     #[at("/admin/game-data/hindrances")]
     Hindrances,
@@ -123,7 +115,7 @@ impl Component for AdminGameDataRouter {
     type Message = AdminGameDataRouterMessage;
     type Properties = AdminGameDataRouterProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
 
         AdminGameDataRouter {
         }
@@ -136,7 +128,6 @@ impl Component for AdminGameDataRouter {
 
     //     match msg {
 
-
     //         // AdminGameDataRouterMessage::ChangeFolder( folder_name ) => {
     //         //     // log!("ChangeFolder", folder);
     //         //     set_local_storage_string( "saves_folder", folder_name);
@@ -146,8 +137,6 @@ impl Component for AdminGameDataRouter {
     //     return true;
     // }
 
-
-
     fn view(
         &self,
         ctx: &Context<Self>
@@ -156,8 +145,6 @@ impl Component for AdminGameDataRouter {
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
             let global_vars = ctx.props().global_vars.clone();
-
-
 
             html! {
 
@@ -200,7 +187,6 @@ impl Component for AdminGameDataRouter {
 
     }
 }
-
 
 pub fn get_game_data_submenu_items() -> Vec<TertiaryLinksMenuItem> {
 

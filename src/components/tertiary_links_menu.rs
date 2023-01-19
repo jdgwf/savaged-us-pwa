@@ -1,6 +1,4 @@
 use yew::prelude::*;
-use standard_components::ui::nbsp::Nbsp;
-// use crate::libs::global_vars::GlobalVars;
 
 #[derive(PartialEq, Clone)]
 pub struct TertiaryLinksMenuItem {
@@ -71,7 +69,6 @@ impl Component for TertiaryLinksMenu {
                     if item.tag.as_str() == &filter_type {
                         let set_dd_menu = set_dd_menu.clone();
 
-
                         html!{<div
                             class={"current flex-grow-1"}
                             onclick={ move | _ | { set_dd_menu.emit(!open_dropdown) }}
@@ -82,9 +79,7 @@ impl Component for TertiaryLinksMenu {
                         </div>}
                     } else if item.separate {
 
-
                         let item_title = item.title.unwrap_or("".to_owned());
-
 
                         let mut base_class = "btn btn-primary".to_owned();
 
@@ -119,7 +114,6 @@ impl Component for TertiaryLinksMenu {
                         let filter_type = filter_type.to_owned();
                         let tag = item.tag.clone();
 
-
                         let base_class = "".to_owned();
 
                         let item_title = item.title.unwrap_or("".to_owned());
@@ -139,7 +133,6 @@ impl Component for TertiaryLinksMenu {
                 {menu_items.clone().into_iter().map( | item | {
                     let filter_type = ctx.props().current_tag.to_owned();
                     let tag = item.tag.clone();
-
 
                     let base_class = item.class.unwrap_or("".to_owned());
 
