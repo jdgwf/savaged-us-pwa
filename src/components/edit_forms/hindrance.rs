@@ -89,7 +89,7 @@ impl Component for EditHindrance {
             }
 
             EditHindranceMessage::ToggleNoPages( _new_value ) => {
-                let new_value = get_local_storage_bool("edit_forms_one_page", false);;
+                let new_value = get_local_storage_bool("edit_forms_one_page", false);
                 set_local_storage_bool( "edit_forms_one_page", !new_value);
                 return true;
             }
@@ -346,7 +346,7 @@ impl Component for EditHindrance {
 
             }
 
-            if (current_page.as_str() == "general" || current_page.as_str() == "__all__" ) {
+            if current_page.as_str() == "general" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
                     <legend>{"General"}</legend>
                     <div class="row full-width">
@@ -448,7 +448,7 @@ impl Component for EditHindrance {
                 </fieldset>
             }
 
-            if (current_page.as_str() == "selection" || current_page.as_str() == "__all__" ) {
+            if current_page.as_str() == "selection" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
                     <legend>{"Selection"}</legend>
                     <TextArea

@@ -1,6 +1,7 @@
 // use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::pages::error404::Error404;
 use savaged_libs::save_db_row::SaveDBRow;
 // use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
@@ -22,7 +23,7 @@ pub enum UserSavesViewMessage {
 }
 pub struct UserSavesView {
     // global_vars: GlobalVars,
-    save: Option<SaveDBRow>,
+    // save: Option<SaveDBRow>,
 }
 
 impl Component for UserSavesView {
@@ -31,24 +32,9 @@ impl Component for UserSavesView {
 
     fn create(ctx: &Context<Self>) -> Self {
 
-        let mut save: Option<SaveDBRow> = None;
-
-        match ctx.props().global_vars.clone().saves {
-            Some( local_saves ) => {
-                for item in local_saves {
-                    if item.uuid == ctx.props().uuid {
-                        save = Some(item.clone());
-                    }
-                }
-            }
-            None => {
-
-            }
-        }
 
         UserSavesView {
             // global_vars: ctx.props().global_vars.clone(),
-            save: save,
         }
     }
 
@@ -85,7 +71,7 @@ impl Component for UserSavesView {
             return html! {
             <UIPage
                 global_vars={global_vars}
-                page_title="Viewing Save"
+                page_title="My Saves"
                 submenu_tag={"user-data".to_owned()}
             >
                 <div class={"text-center"}>
@@ -101,7 +87,7 @@ impl Component for UserSavesView {
             return html! {
                 <UIPage
                     global_vars={global_vars}
-                    page_title="Viewing Save"
+                    page_title="My Saves"
                     submenu_tag={"user-data".to_owned()}
                 >
                     <div class={"text-center"}>
@@ -113,7 +99,22 @@ impl Component for UserSavesView {
             }
         }
 
-        match &self.save {
+
+        let mut save: Option<SaveDBRow> = None;
+
+        match ctx.props().global_vars.clone().saves {
+            Some( local_saves ) => {
+                for item in local_saves {
+                    if item.uuid == ctx.props().uuid {
+                        save = Some(item.clone());
+                    }
+                }
+            }
+            None => {
+
+            }
+        }
+        match &save {
             Some( save ) => {
                 let mut form = html!{ <div class="text-center">{"TODO: Unhandled Save Type"}</div>};
                 match save.save_type.as_ref() {
@@ -176,13 +177,11 @@ impl Component for UserSavesView {
             }
             None => {
                 return html!{
-                    <UIPage
-                        global_vars={global_vars.clone()}
-                        page_title="Viewing Save"
-                        submenu_tag={"user-data".to_owned()}
-                    >
-                        {"Cannot find save!"}
-                    </UIPage>
+                    html! {
+                        <Error404
+                            global_vars={global_vars}
+                        />
+                    }
                 }
             }
         }

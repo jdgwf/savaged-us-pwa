@@ -1,6 +1,6 @@
 pub mod handle_message;
 use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
-use gloo_console::error;
+// use gloo_console::error;
 use gloo_console::log;
 use gloo_net::websocket::{ Message, futures::WebSocket,};
 use savaged_libs::websocket_message::WebSocketMessage;
@@ -71,7 +71,7 @@ impl WebsocketService {
                         }
                     }
 
-                    Err(e) => {
+                    Err( _e ) => {
                         //error!( format!)"ws: {:?}", e.to_string()) );
                         log!("WebSocket connection failure - will try to reconnect periodically.");
                         websocket_offline_callback.emit( true );

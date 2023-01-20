@@ -20,9 +20,9 @@ pub fn error_404(
     >
         <div class="error-404">
             <h1>{"4😭4"}</h1>
-            <p title="Terrible 404 Haiku"><em>{"Page Not Found"}<br />
-            {"Navigate Above"}<br />
-            {"Sadness Ensues"}<br />
+            <p title="Terrible 404 Haiku"><em>{"Your page was not found"}<br />
+            {"Sadness Ensues, but look up"}<br />
+            {"The menu can help"}<br />
             </em></p>
         </div>
     </UIPage>

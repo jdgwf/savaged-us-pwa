@@ -8,6 +8,7 @@ use gloo_console::log;
 use savaged_libs::player_character::armor::Armor;
 use savaged_libs::player_character::edge::Edge;
 use savaged_libs::player_character::gear::Gear;
+use crate::pages::error404::Error404;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::player_character::weapon::Weapon;
 use savaged_libs::save_db_row::SaveDBRow;
@@ -32,7 +33,7 @@ pub struct UserSavesEditProps {
 }
 
 pub enum UserSavesEditMessage {
-    ChangeFolder(String),
+    // ChangeFolder(String),
     Cancel(bool),
 
     UpdateHindrance(Hindrance),
@@ -130,7 +131,9 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
-                        log!( format!("Unhandled add save type: {}", &save_type ) );
+                        if !ctx.props().global_vars.server_side_renderer {
+                            log!( format!("Unhandled add save type: {}", &save_type ) );
+                        }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
                 }
@@ -194,14 +197,18 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
-                        log!( format!("Unhandled save type: {}", &save.save_type ) );
+                        if !ctx.props().global_vars.server_side_renderer {
+                            log!( format!("Unhandled save type: {}", &save.save_type ) );
+                        }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
                 }
 
             }
             None => {
-                log!("create() Cannot find save!");
+                if !ctx.props().global_vars.server_side_renderer {
+                    log!("create() Cannot find save!");
+                }
             }
         }
 
@@ -264,10 +271,10 @@ impl Component for UserSavesEdit {
                 // log!("Cancel called");
                 self.close_and_cancel();
             }
-            UserSavesEditMessage::ChangeFolder( folder_name ) => {
-                // log!("ChangeFolder", folder);
-                set_local_storage_string( "saves_folder", folder_name);
-            }
+            // UserSavesEditMessage::ChangeFolder( folder_name ) => {
+            //     // log!("ChangeFolder", folder);
+            //     set_local_storage_string( "saves_folder", folder_name);
+            // }
         }
         true
     }
@@ -349,6 +356,7 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
+
                         log!( format!("Unhandled save type: {}", &save.save_type ) );
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
@@ -365,14 +373,14 @@ impl Component for UserSavesEdit {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
 
-        if self.redirect_back {
-            return html! { <Redirect<UserRoute> to={UserRoute::UserSavesList}/> }
-        }
-
         let mut global_vars = ctx.props().global_vars.clone();
 
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
+
+        if self.redirect_back {
+            return html! { <Redirect<UserRoute> to={UserRoute::UserSavesList}/> }
+        }
 
         if global_vars.user_loading {
 
@@ -410,8 +418,7 @@ impl Component for UserSavesEdit {
         let mut page_title = "Unhandled Save".to_owned();
         match &self.save {
             Some( save ) => {
-                let mut form = html!{<></>};
-                form = html!{<>
+                let mut form = html!{<>
                     <h2>{"Unhandled Save"}</h2>
                     <strong>{"Save UUID:"}</strong><Nbsp />{&save.uuid}<br />
                     <strong>{"Save Name:"}</strong><Nbsp />{&save.name}<br />
@@ -454,7 +461,11 @@ impl Component for UserSavesEdit {
                         };
                     }
                     None => {
-                        // log!("Cannot find Hindrance?");
+                        return html! {
+                            <Error404
+                                global_vars={global_vars}
+                            />
+                        };
                     }
                 }
 
@@ -470,13 +481,11 @@ impl Component for UserSavesEdit {
             }
             None => {
                 return html!{
-                    <UIPage
-                        global_vars={global_vars.clone()}
-                        page_title="Error Loading Save"
-                        submenu_tag={"user-data".to_owned()}
-                    >
-                        {"Cannot find save!"}
-                    </UIPage>
+                    html! {
+                        <Error404
+                            global_vars={global_vars}
+                        />
+                    }
                 }
             }
         }

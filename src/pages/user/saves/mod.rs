@@ -12,16 +12,32 @@ use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum UserSavesRoute {
+
     #[at("/me/saves")]
     List,
-    #[at("/me/saves/edit/:uuid")]
-    Edit {uuid: String},
+
+    #[at("/me/saves/edit/")]
+    RedirectEdit1,
+    #[at("/me/saves/edit")]
+    RedirectEdit2,
+
+    #[at("/me/saves/view/")]
+    RedirectView1,
+    #[at("/me/saves/view")]
+    RedirectView2,
+
     #[at("/me/saves/add/:save_type")]
     Add {save_type: String},
+
     #[at("/me/saves/view/:uuid")]
     View {uuid: String},
+
+    #[at("/me/saves/edit/:uuid")]
+    Edit {uuid: String},
+
     #[at("/404")]
     NotFound,
+
 }
 
 fn content_switch(
@@ -31,11 +47,11 @@ fn content_switch(
 
     let mut global_vars = global_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_sub_menu = "user".to_owned();
-    } else {
-        global_vars.current_sub_menu = "".to_owned();
-    }
+    // if global_vars.current_user.id > 0 {
+    //     global_vars.current_sub_menu = "user".to_owned();
+    // } else {
+    //     global_vars.current_sub_menu = "".to_owned();
+    // }
 
     match routes {
 
@@ -64,6 +80,15 @@ fn content_switch(
             <UserSavesView
                 uuid={uuid}
                 global_vars={global_vars}
+            />
+        },
+
+        UserSavesRoute::RedirectView1 |
+        UserSavesRoute::RedirectView2 |
+        UserSavesRoute::RedirectEdit1 |
+        UserSavesRoute::RedirectEdit2 => html! {
+            <Redirect<UserSavesRoute>
+                to={UserSavesRoute::List}
             />
         },
 
@@ -121,8 +146,6 @@ impl Component for UserSavesRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
-        // let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
-        // let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
