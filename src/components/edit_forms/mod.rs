@@ -1,6 +1,6 @@
-pub mod hindrance;
 pub mod edge;
+pub mod hindrance;
 
-pub mod gear;
 pub mod armor;
+pub mod gear;
 pub mod weapon;

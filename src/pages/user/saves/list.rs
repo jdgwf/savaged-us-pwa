@@ -1,5 +1,5 @@
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::tertiary_menu::{ TertiaryMenuItem, TertiaryMenu };
+use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::user::saves::UserSavesRoute;
@@ -24,64 +24,54 @@ pub enum UserSavesListMessage {
     ChangeFilter(String),
     ChangeFolder(String),
 }
-pub struct UserSavesList {
-}
+pub struct UserSavesList {}
 
 impl Component for UserSavesList {
     type Message = UserSavesListMessage;
     type Properties = UserSavesListProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
-        UserSavesList {
-        }
+        UserSavesList {}
     }
 
-    fn update(
-        &mut self,
-        _ctx: &Context<Self>,
-        msg: UserSavesListMessage
-    ) -> bool {
-
+    fn update(&mut self, _ctx: &Context<Self>, msg: UserSavesListMessage) -> bool {
         match msg {
-            UserSavesListMessage::ChangeFilter( filter_type ) => {
+            UserSavesListMessage::ChangeFilter(filter_type) => {
                 // log!("ChangeFilter", filter_type);
-                set_local_storage_string( "saves_filter", filter_type);
+                set_local_storage_string("saves_filter", filter_type);
             }
 
-            UserSavesListMessage::ChangeFolder( folder_name ) => {
+            UserSavesListMessage::ChangeFolder(folder_name) => {
                 // log!("ChangeFolder", folder);
-                set_local_storage_string( "saves_folder", folder_name);
+                set_local_storage_string("saves_folder", folder_name);
             }
         }
         true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let mut global_vars = ctx.props().global_vars.clone();
         global_vars.current_sub_menu = "user-data".to_owned();
         let mut filter_type = "character".to_owned();
 
         if !ctx.props().global_vars.server_side_renderer {
-            filter_type = get_local_storage_string( "saves_filter" , "character".to_string());
+            filter_type = get_local_storage_string("saves_filter", "character".to_string());
         }
 
         if global_vars.user_loading {
-
             return html! {
-            <UIPage
-                global_vars={global_vars}
-                page_title="My Saves"
+                <UIPage
+                    global_vars={global_vars}
+                    page_title="My Saves"
 
-            >
-                <div class={"text-center"}>
-                    <br />
-                    {"Loading..."}
-                </div>
+                >
+                    <div class={"text-center"}>
+                        <br />
+                        {"Loading..."}
+                    </div>
 
-            </UIPage>
-        }
+                </UIPage>
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -97,7 +87,7 @@ impl Component for UserSavesList {
                     </div>
 
                 </UIPage>
-            }
+            };
         }
 
         // global_vars.current_menu = "main-my-stuff".to_owned();
@@ -106,22 +96,21 @@ impl Component for UserSavesList {
         let mut saves: Vec<SaveDBRow> = Vec::new();
 
         match &global_vars.saves {
-            Some( save_items ) => {
+            Some(save_items) => {
                 saves = save_items.to_vec();
             }
-            None => {
-
-            }
+            None => {}
         }
 
-        let change_filter_callback_character = ctx.link().callback(UserSavesListMessage::ChangeFilter);
+        let change_filter_callback_character =
+            ctx.link().callback(UserSavesListMessage::ChangeFilter);
         let change_folder_callback = ctx.link().callback(UserSavesListMessage::ChangeFolder);
 
         let mut current_available_folders: Vec<String> = Vec::new();
-        let mut current_folder_counts: HashMap< String, u32> = HashMap::new();
+        let mut current_folder_counts: HashMap<String, u32> = HashMap::new();
 
-        let filter_by_type = | save: &SaveDBRow | {
-            let filter_type= filter_type.to_owned();
+        let filter_by_type = |save: &SaveDBRow| {
+            let filter_type = filter_type.to_owned();
             // let current_folder= current_folder.to_owned();
 
             if save.deleted {
@@ -135,29 +124,28 @@ impl Component for UserSavesList {
                 if save.save_type == "starship"
                     || save.save_type == "vehicle"
                     || save.save_type == "power-armor"
-                    || save.save_type == "walker" {
-                        return true;
-                    }
+                    || save.save_type == "walker"
+                {
+                    return true;
+                }
             } else if filter_type == "gear".to_owned() {
                 if save.save_type == "gear"
                     || save.save_type == "weapons"
                     || save.save_type == "armor"
                     || save.save_type == "vehicles"
-                    || save.save_type == "cyberware" {
-                        return true;
-                    }
+                    || save.save_type == "cyberware"
+                {
+                    return true;
+                }
             } else if filter_type == "other".to_owned() {
-                if save.save_type == "edges"
-                    || save.save_type == "hindrances" {
-                        return true;
-                    }
+                if save.save_type == "edges" || save.save_type == "hindrances" {
+                    return true;
+                }
             } else if save.save_type == filter_type {
                 return true;
-
             }
 
             return false;
-
         };
 
         let mut character_count = 0;
@@ -170,20 +158,21 @@ impl Component for UserSavesList {
         let mut trash_count = 0;
 
         for item in global_vars.clone().saves.unwrap_or(Vec::new()) {
-
             if item.deleted {
                 trash_count += 1;
             } else {
                 if filter_by_type(&item) {
                     let item_folder = item.folder.to_owned();
 
-                    if !item_folder.is_empty()
-                        && !current_available_folders.contains(&item_folder)
+                    if !item_folder.is_empty() && !current_available_folders.contains(&item_folder)
                     {
                         current_available_folders.push(item_folder.clone());
                     }
                     if !item_folder.is_empty() {
-                        current_folder_counts.entry(item_folder).and_modify(|count| *count += 1).or_insert(1);
+                        current_folder_counts
+                            .entry(item_folder)
+                            .and_modify(|count| *count += 1)
+                            .or_insert(1);
                     }
                 }
 
@@ -200,35 +189,36 @@ impl Component for UserSavesList {
                     bestiary_count += 1;
                 }
                 if item.save_type == "gear".to_owned()
-                    ||item.save_type == "weapon".to_owned()
-                    ||item.save_type == "weapons".to_owned()
-                    ||item.save_type == "vehicles".to_owned()
-                    ||item.save_type == "cyberware".to_owned()
-                    || item.save_type == "armor".to_owned() {
+                    || item.save_type == "weapon".to_owned()
+                    || item.save_type == "weapons".to_owned()
+                    || item.save_type == "vehicles".to_owned()
+                    || item.save_type == "cyberware".to_owned()
+                    || item.save_type == "armor".to_owned()
+                {
                     gear_count += 1;
                 }
-                if item.save_type == "hindrances".to_owned()
-                    ||item.save_type == "edges".to_owned() {
+                if item.save_type == "hindrances".to_owned() || item.save_type == "edges".to_owned()
+                {
                     other_count += 1;
                 }
                 if item.save_type == "starship"
-                || item.save_type == "vehicle"
-                || item.save_type == "power-armor"
-                || item.save_type == "walker" {
+                    || item.save_type == "vehicle"
+                    || item.save_type == "power-armor"
+                    || item.save_type == "walker"
+                {
                     scifi_count += 1;
                 }
             }
-
         }
 
         let mut current_folder = get_local_storage_string("saves_folder", "".to_string());
-        let current_available_folders_list= current_available_folders.clone();
+        let current_available_folders_list = current_available_folders.clone();
         if !current_folder.is_empty() && !current_available_folders_list.contains(&current_folder) {
             current_folder = "".to_string();
             set_local_storage_string("saves_folder", "".to_string());
         }
-        let filter_by = | save: &SaveDBRow | {
-            let filter_type= filter_type.to_owned();
+        let filter_by = |save: &SaveDBRow| {
+            let filter_type = filter_type.to_owned();
             // let mut current_folder= current_folder.to_owned();
 
             if save.deleted {
@@ -242,28 +232,29 @@ impl Component for UserSavesList {
                 if save.save_type == "starship"
                     || save.save_type == "vehicle"
                     || save.save_type == "power-armor"
-                    || save.save_type == "walker" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
+                    || save.save_type == "walker"
+                {
+                    if current_folder == save.folder {
+                        return true;
                     }
+                }
             } else if filter_type == "gear".to_owned() {
                 if save.save_type == "gear"
                     || save.save_type == "weapons"
                     || save.save_type == "cyberware"
                     || save.save_type == "vehicles"
-                    || save.save_type == "armor" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
+                    || save.save_type == "armor"
+                {
+                    if current_folder == save.folder {
+                        return true;
                     }
+                }
             } else if filter_type == "other".to_owned() {
-                if save.save_type == "edges"
-                    || save.save_type == "hindrances" {
-                        if current_folder == save.folder {
-                            return true;
-                        }
+                if save.save_type == "edges" || save.save_type == "hindrances" {
+                    if current_folder == save.folder {
+                        return true;
                     }
+                }
             } else if save.save_type == filter_type {
                 if current_folder == save.folder {
                     return true;
@@ -271,7 +262,6 @@ impl Component for UserSavesList {
             }
 
             return false;
-
         };
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
@@ -293,7 +283,7 @@ impl Component for UserSavesList {
                 icon_class: None,
                 separate: false,
             },
-            TertiaryMenuItem{
+            TertiaryMenuItem {
                 tag: "race".to_owned(),
                 label: "Races".to_owned() + &" (" + &race_count.to_string() + &")",
                 class: None,
@@ -341,30 +331,26 @@ impl Component for UserSavesList {
         ];
 
         if ctx.props().global_vars.current_user.has_premium_access() {
-            sub_menu_items.push(
-                TertiaryMenuItem {
-                    tag: "_!_trash_|_".to_owned(),
-                    label: "Trash".to_owned() + &" (" + &trash_count.to_string() + &")",
-                    class: None,
-                    callback: None,
-                    title: None,
-                    icon_class: Some("fa fa-trash".to_owned()),
-                    separate: false,
-                },
-            );
+            sub_menu_items.push(TertiaryMenuItem {
+                tag: "_!_trash_|_".to_owned(),
+                label: "Trash".to_owned() + &" (" + &trash_count.to_string() + &")",
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: Some("fa fa-trash".to_owned()),
+                separate: false,
+            });
         }
 
-        sub_menu_items.push(
-            TertiaryMenuItem {
-                tag: "".to_owned(),
-                label: "Add".to_owned(),
-                class: Some("abs-right success-tab".to_owned()),
-                callback: Some(Callback::noop()),
-                title: None,
-                icon_class: Some("fa fa-plus".to_owned()),
-                separate: true,
-            },
-        );
+        sub_menu_items.push(TertiaryMenuItem {
+            tag: "".to_owned(),
+            label: "Add".to_owned(),
+            class: Some("abs-right success-tab".to_owned()),
+            callback: Some(Callback::noop()),
+            title: None,
+            icon_class: Some("fa fa-plus".to_owned()),
+            separate: true,
+        });
 
         current_available_folders.sort();
         let change_folder_callback1 = change_folder_callback.clone();
@@ -604,4 +590,3 @@ impl Component for UserSavesList {
         }
     }
 }
-

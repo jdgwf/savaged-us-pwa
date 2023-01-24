@@ -1,8 +1,13 @@
-use crate::components::{confirmation_dialog::ConfirmationDialogDefinition, alerts::AlertDefinition};
-use savaged_libs::{user::User, websocket_message::WebSocketMessage, save_db_row::SaveDBRow, player_character::game_data_package::GameDataPackage, banner::SimpleBanner, partner::Partner};
+use crate::components::{
+    alerts::AlertDefinition, confirmation_dialog::ConfirmationDialogDefinition,
+};
+use savaged_libs::{
+    banner::SimpleBanner, partner::Partner, player_character::game_data_package::GameDataPackage,
+    save_db_row::SaveDBRow, user::User, websocket_message::WebSocketMessage,
+};
 use std::rc::Rc;
 use yew::prelude::*;
-use yew_router::history::{AnyHistory};
+use yew_router::history::AnyHistory;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GlobalVars {
@@ -66,10 +71,7 @@ impl Default for GlobalVars {
 impl Reducible for GlobalVars {
     type Action = GlobalVars;
 
-    fn reduce(
-        self: Rc<Self>,
-        _action: Self::Action,
-    ) -> Rc<Self> {
+    fn reduce(self: Rc<Self>, _action: Self::Action) -> Rc<Self> {
         // action
         self
     }

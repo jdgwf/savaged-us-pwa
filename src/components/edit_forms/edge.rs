@@ -1,10 +1,12 @@
 use crate::components::admin::book_select::BookSelect;
-use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
+use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::edge::Edge;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::{get_local_storage_string, get_local_storage_bool, set_local_storage_bool};
+use standard_components::libs::local_storage_shortcuts::{
+    get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
+};
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
@@ -19,7 +21,7 @@ pub struct EditEdgeProps {
     #[prop_or_default]
     pub book_list: Vec<Book>,
 
-    pub on_changed_callback: Callback< Edge >,
+    pub on_changed_callback: Callback<Edge>,
 
     #[prop_or_default]
     pub form_title: Option<String>,
@@ -33,7 +35,7 @@ pub struct EditEdgeProps {
 
 pub enum EditEdgeMessage {
     ChangePage(String),
-    ToggleNoPages( String ),
+    ToggleNoPages(String),
 
     UpdateName(String),
 
@@ -48,8 +50,7 @@ pub enum EditEdgeMessage {
 
     // UpdateMinorEffects( String ),
     // UpdateSummaryMinor( String ),
-
-    UpdateBookID( u32 ),
+    UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
 }
@@ -63,57 +64,48 @@ impl Component for EditEdge {
     type Message = EditEdgeMessage;
     type Properties = EditEdgeProps;
 
-    fn create(
-        ctx: &Context<Self>,
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         EditEdge {
             edit_item: ctx.props().edit_item.clone(),
             local_storage_page_name: "edge_edit_form_page".to_owned(),
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: EditEdgeMessage,
-    ) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: EditEdgeMessage) -> bool {
         match msg {
-            EditEdgeMessage::ChangePage( new_value ) => {
+            EditEdgeMessage::ChangePage(new_value) => {
                 if new_value != "__all__".to_owned() {
-                    set_local_storage_string( &self.local_storage_page_name, new_value);
-
+                    set_local_storage_string(&self.local_storage_page_name, new_value);
                 }
                 return true;
-
             }
 
-            EditEdgeMessage::ToggleNoPages( _new_value ) => {
+            EditEdgeMessage::ToggleNoPages(_new_value) => {
                 let new_value = get_local_storage_bool("edit_forms_one_page", false);
-                set_local_storage_bool( "edit_forms_one_page", !new_value);
+                set_local_storage_bool("edit_forms_one_page", !new_value);
                 return true;
             }
 
-            EditEdgeMessage::UpdateName( new_value ) => {
+            EditEdgeMessage::UpdateName(new_value) => {
                 self.edit_item.name = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
-            EditEdgeMessage::UpdatePage( new_value ) => {
+            EditEdgeMessage::UpdatePage(new_value) => {
                 self.edit_item.page = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
-            EditEdgeMessage::UpdateSummary( new_value ) => {
+            EditEdgeMessage::UpdateSummary(new_value) => {
                 self.edit_item.summary = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
-            EditEdgeMessage::UpdateDescription( new_value ) => {
+            EditEdgeMessage::UpdateDescription(new_value) => {
                 self.edit_item.description = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
@@ -128,10 +120,9 @@ impl Component for EditEdge {
             //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
             //     return true;
             // }
-
-            EditEdgeMessage::UpdateActive( new_value ) => {
+            EditEdgeMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
-                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
@@ -178,34 +169,21 @@ impl Component for EditEdge {
             //     ctx.props().on_changed_callback.emit( self.edit_item.clone() );
             //     return true;
             // }
-
-            EditEdgeMessage::UpdateBookID( new_value ) => {
+            EditEdgeMessage::UpdateBookID(new_value) => {
                 self.edit_item.book_id = new_value;
-                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
-
         }
-
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-         _old_props: &Self::Properties
-    ) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         self.edit_item = ctx.props().edit_item.clone();
         true
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let all = get_local_storage_bool("edit_forms_one_page", false);
-
-        let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
@@ -238,57 +216,50 @@ impl Component for EditEdge {
         ];
 
         if ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
-            sub_menu_items.push(
-                TertiaryMenuItem {
-                    tag: "admin".to_owned(),
-                    label: "Admin".to_owned(),
-                    class: None,
-                    callback: None,
-                    title: None,
-                    icon_class: None,
-                    separate: false,
-                },
-            );
+            sub_menu_items.push(TertiaryMenuItem {
+                tag: "admin".to_owned(),
+                label: "Admin".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            });
         }
 
-        let toggle_no_pages = ctx.link().callback( EditEdgeMessage::ToggleNoPages);
+        let toggle_no_pages = ctx.link().callback(EditEdgeMessage::ToggleNoPages);
 
         if all {
-            sub_menu_items = vec![
-                TertiaryMenuItem {
-                    tag: "__all__".to_owned(),
-                    label: "Back to Paged".to_owned(),
-                    class: Some("all-pages".to_owned()),
-                    callback: Some( toggle_no_pages ),
-                    title: None,
-                    icon_class: None,
-                    separate: true,
-                },
-            ];
-
+            sub_menu_items = vec![TertiaryMenuItem {
+                tag: "__all__".to_owned(),
+                label: "Back to Paged".to_owned(),
+                class: Some("all-pages".to_owned()),
+                callback: Some(toggle_no_pages),
+                title: None,
+                icon_class: None,
+                separate: true,
+            }];
         } else {
-            sub_menu_items.push(
-                TertiaryMenuItem {
-                    tag: "__all__".to_owned(),
-                    label: "No Pages".to_owned(),
-                    class: Some("all-pages".to_owned()),
-                    callback: Some( toggle_no_pages ),
-                    title: None,
-                    icon_class: None,
-                    separate: true,
-                },
-            );
+            sub_menu_items.push(TertiaryMenuItem {
+                tag: "__all__".to_owned(),
+                label: "No Pages".to_owned(),
+                class: Some("all-pages".to_owned()),
+                callback: Some(toggle_no_pages),
+                title: None,
+                icon_class: None,
+                separate: true,
+            });
         }
 
         let change_page_callback_form = ctx.link().callback(EditEdgeMessage::ChangePage);
-        let mut title = html!{<></>};
+        let mut title = html! {<></>};
         match &ctx.props().form_title {
-            Some( form_title ) => {
-                title = html!{<h3 class="text-center no-margins">{form_title.to_owned()}</h3>};
+            Some(form_title) => {
+                title = html! {<h3 class="text-center no-margins">{form_title.to_owned()}</h3>};
             }
             None => {}
         }
-        let header = html!{
+        let header = html! {
             <>
                 <TertiaryMenu
                     server_side_renderer={ctx.props().global_vars.server_side_renderer}
@@ -302,15 +273,24 @@ impl Component for EditEdge {
             </>
         };
 
+        let mut current_page =
+            get_local_storage_string(&self.local_storage_page_name, "general".to_owned());
+
+        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        if (current_page.as_str() == "admin"
+            && !ctx.props().global_vars.current_user.has_admin_access())
+            || !valid_pages.contains(&current_page.as_str())
+        {
+            current_page = "general".to_owned();
+        }
+
         if all {
             current_page = "__all__".to_owned();
-
-        } else {
-            current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
         }
+
         let book_list = ctx.props().book_list.clone();
 
-        html!{
+        html! {
             <div class="edit-form">
             {header}
             <div class="form-flex">
@@ -462,7 +442,5 @@ impl Component for EditEdge {
                 </div>
             </div>
         }
-
     }
-
 }

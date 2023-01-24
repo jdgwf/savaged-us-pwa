@@ -17,60 +17,47 @@ pub struct SettingsDevicesProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum  SettingsDevicesMessages {
-    UpdateLoginItems( Vec<LoginToken> )
+pub enum SettingsDevicesMessages {
+    UpdateLoginItems(Vec<LoginToken>),
 }
 
-pub struct SettingsDevices {
-}
+pub struct SettingsDevices {}
 
 impl Component for SettingsDevices {
     type Message = SettingsDevicesMessages;
     type Properties = SettingsDevicesProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Device Login Tokens".to_owned(), global_vars.server_side_renderer,);
-        SettingsDevices {
-        }
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Device Login Tokens".to_owned(),
+            global_vars.server_side_renderer,
+        );
+        SettingsDevices {}
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: SettingsDevicesMessages,
-    ) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: SettingsDevicesMessages) -> bool {
         match msg {
-            SettingsDevicesMessages::UpdateLoginItems( login_tokens ) => {
-
+            SettingsDevicesMessages::UpdateLoginItems(login_tokens) => {
                 let mut global_vars = ctx.props().global_vars.clone();
 
                 global_vars.current_user.login_tokens = login_tokens.clone();
 
-                ctx.props().global_vars.update_global_vars.emit( global_vars );
+                ctx.props().global_vars.update_global_vars.emit(global_vars);
 
                 return true;
             }
         }
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let global_vars = ctx.props().global_vars.clone();
 
         let mut login_tokens = global_vars.current_user.login_tokens.clone();
 
-        login_tokens.sort_by
-        (|a, b|
-            b.last_seen.cmp(&a.last_seen)
-        );
+        login_tokens.sort_by(|a, b| b.last_seen.cmp(&a.last_seen));
 
         if global_vars.user_loading {
             return html! {
@@ -84,7 +71,7 @@ impl Component for SettingsDevices {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -99,14 +86,16 @@ impl Component for SettingsDevices {
                     {"You are not logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         // let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
         // let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
         // let global_vars = ctx.props().global_vars.clone();
 
-        let update_login_tokens = ctx.link().callback(SettingsDevicesMessages::UpdateLoginItems);
+        let update_login_tokens = ctx
+            .link()
+            .callback(SettingsDevicesMessages::UpdateLoginItems);
 
         let mut global_vars = ctx.props().global_vars.clone();
         let global_vars2 = ctx.props().global_vars.clone();
@@ -154,7 +143,6 @@ impl Component for SettingsDevices {
             </UIPage>
 
         }
-
     }
 }
 
@@ -168,9 +156,9 @@ pub struct SettingsDeviceLineItemProps {
 }
 
 pub enum SettingsDeviceLineItemMessage {
-    DeleteDevice( MouseEvent ),
-    SaveDeviceName( MouseEvent ),
-    UpdateFriendlyName( String ),
+    DeleteDevice(MouseEvent),
+    SaveDeviceName(MouseEvent),
+    UpdateFriendlyName(String),
 }
 
 pub struct SettingsDeviceLineItem {
@@ -182,130 +170,103 @@ impl Component for SettingsDeviceLineItem {
     type Message = SettingsDeviceLineItemMessage;
     type Properties = SettingsDeviceLineItemProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         // let global_vars = ctx.props().global_vars.clone();
 
         SettingsDeviceLineItem {
             // global_vars: global_vars,
-            friendly_name: ctx.props().token.friendly_name.clone()
+            friendly_name: ctx.props().token.friendly_name.clone(),
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: SettingsDeviceLineItemMessage,
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: SettingsDeviceLineItemMessage) -> bool {
         match msg {
-
-            SettingsDeviceLineItemMessage::DeleteDevice( _e ) => {
+            SettingsDeviceLineItemMessage::DeleteDevice(_e) => {
                 let login_token = ctx.props().global_vars.login_token.clone();
                 let current_token = ctx.props().token.token.clone();
                 let update_login_tokens = ctx.props().update_login_tokens.clone();
-                let endpoint = ctx.props().global_vars.api_root.clone() + &"/user/token-remove".to_owned();
-                spawn_local (
-                    async move {
-                        let fetch_result = fetch_api_send_token(
-                            endpoint,
-                            login_token,
-                            current_token,
-                            "".to_owned(),
-                        ).await;
+                let endpoint =
+                    ctx.props().global_vars.api_root.clone() + &"/user/token-remove".to_owned();
+                spawn_local(async move {
+                    let fetch_result =
+                        fetch_api_send_token(endpoint, login_token, current_token, "".to_owned())
+                            .await;
 
-                        match fetch_result {
-                            Ok( login_tokens_replace ) => {
-                                // let vec_val_result = login_tokens_replace.into_serde::< Vec<LoginToken> >();
-                                let vec_val_result: Result<Vec<LoginToken>, Error> = JsValueSerdeExt::into_serde(&login_tokens_replace);
-                                match vec_val_result {
-                                    Ok( vec_val ) => {
-                                        // log!( format!("result {:?}", vec_val) );
-                                        update_login_tokens.emit( vec_val );
-                                    }
-                                    Err( err ) => {
-                                        let err_string: String = format!("SettingsDeviceLineItemMessage::DeleteDevice Serde Err(): {}", &err);
-                                        error!( &err_string  );
-                                    }
+                    match fetch_result {
+                        Ok(login_tokens_replace) => {
+                            // let vec_val_result = login_tokens_replace.into_serde::< Vec<LoginToken> >();
+                            let vec_val_result: Result<Vec<LoginToken>, Error> =
+                                JsValueSerdeExt::into_serde(&login_tokens_replace);
+                            match vec_val_result {
+                                Ok(vec_val) => {
+                                    // log!( format!("result {:?}", vec_val) );
+                                    update_login_tokens.emit(vec_val);
+                                }
+                                Err(err) => {
+                                    let err_string: String = format!("SettingsDeviceLineItemMessage::DeleteDevice Serde Err(): {}", &err);
+                                    error!(&err_string);
                                 }
                             }
-                            Err( err ) => {
-                                error!("SettingsDeviceLineItemMessage::DeleteDevice", &err  );
-                            }
+                        }
+                        Err(err) => {
+                            error!("SettingsDeviceLineItemMessage::DeleteDevice", &err);
                         }
                     }
-                );
+                });
 
                 return true;
             }
 
-            SettingsDeviceLineItemMessage::SaveDeviceName( _e ) => {
+            SettingsDeviceLineItemMessage::SaveDeviceName(_e) => {
                 let update_login_tokens = ctx.props().update_login_tokens.clone();
                 let login_token = ctx.props().global_vars.login_token.clone();
                 let current_token = ctx.props().token.token.clone();
                 let friendly_name = self.friendly_name.to_owned();
-                let endpoint = ctx.props().global_vars.api_root.clone() + &"/user/token-update-name".to_owned();
-                spawn_local (
-                    async move {
+                let endpoint = ctx.props().global_vars.api_root.clone()
+                    + &"/user/token-update-name".to_owned();
+                spawn_local(async move {
+                    let fetch_result =
+                        fetch_api_send_token(endpoint, login_token, current_token, friendly_name)
+                            .await;
 
-                        let fetch_result = fetch_api_send_token(
-                            endpoint,
-                            login_token,
-                            current_token,
-                            friendly_name,
-                        ).await;
-
-                        match fetch_result {
-                            Ok( login_tokens_replace ) => {
-                                // let vec_val_result = login_tokens_replace.into_serde::< Vec<LoginToken> >();
-                                let vec_val_result: Result<Vec<LoginToken>, Error> = JsValueSerdeExt::into_serde(&login_tokens_replace);
-                                match vec_val_result {
-                                    Ok( vec_val ) => {
-                                        update_login_tokens.emit( vec_val );
-                                    }
-                                    Err( err ) => {
-                                        let err_string: String = format!("SettingsDeviceLineItemMessage::SaveDeviceName Serde Err(): {}", &err);
-                                        error!( &err_string  );
-                                    }
+                    match fetch_result {
+                        Ok(login_tokens_replace) => {
+                            // let vec_val_result = login_tokens_replace.into_serde::< Vec<LoginToken> >();
+                            let vec_val_result: Result<Vec<LoginToken>, Error> =
+                                JsValueSerdeExt::into_serde(&login_tokens_replace);
+                            match vec_val_result {
+                                Ok(vec_val) => {
+                                    update_login_tokens.emit(vec_val);
                                 }
-
-                            }
-                            Err( err ) => {
-                                error!("SettingsDeviceLineItemMessage::SaveDeviceName", &err  );
+                                Err(err) => {
+                                    let err_string: String = format!("SettingsDeviceLineItemMessage::SaveDeviceName Serde Err(): {}", &err);
+                                    error!(&err_string);
+                                }
                             }
                         }
+                        Err(err) => {
+                            error!("SettingsDeviceLineItemMessage::SaveDeviceName", &err);
+                        }
                     }
-                );
+                });
 
                 return true;
             }
 
-            SettingsDeviceLineItemMessage::UpdateFriendlyName( new_value ) => {
+            SettingsDeviceLineItemMessage::UpdateFriendlyName(new_value) => {
                 self.friendly_name = new_value.to_owned();
 
                 return true;
             }
-
         }
-
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &SettingsDeviceLineItemProps,
-    ) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _props: &SettingsDeviceLineItemProps) -> bool {
         self.friendly_name = ctx.props().token.friendly_name.clone();
         return true;
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let device = ctx.props().token.clone();
 
         html! {
@@ -379,4 +340,3 @@ impl Component for SettingsDeviceLineItem {
         }
     }
 }
-

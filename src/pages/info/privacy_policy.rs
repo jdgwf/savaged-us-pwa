@@ -2,7 +2,7 @@ use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::info::InfoRoute;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
@@ -10,10 +10,7 @@ pub struct InfoPrivacyPolicyProps {
     pub global_vars: GlobalVars,
 }
 #[function_component(InfoPrivacyPolicy)]
-pub fn info_privacy_policy(
-    props: &InfoPrivacyPolicyProps,
-) -> Html {
-
+pub fn info_privacy_policy(props: &InfoPrivacyPolicyProps) -> Html {
     let mut global_vars = props.global_vars.clone();
 
     global_vars.current_sub_menu = "info-privacy-policy".to_owned();
@@ -63,4 +60,3 @@ pub fn info_privacy_policy(
         </UIPage>
     }
 }
-

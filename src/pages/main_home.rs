@@ -1,50 +1,39 @@
-use yew::prelude::*;
 use crate::components::alerts::AlertDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::alert_level::AlertLevel;
 use standard_components::ui::nbsp::Nbsp;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct MainHomeProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum MainHomeMessage {
+pub enum MainHomeMessage {}
 
-}
-
-pub struct MainHome {
-}
+pub struct MainHome {}
 
 impl Component for MainHome {
     type Message = MainHomeMessage;
     type Properties = MainHomeProps;
 
-    fn create(
-        _ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(_ctx: &Context<Self>) -> Self {
         // let global_vars = ctx.props().global_vars.clone();
 
-        MainHome {
-        }
+        MainHome {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let global_vars = ctx.props().global_vars.clone();
         // let global_vars2 = ctx.props().global_vars.clone();
 
-        let mut saves_html = html!{<></>};
-        let mut game_data_html = html!{<></>};
+        let mut saves_html = html! {<></>};
+        let mut game_data_html = html! {<></>};
 
         match &global_vars.game_data {
-            Some( game_data ) => {
-                game_data_html = html!{
+            Some(game_data) => {
+                game_data_html = html! {
                     <>
                     {"Books: "}{game_data.books.len()}<br />
                     {"Edges: "}{game_data.edges.len()}<br />
@@ -59,8 +48,8 @@ impl Component for MainHome {
             None => {}
         }
         match &global_vars.saves {
-            Some( saves ) => {
-                saves_html = html!{
+            Some(saves) => {
+                saves_html = html! {
                     <>
                         {"saves: "}{saves.len()}<br />
                     </>
@@ -156,6 +145,5 @@ impl Component for MainHome {
             </UIPage>
 
         }
-
     }
 }

@@ -205,7 +205,6 @@ impl Component for EditHindrance {
 
         let all = get_local_storage_bool("edit_forms_one_page", false);
 
-        let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
@@ -302,12 +301,20 @@ impl Component for EditHindrance {
             </>
         };
 
+        let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
+
+        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        if (current_page.as_str() == "admin"  && !ctx.props().global_vars.current_user.has_admin_access())
+            || !valid_pages.contains(&current_page.as_str())
+        {
+            current_page = "general".to_owned();
+        }
+
         if all {
             current_page = "__all__".to_owned();
 
-        } else {
-            current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
         }
+
         let book_list = ctx.props().book_list.clone();
 
         html!{

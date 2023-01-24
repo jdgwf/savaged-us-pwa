@@ -2,15 +2,15 @@ pub mod game_data;
 pub mod home;
 pub mod users;
 
+use self::game_data::get_game_data_submenu_items;
+use self::users::list::AdminUsersList;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use crate::pages::admin::game_data::AdminGameDataRouter;
 use crate::pages::admin::game_data::home::AdminGameDataHome;
+use crate::pages::admin::game_data::AdminGameDataRouter;
 use crate::pages::admin::users::AdminUsersRouter;
 use crate::pages::error404::Error404;
 use home::AdminHome;
-use self::game_data::get_game_data_submenu_items;
-use self::users::list::AdminUsersList;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -36,11 +36,7 @@ pub enum AdminRoute {
     NotFound,
 }
 
-fn content_switch(
-    routes: AdminRoute,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
     if global_vars.user_loading || global_vars.server_side_renderer {
         return html! {
             <UIPage
@@ -49,7 +45,7 @@ fn content_switch(
             >
                 <h1>{ "Verifying user..." }</h1>
             </UIPage>
-        }
+        };
     }
 
     if !global_vars.current_user.has_developer_access() {
@@ -60,11 +56,10 @@ fn content_switch(
             >
                 <h1>{ "Access Denied" }</h1>
             </UIPage>
-        }
+        };
     }
 
     match routes {
-
         AdminRoute::AdminUsersRouter => html! {
             <AdminUsersRouter
                 global_vars={global_vars}
@@ -86,7 +81,7 @@ fn content_switch(
                     sub_menu_items={sub_menu_items}
                 />
             }
-        },
+        }
 
         AdminRoute::AdminGameDataRouter => html! {
             <AdminGameDataRouter
@@ -113,53 +108,49 @@ pub struct AdminRouterProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum AdminRouterMessage {
-
-}
-pub struct AdminRouter {
-}
+pub enum AdminRouterMessage {}
+pub struct AdminRouter {}
 
 impl Component for AdminRouter {
     type Message = AdminRouterMessage;
     type Properties = AdminRouterProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
-        AdminRouter {
-        }
+        AdminRouter {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>
-    ) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
         global_vars.current_menu = "main-admin".to_owned();
 
         if ctx.props().global_vars.server_side_renderer {
-            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
-
+            let history = ctx
+                .props()
+                .global_vars
+                .server_side_renderer_history
+                .as_ref()
+                .unwrap()
+                .clone();
 
             html! {
 
-                <Router
-                    history={history}
-                >
-                    <div class={"main-content"}>
-                        <Switch<AdminRoute>
-                            render={
-                                move |routes|
-                                content_switch(
-                                    routes,
-                                    global_vars.clone(),
-                                )
-                            }
-                        />
-                    </div>
-                </Router>
-        }
+                    <Router
+                        history={history}
+                    >
+                        <div class={"main-content"}>
+                            <Switch<AdminRoute>
+                                render={
+                                    move |routes|
+                                    content_switch(
+                                        routes,
+                                        global_vars.clone(),
+                                    )
+                                }
+                            />
+                        </div>
+                    </Router>
+            }
         } else {
-
             html! {
 
                 <BrowserRouter>
@@ -177,7 +168,5 @@ impl Component for AdminRouter {
                 </BrowserRouter>
             }
         }
-
     }
 }
-

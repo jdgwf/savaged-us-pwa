@@ -1,5 +1,5 @@
 use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
-use yew::{function_component, Properties, Html, html, Children, Callback, AttrValue};
+use yew::{function_component, html, AttrValue, Callback, Children, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct StandardModalProps {
@@ -38,33 +38,29 @@ pub struct StandardModalProps {
 }
 
 #[function_component(StandardModal)]
-pub fn standard_modal(
-    props: &StandardModalProps,
-) -> Html {
-
-    let mut class="modal-container".to_owned();
+pub fn standard_modal(props: &StandardModalProps) -> Html {
+    let mut class = "modal-container".to_owned();
     if props.xl {
         class = "modal-container modal-xl".to_owned();
     }
-    let mut modal_header = html!{<></>};
+    let mut modal_header = html! {<></>};
     match &props.title {
-        Some( title ) => {
-            modal_header = html!{
+        Some(title) => {
+            modal_header = html! {
                 <div class="modal-head">
                     <h3 class="text-center">{title}</h3>
                 </div>
             };
-                // "modal-container modal-xl".to_owned();
+            // "modal-container modal-xl".to_owned();
         }
         None => {}
-
     }
 
     let mut modal_footer = html!(<></>);
 
     match &props.close_cancel_callback {
-        Some( _close_cancel_callback ) => {
-            modal_footer = html!{
+        Some(_close_cancel_callback) => {
+            modal_footer = html! {
                 <div class="modal-foot">
                     <StandardFormSaveButtons
                         close_cancel_callback={_close_cancel_callback.clone()}

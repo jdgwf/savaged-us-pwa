@@ -1,8 +1,7 @@
-
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct InfoTodosProps {
@@ -10,10 +9,7 @@ pub struct InfoTodosProps {
 }
 
 #[function_component(InfoTodos)]
-pub fn info_todos(
-    props: &InfoTodosProps,
-) -> Html {
-
+pub fn info_todos(props: &InfoTodosProps) -> Html {
     let mut global_vars = props.global_vars.clone();
 
     global_vars.current_sub_menu = "info-todos".to_owned();
@@ -182,4 +178,3 @@ pub fn info_todos(
         </UIPage>
     }
 }
-

@@ -17,100 +17,90 @@ pub struct SettingsAPIKeyProps {
 }
 
 pub enum SettingsAPIKeyMessage {
-    ConfirmYes( bool ),
-    RegenerateAPIKey( MouseEvent ),
+    ConfirmYes(bool),
+    RegenerateAPIKey(MouseEvent),
 }
 
-pub struct SettingsAPIKey {
-
-}
+pub struct SettingsAPIKey {}
 
 impl Component for SettingsAPIKey {
     type Message = SettingsAPIKeyMessage;
     type Properties = SettingsAPIKeyProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "API Key".to_owned(), global_vars.server_side_renderer,);
-        SettingsAPIKey {
-        }
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "API Key".to_owned(),
+            global_vars.server_side_renderer,
+        );
+        SettingsAPIKey {}
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: SettingsAPIKeyMessage,
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: SettingsAPIKeyMessage) -> bool {
         match msg {
-
-            SettingsAPIKeyMessage::ConfirmYes( bool ) => {
+            SettingsAPIKeyMessage::ConfirmYes(bool) => {
                 if bool {
-
                     let mut global_vars = ctx.props().global_vars.clone();
                     let login_token = global_vars.login_token.to_owned();
                     let api_root = global_vars.api_root.to_owned();
                     let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
-                    spawn_local (
-                        async move {
-                            let result = fetch_api(
-                                api_root.to_owned() + &"/auth/new-api-key".to_owned(),
-                                "".to_owned(),
-                                login_token.to_owned(),
-                            ).await;
+                    spawn_local(async move {
+                        let result = fetch_api(
+                            api_root.to_owned() + &"/auth/new-api-key".to_owned(),
+                            "".to_owned(),
+                            login_token.to_owned(),
+                        )
+                        .await;
 
-                            match result {
-                                Ok( _result_data ) => {
-
-                                    let user_result = fetch_api(
-                                        api_root.to_owned() + &"/auth/get-user-data".to_owned(),
-                                        "".to_owned(),
-                                        login_token.to_owned(),
-                                    ).await;
-                                    match user_result {
-                                        Ok( user_value ) => {
-                                            // let vec_val_result = user_value.into_serde::<User>();
-                                            let vec_val_result: Result<User, Error> = JsValueSerdeExt::into_serde(&user_value);
-                                            match vec_val_result {
-                                                Ok( vec_val ) => {
-                                                    // update_current_user.emit( vec_val.clone() );
-                                                    global_vars.current_user = vec_val.clone();
-                                                    update_global_vars.emit( global_vars );
-                                                }
-                                                Err( err ) => {
-                                                    let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                                                    // update_current_user.emit( User::default() );
-                                                    error!( &err_string  );
-                                                }
+                        match result {
+                            Ok(_result_data) => {
+                                let user_result = fetch_api(
+                                    api_root.to_owned() + &"/auth/get-user-data".to_owned(),
+                                    "".to_owned(),
+                                    login_token.to_owned(),
+                                )
+                                .await;
+                                match user_result {
+                                    Ok(user_value) => {
+                                        // let vec_val_result = user_value.into_serde::<User>();
+                                        let vec_val_result: Result<User, Error> =
+                                            JsValueSerdeExt::into_serde(&user_value);
+                                        match vec_val_result {
+                                            Ok(vec_val) => {
+                                                // update_current_user.emit( vec_val.clone() );
+                                                global_vars.current_user = vec_val.clone();
+                                                update_global_vars.emit(global_vars);
                                             }
-
-                                        }
-                                        Err( err ) => {
-                                            error!("SettingsAPIKeyMessage::RegenerateAPIKey user parse error", err );
+                                            Err(err) => {
+                                                let err_string: String = format!(
+                                                    "get_data_via_fetch Serde Err(): {}",
+                                                    &err
+                                                );
+                                                // update_current_user.emit( User::default() );
+                                                error!(&err_string);
+                                            }
                                         }
                                     }
-
-                                }
-
-                                Err( err ) => {
-                                    error!("SettingsAPIKeyMessage::RegenerateAPIKey error", err );
+                                    Err(err) => {
+                                        error!("SettingsAPIKeyMessage::RegenerateAPIKey user parse error", err );
+                                    }
                                 }
                             }
 
+                            Err(err) => {
+                                error!("SettingsAPIKeyMessage::RegenerateAPIKey error", err);
+                            }
                         }
-                    );
+                    });
                     return true;
                 }
                 return false;
             }
 
-            SettingsAPIKeyMessage::RegenerateAPIKey( _ ) => {
-
+            SettingsAPIKeyMessage::RegenerateAPIKey(_) => {
                 let dialog = ConfirmationDialogDefinition {
                     title: Some("API Key Regeneration Confirmation".to_string()),
                     callback: ctx.link().callback(SettingsAPIKeyMessage::ConfirmYes),
@@ -120,20 +110,17 @@ impl Component for SettingsAPIKey {
                     label_no: None,
                 };
 
-                ctx.props().global_vars.open_confirmation_dialog.emit( dialog );
+                ctx.props()
+                    .global_vars
+                    .open_confirmation_dialog
+                    .emit(dialog);
 
                 return true;
             }
-
         }
-
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
 
         global_vars.current_sub_menu = "settings-apikey".to_owned();
@@ -150,7 +137,7 @@ impl Component for SettingsAPIKey {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -165,7 +152,7 @@ impl Component for SettingsAPIKey {
                     {"You are not logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if !global_vars.current_user.is_premium {
@@ -180,7 +167,7 @@ impl Component for SettingsAPIKey {
                     {"You are not a WildCard subscriber!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         html! {
@@ -226,6 +213,5 @@ impl Component for SettingsAPIKey {
             </UIPage>
 
         }
-
     }
 }

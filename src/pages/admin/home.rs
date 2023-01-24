@@ -1,7 +1,7 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct AdminHomeProps {
@@ -9,10 +9,7 @@ pub struct AdminHomeProps {
 }
 
 #[function_component(AdminHome)]
-pub fn admin_home(
-    props: &AdminHomeProps,
-) -> Html {
-
+pub fn admin_home(props: &AdminHomeProps) -> Html {
     let mut global_vars = props.global_vars.clone();
     global_vars.current_menu = "main-admin".to_owned();
     global_vars.current_sub_menu = "admin-home".to_owned();
@@ -28,4 +25,3 @@ pub fn admin_home(
         </UIPage>
     }
 }
-

@@ -1,4 +1,6 @@
-use standard_components::libs::local_storage_shortcuts::{get_local_storage_string, set_local_storage_string};
+use standard_components::libs::local_storage_shortcuts::{
+    get_local_storage_string, set_local_storage_string,
+};
 use standard_components::ui::nbsp::Nbsp;
 use web_sys::MouseEvent;
 use yew::prelude::*;
@@ -27,7 +29,6 @@ pub enum TertiaryMenuMessage {
 }
 
 pub struct TertiaryMenu {
-
     open_dropdown: bool,
 }
 
@@ -36,20 +37,14 @@ impl Component for TertiaryMenu {
     type Properties = TertiaryMenuProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
         TertiaryMenu {
             open_dropdown: false,
         }
     }
 
-    fn update(
-        &mut self,
-        _ctx: &Context<Self>,
-        msg: TertiaryMenuMessage
-    ) -> bool {
-
+    fn update(&mut self, _ctx: &Context<Self>, msg: TertiaryMenuMessage) -> bool {
         match msg {
-            TertiaryMenuMessage::SetDropdownOpen( open ) => {
+            TertiaryMenuMessage::SetDropdownOpen(open) => {
                 self.open_dropdown = open;
             }
         }
@@ -57,11 +52,13 @@ impl Component for TertiaryMenu {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let mut filter_type = "character".to_owned();
 
         if !ctx.props().server_side_renderer {
-            filter_type = get_local_storage_string( ctx.props().local_storage_variable.as_str(), "character".to_string());
+            filter_type = get_local_storage_string(
+                ctx.props().local_storage_variable.as_str(),
+                "character".to_string(),
+            );
         }
 
         let menu_changed_callback = ctx.props().menu_changed_callback.clone();
@@ -277,12 +274,7 @@ impl Component for TertiaryMenu {
     }
 }
 
-fn class_is_active(
-    current_select: String,
-    current_menu_item: &str,
-    base_class: String,
-) -> String {
-
+fn class_is_active(current_select: String, current_menu_item: &str, base_class: String) -> String {
     if current_select.as_str() == current_menu_item {
         return base_class + &" active";
     }

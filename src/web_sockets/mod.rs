@@ -2,7 +2,7 @@ pub mod handle_message;
 use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
 // use gloo_console::error;
 use gloo_console::log;
-use gloo_net::websocket::{ Message, futures::WebSocket,};
+use gloo_net::websocket::{futures::WebSocket, Message};
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
 use serde_json;
@@ -20,7 +20,6 @@ impl WebsocketService {
         websocket_offline_callback: &Callback<bool>,
         login_token: String,
     ) -> Self {
-
         let wss_url = server_root
             .replace("http://", "ws://")
             .replace("https://", "wss://")
@@ -28,7 +27,7 @@ impl WebsocketService {
 
         // log!("server_root", &server_root);
         // log!("wss_url", &wss_url);
-        let ws: WebSocket = WebSocket::open( &wss_url ).unwrap();
+        let ws: WebSocket = WebSocket::open(&wss_url).unwrap();
 
         let (mut write, mut read) = ws.split();
 
@@ -39,7 +38,7 @@ impl WebsocketService {
             while let Some(s) = in_rx.next().await {
                 // log!("got event from channel! {}", &s);
                 write.send(Message::Text(s)).await.unwrap();
-                websocket_offline_callback_send.clone().emit( false );
+                websocket_offline_callback_send.clone().emit(false);
             }
         });
 
@@ -52,36 +51,32 @@ impl WebsocketService {
         let received_message_callback = received_message_callback.clone();
         let websocket_offline_callback = websocket_offline_callback.clone();
         spawn_local(async move {
-
             while let Some(msg) = read.next().await {
                 match msg {
                     Ok(Message::Text(val)) => {
                         // log!("Message::Text", &val);
-                        received_message_callback.emit( val.to_string()  );
-                        websocket_offline_callback.emit( false );
+                        received_message_callback.emit(val.to_string());
+                        websocket_offline_callback.emit(false);
                     }
 
                     Ok(Message::Bytes(b)) => {
                         let decoded = std::str::from_utf8(&b);
                         if let Ok(val) = decoded {
+                            received_message_callback.emit(val.to_string());
 
-                            received_message_callback.emit( val.to_string()  );
-
-                            websocket_offline_callback.emit( false );
+                            websocket_offline_callback.emit(false);
                         }
                     }
 
-                    Err( _e ) => {
+                    Err(_e) => {
                         //error!( format!)"ws: {:?}", e.to_string()) );
                         log!("WebSocket connection failure - will try to reconnect periodically.");
-                        websocket_offline_callback.emit( true );
-
+                        websocket_offline_callback.emit(true);
                     }
                 }
             }
             log!("WebSocket Closed");
-            websocket_offline_callback.emit( true );
-
+            websocket_offline_callback.emit(true);
         });
 
         let mut msg = WebSocketMessage::default();
@@ -90,24 +85,19 @@ impl WebsocketService {
         msg.kind = WebsocketMessageType::Online;
 
         // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
-        let send_data_result = serde_json::to_string( &msg );
+        let send_data_result = serde_json::to_string(&msg);
 
         // log!("MainWebAppMessages::SendWebSocket called");
         match send_data_result {
-            Ok( send_data ) => {
+            Ok(send_data) => {
                 // write.send( send_data );
-                let _ = in_tx.clone().try_send(send_data.to_owned() );
+                let _ = in_tx.clone().try_send(send_data.to_owned());
             }
-            Err( _err ) => {
-
-            }
+            Err(_err) => {}
         }
 
-        Self {
-            tx: in_tx,
-        }
+        Self { tx: in_tx }
     }
-
 }
 
 pub fn connect_to_websocket(
@@ -116,7 +106,6 @@ pub fn connect_to_websocket(
     websocket_offline_callback: &Callback<bool>,
     login_token: String,
 ) -> WebsocketService {
-
     return WebsocketService::new(
         server_root.to_owned(),
         received_message_callback,

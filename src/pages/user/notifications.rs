@@ -3,7 +3,7 @@ use crate::libs::fetch_api::fetch_api;
 use crate::libs::fetch_api::fetch_api_for_id;
 use crate::libs::fetch_api::fetch_api_for_id_with_value;
 use crate::libs::global_vars::GlobalVars;
-use gloo_console::{ error };
+use gloo_console::error;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::notification::Notification;
 use savaged_libs::utils::date_formatting::convert_utc_to_datetime;
@@ -21,9 +21,9 @@ pub struct UserNotificationsProps {
 }
 
 pub enum UserNotificationsMessage {
-    SetNotifications( Vec<Notification> ),
-    DeleteMessage( u32 ),
-    SetMessageReadUnread( u32, bool ),
+    SetNotifications(Vec<Notification>),
+    DeleteMessage(u32),
+    SetMessageReadUnread(u32, bool),
     DeleteBasicAdmin(),
     MarkAllRead(),
 }
@@ -37,39 +37,37 @@ fn get_notifications(
     api_root: String,
     login_token: String,
     set_notifications: Callback<Vec<Notification>>,
-
 ) {
-    spawn_local (
-        async move {
-            let result = fetch_api(
-                (api_root + "/notifications/get").to_owned(),
-                "".to_owned(),
-                login_token,
-            ).await;
+    spawn_local(async move {
+        let result = fetch_api(
+            (api_root + "/notifications/get").to_owned(),
+            "".to_owned(),
+            login_token,
+        )
+        .await;
 
-            match result {
-                Ok( value ) => {
-                    // let vec_val_result = value.into_serde::< Vec<Notification> >();
-                    let vec_val_result: Result<Vec<Notification>, Error> = JsValueSerdeExt::into_serde(&value);
-                    match vec_val_result {
-                        Ok( vec_val ) => {
-                            set_notifications.emit( vec_val.clone() );
-                        }
-                        Err( err ) => {
-                            let err_string: String = format!("get_notifications Serde Err(): {}", &err);
-                            set_notifications.emit( Vec::new() );
-                            error!( &err_string  );
-                        }
+        match result {
+            Ok(value) => {
+                // let vec_val_result = value.into_serde::< Vec<Notification> >();
+                let vec_val_result: Result<Vec<Notification>, Error> =
+                    JsValueSerdeExt::into_serde(&value);
+                match vec_val_result {
+                    Ok(vec_val) => {
+                        set_notifications.emit(vec_val.clone());
                     }
-
-                }
-                Err( err ) => {
-                    set_notifications.emit( Vec::new() );
-                    error!("get_notifications Err()", &err );
+                    Err(err) => {
+                        let err_string: String = format!("get_notifications Serde Err(): {}", &err);
+                        set_notifications.emit(Vec::new());
+                        error!(&err_string);
+                    }
                 }
             }
+            Err(err) => {
+                set_notifications.emit(Vec::new());
+                error!("get_notifications Err()", &err);
+            }
         }
-    );
+    });
 }
 
 fn mark_all_read(
@@ -80,52 +78,49 @@ fn mark_all_read(
     let api_root = api_root.clone();
     let login_token = login_token.clone();
     let set_notifications = set_notifications.clone();
-    spawn_local (
-        async move {
+    spawn_local(async move {
+        let api_root = api_root.clone();
+        let login_token = login_token.clone();
+        let set_notifications = set_notifications.clone();
 
-            let api_root = api_root.clone();
-            let login_token = login_token.clone();
-            let set_notifications = set_notifications.clone();
+        let api_root_notify = api_root.clone();
+        let login_token_notify = login_token.clone();
+        let set_notifications_notify = set_notifications.clone();
 
-            let api_root_notify = api_root.clone();
-            let login_token_notify = login_token.clone();
-            let set_notifications_notify = set_notifications.clone();
+        let result = fetch_api(
+            (api_root + "/notifications/set-all-read").to_owned(),
+            "".to_owned(),
+            login_token,
+        )
+        .await;
 
-            let result = fetch_api(
-                (api_root + "/notifications/set-all-read").to_owned(),
-                "".to_owned(),
-                login_token,
-            ).await;
+        match result {
+            Ok(value) => {
+                let success_result: Result<Vec<Notification>, Error> =
+                    JsValueSerdeExt::into_serde(&value);
+                // let success_result = value.into_serde::< Vec<Notification> >();
 
-            match result {
-                Ok( value ) => {
-                    let success_result: Result<Vec<Notification>, Error> = JsValueSerdeExt::into_serde(&value);
-                    // let success_result = value.into_serde::< Vec<Notification> >();
-
-                    match success_result {
-                        Ok( _success_value ) => {
-
-                            get_notifications(
-                                api_root_notify,
-                                login_token_notify,
-                                set_notifications_notify,
-                            );
-                        }
-                        Err( err ) => {
-                            // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                            set_notifications.emit( Vec::new() );
-                            error!( "mark_all_read data Err()", &err.to_string()  );
-                        }
+                match success_result {
+                    Ok(_success_value) => {
+                        get_notifications(
+                            api_root_notify,
+                            login_token_notify,
+                            set_notifications_notify,
+                        );
                     }
-
-                }
-                Err( err ) => {
-                    set_notifications.emit( Vec::new() );
-                    error!("mark_all_read Err()", &err );
+                    Err(err) => {
+                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                        set_notifications.emit(Vec::new());
+                        error!("mark_all_read data Err()", &err.to_string());
+                    }
                 }
             }
+            Err(err) => {
+                set_notifications.emit(Vec::new());
+                error!("mark_all_read Err()", &err);
+            }
         }
-    );
+    });
 }
 
 fn delete_basic_admin(
@@ -136,53 +131,50 @@ fn delete_basic_admin(
     let api_root = api_root.clone();
     let login_token = login_token.clone();
     let set_notifications = set_notifications.clone();
-    spawn_local (
-        async move {
+    spawn_local(async move {
+        let api_root = api_root.clone();
+        let login_token = login_token.clone();
+        let set_notifications = set_notifications.clone();
 
-            let api_root = api_root.clone();
-            let login_token = login_token.clone();
-            let set_notifications = set_notifications.clone();
+        let api_root_notify = api_root.clone();
+        let login_token_notify = login_token.clone();
+        let set_notifications_notify = set_notifications.clone();
 
-            let api_root_notify = api_root.clone();
-            let login_token_notify = login_token.clone();
-            let set_notifications_notify = set_notifications.clone();
+        let result = fetch_api(
+            (api_root + "/notifications/delete-basic-admin").to_owned(),
+            "".to_owned(),
+            login_token,
+        )
+        .await;
 
-            let result = fetch_api(
-                (api_root + "/notifications/delete-basic-admin").to_owned(),
-                "".to_owned(),
-                login_token,
-            ).await;
-
-            match result {
-                Ok( value ) => {
-                    // let success_result = value.into_serde::< Vec<Notification> >();
-                    let success_result: Result<Vec<Notification>, Error> = JsValueSerdeExt::into_serde(&value);
-                    match success_result {
-                        Ok( _success_value ) => {
-
-                            get_notifications(
-                                api_root_notify,
-                                login_token_notify,
-                                set_notifications_notify,
-                            );
-                        }
-                        Err( err ) => {
-                            // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                            set_notifications.emit( Vec::new() );
-                            // log!( &err_string  );
-                            error!( "delete_basic_admin data Err()", &err.to_string()  );
-                        }
+        match result {
+            Ok(value) => {
+                // let success_result = value.into_serde::< Vec<Notification> >();
+                let success_result: Result<Vec<Notification>, Error> =
+                    JsValueSerdeExt::into_serde(&value);
+                match success_result {
+                    Ok(_success_value) => {
+                        get_notifications(
+                            api_root_notify,
+                            login_token_notify,
+                            set_notifications_notify,
+                        );
                     }
-
-                }
-                Err( err ) => {
-                    set_notifications.emit( Vec::new() );
-                    // console::error_2("get_data_via_fetch Err()", &err );
-                    error!( "delete_basic_admin data Err()", &err  );
+                    Err(err) => {
+                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                        set_notifications.emit(Vec::new());
+                        // log!( &err_string  );
+                        error!("delete_basic_admin data Err()", &err.to_string());
+                    }
                 }
             }
+            Err(err) => {
+                set_notifications.emit(Vec::new());
+                // console::error_2("get_data_via_fetch Err()", &err );
+                error!("delete_basic_admin data Err()", &err);
+            }
         }
-    );
+    });
 }
 
 fn delete_notification(
@@ -191,61 +183,57 @@ fn delete_notification(
     set_notifications: Callback<Vec<Notification>>,
     notification_id: u32,
 ) {
-
     let api_root = api_root.clone();
     let login_token = login_token.clone();
     let set_notifications = set_notifications.clone();
     let notification_id = notification_id.clone();
 
-    spawn_local (
-        async move {
+    spawn_local(async move {
+        let api_root = api_root.clone();
+        let login_token = login_token.clone();
+        let set_notifications = set_notifications.clone();
+        let notification_id = notification_id.clone();
 
-            let api_root = api_root.clone();
-            let login_token = login_token.clone();
-            let set_notifications = set_notifications.clone();
-            let notification_id = notification_id.clone();
+        let api_root_notify = api_root.clone();
+        let login_token_notify = login_token.clone();
+        let set_notifications_notify = set_notifications.clone();
 
-            let api_root_notify = api_root.clone();
-            let login_token_notify = login_token.clone();
-            let set_notifications_notify = set_notifications.clone();
+        let result = fetch_api_for_id(
+            (api_root + "/notifications/set-deleted").to_owned(),
+            login_token,
+            notification_id,
+            "notification_id".to_owned(),
+        )
+        .await;
 
-            let result = fetch_api_for_id(
-                (api_root + "/notifications/set-deleted").to_owned(),
-                login_token,
-                notification_id,
-                "notification_id".to_owned(),
-            ).await;
-
-            match result {
-                Ok( value ) => {
-                    // let success_result = value.into_serde::< Vec<Notification> >();
-                    let success_result: Result<Vec<Notification>, Error> = JsValueSerdeExt::into_serde(&value);
-                    match success_result {
-                        Ok( _success_value ) => {
-
-                            get_notifications(
-                                api_root_notify,
-                                login_token_notify,
-                                set_notifications_notify,
-                            );
-                        }
-                        Err( err ) => {
-                            // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                            // set_notifications.emit( Vec::new() );
-                            // log!( &err_string  );
-                            error!( "delete_notification data Err()", &err.to_string()  );
-                        }
+        match result {
+            Ok(value) => {
+                // let success_result = value.into_serde::< Vec<Notification> >();
+                let success_result: Result<Vec<Notification>, Error> =
+                    JsValueSerdeExt::into_serde(&value);
+                match success_result {
+                    Ok(_success_value) => {
+                        get_notifications(
+                            api_root_notify,
+                            login_token_notify,
+                            set_notifications_notify,
+                        );
                     }
-
-                }
-                Err( err ) => {
-                    // set_notifications.emit( Vec::new() );
-                    // console::error_2("get_data_via_fetch Err()", &err );
-                    error!( "delete_notification data Err()", &err  );
+                    Err(err) => {
+                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                        // set_notifications.emit( Vec::new() );
+                        // log!( &err_string  );
+                        error!("delete_notification data Err()", &err.to_string());
+                    }
                 }
             }
+            Err(err) => {
+                // set_notifications.emit( Vec::new() );
+                // console::error_2("get_data_via_fetch Err()", &err );
+                error!("delete_notification data Err()", &err);
+            }
         }
-    );
+    });
 }
 
 fn set_read_notification(
@@ -255,7 +243,6 @@ fn set_read_notification(
     notification_id: u32,
     new_value: bool,
 ) {
-
     let api_root = api_root.clone();
     let login_token = login_token.clone();
     let set_notifications = set_notifications.clone();
@@ -268,82 +255,76 @@ fn set_read_notification(
         new_value_string = "1".to_owned();
     }
     // log!(&(format!("set_read_notification new_value_string: {}", &new_value_string)) );
-    spawn_local (
-        async move {
+    spawn_local(async move {
+        let api_root = api_root.clone();
+        let login_token = login_token.clone();
+        let set_notifications = set_notifications.clone();
+        let notification_id = notification_id.clone();
 
-            let api_root = api_root.clone();
-            let login_token = login_token.clone();
-            let set_notifications = set_notifications.clone();
-            let notification_id = notification_id.clone();
+        let api_root_notify = api_root.clone();
+        let login_token_notify = login_token.clone();
+        let set_notifications_notify = set_notifications.clone();
 
-            let api_root_notify = api_root.clone();
-            let login_token_notify = login_token.clone();
-            let set_notifications_notify = set_notifications.clone();
+        let result = fetch_api_for_id_with_value(
+            (api_root + "/notifications/set-read").to_owned(),
+            login_token,
+            notification_id,
+            "notification_id".to_owned(),
+            new_value_string,
+            "read".to_owned(),
+        )
+        .await;
 
-            let result = fetch_api_for_id_with_value(
-                (api_root + "/notifications/set-read").to_owned(),
-                login_token,
-                notification_id,
-                "notification_id".to_owned(),
-                new_value_string,
-                "read".to_owned(),
-            ).await;
-
-            match result {
-                Ok( value ) => {
-                    // let success_result = value.into_serde::< Vec<Notification> >();
-                    let success_result: Result<Vec<Notification>, Error> = JsValueSerdeExt::into_serde(&value);
-                    match success_result {
-                        Ok( _success_value ) => {
-
-                            get_notifications(
-                                api_root_notify,
-                                login_token_notify,
-                                set_notifications_notify,
-                            );
-                        }
-                        Err( err ) => {
-                            // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                            // set_notifications.emit( Vec::new() );
-                            // error!( &err_string  );
-                            error!( "set_read_notification data Err()", &err.to_string() );
-                        }
+        match result {
+            Ok(value) => {
+                // let success_result = value.into_serde::< Vec<Notification> >();
+                let success_result: Result<Vec<Notification>, Error> =
+                    JsValueSerdeExt::into_serde(&value);
+                match success_result {
+                    Ok(_success_value) => {
+                        get_notifications(
+                            api_root_notify,
+                            login_token_notify,
+                            set_notifications_notify,
+                        );
                     }
-
-                }
-                Err( err ) => {
-                    // set_notifications.emit( Vec::new() );
-                    // error!("get_data_via_fetch Err()", &err );
-                    error!( "set_read_notification data Err()", &err  );
+                    Err(err) => {
+                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                        // set_notifications.emit( Vec::new() );
+                        // error!( &err_string  );
+                        error!("set_read_notification data Err()", &err.to_string());
+                    }
                 }
             }
+            Err(err) => {
+                // set_notifications.emit( Vec::new() );
+                // error!("get_data_via_fetch Err()", &err );
+                error!("set_read_notification data Err()", &err);
+            }
         }
-    );
+    });
 }
 
 impl Component for UserNotifications {
     type Message = UserNotificationsMessage;
     type Properties = UserNotificationsProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
         let login_token = global_vars.login_token.to_owned();
-        let set_notifications = ctx.link().callback(
-            UserNotificationsMessage::SetNotifications
-        );
+        let set_notifications = ctx
+            .link()
+            .callback(UserNotificationsMessage::SetNotifications);
         let api_root = global_vars.api_root.to_owned();
 
         if !global_vars.server_side_renderer {
-            get_notifications(
-                api_root,
-                login_token,
-                set_notifications,
-            );
+            get_notifications(api_root, login_token, set_notifications);
 
-            set_document_title(global_vars.site_title.to_owned(), "Notifications".to_owned(), global_vars.server_side_renderer,);
+            set_document_title(
+                global_vars.site_title.to_owned(),
+                "Notifications".to_owned(),
+                global_vars.server_side_renderer,
+            );
         }
         UserNotifications {
             notifications: Vec::new(),
@@ -351,14 +332,9 @@ impl Component for UserNotifications {
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: UserNotificationsMessage,
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: UserNotificationsMessage) -> bool {
         match msg {
-            UserNotificationsMessage::SetNotifications( new_value ) => {
+            UserNotificationsMessage::SetNotifications(new_value) => {
                 // log!("SetNotifications called");
                 self.notifications = new_value.clone();
                 self.loading = false;
@@ -376,32 +352,29 @@ impl Component for UserNotifications {
                 // log!("SetNotifications updated_user", updated_user.id, new_count);
                 if global_vars.current_user.id > 0 {
                     let update_global_vars = global_vars.update_global_vars.clone();
-                    update_global_vars.emit( global_vars.clone() );
+                    update_global_vars.emit(global_vars.clone());
                 }
 
                 return true;
             }
-            UserNotificationsMessage::DeleteMessage( message_id ) => {
-
+            UserNotificationsMessage::DeleteMessage(message_id) => {
                 // reload notifications
                 let login_token = ctx.props().global_vars.login_token.to_owned();
-                let set_notifications = ctx.link().callback(UserNotificationsMessage::SetNotifications);
+                let set_notifications = ctx
+                    .link()
+                    .callback(UserNotificationsMessage::SetNotifications);
                 let api_root = ctx.props().global_vars.api_root.to_owned();
 
-                delete_notification(
-                    api_root,
-                    login_token,
-                    set_notifications,
-                    message_id,
-                );
+                delete_notification(api_root, login_token, set_notifications, message_id);
 
                 return true;
             }
 
-            UserNotificationsMessage::SetMessageReadUnread( message_id, read_unread ) => {
-
+            UserNotificationsMessage::SetMessageReadUnread(message_id, read_unread) => {
                 let login_token = ctx.props().global_vars.login_token.to_owned();
-                let set_notifications = ctx.link().callback(UserNotificationsMessage::SetNotifications);
+                let set_notifications = ctx
+                    .link()
+                    .callback(UserNotificationsMessage::SetNotifications);
                 let api_root = ctx.props().global_vars.api_root.to_owned();
 
                 // log!(&(format!("read_unread: {}", &read_unread)) );
@@ -418,43 +391,31 @@ impl Component for UserNotifications {
             }
 
             UserNotificationsMessage::MarkAllRead() => {
-
                 let login_token = ctx.props().global_vars.login_token.to_owned();
-                let set_notifications = ctx.link().callback(UserNotificationsMessage::SetNotifications);
+                let set_notifications = ctx
+                    .link()
+                    .callback(UserNotificationsMessage::SetNotifications);
                 let api_root = ctx.props().global_vars.api_root.to_owned();
 
-                mark_all_read(
-                    api_root,
-                    login_token,
-                    set_notifications,
-
-                );
+                mark_all_read(api_root, login_token, set_notifications);
 
                 return true;
             }
             UserNotificationsMessage::DeleteBasicAdmin() => {
-
                 let login_token = ctx.props().global_vars.login_token.to_owned();
-                let set_notifications = ctx.link().callback(UserNotificationsMessage::SetNotifications);
+                let set_notifications = ctx
+                    .link()
+                    .callback(UserNotificationsMessage::SetNotifications);
                 let api_root = ctx.props().global_vars.api_root.to_owned();
 
-                delete_basic_admin(
-                    api_root,
-                    login_token,
-                    set_notifications,
-                );
+                delete_basic_admin(api_root, login_token, set_notifications);
 
                 return true;
             }
-
         }
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let global_vars = ctx.props().global_vars.clone();
 
         let notifications = self.notifications.clone();
@@ -471,7 +432,7 @@ impl Component for UserNotifications {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -486,7 +447,7 @@ impl Component for UserNotifications {
                         {"You are not logged in!"}
                     </div>
                 </UIPage>
-            }
+            };
         }
 
         let mut global_vars = ctx.props().global_vars.clone();
@@ -600,6 +561,5 @@ impl Component for UserNotifications {
             </UIPage>
 
         }
-
     }
 }

@@ -28,29 +28,23 @@ pub struct BookSelectProps {
 }
 
 #[function_component(BookSelect)]
-pub fn book_select(
-    props: &BookSelectProps,
-) -> Html {
-
+pub fn book_select(props: &BookSelectProps) -> Html {
     let onchange = props.onchange.clone();
 
     // let mut book_list: Vec<Book> = props.book_list.clone();
 
-    let callback_set_filter_book= Callback::from(
-        move |e: Event | {
-            e.prevent_default();
+    let callback_set_filter_book = Callback::from(move |e: Event| {
+        e.prevent_default();
 
-            let input: HtmlSelectElement = e.target_unchecked_into();
+        let input: HtmlSelectElement = e.target_unchecked_into();
 
-            let filter_book = input.value().parse().unwrap_or(0);
+        let filter_book = input.value().parse().unwrap_or(0);
 
-            onchange.emit( filter_book )
-
-        }
-    );
+        onchange.emit(filter_book)
+    });
 
     if props.readonly {
-        return html!{
+        return html! {
             <>
             if props.book_list.len() > 0 {
                 <label>
@@ -83,7 +77,7 @@ pub fn book_select(
     let current_user = props.current_user.clone();
 
     let book_list_option = Some(props.book_list.clone());
-    return html!{
+    return html! {
             <>
 
             if props.book_list.len() > 0 {
@@ -139,5 +133,4 @@ pub fn book_select(
 
         </>
     };
-
 }

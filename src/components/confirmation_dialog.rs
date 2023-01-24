@@ -22,7 +22,6 @@ impl Default for ConfirmationDialogDefinition {
             label_no: None,
         }
     }
-
 }
 
 #[derive(Properties, PartialEq)]
@@ -32,62 +31,59 @@ pub struct ConfirmationDialogProps {
     pub definition: ConfirmationDialogDefinition,
 }
 
-pub enum ConfirmationDialogMessage {
+pub enum ConfirmationDialogMessage {}
 
-}
-
-pub struct ConfirmationDialog {
-
-}
+pub struct ConfirmationDialog {}
 
 impl Component for ConfirmationDialog {
     type Message = ConfirmationDialogMessage;
     type Properties = ConfirmationDialogProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let _global_vars = ctx.props().global_vars.clone();
 
-        ConfirmationDialog {
-
-        }
+        ConfirmationDialog {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let cancel_action = ctx.props().close_confirmation_dialog.clone();
         let yes_cancel_action = ctx.props().close_confirmation_dialog.clone();
         let yes_callback = ctx.props().definition.callback.clone();
 
         let mut definition_title = "".to_owned();
-        let mut definition_html = html!{<></>};
+        let mut definition_html = html! {<></>};
         let mut definition_text = "Are you sure you want to do this?".to_owned();
         match &ctx.props().definition.title {
-            Some( title ) => {
+            Some(title) => {
                 definition_title = title.clone();
             }
             None => {}
         }
         match &ctx.props().definition.html {
-            Some( html ) => {
+            Some(html) => {
                 definition_html = html.clone();
             }
             None => {}
         }
         match &ctx.props().definition.text {
-            Some( html ) => {
+            Some(html) => {
                 definition_text = html.clone();
             }
             None => {}
         }
 
-        let definition_label_yes = ctx.props().definition.label_yes.clone().unwrap_or("Yes".to_owned() );
-        let definition_label_no = ctx.props().definition.label_no.clone().unwrap_or("No, thank you".to_owned() );
+        let definition_label_yes = ctx
+            .props()
+            .definition
+            .label_yes
+            .clone()
+            .unwrap_or("Yes".to_owned());
+        let definition_label_no = ctx
+            .props()
+            .definition
+            .label_no
+            .clone()
+            .unwrap_or("No, thank you".to_owned());
 
         html! {
             <div class={"modal-container"}>
@@ -130,6 +126,5 @@ impl Component for ConfirmationDialog {
             </div>
 
         }
-
     }
 }

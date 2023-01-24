@@ -29,20 +29,14 @@ impl Component for TertiaryLinksMenu {
     type Properties = TertiaryLinksMenuProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
         TertiaryLinksMenu {
             open_dropdown: false,
         }
     }
 
-    fn update(
-        &mut self,
-        _ctx: &Context<Self>,
-        msg: TertiaryLinksMenuMessage
-    ) -> bool {
-
+    fn update(&mut self, _ctx: &Context<Self>, msg: TertiaryLinksMenuMessage) -> bool {
         match msg {
-            TertiaryLinksMenuMessage::SetDropdownOpen( open ) => {
+            TertiaryLinksMenuMessage::SetDropdownOpen(open) => {
                 self.open_dropdown = open;
             }
         }
@@ -50,7 +44,6 @@ impl Component for TertiaryLinksMenu {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let filter_type = ctx.props().current_tag.to_owned();
 
         let menu_items = ctx.props().menu_items.clone();
@@ -59,7 +52,9 @@ impl Component for TertiaryLinksMenu {
             class += &" show-dd";
         }
 
-        let set_dd_menu = ctx.link().callback(TertiaryLinksMenuMessage::SetDropdownOpen);
+        let set_dd_menu = ctx
+            .link()
+            .callback(TertiaryLinksMenuMessage::SetDropdownOpen);
         let open_dropdown = self.open_dropdown;
         html! {
         <div class="width-limit">
@@ -153,12 +148,7 @@ impl Component for TertiaryLinksMenu {
     }
 }
 
-fn class_is_active(
-    current_select: String,
-    current_menu_item: &str,
-    base_class: String,
-) -> String {
-
+fn class_is_active(current_select: String, current_menu_item: &str, base_class: String) -> String {
     if current_select.as_str() == current_menu_item {
         return base_class + &" active";
     }

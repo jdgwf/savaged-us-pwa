@@ -1,17 +1,14 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct InfoTechProps {
     pub global_vars: GlobalVars,
 }
 #[function_component(InfoTech)]
-pub fn info_tech(
-    props: &InfoTechProps,
-) -> Html {
-
+pub fn info_tech(props: &InfoTechProps) -> Html {
     let mut global_vars = props.global_vars.clone();
 
     global_vars.current_sub_menu = "info-tech".to_owned();
@@ -60,4 +57,3 @@ pub fn info_tech(
         </UIPage>
     }
 }
-

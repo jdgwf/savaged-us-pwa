@@ -9,9 +9,7 @@ pub struct RegisterProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum RegisterMessage {
-
-}
+pub enum RegisterMessage {}
 
 pub struct Register {
     // global_vars: GlobalVars,
@@ -21,22 +19,18 @@ impl Component for Register {
     type Message = RegisterMessage;
     type Properties = RegisterProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Register".to_owned(), global_vars.server_side_renderer,);
-        Register {
-        }
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Register".to_owned(),
+            global_vars.server_side_renderer,
+        );
+        Register {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
         global_vars.current_menu = "main-register".to_string();
         if global_vars.user_loading {
@@ -51,7 +45,7 @@ impl Component for Register {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
         if global_vars.current_user.id > 0 {
             return html! {
@@ -65,7 +59,7 @@ impl Component for Register {
                         {"You are already logged in!"}
                     </div>
                 </UIPage>
-            }
+            };
         }
         html! {
             <UIPage
@@ -78,6 +72,5 @@ impl Component for Register {
             </UIPage>
 
         }
-
     }
 }

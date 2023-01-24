@@ -9,9 +9,7 @@ pub struct ForgotPasswordProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum ForgotPasswordMessage {
-
-}
+pub enum ForgotPasswordMessage {}
 
 pub struct ForgotPassword {
     // global_vars: GlobalVars,
@@ -21,23 +19,20 @@ impl Component for ForgotPassword {
     type Message = ForgotPasswordMessage;
     type Properties = ForgotPasswordProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Recover Password".to_owned(), global_vars.server_side_renderer,);
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Recover Password".to_owned(),
+            global_vars.server_side_renderer,
+        );
         ForgotPassword {
             // global_vars: global_vars,
         }
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
         global_vars.current_menu = "main-user-forgot-password".to_string();
         if global_vars.user_loading {
@@ -52,7 +47,7 @@ impl Component for ForgotPassword {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
         if global_vars.current_user.id > 0 {
             return html! {
@@ -65,7 +60,7 @@ impl Component for ForgotPassword {
                     {"You are already logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
         html! {
             <UIPage
@@ -77,6 +72,5 @@ impl Component for ForgotPassword {
             </UIPage>
 
         }
-
     }
 }

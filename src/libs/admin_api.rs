@@ -1,8 +1,8 @@
 use savaged_libs::admin_libs::AdminDeletePackage;
 use savaged_libs::admin_libs::AdminSavePackage;
 use serde_json;
-use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
@@ -14,7 +14,7 @@ pub async fn fetch_api_delete_game_data_row(
     // log!("fetch_api_delete_game_data_row 1", endpoint.clone());
     opts.method("POST");
     opts.body(Some(&wasm_bindgen::JsValue::from_str(
-        serde_json::to_string(&req).unwrap().as_str()
+        serde_json::to_string(&req).unwrap().as_str(),
     )));
     opts.mode(RequestMode::Cors);
     let request = Request::new_with_str_and_init(&endpoint, &opts)?;
@@ -23,7 +23,7 @@ pub async fn fetch_api_delete_game_data_row(
         .headers()
         .set("Accept", "application/vnd.github.v3+json")?;
 
-    request.headers().set("Content-Type", "application/json" )?;
+    request.headers().set("Content-Type", "application/json")?;
 
     let window = web_sys::window().unwrap();
     let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
@@ -45,7 +45,7 @@ pub async fn fetch_api_save_game_data_row(
     // log!("fetch_api_for_id 1", endpoint.clone());
     opts.method("POST");
     opts.body(Some(&wasm_bindgen::JsValue::from_str(
-        serde_json::to_string(&req).unwrap().as_str()
+        serde_json::to_string(&req).unwrap().as_str(),
     )));
     opts.mode(RequestMode::Cors);
     let request = Request::new_with_str_and_init(&endpoint, &opts)?;
@@ -54,7 +54,7 @@ pub async fn fetch_api_save_game_data_row(
         .headers()
         .set("Accept", "application/vnd.github.v3+json")?;
 
-    request.headers().set("Content-Type", "application/json" )?;
+    request.headers().set("Content-Type", "application/json")?;
 
     let window = web_sys::window().unwrap();
     let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;

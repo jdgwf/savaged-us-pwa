@@ -65,33 +65,24 @@ pub struct SubmenuData {
     pub unread_notifications: u32,
 }
 
-pub struct MainServerApp {
+pub struct MainServerApp {}
 
-}
-
-fn content_switch(
-    routes: MainServerRoute,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
     match routes {
-
         MainServerRoute::Home => {
-
             html! {
                 <MainHome
                     global_vars={global_vars}
                 />
             }
-        },
+        }
         MainServerRoute::InfoRouter => {
-
             html! {
                 <InfoRouter
                     global_vars={global_vars}
                 />
             }
-        },
+        }
 
         MainServerRoute::UserRouter => {
             html! {
@@ -99,7 +90,7 @@ fn content_switch(
                     global_vars={global_vars}
                 />
             }
-        },
+        }
 
         MainServerRoute::AdminRouter => {
             html! {
@@ -107,7 +98,7 @@ fn content_switch(
                     global_vars={global_vars}
                 />
             }
-        },
+        }
 
         MainServerRoute::UserLogin => {
             html! {
@@ -115,7 +106,7 @@ fn content_switch(
                     global_vars={global_vars}
                 />
             }
-        },
+        }
         MainServerRoute::ForgotPassword => {
             html! {
                 <ForgotPassword
@@ -123,7 +114,7 @@ fn content_switch(
 
                 />
             }
-        },
+        }
         MainServerRoute::Register => {
             html! {
                 <Register
@@ -131,7 +122,7 @@ fn content_switch(
 
                 />
             }
-        },
+        }
 
         MainServerRoute::NotFound => {
             html! {
@@ -140,63 +131,47 @@ fn content_switch(
                 />
             }
         }
-
     }
-
 }
 
 #[function_component]
-pub fn ServerApp(
-    props: &ServerAppProps
-) -> Html {
-
+pub fn ServerApp(props: &ServerAppProps) -> Html {
     let server_root = "https://v4/savaged.us".to_owned();
 
-    let global_vars_state = use_reducer(
-        || GlobalVars {
-            api_root: server_root.to_owned() + &"/_api",
-            current_menu: "".to_string(),
-            current_sub_menu: "".to_string(),
-            current_user: User::default(),
-            game_data: None,
-            hide_popup_menus_callback: Callback::noop(),
-            login_token: "".to_owned(),
-            logout_callback: Callback::noop(),
-            offline: true,
-            add_alert: Callback::noop(),
-            open_confirmation_dialog: Callback::noop(),
-            saves: None,
-            send_websocket: Callback::noop(),
-            server_root: server_root.to_owned(),
-            server_side_renderer: true,
-            server_side_renderer_history: None,
-            show_mobile_menu: false,
-            site_title: "Savaged.us v4".to_owned(),
-            toggle_mobile_menu_callback: Callback::noop(),
-            update_global_vars: Callback::noop(),
-            user_loading: false,
-            partners: props.partners.clone(),
-            banners: props.banners.clone(),
-        }
-    );
+    let global_vars_state = use_reducer(|| GlobalVars {
+        api_root: server_root.to_owned() + &"/_api",
+        current_menu: "".to_string(),
+        current_sub_menu: "".to_string(),
+        current_user: User::default(),
+        game_data: None,
+        hide_popup_menus_callback: Callback::noop(),
+        login_token: "".to_owned(),
+        logout_callback: Callback::noop(),
+        offline: true,
+        add_alert: Callback::noop(),
+        open_confirmation_dialog: Callback::noop(),
+        saves: None,
+        send_websocket: Callback::noop(),
+        server_root: server_root.to_owned(),
+        server_side_renderer: true,
+        server_side_renderer_history: None,
+        show_mobile_menu: false,
+        site_title: "Savaged.us v4".to_owned(),
+        toggle_mobile_menu_callback: Callback::noop(),
+        update_global_vars: Callback::noop(),
+        user_loading: false,
+        partners: props.partners.clone(),
+        banners: props.banners.clone(),
+    });
 
     let history = AnyHistory::from(MemoryHistory::new());
     let blank_hs: HashMap<String, String> = HashMap::new();
-    history
-        .push_with_query(&*props.url, &blank_hs)
-        .unwrap();
+    history.push_with_query(&*props.url, &blank_hs).unwrap();
 
     let mut global_vars: GlobalVars = (*global_vars_state).clone();
 
     global_vars.server_side_renderer_history = Some(history.clone());
-    let callback_content =
-        move |routes| {
-            content_switch(
-                routes,
-                global_vars.clone(),
-            )
-        }
-    ;
+    let callback_content = move |routes| content_switch(routes, global_vars.clone());
 
     html! {
 

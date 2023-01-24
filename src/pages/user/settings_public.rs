@@ -1,11 +1,10 @@
-
-use chrono::Utc;
-use chrono_tz::TZ_VARIANTS;
 use crate::components::image_uploader::ImageUploader;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::fetch_api_with_value;
 use crate::libs::fetch_api::update_user;
 use crate::libs::global_vars::GlobalVars;
+use chrono::Utc;
+use chrono_tz::TZ_VARIANTS;
 use gloo_console::error;
 use gloo_console::log;
 use gloo_utils::format::JsValueSerdeExt;
@@ -17,7 +16,7 @@ use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
-use web_sys::{HtmlInputElement};
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -26,26 +25,25 @@ pub struct SettingsPublicProps {
 }
 
 pub enum SettingsPublicMessage {
-    SaveShareSettings( MouseEvent ),
-    ResetShareSettings( MouseEvent ),
-    UpdateSharedSettingsSaved( String ),
-    UpdateDisplayName( String ),
-    UpdateTwitter( String ),
-    UpdateBio( String ),
-    SaveTimezone( Event ),
-    UpdateTimezoneMessage( String ),
-    UpdateUsername( String ),
-    SaveYourInformation( MouseEvent ),
-    ResetYourInformation( MouseEvent ),
-    UsernameIsAvailable( bool ),
-    UpdateUsernameSaved( String ),
-    ImageChanged( String ),
-    UpdateShowProfileImage( bool ),
-    UpdateShowUserPage( bool ),
+    SaveShareSettings(MouseEvent),
+    ResetShareSettings(MouseEvent),
+    UpdateSharedSettingsSaved(String),
+    UpdateDisplayName(String),
+    UpdateTwitter(String),
+    UpdateBio(String),
+    SaveTimezone(Event),
+    UpdateTimezoneMessage(String),
+    UpdateUsername(String),
+    SaveYourInformation(MouseEvent),
+    ResetYourInformation(MouseEvent),
+    UsernameIsAvailable(bool),
+    UpdateUsernameSaved(String),
+    ImageChanged(String),
+    UpdateShowProfileImage(bool),
+    UpdateShowUserPage(bool),
 }
 
 pub struct SettingsPublic {
-
     current_user: User,
     edit_bio: String,
 
@@ -63,12 +61,11 @@ pub struct SettingsPublic {
     update_tz_message: String,
 }
 
-fn your_information_can_save (
+fn your_information_can_save(
     original_show_user_page: bool,
     current_show_user_page: bool,
     update_username_can_save: bool,
     is_current_username: bool,
-
 ) -> bool {
     if original_show_user_page != current_show_user_page {
         if !is_current_username {
@@ -84,13 +81,14 @@ impl Component for SettingsPublic {
     type Message = SettingsPublicMessage;
     type Properties = SettingsPublicProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Public Settings".to_owned(), global_vars.server_side_renderer,);
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Public Settings".to_owned(),
+            global_vars.server_side_renderer,
+        );
         SettingsPublic {
             edit_username: global_vars.current_user.username.clone(),
             edit_bio: global_vars.current_user.share_bio.clone(),
@@ -101,105 +99,105 @@ impl Component for SettingsPublic {
             current_user: global_vars.current_user.clone(),
             update_shared_settings_message: "".to_owned(),
             update_tz_message: "".to_owned(),
-            update_username_message: "This is your current Username. Start typing in the field above to change it.".to_owned(),
+            update_username_message:
+                "This is your current Username. Start typing in the field above to change it."
+                    .to_owned(),
             update_username_notification_class: "alert alert-info text-center".to_owned(),
             update_username_can_save: false,
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: SettingsPublicMessage,
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: SettingsPublicMessage) -> bool {
         match msg {
-
-            SettingsPublicMessage::SaveYourInformation( _event ) => {
-
+            SettingsPublicMessage::SaveYourInformation(_event) => {
                 let api_root = ctx.props().global_vars.api_root.clone();
                 let login_token = ctx.props().global_vars.login_token.clone();
 
-                let updated_username_notification = ctx.link().callback(SettingsPublicMessage::UpdateUsernameSaved).clone();
+                let updated_username_notification = ctx
+                    .link()
+                    .callback(SettingsPublicMessage::UpdateUsernameSaved)
+                    .clone();
 
                 let global_vars = ctx.props().global_vars.clone();
 
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
                 let username = self.edit_username.clone();
                 let edit_share_display_name = self.edit_share_display_name.clone();
-                spawn_local (
-                    async move {
+                spawn_local(async move {
+                    let api_root = api_root.clone();
+                    let login_token = login_token.clone();
 
-                        let api_root = api_root.clone();
-                        let login_token = login_token.clone();
+                    let username = username.clone();
+                    let edit_share_display_name = edit_share_display_name.clone();
+                    let global_vars = global_vars.clone();
 
-                        let username = username.clone();
-                        let edit_share_display_name = edit_share_display_name.clone();
-                        let global_vars = global_vars.clone();
+                    let result = fetch_api_with_value(
+                        (api_root + "/user/save-username").to_owned(),
+                        "".to_owned(),
+                        login_token,
+                        username.clone(),
+                        "username".to_owned(),
+                    )
+                    .await;
 
-                        let result = fetch_api_with_value(
-                            (api_root + "/user/save-username").to_owned(),
-                            "".to_owned(),
-                            login_token,
-                            username.clone(),
-                            "username".to_owned(),
-                        ).await;
+                    match result {
+                        Ok(value) => {
+                            // let success_result = value.into_serde::< bool >();
+                            let success_result: Result<bool, Error> =
+                                JsValueSerdeExt::into_serde(&value);
+                            match success_result {
+                                Ok(_is_available_value) => {
+                                    let edit_share_display_name = edit_share_display_name.clone();
+                                    let mut global_vars = global_vars.clone();
+                                    // self.current_user.share_display_name = edit_share_display_name.to_owned();
+                                    global_vars.current_user.share_display_name =
+                                        edit_share_display_name.to_owned();
+                                    global_vars.current_user.username = username.clone();
 
-                        match result {
-                            Ok( value ) => {
-                                // let success_result = value.into_serde::< bool >();
-                                let success_result: Result< bool, Error> = JsValueSerdeExt::into_serde(&value);
-                                match success_result {
-                                    Ok( _is_available_value ) => {
-                                        let edit_share_display_name = edit_share_display_name.clone();
-                                        let mut global_vars = global_vars.clone();
-                                        // self.current_user.share_display_name = edit_share_display_name.to_owned();
-                                        global_vars.current_user.share_display_name = edit_share_display_name.to_owned();
-                                        global_vars.current_user.username = username.clone();
-
-                                        update_user(
-                                            global_vars,
-                                            update_global_vars,
-                                            updated_username_notification,
-                                            "".to_owned(),
-                                            false,
-                                        );
-
-                                    }
-                                    Err( err ) => {
-                                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                                        // set_notifications.emit( Vec::new() );
-                                        // error!( &err_string  );
-                                        error!( "update() data error", &err.to_string()  );
-                                    }
+                                    update_user(
+                                        global_vars,
+                                        update_global_vars,
+                                        updated_username_notification,
+                                        "".to_owned(),
+                                        false,
+                                    );
                                 }
-
-                            }
-                            Err( err ) => {
-                                // set_notifications.emit( Vec::new() );
-                                // console::error_2("get_data_via_fetch Err()", &err );
-                                error!( "update() fetch error", &err  );
+                                Err(err) => {
+                                    // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                                    // set_notifications.emit( Vec::new() );
+                                    // error!( &err_string  );
+                                    error!("update() data error", &err.to_string());
+                                }
                             }
                         }
+                        Err(err) => {
+                            // set_notifications.emit( Vec::new() );
+                            // console::error_2("get_data_via_fetch Err()", &err );
+                            error!("update() fetch error", &err);
+                        }
                     }
-                );
+                });
 
                 true
             }
-            SettingsPublicMessage::ResetYourInformation( _event ) => {
+            SettingsPublicMessage::ResetYourInformation(_event) => {
                 self.edit_username = self.current_user.username.clone();
                 self.edit_show_user_page = self.current_user.show_user_page;
                 self.update_username_can_save = false;
-                self.update_username_message = "This is your current Username. Start typing in the field above to change it.".to_owned();
+                self.update_username_message =
+                    "This is your current Username. Start typing in the field above to change it."
+                        .to_owned();
                 self.update_username_notification_class = "alert alert-info text-center".to_owned();
                 true
             }
 
-            SettingsPublicMessage::SaveTimezone( event ) => {
-
+            SettingsPublicMessage::SaveTimezone(event) => {
                 let input: HtmlInputElement = event.target_unchecked_into();
                 self.current_user.timezone = input.value().to_owned();
-                let updated_tz_notification = ctx.link().callback(SettingsPublicMessage::UpdateTimezoneMessage).clone();
+                let updated_tz_notification = ctx
+                    .link()
+                    .callback(SettingsPublicMessage::UpdateTimezoneMessage)
+                    .clone();
 
                 let mut global_vars = ctx.props().global_vars.clone();
 
@@ -217,12 +215,12 @@ impl Component for SettingsPublic {
                 true
             }
 
-            SettingsPublicMessage::UpdateShowProfileImage( new_value ) => {
+            SettingsPublicMessage::UpdateShowProfileImage(new_value) => {
                 self.edit_share_show_profile_image = new_value;
                 true
             }
 
-            SettingsPublicMessage::UpdateShowUserPage( new_value ) => {
+            SettingsPublicMessage::UpdateShowUserPage(new_value) => {
                 // let input: HtmlInputElement = event.target_unchecked_into();
                 self.current_user.show_user_page = new_value;
                 // let updated_tz_notification = ctx.link().callback(SettingsPublicMessage::UpdateTimezoneMessage).clone();
@@ -251,70 +249,73 @@ impl Component for SettingsPublic {
                 // true
             }
 
-            SettingsPublicMessage::UpdateUsername( new_value ) => {
+            SettingsPublicMessage::UpdateUsername(new_value) => {
                 self.edit_username = new_value.to_owned().to_lowercase();
-                let s:String = self.edit_username.chars()
-                .map(|x| match x {
-                    '-' => '-',
-                    '_' => '_',
-                    '0'..='9' => x,
-                    'a'..='z' => x,
-                    _ => ' '
-                }).collect();
+                let s: String = self
+                    .edit_username
+                    .chars()
+                    .map(|x| match x {
+                        '-' => '-',
+                        '_' => '_',
+                        '0'..='9' => x,
+                        'a'..='z' => x,
+                        _ => ' ',
+                    })
+                    .collect();
 
                 self.edit_username = s.replace(" ", "").clone();
 
                 let api_root = ctx.props().global_vars.api_root.clone();
                 let login_token = ctx.props().global_vars.login_token.clone();
-                let set_is_available = ctx.link().callback(SettingsPublicMessage::UsernameIsAvailable);
+                let set_is_available = ctx
+                    .link()
+                    .callback(SettingsPublicMessage::UsernameIsAvailable);
                 let username = self.edit_username.clone();
 
-                spawn_local (
-                    async move {
+                spawn_local(async move {
+                    let api_root = api_root.clone();
+                    let login_token = login_token.clone();
+                    let username = username.clone();
 
-                        let api_root = api_root.clone();
-                        let login_token = login_token.clone();
-                        let username = username.clone();
+                    let result = fetch_api_with_value(
+                        (api_root + "/user/username-available").to_owned(),
+                        "".to_owned(),
+                        login_token,
+                        username,
+                        "username".to_owned(),
+                    )
+                    .await;
 
-                        let result = fetch_api_with_value(
-                            (api_root + "/user/username-available").to_owned(),
-                            "".to_owned(),
-                            login_token,
-                            username,
-                            "username".to_owned(),
-                        ).await;
-
-                        match result {
-                            Ok( value ) => {
-                                // let success_result = value.into_serde::< bool >();
-                                let success_result: Result< bool, Error> = JsValueSerdeExt::into_serde(&value);
-                                match success_result {
-                                    Ok( is_available_value ) => {
-
-                                        set_is_available.emit( is_available_value )
-                                    }
-                                    Err( err ) => {
-                                        // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
-                                        // set_notifications.emit( Vec::new() );
-                                        // log!( &err_string  );
-                                        error!( "SettingsPublicMessage::UpdateUsername data error", &err.to_string()  );
-                                    }
+                    match result {
+                        Ok(value) => {
+                            // let success_result = value.into_serde::< bool >();
+                            let success_result: Result<bool, Error> =
+                                JsValueSerdeExt::into_serde(&value);
+                            match success_result {
+                                Ok(is_available_value) => set_is_available.emit(is_available_value),
+                                Err(err) => {
+                                    // let err_string: String = format!("get_data_via_fetch Serde Err(): {}", &err);
+                                    // set_notifications.emit( Vec::new() );
+                                    // log!( &err_string  );
+                                    error!(
+                                        "SettingsPublicMessage::UpdateUsername data error",
+                                        &err.to_string()
+                                    );
                                 }
-
-                            }
-                            Err( err ) => {
-                                // set_notifications.emit( Vec::new() );
-                                // console::error_2("get_data_via_fetch Err()", &err );
-                                error!( "SettingsPublicMessage::UpdateUsername data error", &err  );
                             }
                         }
+                        Err(err) => {
+                            // set_notifications.emit( Vec::new() );
+                            // console::error_2("get_data_via_fetch Err()", &err );
+                            error!("SettingsPublicMessage::UpdateUsername data error", &err);
+                        }
                     }
-                );
+                });
 
                 true
             }
 
-            SettingsPublicMessage::ImageChanged( new_url ) => {
+            SettingsPublicMessage::ImageChanged(new_url) => {
                 let mut remove_image = false;
 
                 let mut global_vars = ctx.props().global_vars.clone();
@@ -338,7 +339,7 @@ impl Component for SettingsPublic {
 
                 let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
 
-                update_global_vars.emit( global_vars.clone() );
+                update_global_vars.emit(global_vars.clone());
 
                 update_user(
                     global_vars,
@@ -351,42 +352,54 @@ impl Component for SettingsPublic {
                 true
             }
 
-            SettingsPublicMessage::UpdateUsernameSaved( saved ) => {
+            SettingsPublicMessage::UpdateUsernameSaved(saved) => {
                 if saved == "User Updated".to_owned() {
                     self.current_user.username = self.edit_username.to_owned();
                     self.current_user.show_user_page = self.edit_show_user_page.to_owned();
                     self.update_username_can_save = false;
-                    self.update_username_message = "Your username has been successfully changed!".to_owned();
-                    self.update_username_notification_class = "alert alert-success text-center".to_owned();
+                    self.update_username_message =
+                        "Your username has been successfully changed!".to_owned();
+                    self.update_username_notification_class =
+                        "alert alert-success text-center".to_owned();
                 } else {
                     log!("UpdateUsernameSaved saved", saved);
                     self.update_username_can_save = true;
-                    self.update_username_message = "Oh no! Something went wrong! Please try again.".to_owned();
-                    self.update_username_notification_class = "alert alert-danger text-center".to_owned();
+                    self.update_username_message =
+                        "Oh no! Something went wrong! Please try again.".to_owned();
+                    self.update_username_notification_class =
+                        "alert alert-danger text-center".to_owned();
                 }
                 true
             }
 
-            SettingsPublicMessage::UsernameIsAvailable( is_available ) => {
+            SettingsPublicMessage::UsernameIsAvailable(is_available) => {
                 // log!( "UsernameIsAvailable", is_available );
                 if self.edit_username.len() < 3 {
                     self.update_username_can_save = false;
-                    self.update_username_message = "Username must be 3 characters or more".to_owned();
-                    self.update_username_notification_class = "alert alert-danger text-center".to_owned();
+                    self.update_username_message =
+                        "Username must be 3 characters or more".to_owned();
+                    self.update_username_notification_class =
+                        "alert alert-danger text-center".to_owned();
                 } else {
                     if self.edit_username == self.current_user.username {
                         self.update_username_can_save = false;
                         self.update_username_message = "This is your current Username. Start typing in the field above to change it.".to_owned();
-                        self.update_username_notification_class = "alert alert-info text-center".to_owned();
+                        self.update_username_notification_class =
+                            "alert alert-info text-center".to_owned();
                     } else {
                         if is_available {
                             self.update_username_can_save = true;
-                            self.update_username_message = "Username is available! Press Save below to make it yours!".to_owned();
-                            self.update_username_notification_class = "alert alert-success text-center".to_owned();
+                            self.update_username_message =
+                                "Username is available! Press Save below to make it yours!"
+                                    .to_owned();
+                            self.update_username_notification_class =
+                                "alert alert-success text-center".to_owned();
                         } else {
                             self.update_username_can_save = false;
-                            self.update_username_message = "Sorry, this username has been taken.".to_owned();
-                            self.update_username_notification_class = "alert alert-danger text-center".to_owned();
+                            self.update_username_message =
+                                "Sorry, this username has been taken.".to_owned();
+                            self.update_username_notification_class =
+                                "alert alert-danger text-center".to_owned();
                         }
                     }
                 }
@@ -401,29 +414,31 @@ impl Component for SettingsPublic {
                 true
             }
 
-            SettingsPublicMessage::UpdateBio( new_value ) => {
+            SettingsPublicMessage::UpdateBio(new_value) => {
                 self.edit_bio = new_value.to_owned();
                 true
             }
 
-            SettingsPublicMessage::UpdateTwitter( new_value ) => {
+            SettingsPublicMessage::UpdateTwitter(new_value) => {
                 self.edit_twitter = new_value.to_owned();
                 true
             }
 
-            SettingsPublicMessage::UpdateDisplayName( new_value ) => {
+            SettingsPublicMessage::UpdateDisplayName(new_value) => {
                 self.edit_share_display_name = new_value.to_owned();
                 true
             }
 
-            SettingsPublicMessage::SaveShareSettings( _event ) => {
-
+            SettingsPublicMessage::SaveShareSettings(_event) => {
                 self.current_user.twitter = self.edit_twitter.to_owned();
                 self.current_user.share_display_name = self.edit_share_display_name.to_owned();
                 self.current_user.share_show_profile_image = self.edit_share_show_profile_image;
                 self.current_user.share_bio = self.edit_bio.to_owned();
 
-                let updated_user_notification = ctx.link().callback(SettingsPublicMessage::UpdateSharedSettingsSaved).clone();
+                let updated_user_notification = ctx
+                    .link()
+                    .callback(SettingsPublicMessage::UpdateSharedSettingsSaved)
+                    .clone();
                 // let reset_user_notification = ctx.link().callback(SettingsPublicMessage::ResetShareSettings(())).clone();
 
                 let mut global_vars = ctx.props().global_vars.clone();
@@ -443,33 +458,26 @@ impl Component for SettingsPublic {
                 true
             }
 
-            SettingsPublicMessage::ResetShareSettings( _event ) => {
-
+            SettingsPublicMessage::ResetShareSettings(_event) => {
                 self.edit_twitter = self.current_user.twitter.to_owned();
                 self.edit_share_display_name = self.current_user.share_display_name.to_owned();
                 self.edit_bio = self.current_user.share_bio.to_owned();
                 true
             }
 
-            SettingsPublicMessage::UpdateSharedSettingsSaved( message ) => {
+            SettingsPublicMessage::UpdateSharedSettingsSaved(message) => {
                 self.update_shared_settings_message = message.clone();
                 true
             }
 
-            SettingsPublicMessage::UpdateTimezoneMessage( message ) => {
+            SettingsPublicMessage::UpdateTimezoneMessage(message) => {
                 self.update_tz_message = message.clone();
                 true
             }
         }
-
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &SettingsPublicProps,
-    ) -> bool {
-
+    fn changed(&mut self, ctx: &Context<Self>, _props: &SettingsPublicProps) -> bool {
         self.current_user = ctx.props().global_vars.current_user.clone();
 
         self.edit_username = self.current_user.username.clone();
@@ -482,11 +490,7 @@ impl Component for SettingsPublic {
         true
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
 
@@ -505,7 +509,7 @@ impl Component for SettingsPublic {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -520,20 +524,17 @@ impl Component for SettingsPublic {
                     {"You are not logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         let mut share_settings_save_disabled = true;
 
         if global_vars.current_user.share_display_name != self.edit_share_display_name
-            ||
-            self.current_user.share_bio != self.edit_bio
-            ||
-            self.current_user.twitter != self.edit_twitter {
-                share_settings_save_disabled = false;
-            }
-
-
+            || self.current_user.share_bio != self.edit_bio
+            || self.current_user.twitter != self.edit_twitter
+        {
+            share_settings_save_disabled = false;
+        }
 
         html! {
             <UIPage
@@ -717,6 +718,5 @@ impl Component for SettingsPublic {
             </UIPage>
 
         }
-
     }
 }

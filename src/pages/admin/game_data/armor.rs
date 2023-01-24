@@ -7,21 +7,28 @@ use crate::components::alerts::AlertDefinition;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::edit_forms::armor::EditArmor;
 use crate::components::standard_modal::StandardModal;
-use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
+use crate::components::tertiary_links_menu::{TertiaryLinksMenu, TertiaryLinksMenuItem};
 use crate::components::ui_page::UIPage;
-use crate::libs::admin_api::{fetch_api_save_game_data_row, fetch_api_delete_game_data_row};
+use crate::libs::admin_api::{fetch_api_delete_game_data_row, fetch_api_save_game_data_row};
 use crate::libs::global_vars::GlobalVars;
-use crate::{components::admin::admin_table_field::text::AdminTableFieldText, libs::fetch_api::fetch_admin_api};
-use gloo_console::{ error, log };
+use crate::{
+    components::admin::admin_table_field::text::AdminTableFieldText,
+    libs::fetch_api::fetch_admin_api,
+};
+use gloo_console::{error, log};
 use gloo_utils::format::JsValueSerdeExt;
-use savaged_libs::admin_libs::{AdminPagingStatistics, AdminSavePackage, AdminSaveReturn, AdminDeletePackage};
+use savaged_libs::admin_libs::{
+    AdminDeletePackage, AdminPagingStatistics, AdminSavePackage, AdminSaveReturn,
+};
 use savaged_libs::alert_level::AlertLevel;
 use savaged_libs::book::Book;
 use savaged_libs::game_data_row::GameDataRow;
 use savaged_libs::player_character::armor::Armor;
-use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admin_params};
+use savaged_libs::{admin_libs::new_fetch_admin_params, admin_libs::FetchAdminParameters};
 use serde_json::Error;
-use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, set_local_storage_u32};
+use standard_components::libs::local_storage_shortcuts::{
+    get_local_storage_u32, set_local_storage_u32,
+};
 use standard_components::ui::nbsp::Nbsp;
 use std::mem;
 use wasm_bindgen_futures::spawn_local;
@@ -31,21 +38,20 @@ use yew::prelude::*;
 pub struct AdminGameDataArmorProps {
     pub global_vars: GlobalVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
-
 }
 
 pub enum AdminGameDataArmorMessage {
     SetItems(Vec<Armor>),
-    NewItem( u32 ),
+    NewItem(u32),
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
     UpdateArmor(Armor),
     UpdateArmorAndRefresh(Armor),
 
-    ViewItem( u32 ),
-    EditItemDialog( u32 ),
-    DeleteItem( u32 ),
-    DuplicateItem( u32 ),
+    ViewItem(u32),
+    EditItemDialog(u32),
+    DeleteItem(u32),
+    DuplicateItem(u32),
 
     AddItemDialog(bool),
 
@@ -69,32 +75,34 @@ impl Component for AdminGameDataArmor {
     type Properties = AdminGameDataArmorProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-
         let global_vars = ctx.props().global_vars.clone();
 
         let login_token = global_vars.login_token.clone();
         let set_items = ctx.link().callback(AdminGameDataArmorMessage::SetItems);
-        let set_paging = ctx.link().callback(AdminGameDataArmorMessage::SetPagingStats);
+        let set_paging = ctx
+            .link()
+            .callback(AdminGameDataArmorMessage::SetPagingStats);
 
         let mut paging_sorting_and_filter = new_fetch_admin_params();
 
         paging_sorting_and_filter.login_token = Some(login_token);
         paging_sorting_and_filter.needs_book_list = true;
-        paging_sorting_and_filter.number_per_page = get_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
-        paging_sorting_and_filter.filter_book = get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
-        let paging = paging_sorting_and_filter.clone();
-        spawn_local (
-            async move {
-                _get_data(
-                    global_vars,
-                    paging_sorting_and_filter,
-                    set_items,
-                    set_paging,
-
-                ).await;
-
-            }
+        paging_sorting_and_filter.number_per_page = get_local_storage_u32(
+            "admin_page_count",
+            paging_sorting_and_filter.number_per_page,
         );
+        paging_sorting_and_filter.filter_book =
+            get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
+        let paging = paging_sorting_and_filter.clone();
+        spawn_local(async move {
+            _get_data(
+                global_vars,
+                paging_sorting_and_filter,
+                set_items,
+                set_paging,
+            )
+            .await;
+        });
 
         AdminGameDataArmor {
             paging_sorting_and_filter: paging,
@@ -108,15 +116,9 @@ impl Component for AdminGameDataArmor {
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: AdminGameDataArmorMessage
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: AdminGameDataArmorMessage) -> bool {
         match msg {
-
-            AdminGameDataArmorMessage::ViewItem( id ) => {
+            AdminGameDataArmorMessage::ViewItem(id) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -129,7 +131,7 @@ impl Component for AdminGameDataArmor {
                 return false;
             }
 
-            AdminGameDataArmorMessage::EditItemDialog( id ) => {
+            AdminGameDataArmorMessage::EditItemDialog(id) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -142,24 +144,24 @@ impl Component for AdminGameDataArmor {
                 return false;
             }
 
-            AdminGameDataArmorMessage::AddItemDialog( _nv ) => {
+            AdminGameDataArmorMessage::AddItemDialog(_nv) => {
                 log!("AdminGameDataArmorMessage::AddItemDialog");
                 let mut new_hind = Armor::new();
                 new_hind.book_id = self.paging_sorting_and_filter.filter_book;
                 new_hind.active = true;
-                self.editing_item = Some( new_hind );
+                self.editing_item = Some(new_hind);
 
                 self.is_editing = false;
                 self.is_adding = true;
                 return true;
             }
 
-            AdminGameDataArmorMessage::SaveItem( as_new ) => {
+            AdminGameDataArmorMessage::SaveItem(as_new) => {
                 log!("AdminGameDataArmorMessage::SaveItem");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
                 match self_editing_item {
-                    Some( mut editing_item ) => {
+                    Some(mut editing_item) => {
                         if as_new || self_is_adding {
                             editing_item.id = 0;
                         }
@@ -177,95 +179,96 @@ impl Component for AdminGameDataArmor {
                         let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataArmorMessage::SetItems);
-                        spawn_local (
-                            async move {
-                                let result = fetch_api_save_game_data_row(
-                                    (api_root + "/admin/game-data/armor/save").to_owned(),
-                                    req,
+                        spawn_local(async move {
+                            let result = fetch_api_save_game_data_row(
+                                (api_root + "/admin/game-data/armor/save").to_owned(),
+                                req,
+                            )
+                            .await;
 
-                                ).await;
+                            match result {
+                                Ok(value) => {
+                                    let save_result: Result<AdminSaveReturn, Error> =
+                                        JsValueSerdeExt::into_serde(&value);
+                                    match save_result {
+                                        Ok(save_result_data) => {
+                                            match save_result_data.game_data {
+                                                Some(vec_val) => {
+                                                    let mut rv: Vec<Armor> = Vec::new();
+                                                    for mut data in vec_val.into_iter() {
+                                                        data.created_by_user = None;
+                                                        data.updated_by_user = None;
+                                                        data.updated_by_user = None;
 
-                                match result {
-                                    Ok( value ) => {
-                                        let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
-                                        match save_result {
-                                            Ok( save_result_data) => {
-                                                match save_result_data.game_data {
-                                                    Some( vec_val ) => {
+                                                        // log!("data", format!("{:?}", data) );
+                                                        let hind = data.to_armor().unwrap();
+                                                        // log!("data.updated_on", data.updated_on);
+                                                        // log!("data.created_on", data.created_on);
 
-                                                        let mut rv: Vec<Armor> = Vec::new();
-                                                        for mut data in vec_val.into_iter() {
-                                                            data.created_by_user = None;
-                                                            data.updated_by_user = None;
-                                                            data.updated_by_user = None;
+                                                        // log!("hind.updated_on", hind.updated_on);
+                                                        // log!("hind.created_on", hind.created_on);
+                                                        // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
+                                                        // log!("data.updated_by", data.updated_by);
+                                                        // log!("data.created_by", data.created_by);
 
-                                                            // log!("data", format!("{:?}", data) );
-                                                            let hind = data.to_armor().unwrap();
-                                                            // log!("data.updated_on", data.updated_on);
-                                                            // log!("data.created_on", data.created_on);
-
-                                                            // log!("hind.updated_on", hind.updated_on);
-                                                            // log!("hind.created_on", hind.created_on);
-                                                            // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
-                                                            // log!("data.updated_by", data.updated_by);
-                                                            // log!("data.created_by", data.created_by);
-
-                                                            // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
-                                                            // log!("hind.updated_by", hind.updated_by);
-                                                            // log!("hind.created_by", hind.created_by);
-                                                            rv.push( hind )
-                                                        }
-                                                        set_items.emit( rv );
-
-                                                        let alert_def: AlertDefinition = AlertDefinition {
-                                                            level: save_result_data.level,
-                                                            text: Some( save_result_data.message ),
-                                                            ..Default::default()
-                                                        };
-                                                        global_vars.add_alert.emit( alert_def );
+                                                        // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
+                                                        // log!("hind.updated_by", hind.updated_by);
+                                                        // log!("hind.created_by", hind.created_by);
+                                                        rv.push(hind)
                                                     }
+                                                    set_items.emit(rv);
 
-                                                    None => {
-                                                        set_items.emit( Vec::new() );
-                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
                                                             level: save_result_data.level,
-                                                            text: Some( save_result_data.message ),
+                                                            text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                        global_vars.add_alert.emit( alert_def );                                                    }
+                                                    global_vars.add_alert.emit(alert_def);
+                                                }
+
+                                                None => {
+                                                    set_items.emit(Vec::new());
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
+                                                            level: save_result_data.level,
+                                                            text: Some(save_result_data.message),
+                                                            ..Default::default()
+                                                        };
+                                                    global_vars.add_alert.emit(alert_def);
                                                 }
                                             }
-                                            Err( err ) => {
-                                                let err_string: String = format!("SaveItem Serde Err(): {}", &err);
-                                                // set_paging.emit( None );
-                                                set_items.emit( Vec::new() );
-                                                error!( &err_string  );
-                                                let alert_def: AlertDefinition = AlertDefinition {
-                                                    level: AlertLevel::Danger,
-                                                    text: Some( format!("{:?}", err ) ),
-                                                    ..Default::default()
-                                                };
-
-                                                global_vars.add_alert.emit( alert_def );
-                                            }
                                         }
+                                        Err(err) => {
+                                            let err_string: String =
+                                                format!("SaveItem Serde Err(): {}", &err);
+                                            // set_paging.emit( None );
+                                            set_items.emit(Vec::new());
+                                            error!(&err_string);
+                                            let alert_def: AlertDefinition = AlertDefinition {
+                                                level: AlertLevel::Danger,
+                                                text: Some(format!("{:?}", err)),
+                                                ..Default::default()
+                                            };
 
-                                    }
-
-                                    Err( err ) => {
-                                        set_items.emit( Vec::new() );
-                                        error!("get_items paging Err()", &err );
-                                        let alert_def: AlertDefinition = AlertDefinition {
-                                            level: AlertLevel::Danger,
-                                            text: Some( format!("{:?}", err ) ),
-                                            ..Default::default()
-                                        };
-
-                                        global_vars.add_alert.emit( alert_def );
+                                            global_vars.add_alert.emit(alert_def);
+                                        }
                                     }
                                 }
+
+                                Err(err) => {
+                                    set_items.emit(Vec::new());
+                                    error!("get_items paging Err()", &err);
+                                    let alert_def: AlertDefinition = AlertDefinition {
+                                        level: AlertLevel::Danger,
+                                        text: Some(format!("{:?}", err)),
+                                        ..Default::default()
+                                    };
+
+                                    global_vars.add_alert.emit(alert_def);
+                                }
                             }
-                        );
+                        });
 
                         self.editing_item = None;
                     }
@@ -273,11 +276,11 @@ impl Component for AdminGameDataArmor {
                 }
             }
 
-            AdminGameDataArmorMessage::NewItem( book_id ) => {
+            AdminGameDataArmorMessage::NewItem(book_id) => {
                 let self_editing_item = self.editing_item.clone();
                 let mut hind = Armor::new();
                 match self_editing_item {
-                    Some( editing_item ) => {
+                    Some(editing_item) => {
                         hind.active = editing_item.active;
                         hind.book_id = editing_item.book_id;
                     }
@@ -292,13 +295,13 @@ impl Component for AdminGameDataArmor {
                 return true;
             }
 
-            AdminGameDataArmorMessage::SaveItemAndLeaveOpen( _unused ) => {
+            AdminGameDataArmorMessage::SaveItemAndLeaveOpen(_unused) => {
                 log!("AdminGameDataArmorMessage::SaveItemAndLeaveOpen");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
 
                 match self_editing_item {
-                    Some( mut editing_item ) => {
+                    Some(mut editing_item) => {
                         if self_is_adding {
                             editing_item.id = 0;
                         }
@@ -322,112 +325,114 @@ impl Component for AdminGameDataArmor {
                         let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataArmorMessage::SetItems);
-                        let new_item_callback = ctx.link().callback(AdminGameDataArmorMessage::NewItem);
+                        let new_item_callback =
+                            ctx.link().callback(AdminGameDataArmorMessage::NewItem);
 
-                        let update_armor_callback = ctx.link().callback(AdminGameDataArmorMessage::UpdateArmorAndRefresh);
+                        let update_armor_callback = ctx
+                            .link()
+                            .callback(AdminGameDataArmorMessage::UpdateArmorAndRefresh);
 
-                        spawn_local (
-                            async move {
-                                let result = fetch_api_save_game_data_row(
-                                    (api_root + "/admin/game-data/armor/save").to_owned(),
-                                    req,
+                        spawn_local(async move {
+                            let result = fetch_api_save_game_data_row(
+                                (api_root + "/admin/game-data/armor/save").to_owned(),
+                                req,
+                            )
+                            .await;
 
-                                ).await;
+                            match result {
+                                Ok(value) => {
+                                    let save_result: Result<AdminSaveReturn, Error> =
+                                        JsValueSerdeExt::into_serde(&value);
+                                    match save_result {
+                                        Ok(save_result_data) => {
+                                            match save_result_data.game_data {
+                                                Some(vec_val) => {
+                                                    if edit_item_id == 0 {
+                                                        new_item_callback.emit(edit_item_book_id);
+                                                    }
 
-                                match result {
-                                    Ok( value ) => {
-                                        let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
-                                        match save_result {
-                                            Ok( save_result_data) => {
-                                                match save_result_data.game_data {
-                                                    Some( vec_val ) => {
+                                                    let mut rv: Vec<Armor> = Vec::new();
+                                                    for mut data in vec_val.into_iter() {
+                                                        data.created_by_user = None;
+                                                        data.updated_by_user = None;
+                                                        data.updated_by_user = None;
 
-                                                        if edit_item_id == 0 {
-                                                            new_item_callback.emit( edit_item_book_id );
-                                                        }
+                                                        let hind = data.to_armor().unwrap();
 
-                                                        let mut rv: Vec<Armor> = Vec::new();
-                                                        for mut data in vec_val.into_iter() {
-                                                            data.created_by_user = None;
-                                                            data.updated_by_user = None;
-                                                            data.updated_by_user = None;
+                                                        // log!("data", format!("{:?}", data) );
 
-                                                            let hind = data.to_armor().unwrap();
+                                                        // log!("data.updated_on", data.updated_on);
+                                                        // log!("data.created_on", data.created_on);
 
-                                                            // log!("data", format!("{:?}", data) );
+                                                        // log!("hind.updated_on", hind.updated_on);
+                                                        // log!("hind.created_on", hind.created_on);
+                                                        // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
+                                                        // log!("data.updated_by", data.updated_by);
+                                                        // log!("data.created_by", data.created_by);
 
-                                                            // log!("data.updated_on", data.updated_on);
-                                                            // log!("data.created_on", data.created_on);
-
-                                                            // log!("hind.updated_on", hind.updated_on);
-                                                            // log!("hind.created_on", hind.created_on);
-                                                            // log!("data.updated_by_user", format!("{:?}", data.updated_by_user) );
-                                                            // log!("data.updated_by", data.updated_by);
-                                                            // log!("data.created_by", data.created_by);
-
-                                                            // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
-                                                            // log!("hind.updated_by", hind.updated_by);
-                                                            // log!("hind.created_by", hind.created_by);
-                                                            rv.push( hind )
-                                                        }
-                                                        set_items.emit( rv );
-                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                        // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
+                                                        // log!("hind.updated_by", hind.updated_by);
+                                                        // log!("hind.created_by", hind.created_by);
+                                                        rv.push(hind)
+                                                    }
+                                                    set_items.emit(rv);
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
                                                             level: save_result_data.level,
-                                                            text: Some( save_result_data.message ),
+                                                            text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                        global_vars.add_alert.emit( alert_def );
+                                                    global_vars.add_alert.emit(alert_def);
 
                                                     let mut new_hind = Armor::new();
                                                     new_hind.book_id = edit_item_book_id;
                                                     new_hind.active = edit_item_active;
                                                     new_hind.page = edit_item_book_page;
-                                                    update_armor_callback.emit( new_hind );
+                                                    update_armor_callback.emit(new_hind);
+                                                }
 
-                                                    }
-
-                                                    None => {
-                                                        set_items.emit( Vec::new() );
-                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                None => {
+                                                    set_items.emit(Vec::new());
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
                                                             level: save_result_data.level,
-                                                            text: Some( save_result_data.message ),
+                                                            text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                        global_vars.add_alert.emit( alert_def );                                                    }
+                                                    global_vars.add_alert.emit(alert_def);
                                                 }
                                             }
-                                            Err( err ) => {
-                                                let err_string: String = format!("SaveItem Serde Err(): {}", &err);
-                                                // set_paging.emit( None );
-                                                set_items.emit( Vec::new() );
-                                                error!( &err_string  );
-                                                let alert_def: AlertDefinition = AlertDefinition {
-                                                    level: AlertLevel::Danger,
-                                                    text: Some( format!("{:?}", err ) ),
-                                                    ..Default::default()
-                                                };
-
-                                                global_vars.add_alert.emit( alert_def );
-
-                                            }
                                         }
+                                        Err(err) => {
+                                            let err_string: String =
+                                                format!("SaveItem Serde Err(): {}", &err);
+                                            // set_paging.emit( None );
+                                            set_items.emit(Vec::new());
+                                            error!(&err_string);
+                                            let alert_def: AlertDefinition = AlertDefinition {
+                                                level: AlertLevel::Danger,
+                                                text: Some(format!("{:?}", err)),
+                                                ..Default::default()
+                                            };
 
-                                    }
-
-                                    Err( err ) => {
-                                        set_items.emit( Vec::new() );
-                                        error!("get_items paging Err()", &err );
-                                        let alert_def: AlertDefinition = AlertDefinition {
-                                            level: AlertLevel::Danger,
-                                            text: Some( format!("{:?}", err ) ),
-                                            ..Default::default()
-                                        };
-
-                                        global_vars.add_alert.emit( alert_def );
+                                            global_vars.add_alert.emit(alert_def);
+                                        }
                                     }
                                 }
+
+                                Err(err) => {
+                                    set_items.emit(Vec::new());
+                                    error!("get_items paging Err()", &err);
+                                    let alert_def: AlertDefinition = AlertDefinition {
+                                        level: AlertLevel::Danger,
+                                        text: Some(format!("{:?}", err)),
+                                        ..Default::default()
+                                    };
+
+                                    global_vars.add_alert.emit(alert_def);
+                                }
                             }
-                        );
+                        });
 
                         // self.editing_item = None;
                     }
@@ -435,7 +440,7 @@ impl Component for AdminGameDataArmor {
                 }
             }
 
-            AdminGameDataArmorMessage::DeleteItem( id ) => {
+            AdminGameDataArmorMessage::DeleteItem(id) => {
                 log!("AdminGameDataArmorMessage::DeleteItem ", id);
 
                 let api_root = ctx.props().global_vars.api_root.to_owned();
@@ -446,7 +451,8 @@ impl Component for AdminGameDataArmor {
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
-                        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+                        let open_confirmation_dialog =
+                            ctx.props().global_vars.open_confirmation_dialog.clone();
                         let global_vars = global_vars.clone();
                         let set_items = set_items.clone();
                         let api_root = api_root.clone();
@@ -456,11 +462,14 @@ impl Component for AdminGameDataArmor {
                             title: Some("Deletion Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to delete the armor '".to_owned() + &item.name + &"'?" ),
+                            text: Some(
+                                "Are you sure you would like to delete the armor '".to_owned()
+                                    + &item.name
+                                    + &"'?",
+                            ),
                             label_yes: None,
                             label_no: None,
-                            callback: Callback::from( move |_clicked_yes| {
-
+                            callback: Callback::from(move |_clicked_yes| {
                                 let api_root = api_root.to_owned();
                                 let global_vars = global_vars.clone();
                                 let login_token = login_token.clone();
@@ -480,99 +489,105 @@ impl Component for AdminGameDataArmor {
                                 };
 
                                 // let item_name = editing_item.name.to_owned();
-                                spawn_local (
-                                    async move {
-                                        let result = fetch_api_delete_game_data_row(
-                                            (api_root + "/admin/game-data/armor/delete").to_owned(),
-                                            req,
-                                        ).await;
+                                spawn_local(async move {
+                                    let result = fetch_api_delete_game_data_row(
+                                        (api_root + "/admin/game-data/armor/delete").to_owned(),
+                                        req,
+                                    )
+                                    .await;
 
-                                        match result {
-                                            Ok( value ) => {
-                                                let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
-                                                match save_result {
-                                                    Ok( save_result_data) => {
-                                                        match save_result_data.game_data {
-                                                            Some( vec_val ) => {
+                                    match result {
+                                        Ok(value) => {
+                                            let save_result: Result<AdminSaveReturn, Error> =
+                                                JsValueSerdeExt::into_serde(&value);
+                                            match save_result {
+                                                Ok(save_result_data) => {
+                                                    match save_result_data.game_data {
+                                                        Some(vec_val) => {
+                                                            let mut rv: Vec<Armor> = Vec::new();
+                                                            for mut data in vec_val.into_iter() {
+                                                                data.created_by_user = None;
+                                                                data.updated_by_user = None;
+                                                                data.updated_by_user = None;
 
-                                                                let mut rv: Vec<Armor> = Vec::new();
-                                                                for mut data in vec_val.into_iter() {
-                                                                    data.created_by_user = None;
-                                                                    data.updated_by_user = None;
-                                                                    data.updated_by_user = None;
+                                                                let hind = data.to_armor().unwrap();
 
-                                                                    let hind = data.to_armor().unwrap();
-
-                                                                    rv.push( hind )
-                                                                }
-                                                                set_items.emit( rv );
-                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                                rv.push(hind)
+                                                            }
+                                                            set_items.emit(rv);
+                                                            let alert_def: AlertDefinition =
+                                                                AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some(save_result_data.message),
+                                                                    text: Some(
+                                                                        save_result_data.message,
+                                                                    ),
                                                                     ..Default::default()
                                                                 };
-                                                                global_vars.add_alert.emit( alert_def );
-                                                            }
+                                                            global_vars.add_alert.emit(alert_def);
+                                                        }
 
-                                                            None => {
-                                                                set_items.emit( Vec::new() );
-                                                                // error!("get_items Err()", &err );
-                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                        None => {
+                                                            set_items.emit(Vec::new());
+                                                            // error!("get_items Err()", &err );
+                                                            let alert_def: AlertDefinition =
+                                                                AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some(save_result_data.message),
+                                                                    text: Some(
+                                                                        save_result_data.message,
+                                                                    ),
                                                                     ..Default::default()
                                                                 };
-                                                                global_vars.add_alert.emit( alert_def );
-                                                            }
+                                                            global_vars.add_alert.emit(alert_def);
                                                         }
                                                     }
-                                                    Err( err ) => {
-                                                        let err_string: String = format!("SaveItem Serde Err(): {}", &err);
-                                                        // set_paging.emit( None );
-                                                        set_items.emit( Vec::new() );
-                                                        error!( &err_string  );
-                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                }
+                                                Err(err) => {
+                                                    let err_string: String =
+                                                        format!("SaveItem Serde Err(): {}", &err);
+                                                    // set_paging.emit( None );
+                                                    set_items.emit(Vec::new());
+                                                    error!(&err_string);
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
                                                             level: AlertLevel::Danger,
-                                                            text: Some( format!("{:?}", err ) ),
+                                                            text: Some(format!("{:?}", err)),
                                                             ..Default::default()
                                                         };
 
-                                                        global_vars.add_alert.emit( alert_def );
-                                                    }
+                                                    global_vars.add_alert.emit(alert_def);
                                                 }
-
-                                            }
-
-                                            Err( err ) => {
-                                                set_items.emit( Vec::new() );
-                                                error!("get_items paging Err()", &err );
-                                                let alert_def: AlertDefinition = AlertDefinition {
-                                                    level: AlertLevel::Danger,
-                                                    text: Some( format!("{:?}", err ) ),
-                                                    ..Default::default()
-                                                };
-
-                                                global_vars.add_alert.emit( alert_def );
                                             }
                                         }
+
+                                        Err(err) => {
+                                            set_items.emit(Vec::new());
+                                            error!("get_items paging Err()", &err);
+                                            let alert_def: AlertDefinition = AlertDefinition {
+                                                level: AlertLevel::Danger,
+                                                text: Some(format!("{:?}", err)),
+                                                ..Default::default()
+                                            };
+
+                                            global_vars.add_alert.emit(alert_def);
+                                        }
                                     }
-                                );
+                                });
                                 // return false;
                             }),
                         };
 
-                        open_confirmation_dialog.emit( dialog );
+                        open_confirmation_dialog.emit(dialog);
                     }
                 }
             }
 
-            AdminGameDataArmorMessage::DuplicateItem( id ) => {
+            AdminGameDataArmorMessage::DuplicateItem(id) => {
                 log!("AdminGameDataArmorMessage::DuplicateItem", id);
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
-
-                        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+                        let open_confirmation_dialog =
+                            ctx.props().global_vars.open_confirmation_dialog.clone();
 
                         let api_root = ctx.props().global_vars.api_root.to_owned();
                         let login_token = Some(ctx.props().global_vars.login_token.to_owned());
@@ -587,11 +602,14 @@ impl Component for AdminGameDataArmor {
                             title: Some("Duplication Confirmation".to_owned()),
 
                             html: None,
-                            text: Some( "Are you sure you would like to duplicate the armor '".to_owned() + &item_name + &"'?" ),
+                            text: Some(
+                                "Are you sure you would like to duplicate the armor '".to_owned()
+                                    + &item_name
+                                    + &"'?",
+                            ),
                             label_yes: None,
                             label_no: None,
-                            callback: Callback::from( move |_clicked_yes| {
-
+                            callback: Callback::from(move |_clicked_yes| {
                                 let global_vars = global_vars.clone();
                                 let item_name = item_name.clone();
 
@@ -614,142 +632,135 @@ impl Component for AdminGameDataArmor {
                                     api_key: None,
                                 };
 
-                                spawn_local (
-                                    async move {
+                                spawn_local(async move {
+                                    let result = fetch_api_save_game_data_row(
+                                        (api_root + "/admin/game-data/armor/save").to_owned(),
+                                        req,
+                                    )
+                                    .await;
 
-                                        let result = fetch_api_save_game_data_row(
-                                            (api_root + "/admin/game-data/armor/save").to_owned(),
-                                            req,
+                                    match result {
+                                        Ok(value) => {
+                                            let save_result: Result<AdminSaveReturn, Error> =
+                                                JsValueSerdeExt::into_serde(&value);
+                                            match save_result {
+                                                Ok(save_result_data) => {
+                                                    match save_result_data.game_data {
+                                                        Some(vec_val) => {
+                                                            let mut rv: Vec<Armor> = Vec::new();
+                                                            for mut data in vec_val.into_iter() {
+                                                                data.created_by_user = None;
+                                                                data.updated_by_user = None;
+                                                                data.updated_by_user = None;
 
-                                        ).await;
+                                                                let hind = data.to_armor().unwrap();
 
-                                        match result {
-                                            Ok( value ) => {
-                                                let save_result: Result<AdminSaveReturn, Error> = JsValueSerdeExt::into_serde(&value);
-                                                match save_result {
-                                                    Ok( save_result_data) => {
-                                                        match save_result_data.game_data {
-                                                            Some( vec_val ) => {
+                                                                rv.push(hind)
+                                                            }
+                                                            set_items.emit(rv);
 
-                                                                let mut rv: Vec<Armor> = Vec::new();
-                                                                for mut data in vec_val.into_iter() {
-                                                                    data.created_by_user = None;
-                                                                    data.updated_by_user = None;
-                                                                    data.updated_by_user = None;
-
-                                                                    let hind = data.to_armor().unwrap();
-
-                                                                    rv.push( hind )
-                                                                }
-                                                                set_items.emit( rv );
-
-                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                            let alert_def: AlertDefinition = AlertDefinition {
                                                                     level: save_result_data.level,
                                                                     text: Some("Armor '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
                                                                     ..Default::default()
                                                                 };
-                                                                global_vars.add_alert.emit( alert_def );
+                                                            global_vars.add_alert.emit(alert_def);
+                                                        }
 
-                                                            }
-
-                                                            None => {
-                                                                set_items.emit( Vec::new() );
-                                                                let alert_def: AlertDefinition = AlertDefinition {
+                                                        None => {
+                                                            set_items.emit(Vec::new());
+                                                            let alert_def: AlertDefinition =
+                                                                AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some("No Data received!!".to_owned()),
+                                                                    text: Some(
+                                                                        "No Data received!!"
+                                                                            .to_owned(),
+                                                                    ),
                                                                     ..Default::default()
                                                                 };
-                                                                global_vars.add_alert.emit( alert_def );
-                                                                // error!("get_items Err()", &err );
-                                                            }
+                                                            global_vars.add_alert.emit(alert_def);
+                                                            // error!("get_items Err()", &err );
                                                         }
                                                     }
-                                                    Err( err ) => {
-                                                        let err_string: String = format!("SaveItem Serde Err(): {}", &err);
-                                                        // set_paging.emit( None );
-                                                        set_items.emit( Vec::new() );
+                                                }
+                                                Err(err) => {
+                                                    let err_string: String =
+                                                        format!("SaveItem Serde Err(): {}", &err);
+                                                    // set_paging.emit( None );
+                                                    set_items.emit(Vec::new());
 
-                                                        let alert_def: AlertDefinition = AlertDefinition {
+                                                    let alert_def: AlertDefinition =
+                                                        AlertDefinition {
                                                             level: AlertLevel::Danger,
-                                                            text: Some( format!("{:?}", err ) ),
+                                                            text: Some(format!("{:?}", err)),
                                                             ..Default::default()
                                                         };
 
-                                                        global_vars.add_alert.emit( alert_def );
+                                                    global_vars.add_alert.emit(alert_def);
 
-                                                        error!( &err_string  );
-                                                    }
+                                                    error!(&err_string);
                                                 }
-
-                                            }
-
-                                            Err( err ) => {
-                                                set_items.emit( Vec::new() );
-                                                error!("get_items paging Err()", &err );
-                                                let alert_def: AlertDefinition = AlertDefinition {
-                                                    level: AlertLevel::Danger,
-                                                    text: Some( format!("{:?}", err ) ),
-                                                    ..Default::default()
-                                                };
-
-                                                global_vars.add_alert.emit( alert_def );
                                             }
                                         }
+
+                                        Err(err) => {
+                                            set_items.emit(Vec::new());
+                                            error!("get_items paging Err()", &err);
+                                            let alert_def: AlertDefinition = AlertDefinition {
+                                                level: AlertLevel::Danger,
+                                                text: Some(format!("{:?}", err)),
+                                                ..Default::default()
+                                            };
+
+                                            global_vars.add_alert.emit(alert_def);
+                                        }
                                     }
-                                );
+                                });
                                 // return false;
                             }),
                         };
 
-                        open_confirmation_dialog.emit( dialog );
+                        open_confirmation_dialog.emit(dialog);
 
                         return false;
                     }
                 }
-
             }
 
-            AdminGameDataArmorMessage::Cancel( _new_value ) => {
+            AdminGameDataArmorMessage::Cancel(_new_value) => {
                 log!("AdminGameDataArmorMessage::Cancel");
                 self.editing_item = None;
             }
 
-            AdminGameDataArmorMessage::UpdateArmor( new_value ) => {
+            AdminGameDataArmorMessage::UpdateArmor(new_value) => {
                 self.editing_item = Some(new_value);
                 return false;
-
             }
-            AdminGameDataArmorMessage::UpdateArmorAndRefresh( new_value ) => {
+            AdminGameDataArmorMessage::UpdateArmorAndRefresh(new_value) => {
                 self.editing_item = Some(new_value);
                 return true;
-
             }
 
-            AdminGameDataArmorMessage::SetItems( new_value ) => {
+            AdminGameDataArmorMessage::SetItems(new_value) => {
                 self.items = new_value;
                 self.loading = false;
             }
 
-            AdminGameDataArmorMessage::SetPagingStats( new_value ) => {
-
+            AdminGameDataArmorMessage::SetPagingStats(new_value) => {
                 match new_value {
                     Some(mut nv) => {
-
                         match nv.book_list {
-                            Some( bl) => {
+                            Some(bl) => {
                                 nv.book_list = Some(bl);
                             }
-                            None => {
-                                match &self.paging_data {
-                                    Some( pg ) => {
-                                        nv.book_list = pg.book_list.clone();
-                                    }
-                                    None => {}
+                            None => match &self.paging_data {
+                                Some(pg) => {
+                                    nv.book_list = pg.book_list.clone();
                                 }
-                            }
+                                None => {}
+                            },
                         }
                         self.paging_data = Some(nv.clone());
-
                     }
                     None => {
                         self.paging_data = None;
@@ -757,10 +768,9 @@ impl Component for AdminGameDataArmor {
                 }
 
                 self.loading = false;
-
             }
 
-            AdminGameDataArmorMessage::SetFetchAdminParams( new_value ) => {
+            AdminGameDataArmorMessage::SetFetchAdminParams(new_value) => {
                 let mut paging_sorting_and_filter = new_value.clone();
                 self.paging_sorting_and_filter = new_value.clone();
 
@@ -768,64 +778,62 @@ impl Component for AdminGameDataArmor {
 
                 let login_token = global_vars.login_token.clone();
                 let set_items = ctx.link().callback(AdminGameDataArmorMessage::SetItems);
-                let set_paging = ctx.link().callback(AdminGameDataArmorMessage::SetPagingStats);
+                let set_paging = ctx
+                    .link()
+                    .callback(AdminGameDataArmorMessage::SetPagingStats);
 
-                set_local_storage_u32("admin_page_count", paging_sorting_and_filter.number_per_page);
+                set_local_storage_u32(
+                    "admin_page_count",
+                    paging_sorting_and_filter.number_per_page,
+                );
 
                 paging_sorting_and_filter.login_token = Some(login_token);
 
                 paging_sorting_and_filter.needs_book_list = true;
                 match &self.paging_data {
-                    Some( paging ) => {
-                        match &paging.book_list {
-                            Some( book_list ) => {
-                                if book_list.len() > 0 {
-                                    paging_sorting_and_filter.needs_book_list = false;
-                                }
+                    Some(paging) => match &paging.book_list {
+                        Some(book_list) => {
+                            if book_list.len() > 0 {
+                                paging_sorting_and_filter.needs_book_list = false;
                             }
-                            None => {}
                         }
-                    }
+                        None => {}
+                    },
                     None => {}
                 }
-                spawn_local (
-                    async move {
-                        _get_data(
-                            global_vars,
-                            paging_sorting_and_filter,
-                            set_items,
-                            set_paging,
-                        ).await;
-
-                    }
-                );
-
+                spawn_local(async move {
+                    _get_data(
+                        global_vars,
+                        paging_sorting_and_filter,
+                        set_items,
+                        set_paging,
+                    )
+                    .await;
+                });
             }
-
         }
         true
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>
-    ) -> Html {
-
-        let callback_fetch_admin_params = ctx.link().callback( AdminGameDataArmorMessage::SetFetchAdminParams ).clone();
-        let callback_fetch_admin_params_2 = ctx.link().callback( AdminGameDataArmorMessage::SetFetchAdminParams ).clone();
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let callback_fetch_admin_params = ctx
+            .link()
+            .callback(AdminGameDataArmorMessage::SetFetchAdminParams)
+            .clone();
+        let callback_fetch_admin_params_2 = ctx
+            .link()
+            .callback(AdminGameDataArmorMessage::SetFetchAdminParams)
+            .clone();
 
         let mut non_filtered_count: u32 = 0;
-        let mut filtered_count: u32= 0;
+        let mut filtered_count: u32 = 0;
 
         match &self.paging_data {
-            Some( paging_data ) => {
+            Some(paging_data) => {
                 non_filtered_count = paging_data.non_filtered_count;
                 filtered_count = paging_data.filtered_count;
-
             }
-            None => {
-
-            }
+            None => {}
         }
 
         let mut global_vars = ctx.props().global_vars.clone();
@@ -843,49 +851,69 @@ impl Component for AdminGameDataArmor {
         let mut book_list: Option<Vec<Book>> = None;
 
         match &self.paging_data {
-            Some( pg ) => {
+            Some(pg) => {
                 book_list = pg.book_list.clone();
             }
             None => {}
         }
 
-        let mut edit_modal = html!{<></>};
+        let mut edit_modal = html! {<></>};
         match &self.editing_item {
-            Some( editing_item ) => {
+            Some(editing_item) => {
                 let mut editing_title = Some("Viewing Armor".to_owned());
 
-                let mut save_callback:Option<Callback<bool>> = None;
-                let mut add_callback: Option<Callback<bool>>= None;
-                let mut save_as_new_callback: Option<Callback<bool>>= None;
-                let mut save_and_leave_open_callback: Option<Callback<bool>>= None;
+                let mut save_callback: Option<Callback<bool>> = None;
+                let mut add_callback: Option<Callback<bool>> = None;
+                let mut save_as_new_callback: Option<Callback<bool>> = None;
+                let mut save_and_leave_open_callback: Option<Callback<bool>> = None;
 
                 let mut read_only = true;
 
                 if self.is_adding {
                     editing_title = Some("Adding Armor".to_owned());
-                    add_callback = Some(ctx.link().callback(AdminGameDataArmorMessage::SaveItem).clone());
-                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataArmorMessage::SaveItemAndLeaveOpen).clone());
+                    add_callback = Some(
+                        ctx.link()
+                            .callback(AdminGameDataArmorMessage::SaveItem)
+                            .clone(),
+                    );
+                    save_and_leave_open_callback = Some(
+                        ctx.link()
+                            .callback(AdminGameDataArmorMessage::SaveItemAndLeaveOpen)
+                            .clone(),
+                    );
                     read_only = false;
                 }
 
                 if self.is_editing {
                     editing_title = Some("Editing Armor".to_owned());
-                    save_callback = Some(ctx.link().callback(AdminGameDataArmorMessage::SaveItem).clone());
-                    save_as_new_callback = Some(ctx.link().callback(AdminGameDataArmorMessage::SaveItem).clone());
-                    save_and_leave_open_callback = Some(ctx.link().callback(AdminGameDataArmorMessage::SaveItemAndLeaveOpen).clone());
+                    save_callback = Some(
+                        ctx.link()
+                            .callback(AdminGameDataArmorMessage::SaveItem)
+                            .clone(),
+                    );
+                    save_as_new_callback = Some(
+                        ctx.link()
+                            .callback(AdminGameDataArmorMessage::SaveItem)
+                            .clone(),
+                    );
+                    save_and_leave_open_callback = Some(
+                        ctx.link()
+                            .callback(AdminGameDataArmorMessage::SaveItemAndLeaveOpen)
+                            .clone(),
+                    );
                     read_only = false;
                 }
 
                 let mut book_list: Vec<Book> = Vec::new();
 
                 match self.paging_data.clone() {
-                    Some( paging_data ) => {
-                        book_list = paging_data.book_list.unwrap_or( Vec::new() );
+                    Some(paging_data) => {
+                        book_list = paging_data.book_list.unwrap_or(Vec::new());
                     }
                     None => {}
                 }
 
-                edit_modal = html!{
+                edit_modal = html! {
                 <StandardModal
                     xl={true}
                     title={editing_title}
@@ -910,7 +938,9 @@ impl Component for AdminGameDataArmor {
             None => {}
         }
 
-        let add_item = ctx.link().callback(AdminGameDataArmorMessage::AddItemDialog);
+        let add_item = ctx
+            .link()
+            .callback(AdminGameDataArmorMessage::AddItemDialog);
 
         html! {
         <UIPage
@@ -1114,7 +1144,6 @@ impl Component for AdminGameDataArmor {
             </UIPage>
         }
     }
-
 }
 
 async fn _get_data(
@@ -1128,64 +1157,67 @@ async fn _get_data(
     let result = fetch_admin_api(
         (api_root.to_owned() + "/admin/game-data/armor/get").to_owned(),
         paging_sorting_and_filter.clone(),
-    ).await;
+    )
+    .await;
 
     match result {
-        Ok( value ) => {
-            let vec_val_result: Result<Vec<GameDataRow>, Error> = JsValueSerdeExt::into_serde(&value);
+        Ok(value) => {
+            let vec_val_result: Result<Vec<GameDataRow>, Error> =
+                JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
-                Ok( vec_val ) => {
-
+                Ok(vec_val) => {
                     let mut rv: Vec<Armor> = Vec::new();
                     for data in vec_val.into_iter() {
                         let hind = data.to_armor().unwrap();
-                        log!( format!("hind {} {}", &hind.name, mem::size_of_val(&hind) ) );
-                        rv.push( hind );
+                        log!(format!("hind {} {}", &hind.name, mem::size_of_val(&hind)));
+                        rv.push(hind);
                     }
-                    log!( format!("rv {}", mem::size_of_val(&rv) ) );
-                    set_items.emit( rv );
+                    log!(format!("rv {}", mem::size_of_val(&rv)));
+                    set_items.emit(rv);
                 }
-                Err( err ) => {
+                Err(err) => {
                     let err_string: String = format!("get_items Serde Err(): {}", &err);
-                    set_items.emit( Vec::new() );
-                    error!( &err_string );
+                    set_items.emit(Vec::new());
+                    error!(&err_string);
                 }
             }
-
         }
-        Err( err ) => {
-            set_items.emit( Vec::new() );
-            error!("get_items Err()", &err );
+        Err(err) => {
+            set_items.emit(Vec::new());
+            error!("get_items Err()", &err);
         }
     }
 
     let result = fetch_admin_api(
         (api_root + "/admin/game-data/armor/paging").to_owned(),
         paging_sorting_and_filter.clone(),
-
-    ).await;
+    )
+    .await;
 
     match result {
-        Ok( value ) => {
+        Ok(value) => {
             // let vec_val_result = value.into_serde::< Vec<GameDataRow> >();
-            let vec_val_result: Result<AdminPagingStatistics, Error> = JsValueSerdeExt::into_serde(&value);
+            let vec_val_result: Result<AdminPagingStatistics, Error> =
+                JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
-                Ok( vec_val ) => {
-                    log!( format!("vec_val {}", mem::size_of_val(&vec_val) ) );
-                    log!( format!("vec_val.book_list {}", mem::size_of_val(&vec_val.book_list) ) );
-                    set_paging.emit( Some(vec_val) );
+                Ok(vec_val) => {
+                    log!(format!("vec_val {}", mem::size_of_val(&vec_val)));
+                    log!(format!(
+                        "vec_val.book_list {}",
+                        mem::size_of_val(&vec_val.book_list)
+                    ));
+                    set_paging.emit(Some(vec_val));
                 }
-                Err( err ) => {
+                Err(err) => {
                     let err_string: String = format!("get_items paging Serde Err(): {}", &err);
-                    set_paging.emit( None );
-                    error!( &err_string  );
+                    set_paging.emit(None);
+                    error!(&err_string);
                 }
             }
-
         }
-        Err( err ) => {
-            set_paging.emit( None );
-            error!("get_items paging Err()", &err );
+        Err(err) => {
+            set_paging.emit(None);
+            error!("get_items paging Err()", &err);
         }
     }
 }

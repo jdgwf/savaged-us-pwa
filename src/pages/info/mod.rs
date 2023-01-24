@@ -5,16 +5,16 @@ pub mod privacy_policy;
 pub mod tech;
 pub mod todos;
 
-use about::InfoAbout;
-use contact_us::InfoContactUs;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::error404::Error404;
+use about::InfoAbout;
+use contact_us::InfoContactUs;
 use partners::InfoPartners;
 use privacy_policy::InfoPrivacyPolicy;
 use tech::InfoTech;
 use todos::InfoTodos;
+use yew::html;
 use yew::prelude::*;
-use yew::{ html};
 use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
@@ -41,15 +41,10 @@ pub enum InfoRoute {
     NotFound,
 }
 
-fn content_switch(
-    routes: InfoRoute,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn content_switch(routes: InfoRoute, global_vars: GlobalVars) -> Html {
     // let mut global_vars = global_vars.clone();
 
     match routes {
-
         InfoRoute::InfoAbout => html! {
             <InfoAbout
                 global_vars={global_vars}
@@ -100,34 +95,31 @@ pub struct InfoRouterProps {
     pub global_vars: GlobalVars,
 }
 
-pub struct InfoRouterMessage {
-}
+pub struct InfoRouterMessage {}
 
-pub struct InfoRouter {
-}
+pub struct InfoRouter {}
 
 impl Component for InfoRouter {
     type Message = InfoRouterMessage;
     type Properties = InfoRouterProps;
 
-    fn create(
-        _ctx: &Context<Self>
-    ) -> Self {
-
-        InfoRouter {
-        }
+    fn create(_ctx: &Context<Self>) -> Self {
+        InfoRouter {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>
-    ) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
 
         global_vars.current_menu = "main-info".to_owned();
 
         if ctx.props().global_vars.server_side_renderer {
-            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let history = ctx
+                .props()
+                .global_vars
+                .server_side_renderer_history
+                .as_ref()
+                .unwrap()
+                .clone();
 
             html! {
 
@@ -148,7 +140,6 @@ impl Component for InfoRouter {
                 </Router>
             }
         } else {
-
             html! {
 
                 <BrowserRouter>
@@ -166,6 +157,5 @@ impl Component for InfoRouter {
                 </BrowserRouter>
             }
         }
-
     }
 }

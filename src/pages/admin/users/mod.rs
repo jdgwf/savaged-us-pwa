@@ -2,24 +2,19 @@ pub mod list;
 
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::error404::Error404;
+use yew::html;
 use yew::prelude::*;
-use yew::{html};
 use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminUsersRoute {
     // #[at("/admin/users/*")]
     // AdminUsersUsersRouter,
-
     #[at("/404")]
     NotFound,
 }
 
-fn content_switch(
-    routes: AdminUsersRoute,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn content_switch(routes: AdminUsersRoute, global_vars: GlobalVars) -> Html {
     let mut global_vars = global_vars.clone();
 
     if global_vars.current_user.id > 0 {
@@ -29,7 +24,6 @@ fn content_switch(
     }
 
     match routes {
-
         // AdminUsersRoute::Users => html! {
         //     <AdminUsersList
         //         update_global_vars={update_global_vars}
@@ -37,7 +31,6 @@ fn content_switch(
         //         open_confirmation_dialog={open_confirmation_dialog}
         //     />
         // },
-
         AdminUsersRoute::NotFound => html! {
             <Error404
                 global_vars={global_vars}
@@ -51,28 +44,18 @@ pub struct AdminUsersRouterProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum AdminUsersRouterMessage {
-
-}
-pub struct AdminUsersRouter {
-}
+pub enum AdminUsersRouterMessage {}
+pub struct AdminUsersRouter {}
 
 impl Component for AdminUsersRouter {
     type Message = AdminUsersRouterMessage;
     type Properties = AdminUsersRouterProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
-        AdminUsersRouter {
-        }
+        AdminUsersRouter {}
     }
 
-    fn update(
-        &mut self,
-        _ctx: &Context<Self>,
-        msg: AdminUsersRouterMessage
-    ) -> bool {
-
+    fn update(&mut self, _ctx: &Context<Self>, msg: AdminUsersRouterMessage) -> bool {
         match msg {
             // AdminUsersRouterMessage::ChangeFilter( filter_type ) => {
             //     // log!("ChangeFilter", filter_type);
@@ -84,35 +67,37 @@ impl Component for AdminUsersRouter {
             //     set_local_storage_string( "saves_folder", folder_name);
             // }
         }
-
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>
-    ) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         if ctx.props().global_vars.server_side_renderer {
-            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let history = ctx
+                .props()
+                .global_vars
+                .server_side_renderer_history
+                .as_ref()
+                .unwrap()
+                .clone();
             let global_vars = ctx.props().global_vars.clone();
 
             html! {
 
-                <Router
-                    history={history}
-                >
-                    <div class={"main-content"}>
-                        <Switch<AdminUsersRoute>
-                            render={
-                                move |routes|
-                                content_switch(
-                                    routes,
-                                    global_vars.clone(),
-                                )
-                            }
-                        />
-                    </div>
-                </Router>
-        }
+                    <Router
+                        history={history}
+                    >
+                        <div class={"main-content"}>
+                            <Switch<AdminUsersRoute>
+                                render={
+                                    move |routes|
+                                    content_switch(
+                                        routes,
+                                        global_vars.clone(),
+                                    )
+                                }
+                            />
+                        </div>
+                    </Router>
+            }
         } else {
             let global_vars = ctx.props().global_vars.clone();
             html! {
@@ -132,7 +117,5 @@ impl Component for AdminUsersRouter {
                 </BrowserRouter>
             }
         }
-
     }
 }
-

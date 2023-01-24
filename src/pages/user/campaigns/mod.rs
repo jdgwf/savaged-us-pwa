@@ -13,20 +13,15 @@ pub struct UserCampaignsProps {
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
 
-pub struct UserCampaignsMessage {
-
-}
-pub struct UserCampaigns {
-}
+pub struct UserCampaignsMessage {}
+pub struct UserCampaigns {}
 
 impl Component for UserCampaigns {
     type Message = UserCampaignsMessage;
     type Properties = UserCampaignsProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-
-        UserCampaigns {
-        }
+        UserCampaigns {}
     }
 
     // fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -39,7 +34,6 @@ impl Component for UserCampaigns {
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data".to_owned();
         if global_vars.user_loading {
-
             return html! {
                 <UIPage
                     global_vars={global_vars}
@@ -52,24 +46,24 @@ impl Component for UserCampaigns {
                     </div>
 
                 </UIPage>
-            }
-            }
+            };
+        }
 
-            if global_vars.current_user.id == 0 {
-                return html! {
-                    <UIPage
-                        global_vars={global_vars}
-                        page_title="My Saves"
+        if global_vars.current_user.id == 0 {
+            return html! {
+                <UIPage
+                    global_vars={global_vars}
+                    page_title="My Saves"
 
-                    >
-                        <div class={"text-center"}>
-                            <br />
-                            {"You are not logged in!"}
-                        </div>
+                >
+                    <div class={"text-center"}>
+                        <br />
+                        {"You are not logged in!"}
+                    </div>
 
-                    </UIPage>
-                }
-            }
+                </UIPage>
+            };
+        }
 
         global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-campaigns".to_owned();
@@ -85,4 +79,3 @@ impl Component for UserCampaigns {
         }
     }
 }
-

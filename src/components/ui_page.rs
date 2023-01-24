@@ -3,7 +3,7 @@ use crate::components::menu_mobile::MenuMobile;
 use crate::libs::global_vars::GlobalVars;
 use standard_components::libs::set_document_title::set_document_title;
 use yew::virtual_dom::VNode;
-use yew::{function_component, Properties, Html, html, Children, AttrValue};
+use yew::{function_component, html, AttrValue, Children, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct UIPageProps {
@@ -15,13 +15,10 @@ pub struct UIPageProps {
 
     #[prop_or_default]
     pub modal: Option<VNode>,
-
 }
 
 #[function_component(UIPage)]
-pub fn ui_page(
-    props: &UIPageProps,
-) -> Html {
+pub fn ui_page(props: &UIPageProps) -> Html {
     if !props.global_vars.server_side_renderer {
         set_document_title(
             props.global_vars.site_title.to_owned(),
@@ -46,9 +43,9 @@ pub fn ui_page(
         mobile_active_class = "mobile-menu show-mobile-menu";
     }
 
-    let mut modal_html = html!{<></>};
+    let mut modal_html = html! {<></>};
     match &props.modal {
-        Some( modal ) => {
+        Some(modal) => {
             modal_html = modal.clone();
         }
         None => {}

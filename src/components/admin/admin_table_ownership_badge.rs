@@ -4,7 +4,6 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableOwnershipBadgeProps {
-
     pub current_user: User,
 
     #[prop_or_default]
@@ -20,14 +19,10 @@ pub struct AdminTableOwnershipBadgeProps {
     pub created_by: Option<PublicUserInfo>,
     #[prop_or_default]
     pub deleted_by: Option<PublicUserInfo>,
-
 }
 
 #[function_component(AdminTableOwnershipBadge)]
-pub fn admin_table_ownership_badge (
-    props: &AdminTableOwnershipBadgeProps,
-) -> Html {
-
+pub fn admin_table_ownership_badge(props: &AdminTableOwnershipBadgeProps) -> Html {
     // let mut created_by_html = html!(<></>);
     // let mut created_on_html = html!(<></>);
     let mut updated_on_html = html!(<></>);
@@ -46,12 +41,8 @@ pub fn admin_table_ownership_badge (
     // }
 
     match props.updated_by.clone() {
-        Some( user ) => {
-            updated_by_html = html!{ <>{user.name}</>}
-        }
-        None => {
-
-        }
+        Some(user) => updated_by_html = html! { <>{user.name}</>},
+        None => {}
     }
 
     // match props.created_on {
@@ -63,15 +54,14 @@ pub fn admin_table_ownership_badge (
     // }
 
     match props.updated_on.clone() {
-        Some( dt ) => {
-            updated_on_html = html!{ <>{props.current_user.format_datetime(dt, false, true, false)}</>}
+        Some(dt) => {
+            updated_on_html =
+                html! { <>{props.current_user.format_datetime(dt, false, true, false)}</>}
         }
-        None => {
-
-        }
+        None => {}
     }
 
-    return html!{
+    return html! {
 
         <div class="admin-table-created-updated small-text">
             // {created_by_html}<br />
@@ -86,5 +76,4 @@ pub fn admin_table_ownership_badge (
 
         </div>
     };
-
 }

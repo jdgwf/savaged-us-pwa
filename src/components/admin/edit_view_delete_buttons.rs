@@ -2,7 +2,6 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct EditViewDeleteButtonsProps {
-
     pub id: u32,
 
     pub name: AttrValue,
@@ -18,14 +17,10 @@ pub struct EditViewDeleteButtonsProps {
 
     #[prop_or_default]
     pub duplicate_callback: Option<Callback<u32>>,
-
 }
 
 #[function_component(EditViewDeleteButtons)]
-pub fn edit_view_delete_buttons(
-    props: &EditViewDeleteButtonsProps,
-) -> Html {
-
+pub fn edit_view_delete_buttons(props: &EditViewDeleteButtonsProps) -> Html {
     let view_callback: Option<Callback<u32>> = props.view_callback.clone();
     let edit_callback: Option<Callback<u32>> = props.edit_callback.clone();
     let delete_callback: Option<Callback<u32>> = props.delete_callback.clone();
@@ -34,24 +29,25 @@ pub fn edit_view_delete_buttons(
     let id = props.id;
 
     if view_callback == None
-        &&
-        edit_callback == None
-        &&
-        delete_callback == None
-        &&
-        duplicate_callback == None
+        && edit_callback == None
+        && delete_callback == None
+        && duplicate_callback == None
     {
-        return html!{
+        return html! {
             <div class="text-center small-text">{"No Access!"}</div>
         };
     }
 
-    let delete_title = "Click here to delete '".to_owned() + &props.name + "'. You will be asked to verify this action.";
+    let delete_title = "Click here to delete '".to_owned()
+        + &props.name
+        + "'. You will be asked to verify this action.";
     let edit_title = "Click here to delete '".to_owned() + &props.name + "'.";
-    let duplicate_title = "Click here to duplicate '".to_owned() + &props.name + "'. You will be asked to verify this action.";
+    let duplicate_title = "Click here to duplicate '".to_owned()
+        + &props.name
+        + "'. You will be asked to verify this action.";
     let view_title = "Click here to view '".to_owned() + &props.name + "'.";
 
-    return html!{
+    return html! {
         <td class="text-center no-wrap">
             if view_callback != None {
                 <button

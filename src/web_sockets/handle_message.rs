@@ -1,11 +1,3 @@
-use savaged_libs::player_character::game_data_package::GameDataPackage;
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
-use wasm_bindgen_futures::spawn_local;
-use yew::prelude::*;
-use savaged_libs::websocket_message::{
-    WebSocketMessage,
-    WebsocketMessageType,
-};
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
 use crate::local_storage::clear_game_data_local_data;
@@ -15,6 +7,11 @@ use crate::local_storage::index_db_save_game_data;
 use crate::local_storage::index_db_save_saves;
 use gloo_console::error;
 use gloo_console::log;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
+use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
 
 pub fn handle_message(
     msg: WebSocketMessage,
@@ -27,19 +24,16 @@ pub fn handle_message(
             new_global_vars.offline = false;
             new_global_vars.user_loading = false;
             match msg.user {
-                Some( user ) =>  {
+                Some(user) => {
                     // log!( format!("user {} {}", user.id, user.unread_notifications));
                     new_global_vars.current_user = user.clone();
                 }
-                None => {
-
-                }
+                None => {}
             }
 
             if new_global_vars.current_user.id > 0 {
                 let mut global_vars_future = new_global_vars.clone();
                 spawn_local(async move {
-
                     global_vars_future.game_data = get_game_data_from_index_db().await;
                     global_vars_future.saves = get_saves_from_index_db().await;
 
@@ -48,7 +42,6 @@ pub fn handle_message(
             } else {
                 let mut global_vars_future = new_global_vars.clone();
                 spawn_local(async move {
-
                     global_vars_future.game_data = get_game_data_from_index_db().await;
                     global_vars_future.saves = get_saves_from_index_db().await;
 
@@ -58,8 +51,11 @@ pub fn handle_message(
                     // global_vars_future.saves = global_vars_future.saves;
                     // global_vars_future.game_data = global_vars_future.game_data;
 
-                    let saves = global_vars_future.clone().saves.unwrap_or( Vec::new() );
-                    let game_data = &global_vars_future.clone().game_data.unwrap_or( GameDataPackage::default() );
+                    let saves = global_vars_future.clone().saves.unwrap_or(Vec::new());
+                    let game_data = &global_vars_future
+                        .clone()
+                        .game_data
+                        .unwrap_or(GameDataPackage::default());
 
                     // log!("new_global_vars.saves", saves.len());
                     // log!("game_data.books", game_data.books.len());
@@ -71,7 +67,6 @@ pub fn handle_message(
 
                         global_vars_future.game_data = None;
                         global_vars_future.saves = None;
-
                     }
 
                     update_global_vars.emit(global_vars_future);
@@ -80,7 +75,7 @@ pub fn handle_message(
 
                     msg.token = None;
                     msg.kind = WebsocketMessageType::GameDataPackage;
-                    new_global_vars.send_websocket.emit( msg );
+                    new_global_vars.send_websocket.emit(msg);
                 });
             }
 
@@ -93,29 +88,37 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::Offline => {
-            log!( format!("handle_message Offline {:?}", msg) );
+            log!(format!("handle_message Offline {:?}", msg));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = true;
             new_global_vars.user_loading = false;
-            update_global_vars.emit( new_global_vars );
+            update_global_vars.emit(new_global_vars);
         }
 
         WebsocketMessageType::GameDataPackage => {
-            log!( format!("handle_message GameDataPackage") );
+            log!(format!("handle_message GameDataPackage"));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.game_data = msg.game_data.clone();
 
-            let game_data_user_level = get_local_storage_string("game_data_user_level", "".to_owned() );
-            let game_data_last_updated = get_local_storage_string("game_data_last_updated", "".to_owned() );
+            let game_data_user_level =
+                get_local_storage_string("game_data_user_level", "".to_owned());
+            let game_data_last_updated =
+                get_local_storage_string("game_data_last_updated", "".to_owned());
 
-            log!( format!("handle_message GameDataPackage game_data_user_level {}", game_data_user_level) );
-            log!( format!("handle_message GameDataPackage game_data_last_updated {}", game_data_last_updated) );
+            log!(format!(
+                "handle_message GameDataPackage game_data_user_level {}",
+                game_data_user_level
+            ));
+            log!(format!(
+                "handle_message GameDataPackage game_data_last_updated {}",
+                game_data_last_updated
+            ));
             // new_global_vars.user_loading = false;
 
-            match  msg.game_data {
-                Some( game_data ) => {
+            match msg.game_data {
+                Some(game_data) => {
                     spawn_local(async move {
-                        let _results  = clear_game_data_local_data().await;
+                        let _results = clear_game_data_local_data().await;
                         let _results = index_db_save_game_data(game_data).await;
                         // log!( format!(" results, {:?}", results ) );
                     });
@@ -123,16 +126,15 @@ pub fn handle_message(
                 None => {}
             }
 
-            update_global_vars.emit( new_global_vars );
+            update_global_vars.emit(new_global_vars);
         }
 
         WebsocketMessageType::Saves => {
-
             let new_global_vars = global_vars.clone();
             let server_root = global_vars.server_root.to_owned();
 
             match msg.saves {
-                Some( saves ) => {
+                Some(saves) => {
                     // log!( format!("handle_message Saves {:?}", &saves) );
                     // for item in &saves {
                     //     if (&item.name).to_owned() == "Chi Master".to_owned() {
@@ -146,7 +148,6 @@ pub fn handle_message(
                         global_vars_future.saves = get_saves_from_index_db().await;
                         update_global_vars.emit(global_vars_future);
                     });
-
                 }
                 None => {}
             }
@@ -157,7 +158,7 @@ pub fn handle_message(
         }
 
         _ => {
-            error!( format!("Unhandled Message Type! {:?}", msg ) );
+            error!(format!("Unhandled Message Type! {:?}", msg));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             // global_vars.update_global_vars.emit( new_global_vars );

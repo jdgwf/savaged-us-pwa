@@ -2,7 +2,7 @@
 use crate::libs::global_vars::GlobalVars;
 use crate::menu_items::{get_menu_items, MenuItem};
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct MenuMobileProps {
@@ -10,10 +10,7 @@ pub struct MenuMobileProps {
 }
 
 #[function_component(MenuMobile)]
-pub fn menu_mobile(
-    props: &MenuMobileProps,
-) -> Html {
-
+pub fn menu_mobile(props: &MenuMobileProps) -> Html {
     let active_class = "".to_owned();
 
     html! {
@@ -74,14 +71,9 @@ pub fn menu_mobile(
     }
 }
 
-fn make_submenu(
-    menu: MenuItem,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn make_submenu(menu: MenuItem, global_vars: GlobalVars) -> Html {
     match &menu.submenu {
-        Some( submenu_items ) => {
-
+        Some(submenu_items) => {
             return html! {
 
                 <ul class="sub-menu">
@@ -123,10 +115,10 @@ fn make_submenu(
                 }
                 }).collect::<Html>()}
                 </ul>
-            }
+            };
         }
         None => {
-            return html!{<></>};
+            return html! {<></>};
         }
     }
 }

@@ -1,11 +1,11 @@
-use standard_components::ui::nbsp::Nbsp;
-use yew::{Html, html};
-use yew_router::prelude::Link;
-use savaged_libs::user::User;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRoute;
-use crate::{main_app::MainRoute, pages::{user::UserRoute}};
 use crate::pages::info::InfoRoute;
+use crate::{main_app::MainRoute, pages::user::UserRoute};
+use savaged_libs::user::User;
+use standard_components::ui::nbsp::Nbsp;
+use yew::{html, Html};
+use yew_router::prelude::Link;
 #[derive(Debug, Clone)]
 pub struct MenuItem {
     pub html: Option<Html>,
@@ -29,15 +29,11 @@ pub struct MenuItem {
     pub hardcoded: bool,
 }
 
-pub fn get_menu_items(
-    global_vars: &GlobalVars,
-) -> Vec<MenuItem> {
-
-    let mut menu = vec!(
+pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
+    let mut menu = vec![
         MenuItem {
-
             hardcoded: false,
-            html: Some( html!{
+            html: Some(html! {
                 <Link<MainRoute>
                     to={MainRoute::Home}
                 >
@@ -49,7 +45,6 @@ pub fn get_menu_items(
             wildcard_only: false,
             developer_only: false,
             admin_only: false,
-
 
             submenu: None,
 
@@ -65,7 +60,7 @@ pub fn get_menu_items(
         },
         MenuItem {
             hardcoded: false,
-            html: Some( html!{
+            html: Some(html! {
                 <Link<UserRoute>
                     to={UserRoute::UserSavesList}
                 >
@@ -88,71 +83,66 @@ pub fn get_menu_items(
             menu_tag: Some("main-my-stuff".to_owned()),
             sub_menu_tag: None,
 
-            submenu: Some(
-                vec![
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute>
-                                to={UserRoute::UserSavesList}
-                            >
-                                <i class="fa fa-boxes-stacked" /><Nbsp />
-                                {"My Saves"}
-                            </Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+            submenu: Some(vec![
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<UserRoute>
+                            to={UserRoute::UserSavesList}
+                        >
+                            <i class="fa fa-boxes-stacked" /><Nbsp />
+                            {"My Saves"}
+                        </Link<UserRoute>>
+                    }),
+                    registered_only: true,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
+                    submenu: None,
 
-                        submenu: None,
+                    link_class: None,
 
-                        link_class: None,
+                    title: "The My Saves Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "My Saves".to_owned(),
+                    url: None,
 
-                        title: "The My Saves Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "My Saves".to_owned(),
-                        url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("user-data-saves".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<UserRoute>
+                            to={UserRoute::UserCampaigns}
+                        >
+                            <i class="fa fa-dice" /><Nbsp />
+                            {"Campaigns"}
+                        </Link<UserRoute>>
+                    }),
+                    registered_only: true,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
-                        menu_tag: None,
-                        sub_menu_tag: Some("user-data-saves".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute>
-                                to={UserRoute::UserCampaigns}
-                            >
-                                <i class="fa fa-dice" /><Nbsp />
-                                {"Campaigns"}
-                            </Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+                    submenu: None,
 
+                    link_class: None,
 
-                        submenu: None,
+                    title: "The Campaigns Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Campaigns".to_owned(),
+                    url: None,
 
-                        link_class: None,
-
-                        title: "The Campaigns Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Campaigns".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("user-data-campaigns".to_owned()),
-                    },
-                ]
-            ),
-
+                    menu_tag: None,
+                    sub_menu_tag: Some("user-data-campaigns".to_owned()),
+                },
+            ]),
         },
         MenuItem {
             hardcoded: false,
-            html: Some( html!{
+            html: Some(html! {
                 <Link<InfoRoute>
                     to={InfoRoute::InfoAbout}
                 >
@@ -172,179 +162,168 @@ pub fn get_menu_items(
             menu_tag: Some("main-info".to_owned()),
             sub_menu_tag: None,
 
-            submenu: Some(
-                vec![
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoAbout}
-                            >
-                                <i class="fa fa-circle-info" /><Nbsp />
-                                {"About"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-                        link_class: None,
+            submenu: Some(vec![
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoAbout}
+                        >
+                            <i class="fa fa-circle-info" /><Nbsp />
+                            {"About"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
 
+                    submenu: None,
 
-                        submenu: None,
+                    title: "The About Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Info".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-about".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoContactUs}
+                        >
+                            <i class="fa fa-envelope" /><Nbsp />
+                            {"Contact Us"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
-                        title: "The About Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Info".to_owned(),
-                        url: None,
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-about".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoContactUs}
-                            >
-                                <i class="fa fa-envelope" /><Nbsp />
-                                {"Contact Us"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+                    link_class: None,
 
-                        link_class: None,
+                    submenu: None,
 
+                    title: "Contact Us".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Contact Us".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-contact-us".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoPartners}
+                        >
+                            <i class="fa fa-handshake" /><Nbsp />
+                            {"Partners"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
-                        submenu: None,
+                    link_class: None,
 
-                        title: "Contact Us".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Contact Us".to_owned(),
-                        url: None,
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-contact-us".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoPartners}
-                            >
-                                <i class="fa fa-handshake" /><Nbsp />
-                                {"Partners"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+                    submenu: None,
 
-                        link_class: None,
+                    title: "Our Partners".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Partners".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-partners".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoPrivacyPolicy}
+                        >
+                            <i class="fa fa-user-secret" /><Nbsp />
+                            {"Privacy Policy"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
+                    link_class: None,
 
-                        submenu: None,
+                    submenu: None,
 
-                        title: "Our Partners".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Partners".to_owned(),
-                        url: None,
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-partners".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoPrivacyPolicy}
-                            >
-                                <i class="fa fa-user-secret" /><Nbsp />
-                                {"Privacy Policy"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+                    title: "Our Privacy Policy".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Privacy Policy".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-privacy-policy".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoTech}
+                        >
+                            <i class="fa fa-microchip" /><Nbsp />
+                            {"Tech"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
-                        link_class: None,
+                    link_class: None,
 
+                    submenu: None,
 
-                        submenu: None,
+                    title: "The Technology Used Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Tech".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-tech".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<InfoRoute>
+                            to={InfoRoute::InfoTodos}
+                        >
+                            <i class="fa fa-list" /><Nbsp />
+                            {"To-Dos"}
+                        </Link<InfoRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
 
-                        title: "Our Privacy Policy".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Privacy Policy".to_owned(),
-                        url: None,
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-privacy-policy".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoTech}
-                            >
-                                <i class="fa fa-microchip" /><Nbsp />
-                                {"Tech"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
+                    link_class: None,
 
-                        link_class: None,
+                    submenu: None,
 
+                    title: "The To-Dos Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "To-Dos".to_owned(),
+                    url: None,
 
-                        submenu: None,
-
-                        title: "The Technology Used Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Tech".to_owned(),
-                        url: None,
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-tech".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<InfoRoute>
-                                to={InfoRoute::InfoTodos}
-                            >
-                                <i class="fa fa-list" /><Nbsp />
-                                {"To-Dos"}
-                            </Link<InfoRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-
-                        link_class: None,
-
-
-                        submenu: None,
-
-                        title: "The To-Dos Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "To-Dos".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("info-todos".to_owned()),
-                    },
-                ]
-            ),
-
-
+                    menu_tag: None,
+                    sub_menu_tag: Some("info-todos".to_owned()),
+                },
+            ]),
         },
+    ];
 
-    );
-
-    menu = _add_admin_tab( &global_vars, menu );
+    menu = _add_admin_tab(&global_vars, menu);
 
     menu.push(
 
@@ -573,138 +552,116 @@ pub fn get_menu_items(
     return menu;
 }
 
-fn _add_admin_tab(
-    global_vars: &GlobalVars,
-    mut menu: Vec<MenuItem>,
-) -> Vec<MenuItem> {
-
+fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<MenuItem> {
     if global_vars.current_user.has_developer_access() {
-        menu.push(
-            MenuItem {
-                hardcoded: false,
-                html: Some( html!{
-                    <Link<AdminRoute>
-                        to={AdminRoute::AdminHome}
-                    >
-                        <i class="fa fa-lock" /><Nbsp />
-                        {"Admin"}
-                    </Link<AdminRoute>>
-                }),
-                registered_only: false,
-                wildcard_only: false,
-                developer_only: false,
-                admin_only: false,
-                link_class: None,
+        menu.push(MenuItem {
+            hardcoded: false,
+            html: Some(html! {
+                <Link<AdminRoute>
+                    to={AdminRoute::AdminHome}
+                >
+                    <i class="fa fa-lock" /><Nbsp />
+                    {"Admin"}
+                </Link<AdminRoute>>
+            }),
+            registered_only: false,
+            wildcard_only: false,
+            developer_only: false,
+            admin_only: false,
+            link_class: None,
 
+            title: "The Administration Section".to_owned(),
+            icon_class: None, // "fa fa-house".to_owned(),
+            label: "Admin".to_owned(),
+            url: None,
+            menu_tag: Some("main-admin".to_owned()),
+            sub_menu_tag: None,
 
-                title: "The Administration Section".to_owned(),
-                icon_class: None, // "fa fa-house".to_owned(),
-                label: "Admin".to_owned(),
-                url: None,
-                menu_tag: Some("main-admin".to_owned()),
-                sub_menu_tag: None,
+            submenu: Some(vec![
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<AdminRoute>
+                            to={AdminRoute::AdminHome}
+                        >
+                            <i class="fa fa-lock" /><Nbsp />
+                            {"Home"}
+                        </Link<AdminRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
 
-                submenu: Some(
-                    vec![
-                        MenuItem {
-                            hardcoded: false,
-                            html: Some( html!{
-                                <Link<AdminRoute>
-                                    to={AdminRoute::AdminHome}
-                                >
-                                    <i class="fa fa-lock" /><Nbsp />
-                                    {"Home"}
-                                </Link<AdminRoute>>
-                            }),
-                            registered_only: false,
-                            wildcard_only: false,
-                            developer_only: false,
-                            admin_only: false,
-                            link_class: None,
+                    submenu: None,
 
+                    title: "Administration Home".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Administration Home".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("admin-home".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<AdminRoute>
+                            to={AdminRoute::AdminUsersList}
+                        >
+                            <i class="fa fa-users" /><Nbsp />
+                            {"Users"}
+                        </Link<AdminRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
 
-                            submenu: None,
+                    submenu: None,
 
-                            title: "Administration Home".to_owned(),
-                            icon_class: None, // "fa fa-house".to_owned(),
-                            label: "Administration Home".to_owned(),
-                            url: None,
-                            menu_tag: None,
-                            sub_menu_tag: Some("admin-home".to_owned()),
-                        },
-                        MenuItem {
-                            hardcoded: false,
-                            html: Some( html!{
-                                <Link<AdminRoute>
-                                    to={AdminRoute::AdminUsersList}
-                                >
-                                    <i class="fa fa-users" /><Nbsp />
-                                    {"Users"}
-                                </Link<AdminRoute>>
-                            }),
-                            registered_only: false,
-                            wildcard_only: false,
-                            developer_only: false,
-                            admin_only: false,
-                            link_class: None,
+                    title: "Users Administration".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Users".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("admin-users".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<AdminRoute>
+                            to={AdminRoute::AdminGameDataHome}
+                        >
+                            <i class="fa fa-dice" /><Nbsp />
+                            {"Game Data"}
+                        </Link<AdminRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
 
+                    title: "Game Data Administration".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Game Data".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("admin-game-data".to_owned()),
 
-                            submenu: None,
-
-                            title: "Users Administration".to_owned(),
-                            icon_class: None, // "fa fa-house".to_owned(),
-                            label: "Users".to_owned(),
-                            url: None,
-                            menu_tag: None,
-                            sub_menu_tag: Some("admin-users".to_owned()),
-                        },
-                        MenuItem {
-                            hardcoded: false,
-                            html: Some( html!{
-                                <Link<AdminRoute>
-                                    to={AdminRoute::AdminGameDataHome}
-                                >
-                                    <i class="fa fa-dice" /><Nbsp />
-                                    {"Game Data"}
-                                </Link<AdminRoute>>
-                            }),
-                            registered_only: false,
-                            wildcard_only: false,
-                            developer_only: false,
-                            admin_only: false,
-                            link_class: None,
-
-                            title: "Game Data Administration".to_owned(),
-                            icon_class: None, // "fa fa-house".to_owned(),
-                            label: "Game Data".to_owned(),
-                            url: None,
-                            menu_tag: None,
-                            sub_menu_tag: Some("admin-game-data".to_owned()),
-
-
-                            submenu: None,
-                        },
-                    ]
-                ),
-
-            },
-
-        );
+                    submenu: None,
+                },
+            ]),
+        });
     }
 
     return menu;
 }
 
-pub fn user_can_see_menu_item(
-    user: &User,
-    item: &MenuItem,
-) -> bool {
-
-    if !item.registered_only
-        && !item.wildcard_only
-        && !item.developer_only
-        && !item.admin_only
-    {
+pub fn user_can_see_menu_item(user: &User, item: &MenuItem) -> bool {
+    if !item.registered_only && !item.wildcard_only && !item.developer_only && !item.admin_only {
         return true;
     }
 

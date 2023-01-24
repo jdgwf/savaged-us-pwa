@@ -3,7 +3,7 @@ use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::UserRoute;
-use yew::{function_component, Properties, Html, html};
+use yew::{function_component, html, Html, Properties};
 use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
@@ -11,10 +11,7 @@ pub struct MenuMainProps {
     pub global_vars: GlobalVars,
 }
 #[function_component(MenuMain)]
-pub fn menu_main(
-    props: &MenuMainProps,
-) -> Html {
-
+pub fn menu_main(props: &MenuMainProps) -> Html {
     let current_submenu_tag = props.global_vars.current_sub_menu.clone();
     let current_menu_tag = props.global_vars.current_menu.clone();
 
@@ -85,9 +82,9 @@ pub fn menu_main(
     let mut login_class_active = "login-item".to_owned();
 
     if current_menu_tag == "main-userlogin".to_owned()
-    || current_menu_tag == "main-register".to_owned()
-    || current_menu_tag == "main-userforgotpassword".to_owned()
-    || current_menu_tag == "main-userrouter".to_owned()
+        || current_menu_tag == "main-register".to_owned()
+        || current_menu_tag == "main-userforgotpassword".to_owned()
+        || current_menu_tag == "main-userrouter".to_owned()
     {
         login_class_active = "login-item active".to_owned();
     }
@@ -204,4 +201,3 @@ pub fn menu_main(
         </>
     }
 }
-

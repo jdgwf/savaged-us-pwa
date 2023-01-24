@@ -1,27 +1,27 @@
-mod notifications;
-mod subscription;
 pub mod campaigns;
 pub mod forgot_password;
 pub mod login;
+mod notifications;
 pub mod register;
 pub mod saves;
 pub mod settings_api_key;
 pub mod settings_devices;
 pub mod settings_private;
 pub mod settings_public;
-use campaigns::UserCampaigns;
+mod subscription;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::error404::Error404;
+use campaigns::UserCampaigns;
 use notifications::UserNotifications;
-use saves::UserSavesRouter;
 use saves::list::UserSavesList;
+use saves::UserSavesRouter;
 use settings_api_key::SettingsAPIKey;
 use settings_devices::SettingsDevices;
 use settings_private::SettingsPrivate;
 use settings_public::SettingsPublic;
 use subscription::UserSubscription;
+use yew::html;
 use yew::prelude::*;
-use yew::{ html};
 use yew_router::prelude::*;
 
 #[derive(Clone, Routable, PartialEq)]
@@ -52,11 +52,7 @@ pub enum UserRoute {
     NotFound,
 }
 
-fn content_switch(
-    routes: UserRoute,
-    global_vars: GlobalVars,
-) -> Html {
-
+fn content_switch(routes: UserRoute, global_vars: GlobalVars) -> Html {
     let mut global_vars = global_vars.clone();
 
     if global_vars.current_user.id > 0 {
@@ -66,7 +62,6 @@ fn content_switch(
     }
 
     match routes {
-
         UserRoute::UserCampaigns => html! {
             <UserCampaigns
                 global_vars={global_vars}
@@ -131,54 +126,50 @@ pub struct UserRouterProps {
     pub global_vars: GlobalVars,
 }
 
-pub struct UserRouterMessage {
+pub struct UserRouterMessage {}
 
-}
-
-pub struct UserRouter {
-}
+pub struct UserRouter {}
 
 impl Component for UserRouter {
     type Message = UserRouterMessage;
     type Properties = UserRouterProps;
 
-    fn create(
-        _ctx: &Context<Self>
-    ) -> Self {
-
-        UserRouter {
-        }
+    fn create(_ctx: &Context<Self>) -> Self {
+        UserRouter {}
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>
-    ) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         // let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
         // let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
 
         if ctx.props().global_vars.server_side_renderer {
-            let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
+            let history = ctx
+                .props()
+                .global_vars
+                .server_side_renderer_history
+                .as_ref()
+                .unwrap()
+                .clone();
             let mut global_vars = ctx.props().global_vars.clone();
             global_vars.current_menu = "main-register".to_string();
             html! {
 
-                <Router
-                    history={history}
-                >
-                    <div class={"main-content"}>
-                        <Switch<UserRoute>
-                            render={
-                                move |routes|
-                                content_switch(
-                                    routes,
-                                    global_vars.clone(),
-                                )
-                            }
-                        />
-                    </div>
-                </Router>
-        }
+                    <Router
+                        history={history}
+                    >
+                        <div class={"main-content"}>
+                            <Switch<UserRoute>
+                                render={
+                                    move |routes|
+                                    content_switch(
+                                        routes,
+                                        global_vars.clone(),
+                                    )
+                                }
+                            />
+                        </div>
+                    </Router>
+            }
         } else {
             let global_vars = ctx.props().global_vars.clone();
             html! {
@@ -198,6 +189,5 @@ impl Component for UserRouter {
                 </BrowserRouter>
             }
         }
-
     }
 }

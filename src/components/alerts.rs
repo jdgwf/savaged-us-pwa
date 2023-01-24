@@ -1,6 +1,6 @@
-use crate::libs::{global_vars::GlobalVars};
+use crate::libs::global_vars::GlobalVars;
 use savaged_libs::alert_level::AlertLevel;
-use uuid::{Uuid};
+use uuid::Uuid;
 use yew::prelude::*;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -20,10 +20,8 @@ impl Default for AlertDefinition {
             text: None,
             uuid: Uuid::new_v4(),
             active_class: "".to_owned(),
-
         }
     }
-
 }
 
 #[derive(Properties, PartialEq)]
@@ -33,10 +31,7 @@ pub struct AlertsProps {
 }
 
 #[function_component(Alerts)]
-pub fn alerts_component(
-    props: &AlertsProps,
-) -> Html {
-
+pub fn alerts_component(props: &AlertsProps) -> Html {
     html! {
         <div class={"alerts-container"}>
 
@@ -94,5 +89,4 @@ pub fn alerts_component(
         </div>
 
     }
-
 }

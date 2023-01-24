@@ -9,35 +9,26 @@ pub struct UserSubscriptionProps {
     pub global_vars: GlobalVars,
 }
 
-pub enum UserSubscriptionMessage {
+pub enum UserSubscriptionMessage {}
 
-}
-
-pub struct UserSubscription {
-
-}
+pub struct UserSubscription {}
 
 impl Component for UserSubscription {
     type Message = UserSubscriptionMessage;
     type Properties = UserSubscriptionProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Subscriptions and Purchases".to_owned(), global_vars.server_side_renderer,);
-        UserSubscription {
-        }
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Subscriptions and Purchases".to_owned(),
+            global_vars.server_side_renderer,
+        );
+        UserSubscription {}
     }
 
-    fn update(
-        &mut self,
-        _ctx: &Context<Self>,
-        msg: UserSubscriptionMessage,
-    ) -> bool {
-
+    fn update(&mut self, _ctx: &Context<Self>, msg: UserSubscriptionMessage) -> bool {
         match msg {
 
             // SettingsPrivateMessage::UpdateCurrentUser( login_result ) => {
@@ -46,14 +37,9 @@ impl Component for UserSubscription {
             // }
 
         }
-
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
         global_vars.current_menu = "main-user-login".to_owned();
@@ -69,7 +55,7 @@ impl Component for UserSubscription {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if global_vars.current_user.id == 0 {
@@ -84,7 +70,7 @@ impl Component for UserSubscription {
                     {"You are not logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         global_vars.current_sub_menu = "settings-subscription".to_owned();
@@ -98,6 +84,5 @@ impl Component for UserSubscription {
                 <h2><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"TODO: My Subscriptions and Purchases"}</h2>
             </UIPage>
         }
-
     }
 }

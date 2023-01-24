@@ -1,3 +1,4 @@
+use super::UserRoute;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::update_user;
 use crate::libs::global_vars::GlobalVars;
@@ -9,7 +10,6 @@ use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::nbsp::Nbsp;
-use super::UserRoute;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -19,20 +19,20 @@ pub struct SettingsPrivateProps {
 }
 
 pub enum SettingsPrivateMessage {
-    UpdateVerifyPassword( String ),
-    UpdatePassword( String ),
-    UpdateFirstName( String ),
-    UpdateLastName( String ),
-    UpdateEmail( String ),
-    SaveInfo( MouseEvent ),
-    ResetInfo( MouseEvent ),
-    UpdateInformationSaved( String ),
-    PasswordsUpdated( String ),
-    SetReceiveNotifications( bool ),
-    SetTurnOffAdvanceOptions( bool ),
-    RemoveHiddenBanner( u32 ),
-    ResetPasswords( MouseEvent),
-    SavePasswords( MouseEvent),
+    UpdateVerifyPassword(String),
+    UpdatePassword(String),
+    UpdateFirstName(String),
+    UpdateLastName(String),
+    UpdateEmail(String),
+    SaveInfo(MouseEvent),
+    ResetInfo(MouseEvent),
+    UpdateInformationSaved(String),
+    PasswordsUpdated(String),
+    SetReceiveNotifications(bool),
+    SetTurnOffAdvanceOptions(bool),
+    RemoveHiddenBanner(u32),
+    ResetPasswords(MouseEvent),
+    SavePasswords(MouseEvent),
 }
 
 pub struct SettingsPrivate {
@@ -47,23 +47,20 @@ pub struct SettingsPrivate {
     verify_password: String,
 }
 
-fn check_passwords (
-    password: String,
-    verify_password: String,
-)-> ( String, String ) {
+fn check_passwords(password: String, verify_password: String) -> (String, String) {
     let mut message_class = "alert alert-info".to_owned();
-    let mut message_text = "To update your password, just type it twice in the fields above.".to_owned();
+    let mut message_text =
+        "To update your password, just type it twice in the fields above.".to_owned();
 
     if !password.is_empty() || !verify_password.is_empty() {
         message_class = "alert alert-warning".to_owned();
         message_text = "Be sure to fill in both fields!".to_owned();
 
-        if password.len() < 8  {
+        if password.len() < 8 {
             message_class = "alert alert-danger".to_owned();
             message_text = "Your password is too short!".to_owned();
         }
         if !password.is_empty() && !verify_password.is_empty() {
-
             if password == verify_password {
                 message_class = "alert alert-success".to_owned();
                 message_text = "Looks good! You're ready to set your password!".to_owned();
@@ -72,51 +69,48 @@ fn check_passwords (
                 message_text = "Your passwords do not match!".to_owned();
             }
         }
-
     }
 
-    return ( message_class, message_text );
+    return (message_class, message_text);
 }
 
 impl Component for SettingsPrivate {
     type Message = SettingsPrivateMessage;
     type Properties = SettingsPrivateProps;
 
-    fn create(
-        ctx: &Context<Self>
-    ) -> Self {
-
+    fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
-        set_document_title(global_vars.site_title.to_owned(), "Private Settings".to_owned(), global_vars.server_side_renderer,);
+        set_document_title(
+            global_vars.site_title.to_owned(),
+            "Private Settings".to_owned(),
+            global_vars.server_side_renderer,
+        );
         SettingsPrivate {
             current_user: global_vars.current_user.clone(),
             first_name: global_vars.current_user.first_name.to_owned(),
             last_name: global_vars.current_user.last_name.to_owned(),
             email: global_vars.current_user.email.to_owned(),
             update_info_message: "".to_owned(),
-            password_reset_message: "To update your password, just type it twice in the fields above.".to_owned(),
+            password_reset_message:
+                "To update your password, just type it twice in the fields above.".to_owned(),
             password_reset_class: "alert alert-info".to_owned(),
             password: "".to_owned(),
             verify_password: "".to_owned(),
         }
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: SettingsPrivateMessage,
-    ) -> bool {
-
+    fn update(&mut self, ctx: &Context<Self>, msg: SettingsPrivateMessage) -> bool {
         match msg {
-
-            SettingsPrivateMessage::SaveInfo( _event ) => {
-
+            SettingsPrivateMessage::SaveInfo(_event) => {
                 self.current_user.first_name = self.first_name.to_owned();
                 self.current_user.last_name = self.last_name.to_owned();
                 self.current_user.email = self.email.to_owned();
 
-                let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::UpdateInformationSaved).clone();
+                let updated_user_notification = ctx
+                    .link()
+                    .callback(SettingsPrivateMessage::UpdateInformationSaved)
+                    .clone();
                 let mut global_vars = ctx.props().global_vars.clone();
 
                 global_vars.current_user = self.current_user.clone();
@@ -134,16 +128,17 @@ impl Component for SettingsPrivate {
                 true
             }
 
-            SettingsPrivateMessage::ResetInfo( _event ) => {
-
+            SettingsPrivateMessage::ResetInfo(_event) => {
                 self.first_name = self.current_user.first_name.to_owned();
                 self.last_name = self.current_user.last_name.to_owned();
                 self.email = self.current_user.email.to_owned();
                 true
             }
-            SettingsPrivateMessage::SavePasswords( _event ) => {
-
-                let updated_user_notification = ctx.link().callback(SettingsPrivateMessage::PasswordsUpdated).clone();
+            SettingsPrivateMessage::SavePasswords(_event) => {
+                let updated_user_notification = ctx
+                    .link()
+                    .callback(SettingsPrivateMessage::PasswordsUpdated)
+                    .clone();
                 let mut global_vars = ctx.props().global_vars.clone();
 
                 global_vars.current_user = self.current_user.clone();
@@ -160,7 +155,7 @@ impl Component for SettingsPrivate {
                 true
             }
 
-            SettingsPrivateMessage::SetReceiveNotifications( new_value ) => {
+            SettingsPrivateMessage::SetReceiveNotifications(new_value) => {
                 self.current_user.notify_email = new_value;
 
                 let mut global_vars = ctx.props().global_vars.clone();
@@ -179,7 +174,7 @@ impl Component for SettingsPrivate {
                 true
             }
 
-            SettingsPrivateMessage::SetTurnOffAdvanceOptions( new_value ) => {
+            SettingsPrivateMessage::SetTurnOffAdvanceOptions(new_value) => {
                 self.current_user.turn_off_advance_limits = new_value;
 
                 let mut global_vars = ctx.props().global_vars.clone();
@@ -199,77 +194,78 @@ impl Component for SettingsPrivate {
                 true
             }
 
-            SettingsPrivateMessage::UpdateInformationSaved( message ) => {
+            SettingsPrivateMessage::UpdateInformationSaved(message) => {
                 self.update_info_message = message.clone();
                 true
             }
 
-            SettingsPrivateMessage::PasswordsUpdated( _message ) => {
+            SettingsPrivateMessage::PasswordsUpdated(_message) => {
                 self.password = "".to_owned();
                 self.verify_password = "".to_owned();
                 self.password_reset_class = "alert alert-success".to_owned();
-                self.password_reset_message = "Congratulations! Your password has been reset!".to_owned();
+                self.password_reset_message =
+                    "Congratulations! Your password has been reset!".to_owned();
                 true
             }
 
-            SettingsPrivateMessage::ResetPasswords( _event ) => {
+            SettingsPrivateMessage::ResetPasswords(_event) => {
                 self.password_reset_class = "alert alert-info".to_owned();
-                self.password_reset_message = "To update your password, just type it twice in the fields above.".to_owned();
+                self.password_reset_message =
+                    "To update your password, just type it twice in the fields above.".to_owned();
                 self.password = "".to_owned();
                 self.verify_password = "".to_owned();
                 true
             }
 
-            SettingsPrivateMessage::UpdateVerifyPassword( new_value ) => {
-
+            SettingsPrivateMessage::UpdateVerifyPassword(new_value) => {
                 self.verify_password = new_value.to_owned();
-                (self.password_reset_class, self.password_reset_message) = check_passwords( self.password.clone(), self.verify_password.clone() );
+                (self.password_reset_class, self.password_reset_message) =
+                    check_passwords(self.password.clone(), self.verify_password.clone());
                 true
             }
-            SettingsPrivateMessage::UpdatePassword( new_value ) => {
-
+            SettingsPrivateMessage::UpdatePassword(new_value) => {
                 self.password = new_value.to_owned();
-                (self.password_reset_class, self.password_reset_message) = check_passwords( self.password.clone(), self.verify_password.clone() );
+                (self.password_reset_class, self.password_reset_message) =
+                    check_passwords(self.password.clone(), self.verify_password.clone());
                 true
             }
 
-            SettingsPrivateMessage::UpdateFirstName( new_value ) => {
-
+            SettingsPrivateMessage::UpdateFirstName(new_value) => {
                 self.first_name = new_value.to_owned();
                 true
             }
-            SettingsPrivateMessage::UpdateLastName( new_value ) => {
+            SettingsPrivateMessage::UpdateLastName(new_value) => {
                 self.last_name = new_value.to_owned();
                 true
             }
-            SettingsPrivateMessage::UpdateEmail( new_value ) => {
+            SettingsPrivateMessage::UpdateEmail(new_value) => {
                 self.email = new_value.to_owned();
                 true
             }
 
-            SettingsPrivateMessage::RemoveHiddenBanner( remove_id ) => {
-
+            SettingsPrivateMessage::RemoveHiddenBanner(remove_id) => {
                 let mut hidden_banners: Vec<HiddenBanner> = Vec::new();
                 let mut new_hidden_banners: Vec<HiddenBanner> = Vec::new();
-                let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.current_user.hidden_banners.as_ref() );
+                let hidden_banners_result: Result<Vec<HiddenBanner>, serde_json::Error> =
+                    serde_json::from_str(&self.current_user.hidden_banners.as_ref());
                 match hidden_banners_result {
-                    Ok( post_val ) => {
+                    Ok(post_val) => {
                         hidden_banners = post_val;
                     }
-                    Err( err ) => {
+                    Err(err) => {
                         error!("SettingsPrivateMessage::RemoveHiddenBanner hidden_banners_result data parse error", err.to_string());
                     }
                 }
 
                 for banner in hidden_banners.into_iter() {
                     if banner.id != remove_id {
-                        new_hidden_banners.push( banner.clone() );
+                        new_hidden_banners.push(banner.clone());
                     }
                 }
 
-                let to_string_result = serde_json::to_string( &new_hidden_banners);
+                let to_string_result = serde_json::to_string(&new_hidden_banners);
                 match to_string_result {
-                    Ok( string_value ) => {
+                    Ok(string_value) => {
                         self.current_user.hidden_banners = string_value.clone();
                         let mut global_vars = ctx.props().global_vars.clone();
 
@@ -284,24 +280,15 @@ impl Component for SettingsPrivate {
                             false,
                         );
                     }
-                    Err( _error ) => {
-
-                    }
+                    Err(_error) => {}
                 }
 
                 true
             }
-
         }
-
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &SettingsPrivateProps,
-    ) -> bool {
-
+    fn changed(&mut self, ctx: &Context<Self>, _props: &SettingsPrivateProps) -> bool {
         self.current_user = ctx.props().global_vars.current_user.clone();
 
         self.first_name = self.current_user.first_name.to_owned();
@@ -311,11 +298,7 @@ impl Component for SettingsPrivate {
         true
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
 
@@ -334,7 +317,7 @@ impl Component for SettingsPrivate {
                     {"Loading..."}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         if ctx.props().global_vars.current_user.id == 0 {
@@ -349,29 +332,30 @@ impl Component for SettingsPrivate {
                     {"You are not logged in!"}
                 </div>
                 </UIPage>
-            }
+            };
         }
 
         let mut your_info_save_disabled = true;
 
-        if
-            self.first_name != self.current_user.first_name
-                ||
-            self.last_name != self.current_user.last_name
-                ||
-            self.email != self.current_user.email
+        if self.first_name != self.current_user.first_name
+            || self.last_name != self.current_user.last_name
+            || self.email != self.current_user.email
         {
             your_info_save_disabled = false;
         }
 
         let mut hidden_banners: Vec<HiddenBanner> = Vec::new();
-        let hidden_banners_result : Result<Vec<HiddenBanner>, serde_json::Error> = serde_json::from_str(  &self.current_user.hidden_banners.as_ref() );
+        let hidden_banners_result: Result<Vec<HiddenBanner>, serde_json::Error> =
+            serde_json::from_str(&self.current_user.hidden_banners.as_ref());
         match hidden_banners_result {
-            Ok( post_val ) => {
+            Ok(post_val) => {
                 hidden_banners = post_val;
             }
-            Err( err ) => {
-                error!("view() hidden_banners_result data parse error", err.to_string());
+            Err(err) => {
+                error!(
+                    "view() hidden_banners_result data parse error",
+                    err.to_string()
+                );
             }
         }
 
@@ -556,6 +540,5 @@ impl Component for SettingsPrivate {
             </div>
             </UIPage>
         }
-
     }
 }

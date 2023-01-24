@@ -1,6 +1,6 @@
-use chrono::Utc;
 use crate::libs::fetch_api::upload_user_image;
 use crate::libs::global_vars::GlobalVars;
+use chrono::Utc;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::File;
 use web_sys::HtmlInputElement;
@@ -14,13 +14,13 @@ pub struct ImageUploaderProps {
     pub image_name: String,
     pub upload_url: String,
     pub image_style: String,
-    pub on_changed_callback: Callback< String >,
+    pub on_changed_callback: Callback<String>,
     pub is_default_image: bool,
 }
 
- pub enum ImageUploaderMessage {
+pub enum ImageUploaderMessage {
     SelectFile(Option<File>),
-    ClearFile( MouseEvent ),
+    ClearFile(MouseEvent),
 }
 
 pub struct ImageUploader {
@@ -34,9 +34,7 @@ impl Component for ImageUploader {
     type Message = ImageUploaderMessage;
     type Properties = ImageUploaderProps;
 
-    fn create(
-        ctx: &Context<Self>,
-    ) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         ImageUploader {
             image_url: ctx.props().image_url.clone(),
             image_name: ctx.props().image_name.clone(),
@@ -45,22 +43,14 @@ impl Component for ImageUploader {
         }
     }
 
-    fn changed(
-        &mut self,
-        ctx: &Context<Self>,
-        _props: &ImageUploaderProps,
-    ) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _props: &ImageUploaderProps) -> bool {
         self.image_url = ctx.props().image_url.clone();
         self.image_name = ctx.props().image_name.clone();
         self.upload_url = ctx.props().upload_url.clone();
         true
     }
 
-    fn update(
-        &mut self,
-        ctx: &Context<Self>,
-        msg: ImageUploaderMessage,
-    ) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: ImageUploaderMessage) -> bool {
         match msg {
             ImageUploaderMessage::SelectFile(file) => {
                 self.file = file.clone();
@@ -68,39 +58,31 @@ impl Component for ImageUploader {
                 let login_token = ctx.props().global_vars.login_token.clone();
                 let file = file.clone();
                 let upload_url_callback = ctx.props().on_changed_callback.clone();
-                spawn_local (
-                    async move {
-
-                        let _ = upload_user_image(
-                            api_root,
-                            login_token,
-                            "user".to_owned(),
-                            file.clone(),
-                            upload_url_callback, // for now
-                            true, // crop square for user image
-                        ).await;
-                    }
-                );
+                spawn_local(async move {
+                    let _ = upload_user_image(
+                        api_root,
+                        login_token,
+                        "user".to_owned(),
+                        file.clone(),
+                        upload_url_callback, // for now
+                        true,                // crop square for user image
+                    )
+                    .await;
+                });
 
                 false
-
-            },
-            ImageUploaderMessage::ClearFile( _e ) => {
+            }
+            ImageUploaderMessage::ClearFile(_e) => {
                 self.file = None;
                 self.image_url = "".to_owned();
-                ctx.props().on_changed_callback.emit( "".to_owned() );
+                ctx.props().on_changed_callback.emit("".to_owned());
 
                 true
-            },
+            }
         }
-
     }
 
-    fn view(
-        &self,
-        ctx: &Context<Self>,
-    ) -> Html {
-
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let image_style = ctx.props().image_style.clone();
         let label = ctx.props().label.clone();
 
@@ -111,12 +93,10 @@ impl Component for ImageUploader {
             let file_list = input.files();
 
             match file_list {
-                Some( files )  => {
-                    select_file_callback.emit( files.item(0) );
+                Some(files) => {
+                    select_file_callback.emit(files.item(0));
                 }
-                None => {
-
-                }
+                None => {}
             }
         };
 
@@ -160,6 +140,5 @@ impl Component for ImageUploader {
             </div>
 
         }
-
     }
 }
