@@ -38,13 +38,14 @@ impl Component for ForgotPassword {
         ctx: &Context<Self>,
     ) -> Html {
 
-        let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_menu = "main-user-forgot-password".to_string();
         if global_vars.user_loading {
             return html! {
                 <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Forgot Password"
-                submenu_tag={"".to_owned()}
+
             >
                 <div class={"text-center"}>
                     <br />
@@ -58,7 +59,7 @@ impl Component for ForgotPassword {
                 <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Forgot Password"
-                submenu_tag={"".to_owned()}
+
             >                <div class={"text-center"}>
                     <br />
                     {"You are already logged in!"}
@@ -70,7 +71,7 @@ impl Component for ForgotPassword {
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Forgot Password"
-                submenu_tag={"".to_owned()}
+
             >
                 <h2><i class={"fa-solid fa-cogs"}></i><Nbsp />{"TODO: Forgot Password"}</h2>
             </UIPage>

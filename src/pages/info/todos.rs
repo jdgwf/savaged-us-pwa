@@ -15,14 +15,13 @@ pub fn info_todos(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
-    global_vars.current_menu = "main-info".to_owned();
+
     global_vars.current_sub_menu = "info-todos".to_owned();
 
     html! {
     <UIPage
         global_vars={global_vars}
         page_title="Development To-Dos"
-        submenu_tag={"info".to_owned()}
     >
     <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
             <div class={"row"}>

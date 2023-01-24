@@ -464,7 +464,7 @@ impl Component for UserNotifications {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -479,7 +479,7 @@ impl Component for UserNotifications {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -491,13 +491,13 @@ impl Component for UserNotifications {
 
         let mut global_vars = ctx.props().global_vars.clone();
 
-        global_vars.current_sub_menu = "settings_notifications".to_owned();
-
+        global_vars.current_sub_menu = "settings-notifications".to_owned();
+        global_vars.current_menu = "main-user-login".to_owned();
         html! {
         <UIPage
             global_vars={global_vars}
             page_title="Notifications"
-            submenu_tag={"user".to_owned()}
+
         >
                 <h2><i class={"fa-solid fa-radio"}></i><Nbsp />{"My Notifications"}</h2>
                 <div>

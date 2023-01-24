@@ -63,7 +63,7 @@ impl Component for UserSavesView {
 
         let mut global_vars = ctx.props().global_vars.clone();
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
+        // global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
         if global_vars.user_loading {
@@ -72,7 +72,7 @@ impl Component for UserSavesView {
             <UIPage
                 global_vars={global_vars}
                 page_title="My Saves"
-                submenu_tag={"user-data".to_owned()}
+
             >
                 <div class={"text-center"}>
                     <br />
@@ -88,7 +88,7 @@ impl Component for UserSavesView {
                 <UIPage
                     global_vars={global_vars}
                     page_title="My Saves"
-                    submenu_tag={"user-data".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -166,7 +166,7 @@ impl Component for UserSavesView {
                     <UIPage
                         global_vars={global_vars.clone()}
                         page_title="Viewing Save"
-                        submenu_tag={"user-data".to_owned()}
+
                     >
                         <strong>{"Save UUID:"}</strong><Nbsp />{&save.uuid}<br />
                         <strong>{"Save Name:"}</strong><Nbsp />{&save.name}<br />

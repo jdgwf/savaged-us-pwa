@@ -24,7 +24,7 @@ pub fn admin_game_data_home(
     <UIPage
         global_vars={global_vars}
         page_title="Game Data Administration"
-        submenu_tag={"admin".to_owned()}
+
     >
 
     <TertiaryLinksMenu

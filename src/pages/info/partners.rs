@@ -13,14 +13,12 @@ pub fn info_partners(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
-    global_vars.current_menu = "main-info".to_owned();
     global_vars.current_sub_menu = "info-partners".to_owned();
 
     html! {
     <UIPage
         global_vars={global_vars}
         page_title="Our Partners"
-        submenu_tag={"info".to_owned()}
     >
             <h2><i class="fa fa-handshake" /><Nbsp />{"Partners TODO"}</h2>
 

@@ -14,7 +14,6 @@ pub struct MenuItem {
     pub developer_only: bool,
     pub admin_only: bool,
 
-    pub submenu_tag: Option<String>,
     pub submenu: Option<Vec<MenuItem>>,
 
     pub link_class: Option<String>,
@@ -24,8 +23,8 @@ pub struct MenuItem {
     pub title: String,
     pub icon_class: Option<String>,
 
-    pub menu_tag: String,
-    pub sub_menu_tag: String,
+    pub menu_tag: Option<String>,
+    pub sub_menu_tag: Option<String>,
 
     pub hardcoded: bool,
 }
@@ -51,7 +50,7 @@ pub fn get_menu_items(
             developer_only: false,
             admin_only: false,
 
-            submenu_tag: None,
+
             submenu: None,
 
             link_class: None,
@@ -61,8 +60,8 @@ pub fn get_menu_items(
             label: "Home".to_owned(),
             url: None,
 
-            menu_tag: "main-home".to_owned(),
-            sub_menu_tag: "".to_owned(),
+            menu_tag: Some("main-home".to_owned()),
+            sub_menu_tag: None,
         },
         MenuItem {
             hardcoded: false,
@@ -79,7 +78,16 @@ pub fn get_menu_items(
             developer_only: false,
             admin_only: false,
 
-            submenu_tag: Some("user-data".to_owned()),
+            link_class: None,
+
+            title: "Your Data".to_owned(),
+            icon_class: None, // "fa fa-house".to_owned(),
+            label: "My Stuff".to_owned(),
+            url: None,
+
+            menu_tag: Some("main-my-stuff".to_owned()),
+            sub_menu_tag: None,
+
             submenu: Some(
                 vec![
                     MenuItem {
@@ -97,7 +105,7 @@ pub fn get_menu_items(
                         developer_only: false,
                         admin_only: false,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         link_class: None,
@@ -107,8 +115,8 @@ pub fn get_menu_items(
                         label: "My Saves".to_owned(),
                         url: None,
 
-                        menu_tag: "main-my-stuff".to_owned(),
-                        sub_menu_tag: "user-data-saves".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("user-data-saves".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -125,7 +133,7 @@ pub fn get_menu_items(
                         developer_only: false,
                         admin_only: false,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         link_class: None,
@@ -135,20 +143,12 @@ pub fn get_menu_items(
                         label: "Campaigns".to_owned(),
                         url: None,
 
-                        menu_tag: "main-my-stuff".to_owned(),
-                        sub_menu_tag: "user-data-campaigns".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("user-data-campaigns".to_owned()),
                     },
                 ]
             ),
-            link_class: None,
 
-            title: "The About Page".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "About".to_owned(),
-            url: None,
-
-            menu_tag: "main-my-stuff".to_owned(),
-            sub_menu_tag: "".to_owned(),
         },
         MenuItem {
             hardcoded: false,
@@ -165,8 +165,13 @@ pub fn get_menu_items(
             developer_only: false,
             admin_only: false,
             link_class: None,
+            title: "The About Page".to_owned(),
+            icon_class: None, // "fa fa-house".to_owned(),
+            label: "About".to_owned(),
+            url: None,
+            menu_tag: Some("main-info".to_owned()),
+            sub_menu_tag: None,
 
-            submenu_tag: Some("info".to_string()),
             submenu: Some(
                 vec![
                     MenuItem {
@@ -185,15 +190,15 @@ pub fn get_menu_items(
                         admin_only: false,
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The About Page".to_owned(),
                         icon_class: None, // "fa fa-house".to_owned(),
                         label: "Info".to_owned(),
                         url: None,
-                        menu_tag: "info-about".to_owned(),
-                        sub_menu_tag: "info-about".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-about".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -212,15 +217,15 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "Contact Us".to_owned(),
                         icon_class: None, // "fa fa-house".to_owned(),
                         label: "Contact Us".to_owned(),
                         url: None,
-                        menu_tag: "info-contact-us".to_owned(),
-                        sub_menu_tag: "info-contact-us".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-contact-us".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -239,15 +244,15 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "Our Partners".to_owned(),
                         icon_class: None, // "fa fa-house".to_owned(),
                         label: "Partners".to_owned(),
                         url: None,
-                        menu_tag: "info-partners".to_owned(),
-                        sub_menu_tag: "info-partners".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-partners".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -266,15 +271,15 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "Our Privacy Policy".to_owned(),
                         icon_class: None, // "fa fa-house".to_owned(),
                         label: "Privacy Policy".to_owned(),
                         url: None,
-                        menu_tag: "info-privacy-policy".to_owned(),
-                        sub_menu_tag: "info-privacy-policy".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-privacy-policy".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -293,15 +298,15 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Technology Used Page".to_owned(),
                         icon_class: None, // "fa fa-house".to_owned(),
                         label: "Tech".to_owned(),
                         url: None,
-                        menu_tag: "info-tech".to_owned(),
-                        sub_menu_tag: "info-tech".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-tech".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -320,7 +325,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The To-Dos Page".to_owned(),
@@ -328,18 +333,13 @@ pub fn get_menu_items(
                         label: "To-Dos".to_owned(),
                         url: None,
 
-                        menu_tag: "info-todos".to_owned(),
-                        sub_menu_tag: "info-todos".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("info-todos".to_owned()),
                     },
                 ]
             ),
 
-            title: "The About Page".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "About".to_owned(),
-            url: None,
-            menu_tag: "main-info".to_owned(),
-            sub_menu_tag: "".to_owned(),
+
         },
 
     );
@@ -367,7 +367,14 @@ pub fn get_menu_items(
 
             link_class: None,
 
-            submenu_tag: Some("user".to_owned()),
+            title: "Settings".to_owned(),
+            icon_class: None, // "fa fa-house".to_owned(),
+            label: "Settings".to_owned(),
+            url: None,
+
+            menu_tag: Some("main-user-login".to_owned()),
+            sub_menu_tag: None,
+
             submenu: Some(
                 vec![
                     MenuItem {
@@ -387,7 +394,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Private Settings Page".to_owned(),
@@ -395,8 +402,8 @@ pub fn get_menu_items(
                         label: "Private Settings".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_private".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-private".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -415,7 +422,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Public Settings Page".to_owned(),
@@ -423,8 +430,8 @@ pub fn get_menu_items(
                         label: "Public Settings".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_public".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-public".to_owned()),
                     },
 
                     MenuItem {
@@ -452,7 +459,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Notifications Page".to_owned(),
@@ -460,8 +467,8 @@ pub fn get_menu_items(
                         label: "Notifications".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_notifications".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-notifications".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -475,7 +482,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Subscription Page".to_owned(),
@@ -483,8 +490,8 @@ pub fn get_menu_items(
                         label: "Subscription".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_subscription".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-subscription".to_owned()),
                     },
                     MenuItem {
                         hardcoded: false,
@@ -498,7 +505,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The Devices Page".to_owned(),
@@ -506,8 +513,8 @@ pub fn get_menu_items(
                         label: "Devices Settings".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_devices".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-devices".to_owned()),
                     },
 
                     MenuItem {
@@ -522,7 +529,7 @@ pub fn get_menu_items(
 
                         link_class: None,
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "The API Key Page".to_owned(),
@@ -530,8 +537,8 @@ pub fn get_menu_items(
                         label: "API Key".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_apikey".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-apikey".to_owned()),
                     },
 
                     MenuItem {
@@ -546,7 +553,7 @@ pub fn get_menu_items(
 
                         link_class: Some("logout-item".to_string()),
 
-                        submenu_tag: None,
+
                         submenu: None,
 
                         title: "Click here to log out".to_owned(),
@@ -554,19 +561,12 @@ pub fn get_menu_items(
                         label: "Logout".to_owned(),
                         url: None,
 
-                        menu_tag: "user-login".to_owned(),
-                        sub_menu_tag: "settings_logout".to_owned(),
+                        menu_tag: None,
+                        sub_menu_tag: Some("settings-logout".to_owned()),
                     },
                 ]
             ),
 
-            title: "Settings".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "Settings".to_owned(),
-            url: None,
-
-            menu_tag: "user-login".to_owned(),
-            sub_menu_tag: "".to_owned(),
         },
     );
 
@@ -596,14 +596,13 @@ fn _add_admin_tab(
                 admin_only: false,
                 link_class: None,
 
-                submenu_tag: Some("admin".to_string()),
 
                 title: "The Administration Section".to_owned(),
                 icon_class: None, // "fa fa-house".to_owned(),
-                label: "About".to_owned(),
+                label: "Admin".to_owned(),
                 url: None,
-                menu_tag: "main-admin".to_owned(),
-                sub_menu_tag: "".to_owned(),
+                menu_tag: Some("main-admin".to_owned()),
+                sub_menu_tag: None,
 
                 submenu: Some(
                     vec![
@@ -623,15 +622,15 @@ fn _add_admin_tab(
                             admin_only: false,
                             link_class: None,
 
-                            submenu_tag: None,
+
                             submenu: None,
 
                             title: "Administration Home".to_owned(),
                             icon_class: None, // "fa fa-house".to_owned(),
                             label: "Administration Home".to_owned(),
                             url: None,
-                            menu_tag: "admin-home".to_owned(),
-                            sub_menu_tag: "admin-home".to_owned(),
+                            menu_tag: None,
+                            sub_menu_tag: Some("admin-home".to_owned()),
                         },
                         MenuItem {
                             hardcoded: false,
@@ -649,15 +648,15 @@ fn _add_admin_tab(
                             admin_only: false,
                             link_class: None,
 
-                            submenu_tag: None,
+
                             submenu: None,
 
                             title: "Users Administration".to_owned(),
                             icon_class: None, // "fa fa-house".to_owned(),
                             label: "Users".to_owned(),
                             url: None,
-                            menu_tag: "admin-users".to_owned(),
-                            sub_menu_tag: "admin-users".to_owned(),
+                            menu_tag: None,
+                            sub_menu_tag: Some("admin-users".to_owned()),
                         },
                         MenuItem {
                             hardcoded: false,
@@ -679,10 +678,10 @@ fn _add_admin_tab(
                             icon_class: None, // "fa fa-house".to_owned(),
                             label: "Game Data".to_owned(),
                             url: None,
-                            menu_tag: "admin-game-data".to_owned(),
-                            sub_menu_tag: "admin-game-data".to_owned(),
+                            menu_tag: None,
+                            sub_menu_tag: Some("admin-game-data".to_owned()),
 
-                            submenu_tag: None,
+
                             submenu: None,
                         },
                     ]

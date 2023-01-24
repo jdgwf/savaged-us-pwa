@@ -153,7 +153,7 @@ impl Component for AdminUsersList {
         <UIPage
             global_vars={global_vars.clone()}
             page_title="Admin Users"
-            submenu_tag={"admin".to_owned()}
+
         >
 
         <div class="pull-right">
@@ -161,7 +161,7 @@ impl Component for AdminUsersList {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
-                global_vars={ctx.props().global_vars.clone()}
+                global_vars={global_vars.clone()}
             />
         </div>
                 <h2><i class="fa fa-users" /><Nbsp />{"Admin Users"}</h2>

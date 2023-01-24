@@ -56,13 +56,13 @@ impl Component for UserSubscription {
 
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
-
+        global_vars.current_menu = "main-user-login".to_owned();
         if global_vars.user_loading {
             return html! {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -77,7 +77,7 @@ impl Component for UserSubscription {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -87,13 +87,13 @@ impl Component for UserSubscription {
             }
         }
 
-        global_vars.current_sub_menu = "settings_subscription".to_owned();
+        global_vars.current_sub_menu = "settings-subscription".to_owned();
 
         html! {
             <UIPage
                 global_vars={global_vars}
                 page_title="Subscriptions"
-                submenu_tag={"user".to_owned()}
+
             >
                 <h2><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"TODO: My Subscriptions and Purchases"}</h2>
             </UIPage>

@@ -37,14 +37,16 @@ impl Component for Register {
         ctx: &Context<Self>,
     ) -> Html {
 
-        let global_vars = ctx.props().global_vars.clone();
+        let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_menu = "main-register".to_string();
         if global_vars.user_loading {
             return html! {
                 <UIPage
-                global_vars={global_vars.clone()}
-                page_title="Register"
-                submenu_tag={"".to_owned()}
-            >                <div class={"text-center"}>
+                    global_vars={global_vars.clone()}
+                    page_title="Register"
+
+                >
+                <div class={"text-center"}>
                     <br />
                     {"Loading..."}
                 </div>
@@ -54,13 +56,14 @@ impl Component for Register {
         if global_vars.current_user.id > 0 {
             return html! {
                 <UIPage
-                global_vars={global_vars.clone()}
-                page_title="Register"
-                submenu_tag={"".to_owned()}
-            >                <div class={"text-center"}>
-                    <br />
-                    {"You are already logged in!"}
-                </div>
+                    global_vars={global_vars.clone()}
+                    page_title="Register"
+
+                >
+                    <div class={"text-center"}>
+                        <br />
+                        {"You are already logged in!"}
+                    </div>
                 </UIPage>
             }
         }
@@ -68,7 +71,7 @@ impl Component for Register {
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Register"
-                submenu_tag={"".to_owned()}
+
             >
 
                 <h2><i class={"fa-solid fa-cogs"}></i><Nbsp />{"TODO: Register"}</h2>

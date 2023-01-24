@@ -1,5 +1,9 @@
 use chrono::Utc;
+use crate::components::edit_forms::armor::EditArmor;
+use crate::components::edit_forms::edge::EditEdge;
+use crate::components::edit_forms::gear::EditGear;
 use crate::components::edit_forms::hindrance::EditHindrance;
+use crate::components::edit_forms::weapon::EditWeapon;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::{index_db_put_save, get_saves_from_index_db};
@@ -38,6 +42,18 @@ pub enum UserSavesEditMessage {
 
     UpdateHindrance(Hindrance),
     SaveHindrance(bool),
+
+    UpdateEdge(Edge),
+    SaveEdge(bool),
+
+    UpdateArmor(Armor),
+    SaveArmor(bool),
+
+    UpdateGear(Gear),
+    SaveGear(bool),
+
+    UpdateWeapon(Weapon),
+    SaveWeapon(bool),
 
 }
 pub struct UserSavesEdit {
@@ -168,6 +184,7 @@ impl Component for UserSavesEdit {
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
+                        log!( format!("create - setting Armor Data\n{}", &save.data) );
                         editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
@@ -267,6 +284,138 @@ impl Component for UserSavesEdit {
                 }
             }
 
+            UserSavesEditMessage::UpdateArmor( new_value ) => {
+                // log!("ChangeFilter", filter_type);
+                self.editing_armor = Some(new_value);
+            }
+            UserSavesEditMessage::SaveArmor( _new_value ) => {
+                let editing_armor = self.editing_armor.clone();
+                let mut save = self.save.clone().unwrap();
+                let close_callback = UserSavesEditMessage::Cancel.clone();
+                match editing_armor {
+                    Some( editing_armor ) => {
+                        let item = editing_armor.clone();
+                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        save.data = serde_json::to_string(&item).unwrap();
+                        save.name = item.name;
+                        save.updated_on =  Some(Utc::now());
+                        save.updated_by =  global_vars.current_user.id;
+                        close_callback( true );
+                        spawn_local(
+                            async move {
+                                index_db_put_save( server_root, save).await;
+                                global_vars.saves = get_saves_from_index_db().await;
+                                update_global_vars.emit( global_vars );
+
+                            }
+                        );
+                        self.close_and_cancel();
+                    }
+                    None => {}
+                }
+            }
+
+            UserSavesEditMessage::UpdateGear( new_value ) => {
+                // log!("ChangeFilter", filter_type);
+                self.editing_gear = Some(new_value);
+            }
+            UserSavesEditMessage::SaveGear( _new_value ) => {
+                let editing_gear = self.editing_gear.clone();
+                let mut save = self.save.clone().unwrap();
+                let close_callback = UserSavesEditMessage::Cancel.clone();
+                match editing_gear {
+                    Some( editing_gear ) => {
+                        let item = editing_gear.clone();
+                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        save.data = serde_json::to_string(&item).unwrap();
+                        save.name = item.name;
+                        save.updated_on =  Some(Utc::now());
+                        save.updated_by =  global_vars.current_user.id;
+                        close_callback( true );
+                        spawn_local(
+                            async move {
+                                index_db_put_save( server_root, save).await;
+                                global_vars.saves = get_saves_from_index_db().await;
+                                update_global_vars.emit( global_vars );
+
+                            }
+                        );
+                        self.close_and_cancel();
+                    }
+                    None => {}
+                }
+            }
+
+            UserSavesEditMessage::UpdateWeapon( new_value ) => {
+                // log!("ChangeFilter", filter_type);
+                self.editing_weapon = Some(new_value);
+            }
+            UserSavesEditMessage::SaveWeapon( _new_value ) => {
+                let editing_weapon = self.editing_weapon.clone();
+                let mut save = self.save.clone().unwrap();
+                let close_callback = UserSavesEditMessage::Cancel.clone();
+                match editing_weapon {
+                    Some( editing_weapon ) => {
+                        let item = editing_weapon.clone();
+                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        save.data = serde_json::to_string(&item).unwrap();
+                        save.name = item.name;
+                        save.updated_on =  Some(Utc::now());
+                        save.updated_by =  global_vars.current_user.id;
+                        close_callback( true );
+                        spawn_local(
+                            async move {
+                                index_db_put_save( server_root, save).await;
+                                global_vars.saves = get_saves_from_index_db().await;
+                                update_global_vars.emit( global_vars );
+
+                            }
+                        );
+                        self.close_and_cancel();
+                    }
+                    None => {}
+                }
+            }
+
+            UserSavesEditMessage::UpdateEdge( new_value ) => {
+                // log!("ChangeFilter", filter_type);
+                self.editing_edge = Some(new_value);
+            }
+            UserSavesEditMessage::SaveEdge( _new_value ) => {
+                let editing_edge = self.editing_edge.clone();
+                let mut save = self.save.clone().unwrap();
+                let close_callback = UserSavesEditMessage::Cancel.clone();
+                match editing_edge {
+                    Some( editing_edge ) => {
+                        let item = editing_edge.clone();
+                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        save.data = serde_json::to_string(&item).unwrap();
+                        save.name = item.name;
+                        save.updated_on =  Some(Utc::now());
+                        save.updated_by =  global_vars.current_user.id;
+                        close_callback( true );
+                        spawn_local(
+                            async move {
+                                index_db_put_save( server_root, save).await;
+                                global_vars.saves = get_saves_from_index_db().await;
+                                update_global_vars.emit( global_vars );
+
+                            }
+                        );
+                        self.close_and_cancel();
+                    }
+                    None => {}
+                }
+            }
+
             UserSavesEditMessage::Cancel( _new_value ) => {
                 // log!("Cancel called");
                 self.close_and_cancel();
@@ -331,10 +480,10 @@ impl Component for UserSavesEdit {
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
+                        log!( format!("update - setting Armor Data\n{}", &save.data) );
                         self.editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
-                        log!("setting Hindrance Data");
                         self.editing_hindrance = serde_json::from_str(save.data.as_str()).unwrap();
 
                     }
@@ -375,7 +524,7 @@ impl Component for UserSavesEdit {
 
         let mut global_vars = ctx.props().global_vars.clone();
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
+        // global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
         if self.redirect_back {
@@ -388,7 +537,7 @@ impl Component for UserSavesEdit {
                 <UIPage
                     global_vars={global_vars}
                     page_title="Editing Save"
-                    submenu_tag={"user-data".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -404,7 +553,7 @@ impl Component for UserSavesEdit {
                 <UIPage
                     global_vars={global_vars}
                     page_title="Editing Save"
-                    submenu_tag={"user-data".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -443,7 +592,7 @@ impl Component for UserSavesEdit {
                         form = html!{
                             <>
                             <EditHindrance
-                                global_vars={ctx.props().global_vars.clone()}
+                                global_vars={global_vars.clone()}
                                 readonly={false}
                                 edit_item={hindrance.clone()}
                                 form_title={Some("Editing Hindrance")}
@@ -461,11 +610,163 @@ impl Component for UserSavesEdit {
                         };
                     }
                     None => {
-                        return html! {
-                            <Error404
-                                global_vars={global_vars}
+                        // don't replace form.
+                    }
+                }
+
+                match &self.editing_edge {
+                    Some( edge ) => {
+                        let mut save_callback : Option<Callback<bool>> = None;
+                        let mut save_as_new_callback : Option<Callback<bool>> = None;
+                        let mut add_callback: Option<Callback<bool>>  = None;
+
+                        if self.is_adding {
+                            page_title = "Adding Edge".to_owned();
+                            add_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveEdge).clone());
+                        } else {
+                            page_title = "Editing Edge".to_owned();
+                            save_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveEdge).clone());
+                        }
+
+                        form = html!{
+                            <>
+                            <EditEdge
+                                global_vars={global_vars.clone()}
+                                readonly={false}
+                                edit_item={edge.clone()}
+                                form_title={Some("Editing Edge")}
+                                on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateEdge)}
                             />
+
+                            <StandardFormSaveButtons
+                                close_cancel_callback={ctx.link().callback(UserSavesEditMessage::Cancel).clone()}
+                                save_callback={save_callback}
+                                add_callback={add_callback}
+                                save_as_new_callback={save_as_new_callback}
+                            />
+
+                            </>
                         };
+                    }
+                    None => {
+                        // don't replace form.
+                    }
+                }
+
+                match &self.editing_weapon {
+                    Some( weapon ) => {
+                        let mut save_callback : Option<Callback<bool>> = None;
+                        let mut save_as_new_callback : Option<Callback<bool>> = None;
+                        let mut add_callback: Option<Callback<bool>>  = None;
+
+                        if self.is_adding {
+                            page_title = "Adding Weapon".to_owned();
+                            add_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveWeapon).clone());
+                        } else {
+                            page_title = "Editing Weapon".to_owned();
+                            save_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveWeapon).clone());
+                        }
+
+                        form = html!{
+                            <>
+                            <EditWeapon
+                                global_vars={global_vars.clone()}
+                                readonly={false}
+                                edit_item={weapon.clone()}
+                                form_title={Some("Editing Weapon")}
+                                on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateWeapon)}
+                            />
+
+                            <StandardFormSaveButtons
+                                close_cancel_callback={ctx.link().callback(UserSavesEditMessage::Cancel).clone()}
+                                save_callback={save_callback}
+                                add_callback={add_callback}
+                                save_as_new_callback={save_as_new_callback}
+                            />
+
+                            </>
+                        };
+                    }
+                    None => {
+                        // don't replace form.
+                    }
+                }
+
+                match &self.editing_gear {
+                    Some( gear ) => {
+                        let mut save_callback : Option<Callback<bool>> = None;
+                        let mut save_as_new_callback : Option<Callback<bool>> = None;
+                        let mut add_callback: Option<Callback<bool>>  = None;
+
+                        if self.is_adding {
+                            page_title = "Adding Gear".to_owned();
+                            add_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveGear).clone());
+                        } else {
+                            page_title = "Editing Gear".to_owned();
+                            save_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveGear).clone());
+                        }
+
+                        form = html!{
+                            <>
+                            <EditGear
+                                global_vars={global_vars.clone()}
+                                readonly={false}
+                                edit_item={gear.clone()}
+                                form_title={Some("Editing Gear")}
+                                on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateGear)}
+                            />
+
+                            <StandardFormSaveButtons
+                                close_cancel_callback={ctx.link().callback(UserSavesEditMessage::Cancel).clone()}
+                                save_callback={save_callback}
+                                add_callback={add_callback}
+                                save_as_new_callback={save_as_new_callback}
+                            />
+
+                            </>
+                        };
+                    }
+                    None => {
+                        // don't replace form.
+                    }
+                }
+
+                match &self.editing_armor {
+                    Some( armor ) => {
+                        let mut save_callback : Option<Callback<bool>> = None;
+                        let mut save_as_new_callback : Option<Callback<bool>> = None;
+                        let mut add_callback: Option<Callback<bool>>  = None;
+
+                        if self.is_adding {
+                            page_title = "Adding Armor".to_owned();
+                            add_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveArmor).clone());
+                        } else {
+                            page_title = "Editing Armor".to_owned();
+                            save_callback = Some(ctx.link().callback(UserSavesEditMessage::SaveArmor).clone());
+                        }
+
+                        form = html!{
+                            <>
+                            <EditArmor
+                                global_vars={global_vars.clone()}
+                                readonly={false}
+                                edit_item={armor.clone()}
+                                form_title={Some("Editing Armor")}
+                                on_changed_callback={ctx.link().callback(UserSavesEditMessage::UpdateArmor)}
+                            />
+
+                            <StandardFormSaveButtons
+                                close_cancel_callback={ctx.link().callback(UserSavesEditMessage::Cancel).clone()}
+                                save_callback={save_callback}
+                                add_callback={add_callback}
+                                save_as_new_callback={save_as_new_callback}
+                            />
+
+                            </>
+                        };
+                    }
+                    None => {
+                        // don't replace form.
                     }
                 }
 
@@ -473,7 +774,7 @@ impl Component for UserSavesEdit {
                     <UIPage
                         global_vars={global_vars.clone()}
                         page_title={page_title}
-                        submenu_tag={"user-data".to_owned()}
+
                     >
                         {form}
                     </UIPage>

@@ -11,15 +11,13 @@ pub struct UIPageProps {
     pub page_title: AttrValue,
 
     #[prop_or_default]
-    pub submenu_tag: AttrValue,
-
-    #[prop_or_default]
     pub children: Children,
 
     #[prop_or_default]
     pub modal: Option<VNode>,
 
 }
+
 #[function_component(UIPage)]
 pub fn ui_page(
     props: &UIPageProps,
@@ -66,7 +64,6 @@ pub fn ui_page(
             <h1>{"Savaged.us v4"}</h1>
             <MenuMain
                 global_vars={props.global_vars.clone()}
-                submenu_tag={props.submenu_tag.clone()}
             />
             // <div class={"width-limit"}>
             //     // {submenu}

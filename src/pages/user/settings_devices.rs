@@ -77,7 +77,7 @@ impl Component for SettingsDevices {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -92,7 +92,7 @@ impl Component for SettingsDevices {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -109,14 +109,15 @@ impl Component for SettingsDevices {
         let update_login_tokens = ctx.link().callback(SettingsDevicesMessages::UpdateLoginItems);
 
         let mut global_vars = ctx.props().global_vars.clone();
+        let global_vars2 = ctx.props().global_vars.clone();
 
-        global_vars.current_sub_menu = "settings_devices".to_owned();
-
+        global_vars.current_sub_menu = "settings-devices".to_owned();
+        global_vars.current_menu = "main-user-login".to_owned();
+        let open_confirmation_dialog = global_vars.open_confirmation_dialog.clone();
         html! {
             <UIPage
                 global_vars={global_vars}
                 page_title="Devices"
-                submenu_tag={"user".to_owned()}
             >
                 <h2><i class={"fa-solid fa-computer"}></i><Nbsp />{"Device Login Tokens"}</h2>
 
@@ -137,12 +138,12 @@ impl Component for SettingsDevices {
                         <th colspan={4}>{"Browser String"}</th>
                     </tr>
                     </thead>
-                    {login_tokens.into_iter().map(|device| {
+                    {login_tokens.into_iter().map(move |device| {
                         html! {
                             <SettingsDeviceLineItem
-                                global_vars={ctx.props().global_vars.clone()}
+                                global_vars={global_vars2.clone()}
                                 // update_global_vars={ctx.props().global_vars.update_global_vars.clone()}
-                                open_confirmation_dialog={ctx.props().global_vars.open_confirmation_dialog.clone()}
+                                open_confirmation_dialog={open_confirmation_dialog.clone()}
                                 token={device}
                                 update_login_tokens={update_login_tokens.clone()}
                             />

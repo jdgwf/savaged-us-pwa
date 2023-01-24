@@ -8,8 +8,8 @@ use standard_components::libs::local_storage_shortcuts::get_local_storage_string
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use std::collections::HashMap;
+use yew::html;
 use yew::prelude::*;
-use yew::{html};
 use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -60,7 +60,7 @@ impl Component for UserSavesList {
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let mut global_vars = ctx.props().global_vars.clone();
-
+        global_vars.current_sub_menu = "user-data".to_owned();
         let mut filter_type = "character".to_owned();
 
         if !ctx.props().global_vars.server_side_renderer {
@@ -73,7 +73,7 @@ impl Component for UserSavesList {
             <UIPage
                 global_vars={global_vars}
                 page_title="My Saves"
-                submenu_tag={"user-data".to_owned()}
+
             >
                 <div class={"text-center"}>
                     <br />
@@ -89,7 +89,7 @@ impl Component for UserSavesList {
                 <UIPage
                     global_vars={global_vars}
                     page_title="My Saves"
-                    submenu_tag={"user-data".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -100,7 +100,7 @@ impl Component for UserSavesList {
             }
         }
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
+        // global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
         let mut saves: Vec<SaveDBRow> = Vec::new();
@@ -125,6 +125,9 @@ impl Component for UserSavesList {
             // let current_folder= current_folder.to_owned();
 
             if save.deleted {
+                if filter_type == "_!_trash_|_".to_owned() {
+                    return true;
+                }
                 return false;
             }
 
@@ -137,9 +140,10 @@ impl Component for UserSavesList {
                     }
             } else if filter_type == "gear".to_owned() {
                 if save.save_type == "gear"
-                    || save.save_type == "weapon"
+                    || save.save_type == "weapons"
                     || save.save_type == "armor"
-                    || save.save_type == "cybernetics" {
+                    || save.save_type == "vehicles"
+                    || save.save_type == "cyberware" {
                         return true;
                     }
             } else if filter_type == "other".to_owned() {
@@ -171,13 +175,15 @@ impl Component for UserSavesList {
                 trash_count += 1;
             } else {
                 if filter_by_type(&item) {
-                    if !item.folder.is_empty()
-                        && !current_available_folders.contains(&item.folder)
+                    let item_folder = item.folder.to_owned();
+
+                    if !item_folder.is_empty()
+                        && !current_available_folders.contains(&item_folder)
                     {
-                        current_available_folders.push(item.folder.clone());
+                        current_available_folders.push(item_folder.clone());
                     }
-                    if !item.folder.is_empty() {
-                        current_folder_counts.entry(item.folder).and_modify(|count| *count += 1).or_insert(1);
+                    if !item_folder.is_empty() {
+                        current_folder_counts.entry(item_folder).and_modify(|count| *count += 1).or_insert(1);
                     }
                 }
 
@@ -195,6 +201,9 @@ impl Component for UserSavesList {
                 }
                 if item.save_type == "gear".to_owned()
                     ||item.save_type == "weapon".to_owned()
+                    ||item.save_type == "weapons".to_owned()
+                    ||item.save_type == "vehicles".to_owned()
+                    ||item.save_type == "cyberware".to_owned()
                     || item.save_type == "armor".to_owned() {
                     gear_count += 1;
                 }
@@ -223,6 +232,9 @@ impl Component for UserSavesList {
             // let mut current_folder= current_folder.to_owned();
 
             if save.deleted {
+                if filter_type == "_!_trash_|_".to_owned() {
+                    return true;
+                }
                 return false;
             }
 
@@ -237,9 +249,10 @@ impl Component for UserSavesList {
                     }
             } else if filter_type == "gear".to_owned() {
                 if save.save_type == "gear"
-                    || save.save_type == "weapon"
-                    || save.save_type == "armor"
-                    || save.save_type == "cybernetics" {
+                    || save.save_type == "weapons"
+                    || save.save_type == "cyberware"
+                    || save.save_type == "vehicles"
+                    || save.save_type == "armor" {
                         if current_folder == save.folder {
                             return true;
                         }
@@ -362,7 +375,7 @@ impl Component for UserSavesList {
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="My Saves"
-                submenu_tag={"user-data".to_owned()}
+
             >
                 <TertiaryMenu
                     server_side_renderer={global_vars.server_side_renderer}

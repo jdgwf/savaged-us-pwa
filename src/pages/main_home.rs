@@ -72,7 +72,7 @@ impl Component for MainHome {
         let global_vars_copy = ctx.props().global_vars.clone();
         html! {
             <UIPage
-                global_vars={ctx.props().global_vars.clone()}
+                global_vars={global_vars.clone()}
                 page_title="Home"
             >
 

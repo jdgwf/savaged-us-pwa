@@ -133,10 +133,12 @@ impl Component for AdminRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
+        let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_menu = "main-admin".to_owned();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
-            let global_vars = ctx.props().global_vars.clone();
+
 
             html! {
 
@@ -157,7 +159,7 @@ impl Component for AdminRouter {
                 </Router>
         }
         } else {
-            let global_vars = ctx.props().global_vars.clone();
+
             html! {
 
                 <BrowserRouter>

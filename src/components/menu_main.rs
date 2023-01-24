@@ -3,28 +3,29 @@ use crate::libs::global_vars::GlobalVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::UserRoute;
-use yew::{function_component, Properties, Html, html, AttrValue};
+use yew::{function_component, Properties, Html, html};
 use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
 pub struct MenuMainProps {
     pub global_vars: GlobalVars,
-    #[prop_or_default]
-    pub submenu_tag: AttrValue,
 }
 #[function_component(MenuMain)]
 pub fn menu_main(
     props: &MenuMainProps,
 ) -> Html {
 
+    let current_submenu_tag = props.global_vars.current_sub_menu.clone();
+    let current_menu_tag = props.global_vars.current_menu.clone();
+
     let mut show_submenu = false;
 
     let submenu = get_menu_items(&props.global_vars).into_iter().map( | menu | {
-        match &menu.submenu_tag {
-            Some( submenu_tag ) => {
-                // log!("submenu_tag == &props.submenu_tag", submenu_tag, &props.submenu_tag);
+        match &menu.menu_tag {
+            Some( menu_tag ) => {
+                // log!("menu_tag == &props.submenu_tag", submenu_tag, &current_submenu_tag);
                 if
-                    submenu_tag.as_str() == props.submenu_tag.as_str()
+                    current_menu_tag.as_str() == menu_tag.as_str()
                     && user_can_see_menu_item( &props.global_vars.current_user, &menu)
                 {
                     match menu.submenu {
@@ -33,9 +34,9 @@ pub fn menu_main(
                             return submenu_items.into_iter().map( | sub_item | {
 
                                 let mut li_class = "".to_string();
-                                if &sub_item.sub_menu_tag == &props.global_vars.current_sub_menu
-                                    && !props.global_vars.current_sub_menu.is_empty()
-                                    && !sub_item.sub_menu_tag.is_empty()
+                                if sub_item.sub_menu_tag != None
+                                    && &sub_item.sub_menu_tag.unwrap() == &current_submenu_tag
+                                    && !current_submenu_tag.is_empty()
                                 {
                                     li_class = "active".to_string();
                                 }
@@ -83,10 +84,10 @@ pub fn menu_main(
 
     let mut login_class_active = "login-item".to_owned();
 
-    if props.global_vars.current_menu == "main-userlogin".to_owned()
-    || props.global_vars.current_menu == "main-register".to_owned()
-    || props.global_vars.current_menu == "main-userforgotpassword".to_owned()
-    || props.global_vars.current_menu == "main-userrouter".to_owned()
+    if current_menu_tag == "main-userlogin".to_owned()
+    || current_menu_tag == "main-register".to_owned()
+    || current_menu_tag == "main-userforgotpassword".to_owned()
+    || current_menu_tag == "main-userrouter".to_owned()
     {
         login_class_active = "login-item active".to_owned();
     }
@@ -118,7 +119,8 @@ pub fn menu_main(
                     if menu.hardcoded {
                         return html!(<></>);
                     }
-                    if menu.menu_tag == props.global_vars.current_menu {
+                    if menu.menu_tag != None
+                    && menu.menu_tag.unwrap() == current_menu_tag {
                         li_class = "active".to_string();
                     }
                     match menu.link_class {
@@ -128,12 +130,14 @@ pub fn menu_main(
                         None => {}
                     }
 
+
+
                     match menu.html {
                         Some( html ) => {
                             return html! {
                                 <li class={li_class} title={menu.title}>
                                     {html}
-                                    // {menu.menu_tag.clone()}<br/>{props.global_vars.current_menu.clone()}<br />
+                                    // {menu.menu_tag.as_ref().unwrap()}<br/>{current_menu_tag.clone()}<br />
                                 </li>
                             };
                         }

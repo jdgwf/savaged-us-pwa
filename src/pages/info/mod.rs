@@ -122,10 +122,12 @@ impl Component for InfoRouter {
         &self,
         ctx: &Context<Self>
     ) -> Html {
+        let mut global_vars = ctx.props().global_vars.clone();
+
+        global_vars.current_menu = "main-info".to_owned();
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
-            let global_vars = ctx.props().global_vars.clone();
 
             html! {
 
@@ -146,8 +148,6 @@ impl Component for InfoRouter {
                 </Router>
             }
         } else {
-
-            let global_vars = ctx.props().global_vars.clone();
 
             html! {
 

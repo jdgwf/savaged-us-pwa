@@ -13,14 +13,13 @@ pub fn info_tech(
 ) -> Html {
 
     let mut global_vars = props.global_vars.clone();
-    global_vars.current_menu = "main-info".to_owned();
+
     global_vars.current_sub_menu = "info-tech".to_owned();
 
     html! {
     <UIPage
         global_vars={global_vars}
         page_title="Technologies Used"
-        submenu_tag={"info".to_owned()}
     >
             <h2><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</h2>
             <p class="text-center"><strong>{"Version"}<Nbsp />{env!("CARGO_PKG_VERSION")}</strong></p>

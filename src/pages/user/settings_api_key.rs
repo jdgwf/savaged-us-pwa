@@ -135,14 +135,15 @@ impl Component for SettingsAPIKey {
     ) -> Html {
 
         let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_sub_menu = "settings_apikey".to_owned();
 
+        global_vars.current_sub_menu = "settings-apikey".to_owned();
+        global_vars.current_menu = "main-user-login".to_owned();
         if global_vars.user_loading {
             return html! {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -157,7 +158,7 @@ impl Component for SettingsAPIKey {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -172,7 +173,7 @@ impl Component for SettingsAPIKey {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -186,7 +187,7 @@ impl Component for SettingsAPIKey {
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="API Key"
-                submenu_tag={"user".to_owned()}
+
             >
                 <h2><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</h2>
                 <p>{"If you're planning on using the Savaged.us API and want to get more data than unregistered users, then you'll have to generate an API key to get to your data."}</p>

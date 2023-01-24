@@ -1,12 +1,14 @@
+// use gloo_console::log;
 use crate::libs::global_vars::GlobalVars;
-use crate::menu_items::{get_menu_items, user_can_see_menu_item, MenuItem};
+use crate::menu_items::{get_menu_items, MenuItem};
+use standard_components::ui::nbsp::Nbsp;
 use yew::{function_component, Properties, Html, html};
 
-use standard_components::ui::nbsp::Nbsp;
 #[derive(Properties, PartialEq)]
 pub struct MenuMobileProps {
     pub global_vars: GlobalVars,
 }
+
 #[function_component(MenuMobile)]
 pub fn menu_mobile(
     props: &MenuMobileProps,
@@ -19,11 +21,15 @@ pub fn menu_mobile(
             <ul onclick={props.global_vars.hide_popup_menus_callback.clone()} class={"main-menu"}>
             {get_menu_items(&props.global_vars).into_iter().map( | menu | {
 
-                // log!("submenu_tag == &props.submenu_tag", submenu_tag, &props.submenu_tag);
-                if user_can_see_menu_item( &props.global_vars.current_user, &menu)
-                {
+                // log!("&menu.sub_menu_tag.clone().unwrap() == &props.global_vars.current_menu", &menu.menu_tag.clone().unwrap(), &props.global_vars.current_menu);
+                // log!("&props.global_vars.current_sub_menu", &props.global_vars.current_sub_menu);
+                // log!("&menu.sub_menu_tag.clone().unwrap()", &menu.sub_menu_tag.clone().unwrap());
+                // if user_can_see_menu_item( &props.global_vars.current_user, &menu)
+                // {
                     let mut li_class = "".to_string();
-                    if &menu.sub_menu_tag == &props.global_vars.current_menu {
+                    if menu.menu_tag != None
+                        && props.global_vars.current_sub_menu.is_empty()
+                        && &menu.menu_tag.clone().unwrap() == &props.global_vars.current_menu {
                         li_class = "active".to_string();
                     }
                     match &menu.link_class {
@@ -49,14 +55,16 @@ pub fn menu_mobile(
                                     <i class={menu.icon_class.clone()} /><Nbsp />
                                     {menu.label}
                                     {submenu}
+
+
                                 </li>
                             };
                         }
                     }
 
-                } else {
-                    return html!{<></>};
-                }
+                // } else {
+                //     return html!{<></>};
+                // }
 
             }).collect::<Html>()}
 
@@ -79,10 +87,12 @@ fn make_submenu(
                 <ul class="sub-menu">
             {submenu_items.into_iter().map( | sub_item | {
 
+                let sub_item = sub_item.clone();
+
                 let mut li_class = "".to_string();
-                if &sub_item.sub_menu_tag == &global_vars.current_sub_menu
+                if sub_item.sub_menu_tag != None
                     && !global_vars.current_sub_menu.is_empty()
-                    && !sub_item.sub_menu_tag.is_empty()
+                    && sub_item.sub_menu_tag.unwrap() == global_vars.current_sub_menu
                 {
                     li_class = "active".to_string();
                 }

@@ -318,14 +318,16 @@ impl Component for SettingsPrivate {
 
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_sub_menu = "settings_private".to_owned();
+
+        global_vars.current_sub_menu = "settings-private".to_owned();
+        global_vars.current_menu = "main-user-login".to_owned();
 
         if ctx.props().global_vars.user_loading {
             return html! {
                 <UIPage
                     global_vars={global_vars}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -340,7 +342,7 @@ impl Component for SettingsPrivate {
                 <UIPage
                     global_vars={global_vars}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -377,7 +379,7 @@ impl Component for SettingsPrivate {
             <UIPage
                 global_vars={global_vars}
                 page_title="Private Settings"
-                submenu_tag={"user".to_owned()}
+
             >
             <h2><i class={"fa-solid fa-user-secret"}></i><Nbsp />{"Private Settings"}</h2>
             <div class={"alert alert-success text-center"}>

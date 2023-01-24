@@ -21,7 +21,6 @@ pub fn admin_home(
     <UIPage
         global_vars={global_vars}
         page_title="Admin Home"
-        submenu_tag={"admin".to_owned()}
     >
             <h2><i class="fa fa-microchip" /><Nbsp />{"Admin Home"}</h2>
             <p class="text-center"><strong>{"Version"}<Nbsp />{env!("CARGO_PKG_VERSION")}</strong></p>

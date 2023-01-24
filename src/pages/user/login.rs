@@ -203,14 +203,15 @@ impl Component for UserLogin {
                 }
             );
         };
-        let global_vars = global_vars.clone();
+        let mut global_vars = global_vars.clone();
+        global_vars.current_menu = "main-user-login".to_owned();
 
         if global_vars.user_loading {
             html!(
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Login"
-                submenu_tag={"".to_owned()}
+
             >
                 <p class={"text-center"}>{"loading user info...."}</p>
             </UIPage>
@@ -221,7 +222,7 @@ impl Component for UserLogin {
             <UIPage
                 global_vars={global_vars.clone()}
                 page_title="Login"
-                submenu_tag={"".to_owned()}
+
             >
                 <div class={"main-content"}>
                     <h1>{ "Savaged.us Login" }</h1>

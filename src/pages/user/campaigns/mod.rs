@@ -36,13 +36,15 @@ impl Component for UserCampaigns {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
+        global_vars.current_menu = "main-my-stuff".to_owned();
+        global_vars.current_sub_menu = "user-data".to_owned();
         if global_vars.user_loading {
 
             return html! {
                 <UIPage
                     global_vars={global_vars}
                     page_title="My Saves"
-                    submenu_tag={"user-data".to_owned()}
+
                 >
                     <div class={"text-center"}>
                         <br />
@@ -58,7 +60,7 @@ impl Component for UserCampaigns {
                     <UIPage
                         global_vars={global_vars}
                         page_title="My Saves"
-                        submenu_tag={"user-data".to_owned()}
+
                     >
                         <div class={"text-center"}>
                             <br />
@@ -76,7 +78,7 @@ impl Component for UserCampaigns {
             <UIPage
                 global_vars={global_vars}
                 page_title="My Campaigns"
-                submenu_tag={"user-data".to_owned()}
+
             >
                 <>{"Campaigns"}</>
             </UIPage>

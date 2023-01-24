@@ -895,7 +895,7 @@ impl Component for AdminGameDataWeapons {
                 >
                     <EditWeapon
                         for_admin={true}
-                        global_vars={ctx.props().global_vars.clone()}
+                        global_vars={global_vars.clone()}
                         readonly={read_only}
                         edit_item={editing_item.clone()}
                         book_list={book_list}
@@ -914,7 +914,7 @@ impl Component for AdminGameDataWeapons {
         <UIPage
             global_vars={global_vars.clone()}
             page_title="Admin Weapons"
-            submenu_tag={"admin".to_owned()}
+
             modal={Some(edit_modal)}
         >
 
@@ -929,7 +929,7 @@ impl Component for AdminGameDataWeapons {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
-                global_vars={ctx.props().global_vars.clone()}
+                global_vars={global_vars.clone()}
             />
         </div>
                 <h2><i class="fa fa-items" /><Nbsp />{"Admin Weapons"}</h2>

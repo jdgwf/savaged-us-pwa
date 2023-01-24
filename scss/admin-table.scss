@@ -28,6 +28,7 @@ body {
             }
         }
     }
+
     .admin-paging {
         display: flex;
         .row_count {
@@ -41,6 +42,7 @@ body {
         }
 
     }
+
     .admin-table {
         width: 100%;
         background: var(--header-bg-color);

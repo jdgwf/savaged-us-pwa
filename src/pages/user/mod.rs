@@ -159,8 +159,8 @@ impl Component for UserRouter {
 
         if ctx.props().global_vars.server_side_renderer {
             let history = ctx.props().global_vars.server_side_renderer_history.as_ref().unwrap().clone();
-            let global_vars = ctx.props().global_vars.clone();
-
+            let mut global_vars = ctx.props().global_vars.clone();
+            global_vars.current_menu = "main-register".to_string();
             html! {
 
                 <Router

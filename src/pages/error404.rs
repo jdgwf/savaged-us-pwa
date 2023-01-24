@@ -16,7 +16,6 @@ pub fn error_404(
     <UIPage
         global_vars={props.global_vars.clone()}
         page_title="Page Not Found 😭"
-        submenu_tag={"".to_owned()}
     >
         <div class="error-404">
             <h1>{"4😭4"}</h1>

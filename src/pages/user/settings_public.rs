@@ -490,12 +490,15 @@ impl Component for SettingsPublic {
         // let global_vars = ctx.props().global_vars.clone();
         let mut global_vars = ctx.props().global_vars.clone();
 
+        global_vars.current_menu = "main-user-login".to_owned();
+        global_vars.current_sub_menu = "settings-public".to_owned();
+
         if global_vars.user_loading {
             return html! {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -510,7 +513,7 @@ impl Component for SettingsPublic {
                 <UIPage
                     global_vars={global_vars.clone()}
                     page_title="Settings"
-                    submenu_tag={"user".to_owned()}
+
                 >
                 <div class={"text-center"}>
                     <br />
@@ -530,13 +533,13 @@ impl Component for SettingsPublic {
                 share_settings_save_disabled = false;
             }
 
-        global_vars.current_sub_menu = "settings_public".to_owned();
+
 
         html! {
             <UIPage
-                global_vars={ctx.props().global_vars.clone()}
+                global_vars={global_vars.clone()}
                 page_title="Public Settings"
-                submenu_tag={"user".to_owned()}
+
             >
                 <h2><i class={"fa-solid fa-globe"}></i><Nbsp />{"Public Settings"}</h2>
                 <div class={"alert alert-warning"}>
@@ -695,7 +698,7 @@ impl Component for SettingsPublic {
                         <fieldset class={"fieldset"}>
                             <legend>{"User Portrait"}</legend>
                             <ImageUploader
-                                global_vars={ctx.props().global_vars.clone()}
+                                global_vars={global_vars.clone()}
                                 upload_url={"".to_owned()}
                                 label={"User Image Upload".to_owned()}
                                 is_default_image={self.current_user.profile_image.is_empty()}
