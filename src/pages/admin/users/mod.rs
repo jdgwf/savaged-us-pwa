@@ -1,15 +1,20 @@
 pub mod list;
+pub mod activity;
 
+use crate::components::tertiary_links_menu::TertiaryLinksMenuItem;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::error404::Error404;
+use activity::AdminUsersActivity;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+use super::AdminRoute;
+
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminUsersRoute {
-    // #[at("/admin/users/*")]
-    // AdminUsersUsersRouter,
+    #[at("/admin/users/activity")]
+    Activity,
     #[at("/404")]
     NotFound,
 }
@@ -24,13 +29,14 @@ fn content_switch(routes: AdminUsersRoute, global_vars: GlobalVars) -> Html {
     }
 
     match routes {
-        // AdminUsersRoute::Users => html! {
-        //     <AdminUsersList
-        //         update_global_vars={update_global_vars}
-        //         global_vars={global_vars}
-        //         open_confirmation_dialog={open_confirmation_dialog}
-        //     />
-        // },
+        AdminUsersRoute::Activity => html! {
+            <AdminUsersActivity
+                // update_global_vars={update_global_vars}
+                global_vars={global_vars}
+                sub_menu_items={get_admin_users_submenu_items()}
+                // open_confirmation_dialog={open_confirmation_dialog}
+            />
+        },
         AdminUsersRoute::NotFound => html! {
             <Error404
                 global_vars={global_vars}
@@ -118,4 +124,66 @@ impl Component for AdminUsersRouter {
             }
         }
     }
+}
+
+
+pub fn get_admin_users_submenu_items() -> Vec<TertiaryLinksMenuItem> {
+    return vec![
+        TertiaryLinksMenuItem {
+            link: html! {<Link<AdminRoute> to={AdminRoute::AdminUsersList}>{"Users"}</Link<AdminRoute>>},
+            tag: "users-list".to_owned(),
+            class: None,
+            title: None,
+            icon_class: None,
+            separate: false,
+        },
+        TertiaryLinksMenuItem {
+            link: html! {<Link<AdminUsersRoute> to={AdminUsersRoute::Activity}>{"Activity"}</Link<AdminUsersRoute>>},
+            tag: "users-activity".to_owned(),
+            class: None,
+            title: None,
+            icon_class: None,
+            separate: false,
+        },
+        // TertiaryLinksMenuItem {
+        //     link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::Edges}>{"Edges"}</Link<AdminGameDataRoute>>},
+        //     tag: "edges".to_owned(),
+        //     class: None,
+        //     title: None,
+        //     icon_class: None,
+        //     separate: false,
+        // },
+        // TertiaryLinksMenuItem {
+        //     link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::Armor}>{"Armor"}</Link<AdminGameDataRoute>>},
+        //     tag: "armor".to_owned(),
+        //     class: None,
+        //     title: None,
+        //     icon_class: None,
+        //     separate: false,
+        // },
+        // TertiaryLinksMenuItem {
+        //     link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::Weapons}>{"Weapons"}</Link<AdminGameDataRoute>>},
+        //     tag: "weapons".to_owned(),
+        //     class: None,
+        //     title: None,
+        //     icon_class: None,
+        //     separate: false,
+        // },
+        // TertiaryLinksMenuItem {
+        //     link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::Gear}>{"Gear"}</Link<AdminGameDataRoute>>},
+        //     tag: "gear".to_owned(),
+        //     class: None,
+        //     title: None,
+        //     icon_class: None,
+        //     separate: false,
+        // },
+        // TertiaryLinksMenuItem {
+        //     link: html!{<Link to={AdminGameDataRoute::Hindrances}>{"Hindrances"}</Link>},
+        //     tag: "hindrances".to_owned(),
+        //     class: None,
+        //     title: None,
+        //     icon_class: None,
+        //     separate: false,
+        // },
+    ];
 }

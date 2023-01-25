@@ -479,9 +479,12 @@ impl Component for UserSavesList {
 
                 {saves.into_iter().filter( filter_by ).map( |save| {
                     let mut image_style = "".to_owned();
-                    let save_name = save.name.clone();
+                    let save_name_duplicate = save.name.clone();
+                    let save_name_delete = save.name.clone();
                     // let save_uuid = save.uuid.clone();
-                    let open_confirmation_dialog = open_confirmation_dialog.clone();
+                    let open_confirmation_dialog_duplicate = open_confirmation_dialog.clone();
+                    let open_confirmation_dialog_delete = open_confirmation_dialog.clone();
+
                     match save.image_base64 {
                         Some( image_base64 ) => {
                             image_style = format!("background-image: url(\"data::{};base64, {}\");", save.image_base64_mime.unwrap(), &image_base64, );
@@ -539,7 +542,8 @@ impl Component for UserSavesList {
                                     to={UserSavesRoute::View { uuid: save.uuid.to_owned() }}
                                 >
                                     <span
-                                        class="btn btn-secondary"
+                                        class="btn btn-info"
+                                        title="Click here to view this save."
                                     >
                                         <i class={"fa fa-eye"} />
                                     </span>
@@ -550,18 +554,35 @@ impl Component for UserSavesList {
                                 >
                                     <span
                                         class="btn btn-primary"
+                                        title="Click here to edit this save."
                                     >
                                         <i class={"fa fa-edit"} />
                                     </span>
                                 </Link<UserSavesRoute>>
                                 <button
                                     type="button"
+                                    title="Click here to duplicate this save. You will be asked to confirm."
+                                    class="btn btn-warning"
+                                    onclick={ move | _event | {
+                                        let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
+                                        conf_def.text = Some(format!("Are you sure you want to duplicate '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name_duplicate));
+                                        conf_def.callback = Callback::noop();
+                                        open_confirmation_dialog_duplicate.emit(
+                                            conf_def
+                                        );
+                                    }}
+                                >
+                                    <i class={"fa fa-copy"} />
+                                </button>
+                                <button
+                                    type="button"
+                                    title="Click here to remove this save. You will be asked to confirm."
                                     class="btn btn-danger"
                                     onclick={ move | _event | {
                                         let mut conf_def: ConfirmationDialogDefinition = ConfirmationDialogDefinition::default();
-                                        conf_def.text = Some(format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name));
+                                        conf_def.text = Some(format!("Are you sure you want to delete '{}' (Note: this won't happen yet. This is just a confirm box)?", &save_name_delete));
                                         conf_def.callback = Callback::noop();
-                                        open_confirmation_dialog.emit(
+                                        open_confirmation_dialog_delete.emit(
                                             conf_def
                                         );
                                     }}

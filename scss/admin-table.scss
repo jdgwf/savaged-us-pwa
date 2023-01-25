@@ -2,17 +2,25 @@ body {
 
     .admin-home-links {
         display: flex;
-        a {
-            display: block;
-            height: 80px;
-            width: 80px;
-            color: #fff;
-            margin: .5rem;
-            background: var(--header-bg-color);
-            border: solid 2px var(--header-bg-color);
-            &:hover {
-                background: var(--borders-color-lighten);
-            }
+        flex-wrap: wrap;
+	justify-content: center;
+        align-items: center;
+	div {
+ 	    flex-grow: 0;
+            a {
+                display: block;
+                text-align: center;
+                padding: .5rem;
+                height: 120px;
+                width: 120px;
+                color: #fff;
+                margin: .5rem;
+                background: var(--header-bg-color);
+                border: solid 2px var(--header-bg-color);
+                &:hover {
+                    background: var(--borders-color-lighten);
+                }
+	    }
         }
     }
 

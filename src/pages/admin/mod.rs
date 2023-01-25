@@ -3,6 +3,7 @@ pub mod home;
 pub mod users;
 
 use self::game_data::get_game_data_submenu_items;
+use self::users::get_admin_users_submenu_items;
 use self::users::list::AdminUsersList;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
@@ -69,6 +70,7 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
         AdminRoute::AdminUsersList => html! {
             <AdminUsersList
                 global_vars={global_vars}
+                sub_menu_items={get_admin_users_submenu_items()}
             />
         },
 

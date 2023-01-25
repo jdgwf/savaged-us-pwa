@@ -44,9 +44,9 @@ pub enum EditHindranceMessage {
     // SetMajorHindrance(bool),
 
     // UpdateConflicts( String ),
-    // UpdateEffects( String ),
+    // UpdateEffects( Vec<String> ),
 
-    // UpdateMinorEffects( String ),
+    // UpdateMinorEffects( Vec<String> ),
     // UpdateSummaryMinor( String ),
 
     UpdateBookID( u32 ),

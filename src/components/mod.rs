@@ -11,3 +11,5 @@ pub mod standard_modal;
 pub mod tertiary_links_menu;
 pub mod tertiary_menu;
 pub mod ui_page;
+pub mod effects_entry;
+pub mod conflicts_entry;

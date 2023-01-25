@@ -32,25 +32,31 @@ pub fn admin_game_data_home(props: &AdminGameDataHomeProps) -> Html {
             <h2><i class="fa fa-dice" /><Nbsp />{"Game Data Administration"}</h2>
 
             <div class="admin-home-links">
-                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Hindrances}>
-                    {"Hindrances"}
-                </Link<AdminGameDataRoute>>
-
-                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Edges}>
-                    {"Edges"}
-                </Link<AdminGameDataRoute>>
-
-                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Armor}>
-                    {"Armor"}
-                </Link<AdminGameDataRoute>>
-
-                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Gear}>
-                    {"Gear"}
-                </Link<AdminGameDataRoute>>
-
-                <Link<AdminGameDataRoute> to={AdminGameDataRoute::Weapons}>
-                    {"Weapons"}
-                </Link<AdminGameDataRoute>>
+                <div>
+                     <Link<AdminGameDataRoute> to={AdminGameDataRoute::Hindrances}>
+                         {"Hindrances"}
+                     </Link<AdminGameDataRoute>>
+                </div>
+                <div>
+                     <Link<AdminGameDataRoute> to={AdminGameDataRoute::Edges}>
+                         {"Edges"}
+                     </Link<AdminGameDataRoute>>
+                </div>
+                <div>
+                     <Link<AdminGameDataRoute> to={AdminGameDataRoute::Armor}>
+                         {"Armor"}
+                     </Link<AdminGameDataRoute>>
+                </div>
+                <div>
+                     <Link<AdminGameDataRoute> to={AdminGameDataRoute::Gear}>
+                         {"Gear"}
+                     </Link<AdminGameDataRoute>>
+                </div>
+                <div>
+                     <Link<AdminGameDataRoute> to={AdminGameDataRoute::Weapons}>
+                         {"Weapons"}
+                     </Link<AdminGameDataRoute>>
+                </div>
             </div>
         </UIPage>
     }

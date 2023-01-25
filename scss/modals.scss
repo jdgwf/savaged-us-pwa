@@ -12,6 +12,7 @@ body {
         .modal-dialog {
             min-width: 280px;
             max-width: 90%;
+
             margin: 4rem auto;
             background: var(--body-bg-color);
             color: #fff;
@@ -151,8 +152,8 @@ body {
         .modal-container {
 
             .modal-dialog {
-                max-width: 700px;
-                width: 700px;
+                max-width: 1400px;
+                width: 1400px;
             }
 
             &.modal-xl {

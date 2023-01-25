@@ -1,6 +1,7 @@
 use std::ops::Index;
 
 use crate::components::admin::book_select::BookSelect;
+use crate::components::effects_entry::EffectsEntry;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
@@ -12,6 +13,7 @@ use standard_components::libs::local_storage_shortcuts::{
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
+use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 
@@ -44,14 +46,8 @@ pub enum EditWeaponMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
-    // SetMinorOrMajorWeapon(bool),
-    // SetMajorWeapon(bool),
+    UpdateEffects( Vec<String> ),
 
-    // UpdateConflicts( String ),
-    // UpdateEffects( String ),
-
-    // UpdateMinorEffects( String ),
-    // UpdateSummaryMinor( String ),
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
@@ -111,66 +107,26 @@ impl Component for EditWeapon {
                 return true;
             }
 
-            // EditWeaponMessage::SetMinorOrMajorWeapon( new_value ) => {
-            //     self.edit_item.minor_or_major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
 
-            // EditWeaponMessage::SetMajorWeapon( new_value ) => {
-            //     self.edit_item.major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
             EditWeaponMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
-            // EditWeaponMessage::UpdateConflicts( new_value ) => {
 
-            //     let mut nv: Vec<String> = Vec::new();
+            EditWeaponMessage::UpdateEffects( new_value ) => {
+                // let mut nv: Vec<String> = Vec::new();
 
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
+                // for val in new_value.().split("\n") {
+                //     nv.push( val.to_owned() );
+                // }
 
-            //     self.edit_item.conflicts = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
+                self.edit_item.effects = new_value.clone();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
 
-            // EditWeaponMessage::UpdateEffects( new_value ) => {
-            //     let mut nv: Vec<String> = Vec::new();
-
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
-
-            //     self.edit_item.effects = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditWeaponMessage::UpdateMinorEffects( new_value ) => {
-
-            //     let mut nv: Vec<String> = Vec::new();
-
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
-
-            //     self.edit_item.effects_minor = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditWeaponMessage::UpdateSummaryMinor( new_value ) => {
-            //     self.edit_item.summary_minor = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone() );
-            //     return true;
-            // }
             EditWeaponMessage::UpdateBookID(new_value) => {
                 self.edit_item.book_id = new_value;
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -301,29 +257,36 @@ impl Component for EditWeapon {
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
 
-                    <InputCheckbox
-                        label="Active"
-                        readonly={ctx.props().readonly}
-                        checked={self.edit_item.active}
-                        onchange={ctx.link().callback( EditWeaponMessage::UpdateActive )}
-                    />
 
-                    <BookSelect
-                        readonly={ctx.props().readonly}
-                        current_user={ctx.props().global_vars.current_user.clone()}
-                        book_list={book_list}
-                        label={"Book"}
-                        value={self.edit_item.book_id}
-                        onchange={ ctx.link().callback( EditWeaponMessage::UpdateBookID) }
-                    />
-
-                    <InputText
-                        readonly={ctx.props().readonly}
-                        label={"Page Number"}
-                        inline={true}
-                        value={(self.edit_item.page).to_owned()}
-                        onchange={ ctx.link().callback( EditWeaponMessage::UpdatePage) }
-                    />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <InputCheckbox
+                                label="Active"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.active}
+                                onchange={ctx.link().callback( EditWeaponMessage::UpdateActive )}
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <BookSelect
+                                readonly={ctx.props().readonly}
+                                current_user={ctx.props().global_vars.current_user.clone()}
+                                book_list={book_list}
+                                label={"Book"}
+                                value={self.edit_item.book_id}
+                                onchange={ ctx.link().callback( EditWeaponMessage::UpdateBookID) }
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Page Number"}
+                                inline={true}
+                                value={(self.edit_item.page).to_owned()}
+                                onchange={ ctx.link().callback( EditWeaponMessage::UpdatePage) }
+                            />
+                        </div>
+                    </div>
                 </fieldset>
 
             }
@@ -399,34 +362,17 @@ impl Component for EditWeapon {
             if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
                 <fieldset class={"fieldset"}>
                     <legend>{"Effects"}</legend>
+                    <div class="row full-width">
+                        <div class="col-md-6">
 
-                    // if self.edit_item.minor_or_major {
-                    //     <div class="row full-width">
-                    //         <div class="col-md-6">
-                    //             <TextArea
-                    //                 readonly={ctx.props().readonly}
-                    //                 label={"Major Effects"}
-                    //                 value={self.edit_item.effects.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditWeaponMessage::UpdateEffects) }
-                    //             />
-                    //         </div>
-                    //         <div class="col-md-6">
-                    //             <TextArea
-                    //                 readonly={ctx.props().readonly}
-                    //                 label={"Minor Effects"}
-                    //                 value={self.edit_item.effects_minor.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditWeaponMessage::UpdateMinorEffects ) }
-                    //             />
-                    //         </div>
-                    //     </div>
-                    // } else {
-                    //     <TextArea
-                    //         readonly={ctx.props().readonly}
-                    //         label={"Effects"}
-                    //         value={self.edit_item.effects.join("\n")}
-                    //         onchange={ ctx.link().callback( EditWeaponMessage::UpdateEffects) }
-                    //     />
-                    // }
+                            <EffectsEntry
+                                readonly={ctx.props().readonly}
+                                label={"Effects"}
+                                value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditWeaponMessage::UpdateEffects) }
+                            />
+                        </div>
+                    </div>
                 </fieldset>
             }
 

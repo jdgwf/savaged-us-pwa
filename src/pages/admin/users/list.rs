@@ -2,6 +2,7 @@ use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
 use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
+use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::{
@@ -25,6 +26,7 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersListProps {
     pub global_vars: GlobalVars,
+    pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
 }
 
 pub enum AdminUsersListMessage {
@@ -156,7 +158,12 @@ impl Component for AdminUsersList {
             page_title="Admin Users"
 
         >
+        <TertiaryLinksMenu
+            server_side_renderer={global_vars.server_side_renderer}
+            menu_items={ctx.props().sub_menu_items.clone()}
 
+            current_tag={"users-list".to_owned()}
+        />
         <div class="pull-right">
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}

@@ -1,4 +1,6 @@
 use crate::components::admin::book_select::BookSelect;
+use crate::components::conflicts_entry::ConflictsEntry;
+use crate::components::effects_entry::EffectsEntry;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
@@ -45,15 +47,22 @@ pub enum EditHindranceMessage {
     SetMinorOrMajorHindrance(bool),
     SetMajorHindrance(bool),
 
-    UpdateConflicts(String),
-    UpdateEffects(String),
+    UpdateConflicts(Vec<String>),
+    UpdateEffects(Vec<String>),
 
-    UpdateMinorEffects(String),
+    UpdateMinorEffects(Vec<String>),
     UpdateSummaryMinor(String),
 
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+
+    UpdateHiddenOnCharacterSheet(bool),
+    UpdateNeedsToSpecify(bool),
+    UpdateCanBeTakenMoreThanOnce(bool),
+    UpdateAlwaysShowLongName(bool),
+
+    UpdateCountsAsOther( String ),
 }
 
 pub struct EditHindrance {
@@ -127,39 +136,61 @@ impl Component for EditHindrance {
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
+            EditHindranceMessage::UpdateHiddenOnCharacterSheet(new_value) => {
+                self.edit_item.hidden_on_character_sheet = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditHindranceMessage::UpdateNeedsToSpecify(new_value) => {
+                self.edit_item.needs_to_specify = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditHindranceMessage::UpdateCanBeTakenMoreThanOnce(new_value) => {
+                self.edit_item.can_be_taken_more_than_once = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditHindranceMessage::UpdateAlwaysShowLongName(new_value) => {
+                self.edit_item.always_show_long_name = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
 
-            EditHindranceMessage::UpdateConflicts(new_value) => {
+            EditHindranceMessage::UpdateCountsAsOther(new_value) => {
                 let mut nv: Vec<String> = Vec::new();
 
                 for val in new_value.as_str().split("\n") {
-                    nv.push(val.to_owned());
+                    nv.push( val.to_owned() );
                 }
 
-                self.edit_item.conflicts = nv;
+                self.edit_item.counts_as_other = nv;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+
+
+
+            EditHindranceMessage::UpdateConflicts(new_value) => {
+
+
+                self.edit_item.conflicts = new_value.clone();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
             EditHindranceMessage::UpdateEffects(new_value) => {
-                let mut nv: Vec<String> = Vec::new();
 
-                for val in new_value.as_str().split("\n") {
-                    nv.push(val.to_owned());
-                }
 
-                self.edit_item.effects = nv;
+                self.edit_item.effects = new_value.clone();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
             EditHindranceMessage::UpdateMinorEffects(new_value) => {
-                let mut nv: Vec<String> = Vec::new();
 
-                for val in new_value.as_str().split("\n") {
-                    nv.push(val.to_owned());
-                }
-
-                self.edit_item.effects_minor = nv;
+                self.edit_item.effects_minor = new_value.clone();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -300,29 +331,35 @@ impl Component for EditHindrance {
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
 
-                    <InputCheckbox
-                        label="Active"
-                        readonly={ctx.props().readonly}
-                        checked={self.edit_item.active}
-                        onchange={ctx.link().callback( EditHindranceMessage::UpdateActive )}
-                    />
-
-                    <BookSelect
-                        readonly={ctx.props().readonly}
-                        current_user={ctx.props().global_vars.current_user.clone()}
-                        book_list={book_list}
-                        label={"Book"}
-                        value={self.edit_item.book_id}
-                        onchange={ ctx.link().callback( EditHindranceMessage::UpdateBookID) }
-                    />
-
-                    <InputText
-                        readonly={ctx.props().readonly}
-                        label={"Page Number"}
-                        inline={true}
-                        value={(self.edit_item.page).to_owned()}
-                        onchange={ ctx.link().callback( EditHindranceMessage::UpdatePage) }
-                    />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <InputCheckbox
+                                label="Active"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.active}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateActive )}
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <BookSelect
+                                readonly={ctx.props().readonly}
+                                current_user={ctx.props().global_vars.current_user.clone()}
+                                book_list={book_list}
+                                label={"Book"}
+                                value={self.edit_item.book_id}
+                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateBookID) }
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Page Number"}
+                                inline={true}
+                                value={(self.edit_item.page).to_owned()}
+                                onchange={ ctx.link().callback( EditHindranceMessage::UpdatePage) }
+                            />
+                        </div>
+                    </div>
                 </fieldset>
 
             }
@@ -390,6 +427,13 @@ impl Component for EditHindrance {
                                 value={(self.edit_item.description).to_owned()}
                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateDescription) }
                             />
+
+                            <TextArea
+                                readonly={ctx.props().readonly}
+                                label={"Counts As Other Hindrance"}
+                                value={self.edit_item.counts_as_other.join("\n")}
+                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateCountsAsOther) }
+                            />
                         </div>
                     </div>
                 </fieldset>
@@ -402,42 +446,82 @@ impl Component for EditHindrance {
                     if self.edit_item.minor_or_major {
                         <div class="row full-width">
                             <div class="col-md-6">
-                                <TextArea
+                                <EffectsEntry
                                     readonly={ctx.props().readonly}
                                     label={"Major Effects"}
-                                    value={self.edit_item.effects.join("\n")}
+                                    value={self.edit_item.effects.clone()}
                                     onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
                                 />
                             </div>
                             <div class="col-md-6">
-                                <TextArea
+                                <EffectsEntry
                                     readonly={ctx.props().readonly}
                                     label={"Minor Effects"}
-                                    value={self.edit_item.effects_minor.join("\n")}
+                                    value={self.edit_item.effects_minor.clone()}
                                     onchange={ ctx.link().callback( EditHindranceMessage::UpdateMinorEffects ) }
                                 />
                             </div>
                         </div>
                     } else {
-                        <TextArea
-                            readonly={ctx.props().readonly}
-                            label={"Effects"}
-                            value={self.edit_item.effects.join("\n")}
-                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
-                        />
+
+                        <div class="row full-width">
+                            <div class="col-md-6">
+                                <EffectsEntry
+                                    readonly={ctx.props().readonly}
+                                    label={"Effects"}
+                                    value={self.edit_item.effects.clone()}
+                                    onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                                />
+                            </div>
+                        </div>
                     }
+                    <InputCheckbox
+                        label="Always show the long name (the name with (major) or (minor) appended"
+                        readonly={ctx.props().readonly}
+                        checked={self.edit_item.always_show_long_name}
+                        onchange={ctx.link().callback( EditHindranceMessage::UpdateAlwaysShowLongName )}
+                    />
                 </fieldset>
             }
 
             if current_page.as_str() == "selection" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
                     <legend>{"Selection"}</legend>
-                    <TextArea
-                        readonly={ctx.props().readonly}
-                        label={"Conflicts"}
-                        value={self.edit_item.conflicts.join("\n")}
-                        onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
-                    />
+                    <div class="row full-width">
+                        <div class="col-md-6">
+                            <ConflictsEntry
+                                readonly={ctx.props().readonly}
+                                label={"Conflicts"}
+                                value={self.edit_item.conflicts.clone()}
+                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
+                            />
+                        </div>
+                        <div class="col-md-6">
+
+                            <InputCheckbox
+                                label="Hidden on Character Sheet"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.hidden_on_character_sheet}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateHiddenOnCharacterSheet )}
+                            />
+
+                            <InputCheckbox
+                                label="Needs to Specify"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.needs_to_specify}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateNeedsToSpecify )}
+                            />
+
+
+                            <InputCheckbox
+                                label="Can be taken more than once"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.can_be_taken_more_than_once}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateCanBeTakenMoreThanOnce )}
+                            />
+
+                        </div>
+                    </div>
                 </fieldset>
             }
                 </div>

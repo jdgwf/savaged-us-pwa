@@ -6,6 +6,7 @@ pub mod tech;
 pub mod todos;
 
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::websocket_set_location;
 use crate::pages::error404::Error404;
 use about::InfoAbout;
 use contact_us::InfoContactUs;
@@ -17,7 +18,7 @@ use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-#[derive(Clone, Routable, PartialEq)]
+#[derive(Clone, Debug, Routable, PartialEq)]
 pub enum InfoRoute {
     #[at("/info/about")]
     InfoAbout,
@@ -43,6 +44,12 @@ pub enum InfoRoute {
 
 fn content_switch(routes: InfoRoute, global_vars: GlobalVars) -> Html {
     // let mut global_vars = global_vars.clone();
+
+    websocket_set_location(
+        global_vars.send_websocket.clone(),
+        format!("{:?}", routes ),
+    );
+
 
     match routes {
         InfoRoute::InfoAbout => html! {

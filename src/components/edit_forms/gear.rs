@@ -1,4 +1,5 @@
 use crate::components::admin::book_select::BookSelect;
+use crate::components::effects_entry::EffectsEntry;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
@@ -10,6 +11,7 @@ use standard_components::libs::local_storage_shortcuts::{
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
+use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 
@@ -42,14 +44,9 @@ pub enum EditGearMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
-    // SetMinorOrMajorGear(bool),
-    // SetMajorGear(bool),
+    UpdateEffects( Vec<String> ),
 
-    // UpdateConflicts( String ),
-    // UpdateEffects( String ),
 
-    // UpdateMinorEffects( String ),
-    // UpdateSummaryMinor( String ),
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
@@ -109,66 +106,22 @@ impl Component for EditGear {
                 return true;
             }
 
-            // EditGearMessage::SetMinorOrMajorGear( new_value ) => {
-            //     self.edit_item.minor_or_major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditGearMessage::SetMajorGear( new_value ) => {
-            //     self.edit_item.major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
             EditGearMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
-            // EditGearMessage::UpdateConflicts( new_value ) => {
 
-            //     let mut nv: Vec<String> = Vec::new();
 
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
+            EditGearMessage::UpdateEffects( new_value ) => {
 
-            //     self.edit_item.conflicts = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
 
-            // EditGearMessage::UpdateEffects( new_value ) => {
-            //     let mut nv: Vec<String> = Vec::new();
+                self.edit_item.effects = new_value.clone();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
 
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
-
-            //     self.edit_item.effects = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditGearMessage::UpdateMinorEffects( new_value ) => {
-
-            //     let mut nv: Vec<String> = Vec::new();
-
-            //     for val in new_value.as_str().split("\n") {
-            //         nv.push( val.to_owned() );
-            //     }
-
-            //     self.edit_item.effects_minor = nv;
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditGearMessage::UpdateSummaryMinor( new_value ) => {
-            //     self.edit_item.summary_minor = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone() );
-            //     return true;
-            // }
             EditGearMessage::UpdateBookID(new_value) => {
                 self.edit_item.book_id = new_value;
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -299,29 +252,35 @@ impl Component for EditGear {
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
 
-                    <InputCheckbox
-                        label="Active"
-                        readonly={ctx.props().readonly}
-                        checked={self.edit_item.active}
-                        onchange={ctx.link().callback( EditGearMessage::UpdateActive )}
-                    />
-
-                    <BookSelect
-                        readonly={ctx.props().readonly}
-                        current_user={ctx.props().global_vars.current_user.clone()}
-                        book_list={book_list}
-                        label={"Book"}
-                        value={self.edit_item.book_id}
-                        onchange={ ctx.link().callback( EditGearMessage::UpdateBookID) }
-                    />
-
-                    <InputText
-                        readonly={ctx.props().readonly}
-                        label={"Page Number"}
-                        inline={true}
-                        value={(self.edit_item.page).to_owned()}
-                        onchange={ ctx.link().callback( EditGearMessage::UpdatePage) }
-                    />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <InputCheckbox
+                                label="Active"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.active}
+                                onchange={ctx.link().callback( EditGearMessage::UpdateActive )}
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <BookSelect
+                                readonly={ctx.props().readonly}
+                                current_user={ctx.props().global_vars.current_user.clone()}
+                                book_list={book_list}
+                                label={"Book"}
+                                value={self.edit_item.book_id}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateBookID) }
+                            />
+                        </div>
+                        <div class="col-md-4">
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Page Number"}
+                                inline={true}
+                                value={(self.edit_item.page).to_owned()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdatePage) }
+                            />
+                        </div>
+                    </div>
                 </fieldset>
 
             }
@@ -337,43 +296,6 @@ impl Component for EditGear {
                                 value={(self.edit_item.name).to_owned()}
                                 onchange={ ctx.link().callback( EditGearMessage::UpdateName) }
                             />
-
-                            // <InputCheckbox
-                            //     label="Major Gear"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.major}
-                            //     onchange={ctx.link().callback( EditGearMessage::SetMajorGear )}
-                            // />
-                            // <InputCheckbox
-                            //     label="Minor or Major Gear"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.minor_or_major}
-                            //     onchange={ctx.link().callback( EditGearMessage::SetMinorOrMajorGear )}
-                            // />
-
-                            // if self.edit_item.minor_or_major {
-
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Major Summary"}
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearMessage::UpdateSummary) }
-                            //     />
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Minor Summary"}
-                            //         value={(self.edit_item.summary_minor).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearMessage::UpdateSummaryMinor) }
-                            //     />
-                            // } else {
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Summary"}
-
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearMessage::UpdateSummary) }
-                            //     />
-                            // }
 
                             <InputText
                                 label={"UUID"}
@@ -397,34 +319,17 @@ impl Component for EditGear {
             if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
                 <fieldset class={"fieldset"}>
                     <legend>{"Effects"}</legend>
+                    <div class="row full-width">
+                        <div class="col-md-6">
 
-                    // if self.edit_item.minor_or_major {
-                    //     <div class="row full-width">
-                    //         <div class="col-md-6">
-                    //             <TextArea
-                    //                 readonly={ctx.props().readonly}
-                    //                 label={"Major Effects"}
-                    //                 value={self.edit_item.effects.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
-                    //             />
-                    //         </div>
-                    //         <div class="col-md-6">
-                    //             <TextArea
-                    //                 readonly={ctx.props().readonly}
-                    //                 label={"Minor Effects"}
-                    //                 value={self.edit_item.effects_minor.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditGearMessage::UpdateMinorEffects ) }
-                    //             />
-                    //         </div>
-                    //     </div>
-                    // } else {
-                    //     <TextArea
-                    //         readonly={ctx.props().readonly}
-                    //         label={"Effects"}
-                    //         value={self.edit_item.effects.join("\n")}
-                    //         onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
-                    //     />
-                    // }
+                            <EffectsEntry
+                                readonly={ctx.props().readonly}
+                                label={"Effects"}
+                                value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
+                            />
+                        </div>
+                    </div>
                 </fieldset>
             }
 
