@@ -16,7 +16,7 @@ use savaged_libs::player_character::gear::Gear;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::player_character::weapon::Weapon;
 use savaged_libs::save_db_row::SaveDBRow;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use standard_components::ui::standard_form_save_buttons::StandardFormSaveButtons;
 use wasm_bindgen_futures::spawn_local;

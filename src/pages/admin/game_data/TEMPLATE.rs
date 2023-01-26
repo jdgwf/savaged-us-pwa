@@ -23,7 +23,7 @@ use savaged_libs::{ admin_libs::FetchAdminParameters, admin_libs::new_fetch_admi
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{get_local_storage_u32, set_local_storage_u32};
 use standard_components::ui::nbsp::Nbsp;
-use std::mem;
+// use std::mem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
@@ -198,7 +198,7 @@ impl Component for AdminGameDataHindrances {
                                                             data.updated_by_user = None;
 
                                                             // log!("data", format!("{:?}", data) );
-                                                            let hind = data.to_hindrance().unwrap();
+                                                            let item = data.to_hindrance().unwrap();
                                                             // log!("data.updated_on", data.updated_on);
                                                             // log!("data.created_on", data.created_on);
 
@@ -211,7 +211,7 @@ impl Component for AdminGameDataHindrances {
                                                             // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
                                                             // log!("hind.updated_by", hind.updated_by);
                                                             // log!("hind.created_by", hind.created_by);
-                                                            rv.push( hind )
+                                                            rv.push( item )
                                                         }
                                                         set_items.emit( rv );
 
@@ -350,7 +350,7 @@ impl Component for AdminGameDataHindrances {
                                                             data.updated_by_user = None;
                                                             data.updated_by_user = None;
 
-                                                            let hind = data.to_hindrance().unwrap();
+                                                            let item = data.to_hindrance().unwrap();
 
                                                             // log!("data", format!("{:?}", data) );
 
@@ -366,7 +366,7 @@ impl Component for AdminGameDataHindrances {
                                                             // log!("hind.updated_by_obj", format!("{:?}", hind.updated_by_obj) );
                                                             // log!("hind.updated_by", hind.updated_by);
                                                             // log!("hind.created_by", hind.created_by);
-                                                            rv.push( hind )
+                                                            rv.push( item )
                                                         }
                                                         set_items.emit( rv );
                                                         let alert_def: AlertDefinition = AlertDefinition {
@@ -499,9 +499,9 @@ impl Component for AdminGameDataHindrances {
                                                                     data.updated_by_user = None;
                                                                     data.updated_by_user = None;
 
-                                                                    let hind = data.to_hindrance().unwrap();
+                                                                    let item = data.to_hindrance().unwrap();
 
-                                                                    rv.push( hind )
+                                                                    rv.push( item )
                                                                 }
                                                                 set_items.emit( rv );
                                                                 let alert_def: AlertDefinition = AlertDefinition {
@@ -635,9 +635,9 @@ impl Component for AdminGameDataHindrances {
                                                                     data.updated_by_user = None;
                                                                     data.updated_by_user = None;
 
-                                                                    let hind = data.to_hindrance().unwrap();
+                                                                    let item = data.to_hindrance().unwrap();
 
-                                                                    rv.push( hind )
+                                                                    rv.push( item )
                                                                 }
                                                                 set_items.emit( rv );
 
@@ -1135,11 +1135,11 @@ async fn _get_data(
 
                     let mut rv: Vec<Hindrance> = Vec::new();
                     for data in vec_val.into_iter() {
-                        let hind = data.to_hindrance().unwrap();
-                        log!( format!("hind {} {}", &hind.name, mem::size_of_val(&hind) ) );
-                        rv.push( hind );
+                        let item = data.to_hindrance().unwrap();
+                        // log!( format!("item {} {}", &item.name, mem::size_of_val(&item) ) );
+                        rv.push( item );
                     }
-                    log!( format!("rv {}", mem::size_of_val(&rv) ) );
+                    // log!( format!("rv {}", mem::size_of_val(&rv) ) );
                     set_items.emit( rv );
                 }
                 Err( err ) => {
@@ -1168,8 +1168,8 @@ async fn _get_data(
             let vec_val_result: Result<AdminPagingStatistics, Error> = JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok( vec_val ) => {
-                    log!( format!("vec_val {}", mem::size_of_val(&vec_val) ) );
-                    log!( format!("vec_val.book_list {}", mem::size_of_val(&vec_val.book_list) ) );
+                    // log!( format!("vec_val {}", mem::size_of_val(&vec_val) ) );
+                    // log!( format!("vec_val.book_list {}", mem::size_of_val(&vec_val.book_list) ) );
                     set_paging.emit( Some(vec_val) );
                 }
                 Err( err ) => {

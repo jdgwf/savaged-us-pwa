@@ -30,13 +30,13 @@ impl Component for UserSavesView {
     type Message = UserSavesViewMessage;
     type Properties = UserSavesViewProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         UserSavesView {
             // global_vars: ctx.props().global_vars.clone(),
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: UserSavesViewMessage) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: UserSavesViewMessage) -> bool {
         match msg {
             // UserSavesViewMessage::ChangeFilter( filter_type ) => {
             //     // log!("ChangeFilter", filter_type);

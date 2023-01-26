@@ -78,7 +78,7 @@ pub fn edit_view_delete_buttons(props: &AdminTablePagingProps) -> Html {
 
             let mut number_per_page: Vec<u32> = Vec::new();
 
-            for count in 0..number_of_pages + 1 {
+            for count in 0..(number_of_pages + 1) {
                 number_per_page.push(count);
             }
 
@@ -115,7 +115,7 @@ pub fn edit_view_delete_buttons(props: &AdminTablePagingProps) -> Html {
                             onchange={callback_set_current_page}
                             value={props.paging_sorting_and_filter.current_page.to_string()}
                         >
-                            {number_per_page.into_iter().map( |count | {
+                            {number_per_page.into_iter().map( | count | {
                                 if props.paging_sorting_and_filter.current_page == count {
                                     html! {
                                         <option selected={true} value={count.to_string()}>{count+1}</option>
