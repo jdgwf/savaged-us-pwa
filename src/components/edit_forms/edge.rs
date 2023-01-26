@@ -45,8 +45,6 @@ pub enum EditEdgeMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
-
-
     UpdateConflicts( Vec<String> ),
     UpdateEffects( Vec<String> ),
 
@@ -141,12 +139,10 @@ impl Component for EditEdge {
 
             EditEdgeMessage::UpdateEffects( new_value ) => {
 
-
                 self.edit_item.effects = new_value.clone();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 return true;
             }
-
 
             EditEdgeMessage::UpdateBookID(new_value) => {
                 self.edit_item.book_id = new_value;
@@ -278,7 +274,6 @@ impl Component for EditEdge {
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
 
-
                     <div class="row">
                         <div class="col-md-4">
                             <InputCheckbox
@@ -386,7 +381,6 @@ impl Component for EditEdge {
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditEdgeMessage::UpdateActive )}
                             />
-
 
                             <InputCheckbox
                                 label="Can be taken more than once"

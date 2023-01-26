@@ -490,6 +490,7 @@ impl Component for MainApp {
 
             MainAppMessage::ReceivedWebSocket(sent_data) => {
                 // log!( format!("ReceivedWebSocket {}", &sent_data.len() ) );
+                // log!( format!("ReceivedWebSocket {}", &sent_data ) );
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
                 // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);

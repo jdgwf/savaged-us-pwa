@@ -29,7 +29,6 @@ pub fn admin_home(props: &AdminUsersActivityProps) -> Html {
             />
             <h2><i class="fa fa-users" /><Nbsp />{"Current Users' Activity"}</h2>
 
-
         </UIPage>
     }
 }

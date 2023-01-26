@@ -1,18 +1,21 @@
+use crate::components::abilities_entry::AbilitiesEntry;
 use crate::components::admin::book_select::BookSelect;
 use crate::components::effects_entry::EffectsEntry;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
+use gloo_console::error;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::gear::Gear;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_bool;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_bool;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::local_storage_shortcuts::{
-    get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
-};
 use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::input_label::InputLabel;
+use standard_components::ui::input_number::InputNumber;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
-use standard_components::ui::textarea::TextArea;
-// use standard_components::ui::textarea::TextArea;
+use web_sys::HtmlSelectElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -40,16 +43,27 @@ pub enum EditGearMessage {
     ToggleNoPages(String),
 
     UpdateName(String),
+    UpdateGearType(String),
 
     UpdateSummary(String),
+    UpdateAbilities(Vec<String>),
     UpdateDescription(String),
 
-    UpdateEffects( Vec<String> ),
+    UpdateRippersReason( f32 ),
+    UpdateNumberPer( f32 ),
 
+    UpdateCost( f32 ),
+    UpdateWeight( f32 ),
+
+    UpdateEffects( Vec<String> ),
 
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+
+    UpdateIsContainer(bool),
+    UpdateContainerNoWeight(bool),
+    UpdateFractionalWeight(Event),
 }
 
 pub struct EditGear {
@@ -88,6 +102,13 @@ impl Component for EditGear {
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
+
+            EditGearMessage::UpdateGearType(new_value) => {
+                self.edit_item.gear_type = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
             EditGearMessage::UpdatePage(new_value) => {
                 self.edit_item.page = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -96,6 +117,35 @@ impl Component for EditGear {
 
             EditGearMessage::UpdateSummary(new_value) => {
                 self.edit_item.summary = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditGearMessage::UpdateAbilities(new_value) => {
+                self.edit_item.abilities = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditGearMessage::UpdateRippersReason( new_value ) => {
+                self.edit_item.rippers_reason_cost = new_value.round() as i32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditGearMessage::UpdateCost( new_value ) => {
+                self.edit_item.cost = new_value;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditGearMessage::UpdateWeight( new_value ) => {
+                self.edit_item.weight = new_value;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditGearMessage::UpdateNumberPer( new_value ) => {
+                self.edit_item.number_per = new_value.round() as u32;
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -112,10 +162,35 @@ impl Component for EditGear {
                 return true;
             }
 
+            EditGearMessage::UpdateIsContainer(new_value) => {
+                self.edit_item.container = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditGearMessage::UpdateContainerNoWeight(new_value) => {
+                self.edit_item.container_no_weight = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditGearMessage::UpdateFractionalWeight(event) => {
+                event.prevent_default();
 
+                let input: HtmlSelectElement = event.target_unchecked_into();
+                let nv_res = input.value().parse::<f32>();
+                match nv_res {
+                    Ok( nv ) => {
+                        self.edit_item.container_fractional_weight = nv;
+                    }
+                    Err (err ) => {
+                        error!( format!("Cannot format f32! '{}' - {}", input.value(), err) );
+                    }
+                }
+
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
 
             EditGearMessage::UpdateEffects( new_value ) => {
-
 
                 self.edit_item.effects = new_value.clone();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
@@ -149,8 +224,8 @@ impl Component for EditGear {
                 separate: false,
             },
             TertiaryMenuItem {
-                tag: "selection".to_owned(),
-                label: "Selection".to_owned(),
+                tag: "details".to_owned(),
+                label: "Details".to_owned(),
                 class: None,
                 callback: None,
                 title: None,
@@ -229,7 +304,7 @@ impl Component for EditGear {
         let mut current_page =
             get_local_storage_string(&self.local_storage_page_name, "general".to_owned());
 
-        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        let valid_pages = vec!["general", "admin", "effects", "details"];
         if (current_page.as_str() == "admin"
             && !ctx.props().global_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
@@ -298,6 +373,20 @@ impl Component for EditGear {
                             />
 
                             <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Type"}
+                                value={(self.edit_item.gear_type).to_owned()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateGearType) }
+                            />
+
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Summary"}
+                                value={(self.edit_item.summary).to_owned()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateSummary) }
+                            />
+
+                            <InputText
                                 label={"UUID"}
                                 readonly={true}
                                 value={(self.edit_item.uuid.to_string()).to_owned()}
@@ -324,8 +413,30 @@ impl Component for EditGear {
 
                             <EffectsEntry
                                 readonly={ctx.props().readonly}
+                                description="These effects will apply when this item is equipped"
                                 label={"Effects"}
                                 value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
+                            />
+
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Rippers Reason Cost"}
+                                step={"1"}
+                                min={"-5"}
+                                max={"0"}
+                                description={"Just put in the reason cost here (-1, -2, -3, etc) to reduce your character's reason due to RipperTech"}
+                                value={self.edit_item.rippers_reason_cost as f32}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateRippersReason) }
+                            />
+                        </div>
+                        <div class="col-md-6">
+
+                            <AbilitiesEntry
+                                readonly={ctx.props().readonly}
+                                description="These abilities will be added to the summary when this item is equipped"
+                                label={"Abilities"}
+                                value={self.edit_item.abilities.clone()}
                                 onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
                             />
                         </div>
@@ -333,9 +444,82 @@ impl Component for EditGear {
                 </fieldset>
             }
 
-            if current_page.as_str() == "selection" || current_page.as_str() == "__all__" {
+            if current_page.as_str() == "details" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
-                    <legend>{"Selection"}</legend>
+                    <legend>{"Details"}</legend>
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Cost"}
+                                step={".01"}
+                                value={self.edit_item.cost }
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateCost) }
+                            />
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Weight"}
+                                step={".01"}
+                                value={self.edit_item.weight}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateWeight) }
+                            />
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Number per cost/weight"}
+                                step={"1"}
+                                min={"1"}
+                                max={"500"}
+                                value={self.edit_item.number_per as f32}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateNumberPer) }
+                            />
+                        </div>
+                        <div class="col-md-6">
+
+                        <InputCheckbox
+                            label="Is a Container"
+                            checked={self.edit_item.container}
+                            onchange={ ctx.link().callback( EditGearMessage::UpdateIsContainer) }
+                        />
+
+                        if self.edit_item.container {
+
+                            <InputCheckbox
+                                label="Container doesn't contribute to weight (a pack animal, or a bag of holding)"
+                                checked={self.edit_item.container_no_weight}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateContainerNoWeight) }
+                            />
+
+                            if !self.edit_item.container_no_weight {
+                                <label
+                                >
+                                    <InputLabel
+                                        label={"Fractional weight"}
+                                        inline={false}
+                                    />
+
+                                    <div class="small-text">
+                                    {"Item contents weights are multiplied by the value below if stored in this container."}
+                                    </div>
+
+                                    <select
+                                        readonly={ctx.props().readonly}
+                                        value={self.edit_item.container_fractional_weight.to_string()}
+                                        onchange={ctx.link().callback( EditGearMessage::UpdateFractionalWeight )}
+                                    >
+                                        <option value=".25" selected={self.edit_item.container_fractional_weight == 0.25}>{"¼ Total Weight"}</option>
+                                        <option value=".5" selected={self.edit_item.container_fractional_weight == 0.5}>{"½ Total Weight"}</option>
+                                        <option value="1" selected={self.edit_item.container_fractional_weight == 1.0}>{"Normal Weight (no reduction)"}</option>
+
+                                    </select>
+
+                                </label>
+                            }
+                        }
+
+                        </div>
+                    </div>
+
                     // <TextArea
                     //     readonly={ctx.props().readonly}
                     //     label={"Conflicts"}

@@ -60,6 +60,7 @@ pub enum EditHindranceMessage {
     UpdateHiddenOnCharacterSheet(bool),
     UpdateNeedsToSpecify(bool),
     UpdateCanBeTakenMoreThanOnce(bool),
+    UpdateCannotBeSelected(bool),
     UpdateAlwaysShowLongName(bool),
 
     UpdateCountsAsOther( String ),
@@ -151,6 +152,13 @@ impl Component for EditHindrance {
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
+
+            EditHindranceMessage::UpdateCannotBeSelected(new_value) => {
+                self.edit_item.cannot_be_selected = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
             EditHindranceMessage::UpdateAlwaysShowLongName(new_value) => {
                 self.edit_item.always_show_long_name = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -169,11 +177,7 @@ impl Component for EditHindrance {
                 return true;
             }
 
-
-
-
             EditHindranceMessage::UpdateConflicts(new_value) => {
-
 
                 self.edit_item.conflicts = new_value.clone();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -181,7 +185,6 @@ impl Component for EditHindrance {
             }
 
             EditHindranceMessage::UpdateEffects(new_value) => {
-
 
                 self.edit_item.effects = new_value.clone();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -512,12 +515,19 @@ impl Component for EditHindrance {
                                 onchange={ctx.link().callback( EditHindranceMessage::UpdateNeedsToSpecify )}
                             />
 
-
                             <InputCheckbox
                                 label="Can be taken more than once"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.can_be_taken_more_than_once}
                                 onchange={ctx.link().callback( EditHindranceMessage::UpdateCanBeTakenMoreThanOnce )}
+                            />
+
+                            <InputCheckbox
+                                label="Cannot be selected."
+                                description="Must be added through an add_hindrance modline."
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.cannot_be_selected}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateCannotBeSelected )}
                             />
 
                         </div>

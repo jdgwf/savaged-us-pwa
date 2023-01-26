@@ -53,7 +53,6 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
                                     {menu.label}
                                     {submenu}
 
-
                                 </li>
                             };
                         }

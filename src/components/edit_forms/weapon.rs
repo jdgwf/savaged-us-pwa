@@ -107,13 +107,11 @@ impl Component for EditWeapon {
                 return true;
             }
 
-
             EditWeaponMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
-
 
             EditWeaponMessage::UpdateEffects( new_value ) => {
                 // let mut nv: Vec<String> = Vec::new();
@@ -256,7 +254,6 @@ impl Component for EditWeapon {
 
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
-
 
                     <div class="row">
                         <div class="col-md-4">

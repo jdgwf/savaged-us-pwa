@@ -112,7 +112,11 @@ impl Component for UserSavesEdit {
                         // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
                         // editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
                     }
-                    "weapon" => {
+                    "cyberware" => {
+                        // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
+                        // editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "weapon"|"weapons" => {
                         // form = html!{ <div class="text-center">{"TODO: Weapon Edit Form"}</div>};
                         // editing_weapon = serde_json::from_str(save.data.as_str()).unwrap();
                     }
@@ -171,13 +175,17 @@ impl Component for UserSavesEdit {
                         // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
                         editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
                     }
-                    "weapon" => {
+                    "cyberware" => {
+                        // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
+                        // editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "weapon"|"weapons" => {
                         // form = html!{ <div class="text-center">{"TODO: Weapon Edit Form"}</div>};
                         editing_weapon = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
-                        log!(format!("create - setting Armor Data\n{}", &save.data));
+                        // log!(format!("create - setting Armor Data\n{}", &save.data));
                         editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
@@ -438,13 +446,17 @@ impl Component for UserSavesEdit {
                         // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
                         self.editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
                     }
-                    "weapon" => {
+                    "cyberware" => {
+                        // form = html!{ <div class="text-center">{"TODO: Gear Edit Form"}</div>};
+                        // editing_gear = serde_json::from_str(save.data.as_str()).unwrap();
+                    }
+                    "weapon"|"weapons" => {
                         // form = html!{ <div class="text-center">{"TODO: Weapon Edit Form"}</div>};
                         self.editing_weapon = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
-                        log!(format!("update - setting Armor Data\n{}", &save.data));
+                        // log!(format!("update - setting Armor Data\n{}", &save.data));
                         self.editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {

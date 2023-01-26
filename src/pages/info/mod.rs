@@ -50,7 +50,6 @@ fn content_switch(routes: InfoRoute, global_vars: GlobalVars) -> Html {
         format!("{:?}", routes ),
     );
 
-
     match routes {
         InfoRoute::InfoAbout => html! {
             <InfoAbout

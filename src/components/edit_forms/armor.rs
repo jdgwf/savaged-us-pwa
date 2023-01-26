@@ -47,7 +47,6 @@ pub enum EditArmorMessage {
 
     UpdateEffects( Vec<String> ),
 
-
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
@@ -107,7 +106,6 @@ impl Component for EditArmor {
                 return true;
             }
 
-
             EditArmorMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -116,12 +114,10 @@ impl Component for EditArmor {
 
             EditArmorMessage::UpdateEffects( new_value ) => {
 
-
                 self.edit_item.effects = new_value.clone();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 return true;
             }
-
 
             EditArmorMessage::UpdateBookID(new_value) => {
                 self.edit_item.book_id = new_value;

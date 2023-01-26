@@ -205,7 +205,6 @@ impl Component for EditHindrance {
 
         let all = get_local_storage_bool("edit_forms_one_page", false);
 
-
         let mut sub_menu_items: Vec<TertiaryMenuItem> = vec![
             TertiaryMenuItem {
                 tag: "general".to_owned(),

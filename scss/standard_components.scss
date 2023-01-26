@@ -26,6 +26,7 @@ body {
         select,
         input[type=email],
         input[type=text],
+        input[type=number],
         input[type=password] {
             width: 100%;
             border: 0;
@@ -35,6 +36,7 @@ body {
         textarea:read-only,
         input[type=email]:read-only,
         input[type=text]:read-only,
+        input[type=number]:read-only,
         input[type=password]:read-only {
             background: #999;
 

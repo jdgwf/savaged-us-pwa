@@ -373,7 +373,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
                         link_class: None,
 
-
                         submenu: None,
 
                         title: "The Private Settings Page".to_owned(),
@@ -400,7 +399,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         admin_only: false,
 
                         link_class: None,
-
 
                         submenu: None,
 
@@ -438,7 +436,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
                         link_class: None,
 
-
                         submenu: None,
 
                         title: "The Notifications Page".to_owned(),
@@ -461,7 +458,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
                         link_class: None,
 
-
                         submenu: None,
 
                         title: "The Subscription Page".to_owned(),
@@ -483,7 +479,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         admin_only: false,
 
                         link_class: None,
-
 
                         submenu: None,
 
@@ -508,7 +503,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
                         link_class: None,
 
-
                         submenu: None,
 
                         title: "The API Key Page".to_owned(),
@@ -531,7 +525,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         admin_only: false,
 
                         link_class: Some("logout-item".to_string()),
-
 
                         submenu: None,
 

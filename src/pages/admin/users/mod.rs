@@ -126,7 +126,6 @@ impl Component for AdminUsersRouter {
     }
 }
 
-
 pub fn get_admin_users_submenu_items() -> Vec<TertiaryLinksMenuItem> {
     return vec![
         TertiaryLinksMenuItem {

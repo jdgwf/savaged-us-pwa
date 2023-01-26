@@ -127,8 +127,6 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
                         None => {}
                     }
 
-
-
                     match menu.html {
                         Some( html ) => {
                             return html! {
