@@ -287,7 +287,7 @@ impl Component for EditGear {
             }
             None => {}
         }
-        let mut header = html! {
+        let header = html! {
             <>
                 <TertiaryMenu
                     server_side_renderer={ctx.props().global_vars.server_side_renderer}
@@ -405,45 +405,6 @@ impl Component for EditGear {
                 </fieldset>
             }
 
-            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
-                <fieldset class={"fieldset"}>
-                    <legend>{"Effects"}</legend>
-                    <div class="row full-width">
-                        <div class="col-md-6">
-
-                            <EffectsEntry
-                                readonly={ctx.props().readonly}
-                                description="These effects will apply when this item is equipped"
-                                label={"Effects"}
-                                value={self.edit_item.effects.clone()}
-                                onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
-                            />
-
-                            <InputNumber
-                                readonly={ctx.props().readonly}
-                                label={"Rippers Reason Cost"}
-                                step={"1"}
-                                min={"-5"}
-                                max={"0"}
-                                description={"Just put in the reason cost here (-1, -2, -3, etc) to reduce your character's reason due to RipperTech"}
-                                value={self.edit_item.rippers_reason_cost as f32}
-                                onchange={ ctx.link().callback( EditGearMessage::UpdateRippersReason) }
-                            />
-                        </div>
-                        <div class="col-md-6">
-
-                            <AbilitiesEntry
-                                readonly={ctx.props().readonly}
-                                description="These abilities will be added to the summary when this item is equipped"
-                                label={"Abilities"}
-                                value={self.edit_item.abilities.clone()}
-                                onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
-                            />
-                        </div>
-                    </div>
-                </fieldset>
-            }
-
             if current_page.as_str() == "details" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
                     <legend>{"Details"}</legend>
@@ -528,6 +489,46 @@ impl Component for EditGear {
                     // />
                 </fieldset>
             }
+
+            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Effects"}</legend>
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
+                            <EffectsEntry
+                                readonly={ctx.props().readonly}
+                                description="These effects will apply when this item is equipped"
+                                label={"Effects"}
+                                value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateEffects) }
+                            />
+
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Rippers Reason Cost"}
+                                step={"1"}
+                                min={"-5"}
+                                max={"0"}
+                                description={"Just put in the reason cost here (-1, -2, -3, etc) to reduce your character's reason due to RipperTech"}
+                                value={self.edit_item.rippers_reason_cost as f32}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateRippersReason) }
+                            />
+                        </div>
+                        <div class="col-md-6">
+
+                            <AbilitiesEntry
+                                readonly={ctx.props().readonly}
+                                description="These abilities will be added to the summary when this item is equipped"
+                                label={"Abilities"}
+                                value={self.edit_item.abilities.clone()}
+                                onchange={ ctx.link().callback( EditGearMessage::UpdateAbilities) }
+                            />
+                        </div>
+                    </div>
+                </fieldset>
+            }
+
                 </div>
             </div>
         }

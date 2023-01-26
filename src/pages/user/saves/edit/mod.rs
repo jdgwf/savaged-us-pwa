@@ -9,7 +9,7 @@ use crate::local_storage::{get_saves_from_index_db, index_db_put_save};
 use crate::pages::error404::Error404;
 use crate::pages::user::UserRoute;
 use chrono::Utc;
-use gloo_console::log;
+use gloo_console::error;
 use savaged_libs::player_character::armor::Armor;
 use savaged_libs::player_character::edge::Edge;
 use savaged_libs::player_character::gear::Gear;
@@ -23,6 +23,7 @@ use wasm_bindgen_futures::spawn_local;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use savaged_libs::clean_json_data;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesEditProps {
@@ -147,7 +148,7 @@ impl Component for UserSavesEdit {
 
                     _ => {
                         if !ctx.props().global_vars.server_side_renderer {
-                            log!(format!("Unhandled add save type: {}", &save_type));
+                            error!(format!("Unhandled add save type: {}", &save_type));
                         }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
@@ -186,7 +187,8 @@ impl Component for UserSavesEdit {
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
                         // log!(format!("create - setting Armor Data\n{}", &save.data));
-                        editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
+                        let save_data = clean_json_data( save.data.to_owned() );
+                        editing_armor = serde_json::from_str(save_data.as_str()).unwrap();
                     }
                     "hindrances" => {
                         // log!("setting Hindrance Data");
@@ -215,7 +217,7 @@ impl Component for UserSavesEdit {
 
                     _ => {
                         if !ctx.props().global_vars.server_side_renderer {
-                            log!(format!("Unhandled save type: {}", &save.save_type));
+                            error!(format!("Unhandled save type: {}", &save.save_type));
                         }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
@@ -223,7 +225,7 @@ impl Component for UserSavesEdit {
             }
             None => {
                 if !ctx.props().global_vars.server_side_renderer {
-                    log!("create() Cannot find save!");
+                    error!("create() Cannot find save!");
                 }
             }
         }
@@ -457,7 +459,8 @@ impl Component for UserSavesEdit {
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
                         // log!(format!("update - setting Armor Data\n{}", &save.data));
-                        self.editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
+                        let save_data = clean_json_data( save.data.to_owned() );
+                        self.editing_armor = serde_json::from_str(save_data.as_str()).unwrap();
                     }
                     "hindrances" => {
                         self.editing_hindrance = serde_json::from_str(save.data.as_str()).unwrap();
@@ -480,13 +483,13 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
-                        log!(format!("Unhandled save type: {}", &save.save_type));
+                        error!(format!("Unhandled save type: {}", &save.save_type));
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
                     }
                 }
             }
             None => {
-                log!("create() Cannot find save!");
+                error!("create() Cannot find save!");
             }
         }
 

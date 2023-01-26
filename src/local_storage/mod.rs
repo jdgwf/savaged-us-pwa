@@ -1,7 +1,7 @@
 use blob;
 use chrono::offset::Utc;
 use chrono::{DateTime, TimeZone};
-use gloo_console::log;
+use gloo_console::{log, error};
 use indexed_db_futures::js_sys::Uint8Array;
 use indexed_db_futures::{js_sys, prelude::*};
 use savaged_libs::player_character::game_data_package::GameDataPackage;
@@ -14,7 +14,7 @@ use web_sys::{DomException, Request, RequestInit, Response};
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
 static INDEX_DB_SAVES_STORE_NAME: &str = "saves";
-static INDEX_DB_VERSION: u32 = 8;
+static INDEX_DB_VERSION: u32 = 9;
 
 #[derive(Debug)]
 pub struct GameDataSyncUpdateResults {
@@ -747,9 +747,11 @@ pub async fn clear_game_data_local_data() {
 pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
     let mut game_data = GameDataPackage::default();
 
-    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    match db_req_result {
+
+    let db_req_result_books = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+
+    match db_req_result_books {
         Ok(mut db_req) => {
             // log!("get_game_data_from_index_db CALLED");
             _create_tables(&mut db_req).await;
@@ -779,31 +781,37 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                                     Ok(item) => {
                                         game_data.books.push(item);
                                     }
-                                    Err(_err) => {
+                                    Err( err) => {
+                                        error!( format!("books error 1 {:?}", err ));
                                         return None;
                                     }
-                                }
+                                 }
                             }
-                            Err(_err) => {}
+                            Err(err) => {
+                                error!("books error 2", err);
+                            }
                         }
                     }
+                    db.close();
                 }
-                Err(_err) => {}
+
+                Err( err) => {
+                    error!("books error 3", err);
+                    return None;
+                }
             }
 
-            db.close();
+            }
+            Err( err) => {
+                error!("books error 4", err);
+                return None;
+            }
         }
 
-        Err(_err) => {
-            return None;
-        }
-    }
+    let db_req_result_edges = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    let db_req_result2 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
-
-    match db_req_result2 {
+    match db_req_result_edges {
         Ok(mut db_req) => {
-            _create_tables(&mut db_req).await;
             // Edges.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one("game_data_edges").unwrap();
@@ -827,27 +835,30 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                             Ok(item) => {
                                 game_data.edges.push(item);
                             }
-                            Err(_err) => {
+                            Err(err) => {
+                                error!( format!("game_data_edges error 1 {:?}", err ));
                                 return None;
                             }
                         }
                     }
-                    Err(_err) => {}
+                    Err(err) => {
+                        error!("game_data_edges error 2", err);
+                    }
                 }
             }
             db.close();
         }
 
-        Err(_err) => {
+        Err( err) => {
+            error!("game_data_edges error 3", err);
             return None;
         }
     }
 
-    let db_req_result3 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    let db_req_result_hindrances = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    match db_req_result3 {
+    match db_req_result_hindrances {
         Ok(mut db_req) => {
-            _create_tables(&mut db_req).await;
             // Hindrances.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one("game_data_hindrances").unwrap();
@@ -871,28 +882,31 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                             Ok(item) => {
                                 game_data.hindrances.push(item);
                             }
-                            Err(_err) => {
+                            Err(err) => {
+                                error!( format!("game_data_hindrances error 1 {:?}", err ));
                                 return None;
                             }
                         }
                     }
-                    Err(_err) => {}
+                    Err(err) => {
+                        error!("game_data_hindrances error 2", err);
+                    }
                 }
             }
             db.close();
         }
 
-        Err(_err) => {
+        Err( err) => {
+            error!("game_data_hindrances error 3", err);
             return None;
         }
     }
 
-    let db_req_result4 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    let db_req_result_armor = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    match db_req_result4 {
+    match db_req_result_armor {
         Ok(mut db_req) => {
-            _create_tables(&mut db_req).await;
-            // Hindrances.
+            // Armor.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one("game_data_armor").unwrap();
             let store = tx.object_store("game_data_armor").unwrap();
@@ -915,28 +929,31 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                             Ok(item) => {
                                 game_data.armor.push(item);
                             }
-                            Err(_err) => {
+                            Err(err) => {
+                                error!( format!("game_data_armor error 1 {:?}", err ));
                                 return None;
                             }
                         }
                     }
-                    Err(_err) => {}
+                    Err(err) => {
+                        error!("game_data_armor error 2", err);
+                    }
                 }
             }
             db.close();
         }
 
-        Err(_err) => {
+        Err( err) => {
+            error!("game_data_armor error 3", err);
             return None;
         }
     }
 
-    let db_req_result5 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    let db_req_result_weapons = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    match db_req_result5 {
+    match db_req_result_weapons {
         Ok(mut db_req) => {
-            _create_tables(&mut db_req).await;
-            // Hindrances.
+            // Weapons.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one("game_data_weapons").unwrap();
             let store = tx.object_store("game_data_weapons").unwrap();
@@ -959,28 +976,31 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                             Ok(item) => {
                                 game_data.weapons.push(item);
                             }
-                            Err(_err) => {
+                            Err(err) => {
+                                error!( format!("game_data_weapons error 1 {:?}", err ));
                                 return None;
                             }
                         }
                     }
-                    Err(_err) => {}
+                    Err(err) => {
+                        error!("game_data_weapons error 2", err);
+                    }
                 }
             }
             db.close();
         }
 
-        Err(_err) => {
+        Err( err) => {
+            error!("game_data_weapons error 3", err);
             return None;
         }
     }
 
-    let db_req_result6 = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    let db_req_result_gear = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
-    match db_req_result6 {
+    match db_req_result_gear {
         Ok(mut db_req) => {
-            _create_tables(&mut db_req).await;
-            // Hindrances.
+            // Gear.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one("game_data_gear").unwrap();
             let store = tx.object_store("game_data_gear").unwrap();
@@ -1003,21 +1023,32 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
                             Ok(item) => {
                                 game_data.gear.push(item);
                             }
-                            Err(_err) => {
+                            Err(err) => {
+                                error!( format!("game_data_gear error 1 {:?}", err ));
                                 return None;
                             }
                         }
                     }
-                    Err(_err) => {}
+                    Err(err) => {
+                        error!("game_data_gear error 2", err);
+                    }
                 }
             }
             db.close();
         }
 
-        Err(_err) => {
+        Err( err) => {
+            error!("game_data_gear error 3", err);
             return None;
         }
     }
+
+    log!("local_storage game_data.books.len()", game_data.books.len());
+    log!("local_storage game_data.edges.len()", game_data.edges.len());
+    log!("local_storage game_data.hindrances.len()", game_data.hindrances.len());
+    log!("local_storage game_data.gear.len()", game_data.gear.len());
+    log!("local_storage game_data.armor.len()", game_data.armor.len());
+    log!("local_storage game_data.weapons.len()", game_data.weapons.len());
 
     return Some(game_data);
 }

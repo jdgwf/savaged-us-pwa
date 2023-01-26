@@ -1,5 +1,7 @@
+use crate::components::abilities_entry::AbilitiesEntry;
 use crate::components::admin::book_select::BookSelect;
 use crate::components::effects_entry::EffectsEntry;
+use crate::components::select_minimum_strength::SelectMinimumStrength;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
@@ -9,6 +11,7 @@ use standard_components::libs::local_storage_shortcuts::{
     get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
 };
 use standard_components::ui::input_checkbox::InputCheckbox;
+use standard_components::ui::input_number::InputNumber;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
 use standard_components::ui::textarea::TextArea;
@@ -44,12 +47,41 @@ pub enum EditArmorMessage {
 
     UpdateSummary(String),
     UpdateDescription(String),
+    UpdateMinimumStrength( String ),
 
     UpdateEffects( Vec<String> ),
 
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+
+    UpdateCost( f32 ),
+    UpdateWeight( f32 ),
+    UpdateSize( f32 ),
+
+    UpdateSecondaryArmor( f32 ),
+    UpdateArmor( f32 ),
+    UpdateToughness( f32 ),
+
+
+    UpdateAbilities(Vec<String>),
+
+    UpdateCoversHead(bool),
+    UpdateCoversFace(bool),
+    UpdateCoversTorso(bool),
+    UpdateCoversArms(bool),
+    UpdateCoversLegs(bool),
+
+    UpdateIsShield( bool ),
+    UpdateIsEnergyScreen( bool ),
+
+    UpdateArmorStacks( bool ),
+    UpdateHeavyArmor( bool ),
+
+    UpdateRequiresTwoHands( bool ),
+    UpdateParry( f32 ),
+    UpdateHardness( f32 ),
+    UpdateCoverVsRanged( f32 ),
 }
 
 pub struct EditArmor {
@@ -100,6 +132,12 @@ impl Component for EditArmor {
                 return true;
             }
 
+            EditArmorMessage::UpdateMinimumStrength(new_value) => {
+                self.edit_item.minimum_strength = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
             EditArmorMessage::UpdateDescription(new_value) => {
                 self.edit_item.description = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
@@ -108,6 +146,113 @@ impl Component for EditArmor {
 
             EditArmorMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateCoversHead(new_value) => {
+                self.edit_item.covers_head = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateCoversFace(new_value) => {
+                self.edit_item.covers_face = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateCoversTorso(new_value) => {
+                self.edit_item.covers_torso = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateCost( new_value ) => {
+                self.edit_item.cost = new_value;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateWeight( new_value ) => {
+                self.edit_item.weight = new_value;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateSize( new_value ) => {
+                self.edit_item.size = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateSecondaryArmor( new_value ) => {
+                self.edit_item.secondary_armor_value = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateArmor( new_value ) => {
+                self.edit_item.armor_value = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateParry( new_value ) => {
+                self.edit_item.shield_parry_bonus = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateHardness( new_value ) => {
+                self.edit_item.hardness = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateCoverVsRanged( new_value ) => {
+                self.edit_item.shield_cover_vs_ranged = new_value.round() as i32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateToughness( new_value ) => {
+                self.edit_item.toughness = new_value.round() as u32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateRequiresTwoHands(new_value) => {
+                self.edit_item.requires_2_hands = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateCoversArms(new_value) => {
+                self.edit_item.covers_arms = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateCoversLegs(new_value) => {
+                self.edit_item.covers_legs = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateIsShield(new_value) => {
+                self.edit_item.is_shield = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateIsEnergyScreen(new_value) => {
+                self.edit_item.is_energy_screen = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateArmorStacks(new_value) => {
+                self.edit_item.stacks_with_other_armor = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateHeavyArmor(new_value) => {
+                self.edit_item.heavy = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -124,6 +269,12 @@ impl Component for EditArmor {
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
+            EditArmorMessage::UpdateAbilities(new_value) => {
+                self.edit_item.abilities = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
         }
     }
 
@@ -146,8 +297,17 @@ impl Component for EditArmor {
                 separate: false,
             },
             TertiaryMenuItem {
-                tag: "selection".to_owned(),
-                label: "Selection".to_owned(),
+                tag: "details".to_owned(),
+                label: "Details".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+            TertiaryMenuItem {
+                tag: "protection".to_owned(),
+                label: "Protection".to_owned(),
                 class: None,
                 callback: None,
                 title: None,
@@ -157,6 +317,24 @@ impl Component for EditArmor {
             TertiaryMenuItem {
                 tag: "effects".to_owned(),
                 label: "Effects".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+            TertiaryMenuItem {
+                tag: "integrated_weapons".to_owned(),
+                label: "Integrated Weapons".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+            TertiaryMenuItem {
+                tag: "alternate_modes".to_owned(),
+                label: "Alternate Modes".to_owned(),
                 class: None,
                 callback: None,
                 title: None,
@@ -226,7 +404,7 @@ impl Component for EditArmor {
         let mut current_page =
             get_local_storage_string(&self.local_storage_page_name, "general".to_owned());
 
-        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        let valid_pages = vec!["general", "admin", "effects", "protection", "details", "integrated_weapons", "alternate_modes"];
         if (current_page.as_str() == "admin"
             && !ctx.props().global_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
@@ -295,6 +473,13 @@ impl Component for EditArmor {
                             />
 
                             <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Name"}
+                                value={(self.edit_item.summary).to_owned()}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateSummary) }
+                            />
+
+                            <InputText
                                 label={"UUID"}
                                 readonly={true}
                                 value={(self.edit_item.uuid.to_string()).to_owned()}
@@ -313,32 +498,300 @@ impl Component for EditArmor {
                 </fieldset>
             }
 
-            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
+            if current_page.as_str() == "details" || current_page.as_str() == "__all__" {
                 <fieldset class={"fieldset"}>
-                    <legend>{"Effects"}</legend>
-
+                    <legend>{"Details"}</legend>
                     <div class="row full-width">
                         <div class="col-md-6">
-                            <EffectsEntry
+
+                            <InputNumber
                                 readonly={ctx.props().readonly}
-                                label={"Effects"}
-                                value={self.edit_item.effects.clone()}
-                                onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
+                                label={"Cost"}
+                                step={".01"}
+                                value={self.edit_item.cost }
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateCost) }
                             />
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Weight"}
+                                step={".01"}
+                                value={self.edit_item.weight}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateWeight) }
+                            />
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <SelectMinimumStrength
+                                label={"Minimum Strength"}
+                                readonly={ctx.props().readonly}
+                                value={(self.edit_item.minimum_strength.to_string()).to_owned()}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateMinimumStrength) }
+                            />
+
+                            <InputCheckbox
+                                label="Is a Shield"
+                                description="This will modify the available Protection parameters below"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.is_shield}
+                                onchange={ctx.link().callback( EditArmorMessage::UpdateIsShield )}
+                            />
+
+                            <InputNumber
+                                readonly={ctx.props().readonly}
+                                label={"Size"}
+                                step={"1"}
+                                value={self.edit_item.size as f32}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateSize) }
+                            />
+
+
                         </div>
                     </div>
-                </fieldset>
-            }
 
-            if current_page.as_str() == "selection" || current_page.as_str() == "__all__" {
-                <fieldset class={"fieldset"}>
-                    <legend>{"Selection"}</legend>
                     // <TextArea
                     //     readonly={ctx.props().readonly}
                     //     label={"Conflicts"}
                     //     value={self.edit_item.conflicts.join("\n")}
                     //     onchange={ ctx.link().callback( EditArmorMessage::UpdateConflicts) }
                     // />
+                </fieldset>
+            }
+
+
+            if current_page.as_str() == "protection" || current_page.as_str() == "__all__" {
+
+                if self.edit_item.is_shield {
+                    <fieldset class={"fieldset"}>
+                        <legend>{"Shield Protection"}</legend>
+                        <div class="row full-width">
+                            <div class="col-md-4">
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Parry Bonus"}
+                                    step={"1"}
+                                    value={self.edit_item.shield_parry_bonus as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateParry) }
+                                />
+
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Cover vs Ranged"}
+                                    description={"This will be a negative number if anything"}
+                                    step={"1"}
+                                    min={"-5"}
+                                    max={"0"}
+                                    value={self.edit_item.shield_cover_vs_ranged as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateCoverVsRanged) }
+                                />
+
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Hardness"}
+                                    step={"1"}
+                                    value={self.edit_item.hardness as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateHardness) }
+                                />
+
+                                <InputCheckbox
+                                    label="Requires Two Hands"
+
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.requires_2_hands}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateRequiresTwoHands )}
+                                />
+
+
+                            </div>
+                        </div>
+                    </fieldset>
+                } else {
+                    <fieldset class={"fieldset"}>
+                        <legend>{"Armor Protection"}</legend>
+                        <div class="row full-width">
+                            <div class="col-md-4">
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Armor Value"}
+                                    step={"1"}
+                                    value={self.edit_item.armor_value as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateArmor) }
+                                />
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Secondary Armor Value"}
+                                    step={"1"}
+                                    value={self.edit_item.secondary_armor_value as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateSecondaryArmor) }
+                                />
+                                <InputNumber
+                                    readonly={ctx.props().readonly}
+                                    label={"Toughness Bonus"}
+                                    step={"1"}
+                                    value={self.edit_item.toughness as f32}
+                                    onchange={ ctx.link().callback( EditArmorMessage::UpdateToughness) }
+                                />
+
+
+                            </div>
+                            <div class="col-md-4">
+                                <h4>{"Locations"}</h4>
+                                <InputCheckbox
+                                    label="Head"
+                                    label_class="no-margins"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.covers_head}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateCoversHead )}
+                                />
+                                <InputCheckbox
+                                    label="Face"
+                                    label_class="no-margins"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.covers_face}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateCoversFace )}
+                                />
+                                <InputCheckbox
+                                    label="Torso"
+                                    label_class="no-margins"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.covers_torso}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateCoversTorso )}
+                                />
+                                <InputCheckbox
+                                    label="Arms"
+                                    label_class="no-margins"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.covers_arms}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateCoversArms )}
+                                />
+                                <InputCheckbox
+                                    label="Legs"
+                                    label_class="no-margins"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.covers_legs}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateCoversLegs )}
+                                />
+
+                            </div>
+                            <div class="col-md-4">
+                                <InputCheckbox
+                                    label="Is an Energy Screen"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.is_shield}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateIsEnergyScreen )}
+                                />
+
+                                <InputCheckbox
+                                    label="Heavy Armor"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.heavy}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateHeavyArmor )}
+                                />
+
+                                <InputCheckbox
+                                    label="Stacks fully with other armor"
+                                    readonly={ctx.props().readonly}
+                                    checked={self.edit_item.stacks_with_other_armor}
+                                    onchange={ctx.link().callback( EditArmorMessage::UpdateArmorStacks )}
+                                />
+
+
+
+
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+            }
+
+
+            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Effects"}</legend>
+
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
+                            <EffectsEntry
+                                readonly={ctx.props().readonly}
+                                description="These effects will apply when this item is equipped"
+                                label={"Effects"}
+                                value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
+                            />
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <AbilitiesEntry
+                                readonly={ctx.props().readonly}
+                                description="These abilities will be added to the summary when this item is equipped"
+                                label={"Abilities"}
+                                value={self.edit_item.abilities.clone()}
+                                onchange={ ctx.link().callback( EditArmorMessage::UpdateAbilities) }
+                            />
+                        </div>
+                    </div>
+                </fieldset>
+            }
+
+            if current_page.as_str() == "integrated_weapons" || current_page.as_str() == "__all__"  {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Integrated Weapons"}</legend>
+
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
+                            // <EffectsEntry
+                            //     readonly={ctx.props().readonly}
+                            //     description="These effects will apply when this item is equipped"
+                            //     label={"Effects"}
+                            //     value={self.edit_item.effects.clone()}
+                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
+                            // />
+
+                        </div>
+                        <div class="col-md-6">
+
+                            // <AbilitiesEntry
+                            //     readonly={ctx.props().readonly}
+                            //     description="These abilities will be added to the summary when this item is equipped"
+                            //     label={"Abilities"}
+                            //     value={self.edit_item.abilities.clone()}
+                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateAbilities) }
+                            // />
+                        </div>
+                    </div>
+                </fieldset>
+            }
+
+            if current_page.as_str() == "alternate_modes" || current_page.as_str() == "__all__"  {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Alternate Modes"}</legend>
+
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
+                            // <EffectsEntry
+                            //     readonly={ctx.props().readonly}
+                            //     description="These effects will apply when this item is equipped"
+                            //     label={"Effects"}
+                            //     value={self.edit_item.effects.clone()}
+                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
+                            // />
+
+                        </div>
+                        <div class="col-md-6">
+
+                            // <AbilitiesEntry
+                            //     readonly={ctx.props().readonly}
+                            //     description="These abilities will be added to the summary when this item is equipped"
+                            //     label={"Abilities"}
+                            //     value={self.edit_item.abilities.clone()}
+                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateAbilities) }
+                            // />
+                        </div>
+                    </div>
                 </fieldset>
             }
                 </div>

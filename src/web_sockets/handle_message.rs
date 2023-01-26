@@ -18,6 +18,10 @@ pub fn handle_message(
     global_vars: GlobalVars,
     update_global_vars: Callback<GlobalVars>,
 ) {
+    if global_vars.server_side_renderer {
+        return;
+    }
+
     match msg.kind {
         WebsocketMessageType::Online => {
             let mut new_global_vars = global_vars.clone();

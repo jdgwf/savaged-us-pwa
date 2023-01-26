@@ -1,7 +1,8 @@
-use crate::components::alerts::AlertDefinition;
+// use crate::components::alerts::AlertDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use savaged_libs::alert_level::AlertLevel;
+// use gloo_console::log;
+// use savaged_libs::alert_level::AlertLevel;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
@@ -45,7 +46,9 @@ impl Component for MainHome {
                     </>
                 };
             }
-            None => {}
+            None => {
+                // log!("main_home view no game_data?")
+            }
         }
         match &global_vars.saves {
             Some(saves) => {
@@ -55,10 +58,12 @@ impl Component for MainHome {
                     </>
                 };
             }
-            None => {}
+            None => {
+                // log!("main_home view no saves?")
+            }
         }
 
-        let global_vars_copy = ctx.props().global_vars.clone();
+        // let global_vars_copy = ctx.props().global_vars.clone();
         html! {
             <UIPage
                 global_vars={global_vars.clone()}
@@ -74,21 +79,21 @@ impl Component for MainHome {
                 </div>
                 // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
                 <hr />
-                <button
-                    class="btn"
-                        onclick={ move |_e| {
-                        global_vars_copy.add_alert.emit(
-                            AlertDefinition {
-                                level: AlertLevel::Info,
-                                text: Some("Hello!".to_owned()),
-                                ..Default::default()
-                            }
-                        );
-                    }}
-                >
-                    {"Add Alert"}
-                </button>
-                <hr />
+                // <button
+                //     class="btn"
+                //         onclick={ move |_e| {
+                //         global_vars_copy.add_alert.emit(
+                //             AlertDefinition {
+                //                 level: AlertLevel::Info,
+                //                 text: Some("Hello!".to_owned()),
+                //                 ..Default::default()
+                //             }
+                //         );
+                //     }}
+                // >
+                //     {"Add Alert"}
+                // </button>
+                // <hr />
                 // <h3>{"Data Retrieval Event Buttons"}</h3>
                 // <button
                 //     class="btn"

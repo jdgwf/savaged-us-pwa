@@ -231,6 +231,7 @@ impl Component for MainApp {
         global_vars.open_confirmation_dialog =
             ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
 
+
         let wss = connect_to_websocket(
             global_vars.server_root.to_owned(),
             &received_message_callback,
