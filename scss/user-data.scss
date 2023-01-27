@@ -18,9 +18,9 @@ body {
                 height: 155px;
                 // margin: .5rem;
                 border-radius: .5rem;
-                // border: solid 2px #888;
+                // border: solid 2px var(--borders-color);
                 padding: 15% 0 0 0;
-                background: #888;
+                background: var(--borders-color);
                 overflow: hidden;
                 position: absolute;
                 bottom: 0;
@@ -47,8 +47,8 @@ body {
                 height: 30px;
                 // margin: .5rem;
                 border-radius: .5rem;
-                // border: solid 2px #888;
-                background: #888;
+                // border: solid 2px var(--borders-color);
+                background: var(--borders-color);
                 overflow: hidden;
                 position: absolute;
                 top: 0;
@@ -96,7 +96,7 @@ body {
             // overflow: hidden;
             // cursor: pointer;
             border-radius: .5rem;
-            border: solid 2px #888;
+            border: solid 2px var(--borders-color);
             background-size: cover;
             overflow: hidden;
 

@@ -23,18 +23,10 @@ html {
 }
 
 * {
-    // transition: background-color 1s ease;
-    // transition: color 1s ease;
-    -webkit-transition: background .5s ease;
-    -moz-transition: background .5s ease;
-    -o-transition: background .5s ease;
-    transition: background .5s ease;
-
-    -webkit-transition: color .5s ease;
-    -moz-transition: color .5s ease;
-    -o-transition: color .5s ease;
-    transition: color .5s ease;
+    transition: .25s ease-in-out;
+    transition-property: color, border-color, box-shadow, background-color;
 }
+
 body {
 
 
@@ -654,9 +646,10 @@ body {
                     white-space: nowrap;
                     text-align: center;
                     color: var(--body-font-color);
-
+                    border-top-color: var(--header-bg-color) !important;
                     &:hover {
                         background-color: var(--borders-color-lighten);
+                        border-color: var(--borders-color-lighten);
                     }
                 }
 
@@ -675,7 +668,7 @@ body {
                     a {
                         color: #fff;
                         background-color: #194c87;
-                        border-color: #194c87;
+                        border: solid 2px var(--header-bg-color);
                         &:hover {
                             color: #fff;
                             background-color: #1f5ba0;
@@ -688,7 +681,7 @@ body {
 
                         color: #fff;
                         background-color: #198754;
-                        border-color: #198754;
+                        border: solid 2px var(--header-bg-color);
                         &:hover {
                             color: #fff;
                             background-color: #157347;

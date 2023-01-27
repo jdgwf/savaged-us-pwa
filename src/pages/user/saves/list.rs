@@ -90,8 +90,9 @@ impl Component for UserSavesList {
             };
         }
 
-        // global_vars.current_menu = "main-my-stuff".to_owned();
+
         global_vars.current_sub_menu = "user-data-saves".to_owned();
+        global_vars.current_menu = "main-my-stuff".to_owned();
 
         let mut saves: Vec<SaveDBRow> = Vec::new();
 

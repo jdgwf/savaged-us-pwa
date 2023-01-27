@@ -55,7 +55,7 @@ impl Component for UserSavesView {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let mut global_vars = ctx.props().global_vars.clone();
 
-        // global_vars.current_menu = "main-my-stuff".to_owned();
+        global_vars.current_menu = "main-my-stuff".to_owned();
         global_vars.current_sub_menu = "user-data-saves".to_owned();
 
         if global_vars.user_loading {
