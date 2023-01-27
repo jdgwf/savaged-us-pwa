@@ -1,4 +1,3 @@
-use super::UserRoute;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::update_user;
 use crate::libs::global_vars::GlobalVars;
@@ -6,10 +5,13 @@ use gloo_console::error;
 use savaged_libs::hidden_banner::HiddenBanner;
 use savaged_libs::user::User;
 use serde_json;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::nbsp::Nbsp;
+use super::UserRoute;
+use web_sys::{HtmlSelectElement};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -33,6 +35,8 @@ pub enum SettingsPrivateMessage {
     RemoveHiddenBanner(u32),
     ResetPasswords(MouseEvent),
     SavePasswords(MouseEvent),
+
+    SetUITheme( Event ),
 }
 
 pub struct SettingsPrivate {
@@ -194,6 +198,31 @@ impl Component for SettingsPrivate {
                 true
             }
 
+            SettingsPrivateMessage::SetUITheme( event ) => {
+                let input: HtmlSelectElement = event.target_unchecked_into();
+
+                let body_class = input.value();
+
+                set_local_storage_string( "UI_THEME", body_class.to_owned());
+
+                self.current_user.theme_css = body_class.to_owned();
+
+                let mut global_vars = ctx.props().global_vars.clone();
+
+                global_vars.current_user = self.current_user.clone();
+
+                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+
+                update_user(
+                    global_vars,
+                    update_global_vars,
+                    Callback::noop(),
+                    "".to_owned(),
+                    false,
+                );
+                true
+            }
+
             SettingsPrivateMessage::UpdateInformationSaved(message) => {
                 self.update_info_message = message.clone();
                 true
@@ -229,6 +258,8 @@ impl Component for SettingsPrivate {
                     check_passwords(self.password.clone(), self.verify_password.clone());
                 true
             }
+
+
 
             SettingsPrivateMessage::UpdateFirstName(new_value) => {
                 self.first_name = new_value.to_owned();
@@ -366,9 +397,9 @@ impl Component for SettingsPrivate {
 
             >
             <h2><i class={"fa-solid fa-user-secret"}></i><Nbsp />{"Private Settings"}</h2>
-            <div class={"alert alert-success text-center"}>
-                {"The data in the section is strictly between you and Savaged.us. We won't share anything here with anyone else."}
-            </div>
+
+            <p class="text-center">{"The data in the section is strictly between you and Savaged.us. We won't share anything here with anyone else."}</p>
+
             <input
                 type={"email"}
                 value=""
@@ -510,6 +541,20 @@ impl Component for SettingsPrivate {
                                 {"This will both remove the banner on the Character Generator Traits page warning to use the Advances for advancing character skills and attributes and turn off the read-only flag when a character has advanced."}
                             </div>
                         </InputCheckbox>
+
+                        <label>
+                            {"App Theme:"}<br />
+
+                            <select
+                                onchange={ctx.link().callback( SettingsPrivateMessage::SetUITheme )}
+                            >
+                                <option selected={self.current_user.theme_css.as_str() == "_default_"} value="_default_">{"Magenta (default)"}</option>
+                                <option selected={self.current_user.theme_css.as_str() == "blue"} value="blue">{"Blue"}</option>
+                                <option selected={self.current_user.theme_css.as_str() == "green"} value="green">{"Green"}</option>
+                                <option selected={self.current_user.theme_css.as_str() == "gray"} value="gray">{"Gray"}</option>
+                                <option selected={self.current_user.theme_css.as_str() == "red"} value="red">{"Red"}</option>
+                            </select>
+                        </label>
                     </fieldset>
                     <fieldset class={"fieldset"}>
                         <legend>{"Hidden Banners"}</legend>

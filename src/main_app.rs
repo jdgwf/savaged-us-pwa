@@ -26,6 +26,9 @@ use savaged_libs::user::User;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
+use standard_components::libs::set_body_class::set_body_class;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use uuid::Uuid;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -255,7 +258,7 @@ impl Component for MainApp {
     fn update(&mut self, ctx: &Context<Self>, msg: MainAppMessage) -> bool {
         match msg {
             MainAppMessage::ToggleMobileMenu(_new_value) => {
-                log!("ToggleMobileMenu called");
+                // log!("ToggleMobileMenu called");
                 self.global_vars.show_mobile_menu = !self.global_vars.show_mobile_menu;
                 return true;
             }
@@ -556,6 +559,15 @@ impl Component for MainApp {
         let global_vars2 = self.global_vars.clone();
         let global_vars3 = self.global_vars.clone();
         let global_vars4 = self.global_vars.clone();
+
+        let mut body_class = get_local_storage_string( "UI_THEME", "".to_string());
+
+        if self.global_vars.current_user.id > 0 && body_class.is_empty() {
+            body_class = self.global_vars.current_user.theme_css.to_owned();
+            set_local_storage_string( "UI_THEME", body_class.to_string())
+        }
+
+        set_body_class( body_class.replace("_default_", ""), self.global_vars.server_side_renderer );
 
         html! {
 

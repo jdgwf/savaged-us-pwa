@@ -92,7 +92,7 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::Offline => {
-            log!(format!("handle_message Offline {:?}", msg));
+            // log!(format!("handle_message Offline {:?}", msg));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = true;
             new_global_vars.user_loading = false;
@@ -100,7 +100,7 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::GameDataPackage => {
-            log!(format!("handle_message GameDataPackage"));
+            // log!(format!("handle_message GameDataPackage"));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.game_data = msg.game_data.clone();
 
@@ -109,14 +109,14 @@ pub fn handle_message(
             let game_data_last_updated =
                 get_local_storage_string("game_data_last_updated", "".to_owned());
 
-            log!(format!(
-                "handle_message GameDataPackage game_data_user_level {}",
-                game_data_user_level
-            ));
-            log!(format!(
-                "handle_message GameDataPackage game_data_last_updated {}",
-                game_data_last_updated
-            ));
+            // log!(format!(
+            //     "handle_message GameDataPackage game_data_user_level {}",
+            //     game_data_user_level
+            // ));
+            // log!(format!(
+            //     "handle_message GameDataPackage game_data_last_updated {}",
+            //     game_data_last_updated
+            // ));
             // new_global_vars.user_loading = false;
 
             match msg.game_data {

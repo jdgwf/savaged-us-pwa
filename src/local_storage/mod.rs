@@ -34,7 +34,7 @@ pub struct SavesSyncUpdateResults {
 
 async fn _create_tables(db_req: &mut OpenDbRequest) {
     db_req.set_on_upgrade_needed(Some(|evt: &IdbVersionChangeEvent| -> Result<(), JsValue> {
-        log!("_create_tables?");
+        // log!("_create_tables?");
         // Check if the object store exists; create it if it doesn't
         if let None = evt
             .db()
@@ -42,7 +42,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == INDEX_DB_BOOKS_STORE_NAME)
         {
             let _ = evt.db().create_object_store(INDEX_DB_BOOKS_STORE_NAME);
-            log!("Created indexed_db store", INDEX_DB_BOOKS_STORE_NAME);
+            // log!("Created indexed_db store", INDEX_DB_BOOKS_STORE_NAME);
         }
         if let None = evt
             .db()
@@ -50,7 +50,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == "game_data_edges")
         {
             let _ = evt.db().create_object_store("game_data_edges");
-            log!("Created indexed_db store", "game_data_edges");
+            // log!("Created indexed_db store", "game_data_edges");
         }
         if let None = evt
             .db()
@@ -58,7 +58,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == "game_data_hindrances")
         {
             let _ = evt.db().create_object_store("game_data_hindrances");
-            log!("Created indexed_db store", "game_data_hindrances");
+            // log!("Created indexed_db store", "game_data_hindrances");
         }
 
         if let None = evt
@@ -67,7 +67,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == "game_data_gear")
         {
             let _ = evt.db().create_object_store("game_data_gear");
-            log!("Created indexed_db store", "game_data_gear");
+            // log!("Created indexed_db store", "game_data_gear");
         }
 
         if let None = evt
@@ -76,7 +76,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == "game_data_armor")
         {
             let _ = evt.db().create_object_store("game_data_armor");
-            log!("Created indexed_db store", "game_data_armor");
+            // log!("Created indexed_db store", "game_data_armor");
         }
 
         if let None = evt
@@ -85,7 +85,7 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
             .find(|n| n == "game_data_weapons")
         {
             let _ = evt.db().create_object_store("game_data_weapons");
-            log!("Created indexed_db store", "game_data_weapons");
+            // log!("Created indexed_db store", "game_data_weapons");
         }
 
         if let None = evt
@@ -97,9 +97,9 @@ async fn _create_tables(db_req: &mut OpenDbRequest) {
                 .db()
                 .create_object_store(INDEX_DB_SAVES_STORE_NAME)
                 .unwrap();
-            log!("Created indexed_db store", INDEX_DB_SAVES_STORE_NAME);
+            // log!("Created indexed_db store", INDEX_DB_SAVES_STORE_NAME);
         }
-        log!("_create_tables end");
+        // log!("_create_tables end");
         Ok(())
     }));
 }
@@ -725,12 +725,12 @@ pub async fn clear_data_store(store_name: &str) {
                     // log!( format!("clear_data_store cleared {}", store_name) );
                 }
                 Err(err) => {
-                    log!(format!("clear_data_store errpr {} {:?}", store_name, err));
+                    error!(format!("clear_data_store errpr {} {:?}", store_name, err));
                 }
             }
         }
         Err(err) => {
-            log!(format!("clear_data_store error! {:?}", err));
+            error!(format!("clear_data_store error! {:?}", err));
         }
     }
 }
@@ -1043,12 +1043,12 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
         }
     }
 
-    log!("local_storage game_data.books.len()", game_data.books.len());
-    log!("local_storage game_data.edges.len()", game_data.edges.len());
-    log!("local_storage game_data.hindrances.len()", game_data.hindrances.len());
-    log!("local_storage game_data.gear.len()", game_data.gear.len());
-    log!("local_storage game_data.armor.len()", game_data.armor.len());
-    log!("local_storage game_data.weapons.len()", game_data.weapons.len());
+    // log!("local_storage game_data.books.len()", game_data.books.len());
+    // log!("local_storage game_data.edges.len()", game_data.edges.len());
+    // log!("local_storage game_data.hindrances.len()", game_data.hindrances.len());
+    // log!("local_storage game_data.gear.len()", game_data.gear.len());
+    // log!("local_storage game_data.armor.len()", game_data.armor.len());
+    // log!("local_storage game_data.weapons.len()", game_data.weapons.len());
 
     return Some(game_data);
 }

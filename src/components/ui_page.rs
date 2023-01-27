@@ -81,11 +81,11 @@ pub fn ui_page(props: &UIPageProps) -> Html {
 
                     { for props.children.iter() }
 
-                    <footer class="text-center">{("Using server ").to_owned() + &props.global_vars.server_root}</footer>
+
                 </div>
             </div>
         </div>
-
+        <footer class="text-center">{("Using server ").to_owned() + &props.global_vars.server_root}</footer>
         </>
     }
 }

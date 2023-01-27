@@ -82,6 +82,10 @@ pub enum EditArmorMessage {
     UpdateParry( f32 ),
     UpdateHardness( f32 ),
     UpdateCoverVsRanged( f32 ),
+
+    UpdateSetStrength( String ),
+    UpdateRun( String ),
+    UpdatePace( f32 ),
 }
 
 pub struct EditArmor {
@@ -140,6 +144,18 @@ impl Component for EditArmor {
 
             EditArmorMessage::UpdateDescription(new_value) => {
                 self.edit_item.description = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateSetStrength(new_value) => {
+                self.edit_item.set_strength = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateRun(new_value) => {
+                self.edit_item.run = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -208,6 +224,12 @@ impl Component for EditArmor {
 
             EditArmorMessage::UpdateCoverVsRanged( new_value ) => {
                 self.edit_item.shield_cover_vs_ranged = new_value.round() as i32;
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdatePace( new_value ) => {
+                self.edit_item.pace = new_value.round() as u32;
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -634,8 +656,8 @@ impl Component for EditArmor {
 
 
                             </div>
-                            <div class="col-md-4">
-                                <h4>{"Locations"}</h4>
+                            <div class="col-md-4 text-center">
+                                <h4 style="margin: .5rem">{"Locations"}</h4>
                                 <InputCheckbox
                                     label="Head"
                                     label_class="no-margins"
@@ -732,6 +754,40 @@ impl Component for EditArmor {
                             />
                         </div>
                     </div>
+                    <h4 style="text-align: center; margin: .5rem">{"Trait Enhancements"}</h4>
+                    <div class="row full-width">
+                    <div class="col-md-4">
+                        <InputNumber
+                            readonly={ctx.props().readonly}
+                            description={"If not 0, this will override the character's base pace"}
+                            label={"Set Pace"}
+                            step={"1"}
+                            value={self.edit_item.pace as f32}
+                            onchange={ ctx.link().callback( EditArmorMessage::UpdatePace) }
+                        />
+
+
+                    </div>
+                    <div class="col-md-4">
+                        <SelectMinimumStrength
+                            label={"Set Run Die"}
+                            description={"If not-empty, this will override the character's run die"}
+                            readonly={ctx.props().readonly}
+                            value={self.edit_item.run.to_owned()}
+                            onchange={ ctx.link().callback( EditArmorMessage::UpdateRun) }
+                        />
+                    </div>
+                    <div class="col-md-4">
+                        <SelectMinimumStrength
+                            label="Set Strength"
+                            description={"If not-empty, this will override the character's strength"}
+                            readonly={ctx.props().readonly}
+                            value={self.edit_item.set_strength.to_owned()}
+                            onchange={ctx.link().callback( EditArmorMessage::UpdateSetStrength )}
+                        />
+
+                    </div>
+                </div>
                 </fieldset>
             }
 

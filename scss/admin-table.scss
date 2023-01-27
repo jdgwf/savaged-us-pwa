@@ -15,10 +15,10 @@ body {
                 width: 120px;
                 color: #fff;
                 margin: .5rem;
-                background: var(--header-bg-color);
+                background-color: var(--header-bg-color);
                 border: solid 2px var(--header-bg-color);
                 &:hover {
-                    background: var(--borders-color-lighten);
+                    background-color: var(--borders-color-lighten);
                 }
 	    }
         }
@@ -53,7 +53,7 @@ body {
 
     .admin-table {
         width: 100%;
-        background: var(--header-bg-color);
+        background-color: var(--header-bg-color);
         thead {
             tr {
                 th {
@@ -64,11 +64,11 @@ body {
         tbody {
             tr {
                 td {
-                    background: var(--body-bg-color);
+                    background-color: var(--body-bg-color);
                 }
                 &:hover {
                     td {
-                        background: var(--borders-color);
+                        background-color: var(--borders-color);
                     }
                 }
             }

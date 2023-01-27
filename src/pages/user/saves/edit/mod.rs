@@ -456,7 +456,7 @@ impl Component for UserSavesEdit {
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
-                        log!(format!("update - setting Armor Data\n{}", &save.data));
+                        // log!(format!("update - setting Armor Data\n{}", &save.data));
                         self.editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {

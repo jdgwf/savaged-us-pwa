@@ -362,7 +362,7 @@ impl Component for SettingsPublic {
                     self.update_username_notification_class =
                         "alert alert-success text-center".to_owned();
                 } else {
-                    log!("UpdateUsernameSaved saved", saved);
+                    // log!("UpdateUsernameSaved saved", saved);
                     self.update_username_can_save = true;
                     self.update_username_message =
                         "Oh no! Something went wrong! Please try again.".to_owned();
@@ -543,9 +543,9 @@ impl Component for SettingsPublic {
 
             >
                 <h2><i class={"fa-solid fa-globe"}></i><Nbsp />{"Public Settings"}</h2>
-                <div class={"alert alert-warning"}>
+                <p class={"text-center"}>
                     {"Anything here can potentially be shared on the public side, so if you wish to remain anonymous to everyone this is the place to do it!"}
-                </div>
+                </p>
                 <div class={"row"}>
                     <div class={"col-xs-12 col-md-6"}>
                         <fieldset class={"fieldset"}>

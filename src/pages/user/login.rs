@@ -142,10 +142,10 @@ impl Component for UserLogin {
             let set_login_message = set_login_message.clone();
 
             spawn_local(async move {
-                log!(
-                    "trying login-for-token",
-                    api_root.clone() + "/auth/login-for-token"
-                );
+                // log!(
+                //     "trying login-for-token",
+                //     api_root.clone() + "/auth/login-for-token"
+                // );
                 let result = savaged_login(
                     (api_root + "/auth/login-for-token").to_owned(),
                     username,

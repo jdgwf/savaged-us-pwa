@@ -1,0 +1,31 @@
+body {
+
+    --borders-color: rgb(141, 39, 127);
+    --borders-color-lighten: rgb(177, 37, 158);
+    &.gray {
+        --borders-color: #666;
+        --borders-color-lighten: #777;
+    }
+
+    &.green {
+        --borders-color: rgb(52, 175, 41);
+        --borders-color-lighten: rgb(49, 209, 34);
+    }
+
+    &.blue {
+        --borders-color: rgb(41, 77, 175);
+        --borders-color-lighten: rgb(34, 90, 209);
+    }
+    &.red {
+        --borders-color: rgb(175, 41, 41);
+        --borders-color-lighten: rgb(209, 34, 34);
+    }
+    --header-bg-color: #000;
+    --body-font-color: #eee;
+    --body-bg-color: #333333;
+    --label-bg-color: #292929;
+    --label-bg-color-selected: #333333;
+
+    --body-anchor-color: #198754;
+    --body-anchor-color-hover: #1da767;
+}

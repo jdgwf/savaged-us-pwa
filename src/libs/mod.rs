@@ -1,6 +1,7 @@
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
 use yew::Callback;
+use web_sys;
 
 pub mod admin_api;
 pub mod fetch_api;
@@ -29,3 +30,4 @@ pub fn websocket_set_room(
     };
     send_websocket.emit( msg );
 }
+

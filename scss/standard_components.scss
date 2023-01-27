@@ -1,7 +1,7 @@
 body {
 
     label {
-        background: var(--label-bg-color);
+        background-color: var(--label-bg-color);
         padding: 1rem;
 
         margin: 0 0 0 0;
@@ -106,7 +106,7 @@ body {
 
     .content-box,
     .fieldset {
-        background: var(--label-bg-color);
+        background-color: var(--label-bg-color);
         border-radius: .5rem;
         margin: 0 0 1rem 0;
         display: block;
@@ -125,7 +125,7 @@ body {
             text-align: center;
             border-radius: 3rem;
             color: var(--body-color);
-            background: var(--borders-color);
+            background-color: var(--borders-color);
             border: solid 2px var(--borders-color);
         }
 
@@ -152,7 +152,7 @@ body {
 
     .btn {
         border: solid 1px transparent;
-        // background: var(--borders-color);
+        // background-color: var(--borders-color);
         // color: #fff;
         font-size: 1rem;
         padding: .25rem .5rem;
@@ -160,9 +160,9 @@ body {
         cursor: pointer;
 
         // // default to a primary button's colors
-        // // background: var(--body-anchor-color);
+        // // background-color: var(--body-anchor-color);
         // &:hover {
-        //     background: var(--borders-color-lighten);
+        //     background-color: var(--borders-color-lighten);
         //     color: #333;
         // }
         color: #fff;
@@ -184,18 +184,18 @@ body {
         }
 
         // &.btn-primary {
-        //     background: var(--body-anchor-color);
+        //     background-color: var(--body-anchor-color);
         //     &:hover {
-        //         background: var(--body-anchor-color-hover);
+        //         background-color: var(--body-anchor-color-hover);
         //         color: #333;
         //     }
         // }
 
         &.btn-secondary {
-            background: var(--borders-color);
+            background-color: var(--borders-color);
             border-color: var(--borders-color);
             &:hover {
-                background: var(--borders-color-lighten);
+                background-color: var(--borders-color-lighten);
             }
         }
 
