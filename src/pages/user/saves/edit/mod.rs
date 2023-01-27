@@ -9,7 +9,7 @@ use crate::local_storage::{get_saves_from_index_db, index_db_put_save};
 use crate::pages::error404::Error404;
 use crate::pages::user::UserRoute;
 use chrono::Utc;
-use gloo_console::error;
+use gloo_console::{error, log};
 use savaged_libs::player_character::armor::Armor;
 use savaged_libs::player_character::edge::Edge;
 use savaged_libs::player_character::gear::Gear;
@@ -23,7 +23,6 @@ use wasm_bindgen_futures::spawn_local;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use savaged_libs::clean_json_data;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesEditProps {
@@ -187,8 +186,7 @@ impl Component for UserSavesEdit {
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
                         // log!(format!("create - setting Armor Data\n{}", &save.data));
-                        let save_data = clean_json_data( save.data.to_owned() );
-                        editing_armor = serde_json::from_str(save_data.as_str()).unwrap();
+                        editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
                         // log!("setting Hindrance Data");
@@ -458,9 +456,8 @@ impl Component for UserSavesEdit {
                     }
                     "armor" => {
                         // form = html!{ <div class="text-center">{"TODO: Armor Edit Form"}</div>};
-                        // log!(format!("update - setting Armor Data\n{}", &save.data));
-                        let save_data = clean_json_data( save.data.to_owned() );
-                        self.editing_armor = serde_json::from_str(save_data.as_str()).unwrap();
+                        log!(format!("update - setting Armor Data\n{}", &save.data));
+                        self.editing_armor = serde_json::from_str(save.data.as_str()).unwrap();
                     }
                     "hindrances" => {
                         self.editing_hindrance = serde_json::from_str(save.data.as_str()).unwrap();
