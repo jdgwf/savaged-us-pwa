@@ -299,13 +299,17 @@ async fn _get_data(
                 Err(err) => {
                     let err_string: String = format!("get_users Serde Err(): {}", &err);
                     set_users.emit(Vec::new());
-                    error!(&err_string);
+                    if !global_vars.server_side_renderer {
+                        error!(&err_string);
+                    }
                 }
             }
         }
         Err(err) => {
             set_users.emit(Vec::new());
-            error!("get_users Err()", &err);
+            if !global_vars.server_side_renderer {
+                error!("get_users Err()", &err);
+            }
         }
     }
 
@@ -327,13 +331,17 @@ async fn _get_data(
                 Err(err) => {
                     let err_string: String = format!("get_users paging Serde Err(): {}", &err);
                     set_paging.emit(None);
-                    error!(&err_string);
+                    if !global_vars.server_side_renderer {
+                        error!(&err_string);
+                    }
                 }
             }
         }
         Err(err) => {
             set_paging.emit(None);
-            error!("get_users paging Err()", &err);
+            if !global_vars.server_side_renderer {
+                error!("get_users paging Err()", &err);
+            }
         }
     }
 }

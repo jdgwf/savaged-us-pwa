@@ -452,11 +452,13 @@ impl Component for MainApp {
                         }
                     }
                     Err(err) => {
-                        error!(format!(
-                            "MainWebAppMessages::SendWebSocket json to_str error {} {:?}",
-                            err.to_string(),
-                            &send_message
-                        ));
+                        if !self.global_vars.server_side_renderer {
+                            error!(format!(
+                                "MainWebAppMessages::SendWebSocket json to_str error {} {:?}",
+                                err.to_string(),
+                                &send_message
+                            ));
+                        }
                         return false;
                     }
                 }
@@ -468,7 +470,9 @@ impl Component for MainApp {
                 if global_vars.offline != offline {
                     global_vars.offline = offline;
 
-                    log!("WebsocketOffline called", offline);
+                    if !global_vars.server_side_renderer {
+                        log!("WebsocketOffline called", offline);
+                    }
 
                     ctx.link()
                         .callback(MainAppMessage::UpdateGlobalVars)
@@ -512,11 +516,13 @@ impl Component for MainApp {
                         return false;
                     }
                     Err(err) => {
-                        error!(
-                            "MainWebAppMessages::ReceivedWebSocket json from_str error",
-                            err.to_string(),
-                            &sent_data
-                        );
+                        if !self.global_vars.server_side_renderer {
+                            error!(
+                                "MainWebAppMessages::ReceivedWebSocket json from_str error",
+                                err.to_string(),
+                                &sent_data
+                            );
+                        }
                         return false;
                     }
                 }

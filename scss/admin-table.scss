@@ -53,29 +53,36 @@ body {
 
     .admin-table {
         width: 100%;
-        background-color: var(--header-bg-color);
-        thead {
-            tr {
-                th {
-
+        background-color: var(--content-box-bg);
+        border-right: solid 2px var(--borders-color);
+        border-top: solid 2px var(--borders-color);
+        > thead {
+            > tr {
+                > th {
+                    background-color: var(--borders-color-lighten);
+                    border-left: solid 2px var(--borders-color);
+                    border-bottom: solid 2px var(--borders-color);
                 }
             }
         }
-        tbody {
-            tr {
-                td {
-                    background-color: var(--body-bg-color);
+        > tbody {
+            > tr {
+                > td {
+                    // background-color: var(--content-box-bg);
+                    border-left: solid 2px var(--borders-color);
+                    border-bottom: solid 2px var(--borders-color);
                 }
                 &:hover {
                     td {
                         background-color: var(--borders-color);
+
                     }
                 }
             }
         }
-        tfoot {
-            tr {
-                th {
+        > tfoot {
+            > tr {
+                > th {
                     label {
                         width: auto;
                         display: inline-block;
@@ -94,10 +101,12 @@ body {
             }
         }
 
-        thead,tbody,tfoot {
-            tr {
-                th,
-                td {
+        > thead,
+        > tbody,
+        > tfoot {
+            > tr {
+                > th,
+                > td {
                     padding: .25rem .5rem;
                     vertical-align: top;
                     &.min-width {

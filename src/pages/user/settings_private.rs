@@ -548,7 +548,7 @@ impl Component for SettingsPrivate {
                             <select
                                 onchange={ctx.link().callback( SettingsPrivateMessage::SetUITheme )}
                             >
-                                <option selected={self.current_user.theme_css.as_str() == "_default_"} value="_default_">{"Magenta (default)"}</option>
+                                <option selected={self.current_user.theme_css.as_str() == "_default_"} value="_default_">{"Fuchsia (default)"}</option>
                                 <option selected={self.current_user.theme_css.as_str() == "blue"} value="blue">{"Blue"}</option>
                                 <option selected={self.current_user.theme_css.as_str() == "green"} value="green">{"Green"}</option>
                                 <option selected={self.current_user.theme_css.as_str() == "gray"} value="gray">{"Gray"}</option>

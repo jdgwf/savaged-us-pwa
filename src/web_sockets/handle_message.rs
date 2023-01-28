@@ -162,7 +162,9 @@ pub fn handle_message(
         }
 
         _ => {
-            error!(format!("Unhandled Message Type! {:?}", msg));
+            if !global_vars.server_side_renderer {
+                error!(format!("Unhandled Message Type! {:?}", msg));
+            }
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             // global_vars.update_global_vars.emit( new_global_vars );

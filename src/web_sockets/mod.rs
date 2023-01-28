@@ -72,6 +72,7 @@ impl WebsocketService {
                     Err(_e) => {
                         //error!( format!)"ws: {:?}", e.to_string()) );
                         error!("WebSocket connection failure - will try to reconnect periodically.");
+
                         websocket_offline_callback.emit(true);
                     }
                 }

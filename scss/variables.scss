@@ -1,31 +1,62 @@
 body {
 
-    --borders-color: rgb(141, 39, 127);
-    --borders-color-lighten: rgb(177, 37, 158);
+    --content-box-bg: rgba(51,51,51,.7);
+    --borders-color: #990099;;
+    --borders-color-lighten: #bb00bb;
+
+    --background-image: url(/images/fuchsia_theme_bg.webp);
+    --background-position-y: bottom;
+    --background-repeat: no-repeat;
+    --background-size: 100% auto;
+
+    --header-bg-color: #000;
+    --body-font-color: #eee;
+    --body-bg-color: #403e6f;
+    --label-bg-color: #292929;
+    --label-bg-color-selected: #333333;
+
+    --body-anchor-color: #990099;
+    --body-anchor-color-hover: #bb00bb;
+
     &.gray {
         --borders-color: #666;
         --borders-color-lighten: #777;
+
+        --body-bg-color: #252525;
+        --body-anchor-color: #666;
+        --body-anchor-color-hover: #777;
+        --background-image: url(/images/gray_theme_bg.webp);
     }
 
     &.green {
         --borders-color: rgb(52, 175, 41);
         --borders-color-lighten: rgb(49, 209, 34);
+
+        --body-bg-color: #555358;
+        --body-anchor-color: #198754;
+        --body-anchor-color-hover: #1da767;
+        --background-image: url(/images/green_theme_bg.webp);
     }
 
     &.blue {
+        --body-bg-color: #05a3d9;
+        --background-image: url(/images/blue_theme_bg.webp);
         --borders-color: rgb(41, 77, 175);
         --borders-color-lighten: rgb(34, 90, 209);
+
+        --body-anchor-color: rgb(41, 77, 175);
+        --body-anchor-color-hover: rgb(34, 90, 209);
     }
     &.red {
+        --background-image: url(/images/red_theme_bg.webp);
+        --body-bg-color: #840155;
         --borders-color: rgb(175, 41, 41);
         --borders-color-lighten: rgb(209, 34, 34);
-    }
-    --header-bg-color: #000;
-    --body-font-color: #eee;
-    --body-bg-color: #333333;
-    --label-bg-color: #292929;
-    --label-bg-color-selected: #333333;
 
-    --body-anchor-color: #198754;
-    --body-anchor-color-hover: #1da767;
+        --body-anchor-color: rgb(175, 41, 41);
+        --body-anchor-color-hover: rgb(209, 34, 34);
+    }
+
+
+
 }

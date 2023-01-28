@@ -59,6 +59,10 @@ body {
         left: 0;
         transition: left .5s;
         background-color: var(--body-bg-color);
+        background-image: var(--background-image);
+        background-position-y: var(--background-position-y);
+        background-repeat: var(--background-repeat);
+        background-size: var(--background-size);
         &.show-mobile-menu {
             left: 302px;
         }
@@ -306,7 +310,7 @@ body {
 
         .main-logo {
             float: left;
-            height: 2rem;
+            height: 4.25rem;
             margin: 0 1rem 0 .75rem;
             padding: 0;
         }
@@ -330,7 +334,7 @@ body {
             margin: 0 0 -2px 0;
             padding: 0;
             min-height: 2.5rem;
-            width: 100%;
+            // width: 100%;
 
             li {
 

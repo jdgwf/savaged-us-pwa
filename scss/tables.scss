@@ -1,5 +1,10 @@
 body {
 
+    table {
+        border-spacing: 0;
+        border-collapse: separate;
+    }
+
     .edit-table {
         background: #222;
         width: 100%;

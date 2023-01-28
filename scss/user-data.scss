@@ -77,7 +77,7 @@ body {
             &:hover {
                 .folder-nip,
                 .folder-base {
-                    background: #999;
+                    background: var(--borders-color-lighten);
                 }
                 .controls {
                     bottom: 0;
