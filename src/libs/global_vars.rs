@@ -2,8 +2,8 @@ use crate::components::{
     alerts::AlertDefinition, confirmation_dialog::ConfirmationDialogDefinition,
 };
 use savaged_libs::{
-    banner::SimpleBanner, partner::Partner, player_character::game_data_package::GameDataPackage,
-    save_db_row::SaveDBRow, user::User, websocket_message::WebSocketMessage,
+    player_character::game_data_package::GameDataPackage,
+    save_db_row::SaveDBRow, user::User, websocket_message::WebSocketMessage, web_content::WebContent,
 };
 use std::rc::Rc;
 use yew::prelude::*;
@@ -33,8 +33,7 @@ pub struct GlobalVars {
     pub update_global_vars: Callback<GlobalVars>,
     pub user_loading: bool,
 
-    pub partners: Option<Vec<Partner>>,
-    pub banners: Option<Vec<SimpleBanner>>,
+    pub web_content: Option<WebContent>,
 }
 
 impl Default for GlobalVars {
@@ -62,8 +61,7 @@ impl Default for GlobalVars {
             update_global_vars: Callback::noop(),
             user_loading: true,
 
-            partners: None,
-            banners: None,
+            web_content: None,
         }
     }
 }

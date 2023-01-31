@@ -1,12 +1,14 @@
 pub mod handle_message;
+
 use futures::{channel::mpsc::Sender, SinkExt, StreamExt};
-// use gloo_console::error;
-use gloo_console::log;
 use gloo_console::error;
+use gloo_console::log;
 use gloo_net::websocket::{futures::WebSocket, Message};
+use gloo_timers::future::sleep;
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
 use serde_json;
+use std::time::Duration;
 use wasm_bindgen_futures::spawn_local;
 use yew::Callback;
 
@@ -77,7 +79,9 @@ impl WebsocketService {
                     }
                 }
             }
-            log!("WebSocket Closed");
+            log!("WebSocket Closed...sleeping");
+            let _ = sleep(Duration::from_secs(15)).await;
+            log!("I'm awake, trying to reconnect...");
             websocket_offline_callback.emit(true);
         });
 
@@ -108,6 +112,7 @@ pub fn connect_to_websocket(
     websocket_offline_callback: &Callback<bool>,
     login_token: String,
 ) -> WebsocketService {
+    // log!("connect_to_websocket() called");
     return WebsocketService::new(
         server_root.to_owned(),
         received_message_callback,

@@ -5,20 +5,22 @@ use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
-use crate::pages::admin::home::AdminHome;
 use crate::pages::admin::AdminRouter;
+use crate::pages::admin::home::AdminHome;
 use crate::pages::error404::Error404;
+use crate::pages::help::HelpRouter;
+use crate::pages::help::home::HelpHome;
 use crate::pages::info::InfoRoute;
 use crate::pages::info::InfoRouter;
 use crate::pages::main_home::MainHome;
+use crate::pages::user::UserRoute;
+use crate::pages::user::UserRouter;
 use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::register::Register;
-use crate::pages::user::UserRoute;
-use crate::pages::user::UserRouter;
+use crate::web_sockets::WebsocketService;
 use crate::web_sockets::connect_to_websocket;
 use crate::web_sockets::handle_message::handle_message;
-use crate::web_sockets::WebsocketService;
 use gloo_console::error;
 use gloo_console::log;
 use gloo_timers::future::TimeoutFuture;
@@ -26,9 +28,9 @@ use savaged_libs::user::User;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
-use standard_components::libs::set_body_class::set_body_class;
-use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
+use standard_components::libs::set_body_class::set_body_class;
 use uuid::Uuid;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -59,6 +61,11 @@ pub enum MainRoute {
     InfoRouterRedirect,
     #[at("/info/*")]
     InfoRouter,
+
+    #[at("/help")]
+    HelpHome,
+    #[at("/help/*")]
+    HelpRouter,
 
     #[not_found]
     #[at("/404")]
@@ -134,6 +141,22 @@ fn content_switch(
         MainRoute::InfoRouter => {
             html! {
                 <InfoRouter
+                    global_vars={global_vars}
+
+                />
+            }
+        }
+        MainRoute::HelpRouter => {
+            html! {
+                <HelpRouter
+                    global_vars={global_vars}
+
+                />
+            }
+        }
+        MainRoute::HelpHome => {
+            html! {
+                <HelpHome
                     global_vars={global_vars}
 
                 />
@@ -231,9 +254,7 @@ impl Component for MainApp {
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
-        global_vars.open_confirmation_dialog =
-            ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
-
+        global_vars.open_confirmation_dialog =  ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
 
         let wss = connect_to_websocket(
             global_vars.server_root.to_owned(),
@@ -425,6 +446,9 @@ impl Component for MainApp {
                     msg.kind = WebsocketMessageType::GameDataPackage;
                     send_websocket.emit(msg);
                 });
+
+                set_local_storage_string( "UI_THEME", "_default_".to_string());
+
                 self.global_vars_context
                     .dispatch(self.global_vars.to_owned());
                 // self.global_vars = global_vars.clone();
@@ -470,20 +494,20 @@ impl Component for MainApp {
                 if global_vars.offline != offline {
                     global_vars.offline = offline;
 
-                    if !global_vars.server_side_renderer {
-                        log!("WebsocketOffline called", offline);
-                    }
+                    // if !global_vars.server_side_renderer {
+                    //     log!("WebsocketOffline called", offline);
+                    // }
 
                     ctx.link()
                         .callback(MainAppMessage::UpdateGlobalVars)
                         .emit(global_vars);
                 }
 
+
                 if offline {
-                    let received_message_callback =
-                        ctx.link().callback(MainAppMessage::ReceivedWebSocket);
-                    let websocket_offline_callback =
-                        ctx.link().callback(MainAppMessage::WebsocketOffline);
+                    let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
+                    let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
+
 
                     self.wss = connect_to_websocket(
                         self.global_vars.server_root.to_owned(),
@@ -491,23 +515,26 @@ impl Component for MainApp {
                         &websocket_offline_callback,
                         self.global_vars.login_token.to_owned(),
                     );
+
+
+
                 }
 
                 return false;
             }
 
             MainAppMessage::ReceivedWebSocket(sent_data) => {
-                // log!( format!("ReceivedWebSocket {}", &sent_data.len() ) );
+                // log!( format!("MainAppMessage::ReceivedWebSocket {}", &sent_data.len() ) );
                 // log!( format!("ReceivedWebSocket {}", &sent_data ) );
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
                 // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
                 match msg_result {
                     Ok(msg) => {
-                        global_vars.offline = false;
+                        // global_vars.offline = false;
                         // global_vars.user_loading = false;
 
-                        // log!( format!("calling handle_message " ));
+                        // log!( format!("calling handle_message {:?}", msg ));
                         handle_message(
                             msg,
                             global_vars,
@@ -572,6 +599,7 @@ impl Component for MainApp {
             body_class = self.global_vars.current_user.theme_css.to_owned();
             set_local_storage_string( "UI_THEME", body_class.to_string())
         }
+
 
         set_body_class( body_class.replace("_default_", ""), self.global_vars.server_side_renderer );
 

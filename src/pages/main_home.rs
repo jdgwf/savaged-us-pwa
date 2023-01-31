@@ -1,6 +1,7 @@
 // use crate::components::alerts::AlertDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use standard_components::ui::content_box::ContentBox;
 // use gloo_console::log;
 // use savaged_libs::alert_level::AlertLevel;
 use standard_components::ui::nbsp::Nbsp;
@@ -70,15 +71,45 @@ impl Component for MainHome {
                 page_title="Home"
             >
 
-                <h2><i class="fa fa-house" /><Nbsp />{"Home Page"}</h2>
-                <hr />
-                <div class="alert alert-info">
-                    {"Note, this is using LIVE data from"}<Nbsp /><a href="https://savaged.us">{"https://savaged.us"}</a>{". However it's not using the live database. Every morning at 03:00CST the entirety of the live database is copied here. Which means your changes, settings, and login tokens at this URL will all be overwritten every day."}<br />
-                    <br />
-                    {"This is good, because this is a ground-up rewrite and there certainly will be breaking changes to our data - especially this early in development."}
+
+            <div class="row home-points">
+            <div class="col-md-6"></div>
+            <div class="col-md-6">
+            <h2 class="text-center home-h2">{"Create ANY Savage Worlds Character In Minutes!"}</h2>
+            <ContentBox>
+
+                <div class="row home-points">
+                    <div class="col-md-6">
+                        <p><strong>{"FREE"}</strong><Nbsp />{"Basic character creation"}</p>
+                        <p>{"Export to popular Virtual Tabletops"}
+                            <ul>
+                                <li>{"Roll 20"}</li>
+                                <li>{"Fantasy Grounds"}</li>
+                                <li>{"Foundry"}</li>
+                            </ul>
+                        </p>
+                        <p>{"Many ready-to-go built-in settings, or create your own!"}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>{"Share your campaigns and characters with your players"}</p>
+
+                        <p>{"Create custom vehicles from the Science Fiction Companion"}</p>
+
+                        <p>{"Create your own custom Edges, Hindrances, Gear, and More"}</p>
+                    </div>
                 </div>
-                // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
-                <hr />
+            </ContentBox>
+            </div>
+            </div>
+                // <h2><i class="fa fa-house" /><Nbsp />{"Home Page"}</h2>
+                // <hr />
+                // <div class="alert alert-info">
+                //     {"Note, this is using LIVE data from"}<Nbsp /><a href="https://savaged.us">{"https://savaged.us"}</a>{". However it's not using the live database. Every morning at 03:00CST the entirety of the live database is copied here. Which means your changes, settings, and login tokens at this URL will all be overwritten every day."}<br />
+                //     <br />
+                //     {"This is good, because this is a ground-up rewrite and there certainly will be breaking changes to our data - especially this early in development."}
+                // </div>
+                // // {"This is an RPG Awesome Icon:"}<Nbsp /><i class="ra  ra-dinosaur " />
+                // <hr />
                 // <button
                 //     class="btn"
                 //         onclick={ move |_e| {
@@ -137,16 +168,16 @@ impl Component for MainHome {
                 // </button>
                 // }
 
-                <div class="row">
-                    <div class="col-6">
-                        <h4>{"GameDataRow Data Counts"}</h4>
-                        {game_data_html}
-                    </div>
-                    <div class="col-6">
-                        <h4>{"Saves Count"}</h4>
-                        {saves_html}
-                    </div>
-                </div>
+                // <div class="row">
+                //     <div class="col-6">
+                //         <h4>{"GameDataRow Data Counts"}</h4>
+                //         {game_data_html}
+                //     </div>
+                //     <div class="col-6">
+                //         <h4>{"Saves Count"}</h4>
+                //         {saves_html}
+                //     </div>
+                // </div>
             </UIPage>
 
         }

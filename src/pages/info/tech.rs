@@ -1,6 +1,6 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use standard_components::ui::nbsp::Nbsp;
+use standard_components::ui::{nbsp::Nbsp, content_box::ContentBox};
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
@@ -13,12 +13,14 @@ pub fn info_tech(props: &InfoTechProps) -> Html {
 
     global_vars.current_sub_menu = "info-tech".to_owned();
 
+    let title= html!{<><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</>};
     html! {
     <UIPage
         global_vars={global_vars}
         page_title="Technologies Used"
     >
-            <h2><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</h2>
+        <ContentBox label_html={title}>
+
             <p class="text-center"><strong>{"Version"}<Nbsp />{env!("CARGO_PKG_VERSION")}</strong></p>
             <p>{"This web app uses the following technologies:"}</p>
 
@@ -54,6 +56,7 @@ pub fn info_tech(props: &InfoTechProps) -> Html {
                     {"A CSS precompiler which, for me, makes CSS so much cleaner to edit."}
                 </li>
             </ul>
+            </ContentBox>
         </UIPage>
     }
 }

@@ -8,10 +8,15 @@ body {
     .edit-table {
         background: #222;
         width: 100%;
-        thead {
-            tr {
-                th {
-                    background: #222;
+        background-color: var(--content-box-bg);
+        border-right: solid 2px var(--borders-color);
+        border-top: solid 2px var(--borders-color);
+        > thead {
+            > tr {
+                > th {
+                    background-color: var(--borders-color-lighten);
+                    border-left: solid 2px var(--borders-color);
+                    border-bottom: solid 2px var(--borders-color);
                     color: #fff;
                     padding: .125rem .5rem;
                     &.min-width {
@@ -20,19 +25,21 @@ body {
                 }
             }
         }
-        tbody {
-            tr{
-                td {
+        > tbody {
+            > tr{
+                > td {
                     padding: .125rem .5rem;
-                    background: #999;
-                    color: #333;
+                    border-left: solid 2px var(--borders-color);
+                    border-bottom: solid 2px var(--borders-color);
                     &.min-width {
                         width: 1%;
                     }
                 }
-                th {
-                    background: #666;
-                    color: #fff;
+                > th {
+                    border-left: solid 2px var(--borders-color);
+                    border-bottom: solid 2px var(--borders-color);
+                    // background: #666;
+                    // color: #fff;
                     padding: .125rem .5rem;
                     &.min-width {
                         width: 1%;
@@ -40,8 +47,8 @@ body {
                 }
             }
             &:hover {
-                td {
-                    background: #aaa;
+                td, tr {
+                    background-color: var(--table-td-hover-bg);
                 }
             }
         }
@@ -50,13 +57,13 @@ body {
                 &:nth-child(odd) {
                     tr{
                         td {
-                            background: #ccc;
+                            // background: #ccc;
                         }
 
                     }
                     &:hover {
                         td {
-                            background: #ddd;
+                            // background: #ddd;
                         }
                     }
                 }

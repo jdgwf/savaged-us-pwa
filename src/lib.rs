@@ -16,19 +16,17 @@ use crate::pages::user::forgot_password::ForgotPassword;
 use crate::pages::user::login::UserLogin;
 use crate::pages::user::register::Register;
 use pages::user::UserRouter;
-use savaged_libs::banner::SimpleBanner;
-use savaged_libs::partner::Partner;
 use savaged_libs::user::User;
+use savaged_libs::web_content::WebContent;
 use std::collections::HashMap;
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
 
-#[derive(Properties, PartialEq, Eq, Debug)]
+#[derive(Properties, PartialEq, Debug)]
 pub struct ServerAppProps {
     pub url: AttrValue,
-    pub partners: Option<Vec<Partner>>,
-    pub banners: Option<Vec<SimpleBanner>>,
+    pub web_content: WebContent,
     // pub queries: HashMap<String, String>,
 }
 
@@ -160,8 +158,7 @@ pub fn ServerApp(props: &ServerAppProps) -> Html {
         toggle_mobile_menu_callback: Callback::noop(),
         update_global_vars: Callback::noop(),
         user_loading: false,
-        partners: props.partners.clone(),
-        banners: props.banners.clone(),
+        web_content: Some(props.web_content.clone()),
     });
 
     let history = AnyHistory::from(MemoryHistory::new());

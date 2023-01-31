@@ -10,6 +10,7 @@ use gloo_console::log;
 use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
@@ -21,16 +22,20 @@ pub fn handle_message(
     if global_vars.server_side_renderer {
         return;
     }
-
+    // log!(format!("handle_message called"));
     match msg.kind {
         WebsocketMessageType::Online => {
+            // log!(format!("handle_message Online"));
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = false;
             new_global_vars.user_loading = false;
+
+            new_global_vars.web_content = msg.web_content;
             match msg.user {
                 Some(user) => {
                     // log!( format!("user {} {}", user.id, user.unread_notifications));
                     new_global_vars.current_user = user.clone();
+
                 }
                 None => {}
             }
@@ -43,7 +48,11 @@ pub fn handle_message(
 
                     update_global_vars.emit(global_vars_future);
                 });
+                set_local_storage_string( "UI_THEME", new_global_vars.current_user.theme_css.to_owned());
             } else {
+
+                set_local_storage_string( "UI_THEME", "_default_".to_string());
+
                 let mut global_vars_future = new_global_vars.clone();
                 spawn_local(async move {
                     global_vars_future.game_data = get_game_data_from_index_db().await;
@@ -92,7 +101,8 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::Offline => {
-            // log!(format!("handle_message Offline {:?}", msg));
+            // log!(format!("handle_message Offline"));
+
             let mut new_global_vars = global_vars.clone();
             new_global_vars.offline = true;
             new_global_vars.user_loading = false;
@@ -104,20 +114,8 @@ pub fn handle_message(
             let mut new_global_vars = global_vars.clone();
             new_global_vars.game_data = msg.game_data.clone();
 
-            let game_data_user_level =
-                get_local_storage_string("game_data_user_level", "".to_owned());
-            let game_data_last_updated =
-                get_local_storage_string("game_data_last_updated", "".to_owned());
-
-            // log!(format!(
-            //     "handle_message GameDataPackage game_data_user_level {}",
-            //     game_data_user_level
-            // ));
-            // log!(format!(
-            //     "handle_message GameDataPackage game_data_last_updated {}",
-            //     game_data_last_updated
-            // ));
-            // new_global_vars.user_loading = false;
+            let game_data_user_level = get_local_storage_string("game_data_user_level", "".to_owned());
+            let game_data_last_updated = get_local_storage_string("game_data_last_updated", "".to_owned());
 
             match msg.game_data {
                 Some(game_data) => {
@@ -134,6 +132,7 @@ pub fn handle_message(
         }
 
         WebsocketMessageType::Saves => {
+            // log!(format!("handle_message Saves"));
             let new_global_vars = global_vars.clone();
             let server_root = global_vars.server_root.to_owned();
 

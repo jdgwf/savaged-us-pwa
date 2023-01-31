@@ -1,6 +1,6 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use standard_components::ui::nbsp::Nbsp;
+use standard_components::ui::{nbsp::Nbsp, content_box::ContentBox};
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
@@ -14,12 +14,16 @@ pub fn info_todos(props: &InfoTodosProps) -> Html {
 
     global_vars.current_sub_menu = "info-todos".to_owned();
 
+    let title = html!{<><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</>};
     html! {
     <UIPage
         global_vars={global_vars}
         page_title="Development To-Dos"
     >
-    <h2><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</h2>
+
+    <ContentBox label_html={title}>
+
+
             <div class={"row"}>
                 <div class={"col-md"}>
 
@@ -175,6 +179,7 @@ pub fn info_todos(props: &InfoTodosProps) -> Html {
                     </ul>
                 </div>
             </div>
+            </ContentBox>
         </UIPage>
     }
 }

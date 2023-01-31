@@ -18,6 +18,10 @@ body {
     --body-anchor-color: #990099;
     --body-anchor-color-hover: #bb00bb;
 
+    --table-td-hover-bg: var(--label-bg-color);
+
+    --home-h2-color: #FFE700;
+
     &.gray {
         --borders-color: #666;
         --borders-color-lighten: #777;
@@ -26,6 +30,8 @@ body {
         --body-anchor-color: #666;
         --body-anchor-color-hover: #777;
         --background-image: url(/images/gray_theme_bg.webp);
+
+        --table-td-hover-bg: var(--label-bg-color);
     }
 
     &.green {
@@ -36,16 +42,25 @@ body {
         --body-anchor-color: #198754;
         --body-anchor-color-hover: #1da767;
         --background-image: url(/images/green_theme_bg.webp);
+
+        --table-td-hover-bg: var(--label-bg-color);
     }
 
     &.blue {
         --body-bg-color: #05a3d9;
         --background-image: url(/images/blue_theme_bg.webp);
-        --borders-color: rgb(41, 77, 175);
-        --borders-color-lighten: rgb(34, 90, 209);
+        // --borders-color: rgb(41, 77, 175);
+        // --borders-color-lighten: rgb(34, 90, 209);
 
-        --body-anchor-color: rgb(41, 77, 175);
-        --body-anchor-color-hover: rgb(34, 90, 209);
+        // --body-anchor-color: rgb(41, 77, 175);
+        // --body-anchor-color-hover: rgb(34, 90, 209);
+        --borders-color: #0153d9;
+        --borders-color-lighten: #246ce1;
+
+        --body-anchor-color: #0153d9;
+        --body-anchor-color-hover: #246ce1;
+
+        --table-td-hover-bg: var(--label-bg-color);
     }
     &.red {
         --background-image: url(/images/red_theme_bg.webp);
@@ -55,6 +70,8 @@ body {
 
         --body-anchor-color: rgb(175, 41, 41);
         --body-anchor-color-hover: rgb(209, 34, 34);
+
+        --table-td-hover-bg: var(--label-bg-color);
     }
 
 

@@ -1,5 +1,6 @@
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::admin::AdminRoute;
+use crate::pages::help::HelpRoute;
 use crate::pages::info::InfoRoute;
 use crate::{main_app::MainRoute, pages::user::UserRoute};
 use savaged_libs::user::User;
@@ -318,6 +319,181 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
                     menu_tag: None,
                     sub_menu_tag: Some("info-todos".to_owned()),
+                },
+            ]),
+        },
+        MenuItem {
+            hardcoded: false,
+            html: Some(html! {
+                <Link<MainRoute>
+                    to={MainRoute::HelpHome}
+                >
+                    <i class="fa fa-circle-question" /><Nbsp />
+                    {"Help"}
+                </Link<MainRoute>>
+            }),
+            registered_only: false,
+            wildcard_only: false,
+            developer_only: false,
+            admin_only: false,
+            link_class: None,
+            title: "The Help Pages".to_owned(),
+            icon_class: None, // "fa fa-house".to_owned(),
+            label: "Help".to_owned(),
+            url: None,
+            menu_tag: Some("main-help".to_owned()),
+            sub_menu_tag: None,
+
+            submenu: Some(vec![
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<MainRoute>
+                            to={MainRoute::HelpHome}
+                        >
+                            <i class="fa fa-circle-question" /><Nbsp />
+                            {"Home"}
+                        </Link<MainRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Help Home Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help Home".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-home".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<HelpRoute>
+                            to={HelpRoute::HelpRegistration { tag: "home".to_owned() }}
+                        >
+                            <i class="fa fa-user" /><Nbsp />
+                            {"Registration & Login "}
+                        </Link<HelpRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Help Home Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help Home".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-registration".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<HelpRoute>
+                            to={HelpRoute::HelpSaves { tag: "home".to_owned() }}
+                        >
+                            <i class="fa fa-save" /><Nbsp />
+                            {"Saves & Data"}
+                        </Link<HelpRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Help Saves and Data Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help for Saves and Data".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-saves".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<HelpRoute>
+                            to={HelpRoute::HelpCharacters { tag: "home".to_owned() }}
+                        >
+                            <i class="fa fa-circle-question" /><Nbsp />
+                            {"Character Creator"}
+                        </Link<HelpRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Character Creator Help Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help for Character Creator".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-characters".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<HelpRoute>
+                            to={HelpRoute::HelpCampaigns { tag: "home".to_owned() }}
+                        >
+                            <i class="fa fa-dice" /><Nbsp />
+                            {"Campaigns"}
+                        </Link<HelpRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Help Campaigns Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help Campaigns".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-campaigns".to_owned()),
+                },
+                MenuItem {
+                    hardcoded: false,
+                    html: Some(html! {
+                        <Link<HelpRoute>
+                            to={HelpRoute::HelpVehicles { tag: "home".to_owned() }}
+                        >
+                            <i class="fa fa-car" /><Nbsp />
+                            {"Vehicles"}
+                        </Link<HelpRoute>>
+                    }),
+                    registered_only: false,
+                    wildcard_only: false,
+                    developer_only: false,
+                    admin_only: false,
+                    link_class: None,
+
+                    submenu: None,
+
+                    title: "The Help Vehicles Page".to_owned(),
+                    icon_class: None, // "fa fa-house".to_owned(),
+                    label: "Help Vehicles".to_owned(),
+                    url: None,
+                    menu_tag: None,
+                    sub_menu_tag: Some("help-vehicles".to_owned()),
                 },
             ]),
         },

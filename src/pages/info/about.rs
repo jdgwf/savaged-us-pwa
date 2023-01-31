@@ -19,7 +19,7 @@ pub fn info_about(props: &InfoAboutProps) -> Html {
         global_vars={global_vars}
         page_title="About Savaged.us"
     >
-            <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>
+            // <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>
             <div class="row">
         <div class="col-md-6">
             <div class="alliante-bg">
