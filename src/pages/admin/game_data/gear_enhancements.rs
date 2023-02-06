@@ -1,11 +1,12 @@
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
+use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::admin_table_field::active::AdminTableFieldActive;
 use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::alerts::AlertDefinition;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
-use crate::components::edit_forms::edge::EditEdge;
+use crate::components::edit_forms::gear_enhancement::EditGearEnhancement;
 use crate::components::standard_modal::StandardModal;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenu, TertiaryLinksMenuItem};
 use crate::components::ui_page::UIPage;
@@ -23,7 +24,7 @@ use savaged_libs::admin_libs::{
 use savaged_libs::alert_level::AlertLevel;
 use savaged_libs::book::Book;
 use savaged_libs::game_data_row::GameDataRow;
-use savaged_libs::player_character::edge::Edge;
+use savaged_libs::player_character::gear_enhancement::GearEnhancement;
 use savaged_libs::{admin_libs::new_fetch_admin_params, admin_libs::FetchAdminParameters};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{
@@ -35,18 +36,18 @@ use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
-pub struct AdminGameDataEdgesProps {
+pub struct AdminGameDataGearEnhancementsProps {
     pub global_vars: GlobalVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
 }
 
-pub enum AdminGameDataEdgesMessage {
-    SetItems(Vec<Edge>),
+pub enum AdminGameDataGearEnhancementsMessage {
+    SetItems(Vec<GearEnhancement>),
     NewItem(u32),
     SetPagingStats(Option<AdminPagingStatistics>),
     SetFetchAdminParams(FetchAdminParameters),
-    UpdateEdge(Edge),
-    UpdateEdgeAndRefresh(Edge),
+    UpdateGearEnhancement(GearEnhancement),
+    UpdateGearEnhancementAndRefresh(GearEnhancement),
 
     ViewItem(u32),
     EditItemDialog(u32),
@@ -59,28 +60,28 @@ pub enum AdminGameDataEdgesMessage {
     SaveItemAndLeaveOpen(bool),
     SaveItem(bool),
 }
-pub struct AdminGameDataEdges {
-    items: Vec<Edge>,
+pub struct AdminGameDataGearEnhancements {
+    items: Vec<GearEnhancement>,
     paging_data: Option<AdminPagingStatistics>,
     paging_sorting_and_filter: FetchAdminParameters,
     loading: bool,
-    editing_item: Option<Edge>,
+    editing_item: Option<GearEnhancement>,
     is_adding: bool,
     is_editing: bool,
 }
 
-impl Component for AdminGameDataEdges {
-    type Message = AdminGameDataEdgesMessage;
-    type Properties = AdminGameDataEdgesProps;
+impl Component for AdminGameDataGearEnhancements {
+    type Message = AdminGameDataGearEnhancementsMessage;
+    type Properties = AdminGameDataGearEnhancementsProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let global_vars = ctx.props().global_vars.clone();
 
         let login_token = global_vars.login_token.clone();
-        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+        let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
         let set_paging = ctx
             .link()
-            .callback(AdminGameDataEdgesMessage::SetPagingStats);
+            .callback(AdminGameDataGearEnhancementsMessage::SetPagingStats);
 
         let mut paging_sorting_and_filter = new_fetch_admin_params();
 
@@ -105,7 +106,7 @@ impl Component for AdminGameDataEdges {
             .await;
         });
 
-        AdminGameDataEdges {
+        AdminGameDataGearEnhancements {
             paging_sorting_and_filter: paging,
             items: Vec::new(),
             paging_data: None,
@@ -116,9 +117,9 @@ impl Component for AdminGameDataEdges {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: AdminGameDataEdgesMessage) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: AdminGameDataGearEnhancementsMessage) -> bool {
         match msg {
-            AdminGameDataEdgesMessage::ViewItem(id) => {
+            AdminGameDataGearEnhancementsMessage::ViewItem(id) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -131,7 +132,7 @@ impl Component for AdminGameDataEdges {
                 return false;
             }
 
-            AdminGameDataEdgesMessage::EditItemDialog(id) => {
+            AdminGameDataGearEnhancementsMessage::EditItemDialog(id) => {
                 // self.editing_item = None;
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -144,9 +145,9 @@ impl Component for AdminGameDataEdges {
                 return false;
             }
 
-            AdminGameDataEdgesMessage::AddItemDialog(_nv) => {
-                log!("AdminGameDataEdgesMessage::AddItemDialog");
-                let mut new_item = Edge::default();
+            AdminGameDataGearEnhancementsMessage::AddItemDialog(_nv) => {
+                log!("AdminGameDataGearEnhancementsMessage::AddItemDialog");
+                let mut new_item = GearEnhancement::default();
                 new_item.book_id = self.paging_sorting_and_filter.filter_book;
                 new_item.active = true;
                 self.editing_item = Some(new_item);
@@ -156,8 +157,8 @@ impl Component for AdminGameDataEdges {
                 return true;
             }
 
-            AdminGameDataEdgesMessage::SaveItem(as_new) => {
-                log!("AdminGameDataEdgesMessage::SaveItem");
+            AdminGameDataGearEnhancementsMessage::SaveItem(as_new) => {
+                log!("AdminGameDataGearEnhancementsMessage::SaveItem");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
                 match self_editing_item {
@@ -178,10 +179,10 @@ impl Component for AdminGameDataEdges {
                         let api_root = ctx.props().global_vars.api_root.to_owned();
                         let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
-                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                        let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
                         spawn_local(async move {
                             let result = fetch_api_save_game_data_row(
-                                (api_root + "/admin/game-data/edges/save").to_owned(),
+                                (api_root + "/admin/game-data/gear_enhancements/save").to_owned(),
                                 req,
                             )
                             .await;
@@ -194,14 +195,14 @@ impl Component for AdminGameDataEdges {
                                         Ok(save_result_data) => {
                                             match save_result_data.game_data {
                                                 Some(vec_val) => {
-                                                    let mut rv: Vec<Edge> = Vec::new();
+                                                    let mut rv: Vec<GearEnhancement> = Vec::new();
                                                     for mut data in vec_val.into_iter() {
                                                         data.created_by_user = None;
                                                         data.updated_by_user = None;
                                                         data.updated_by_user = None;
 
                                                         // log!("data", format!("{:?}", data) );
-                                                        let item = data.to_edge().unwrap();
+                                                        let item = data.to_gear_enhancement().unwrap();
                                                         // log!("data.updated_on", data.updated_on);
                                                         // log!("data.created_on", data.created_on);
 
@@ -276,27 +277,27 @@ impl Component for AdminGameDataEdges {
                 }
             }
 
-            AdminGameDataEdgesMessage::NewItem(book_id) => {
+            AdminGameDataGearEnhancementsMessage::NewItem(book_id) => {
                 let self_editing_item = self.editing_item.clone();
-                let mut new_item = Edge::default();
+                let mut hind = GearEnhancement::default();
                 match self_editing_item {
                     Some(editing_item) => {
-                        new_item.active = editing_item.active;
-                        new_item.book_id = editing_item.book_id;
+                        hind.active = editing_item.active;
+                        hind.book_id = editing_item.book_id;
                     }
                     None => {
-                        new_item.active = true;
-                        new_item.book_id = book_id;
+                        hind.active = true;
+                        hind.book_id = book_id;
                     }
                 }
 
-                self.editing_item = Some(new_item);
+                self.editing_item = Some(hind);
 
                 return true;
             }
 
-            AdminGameDataEdgesMessage::SaveItemAndLeaveOpen(_unused) => {
-                log!("AdminGameDataEdgesMessage::SaveItemAndLeaveOpen");
+            AdminGameDataGearEnhancementsMessage::SaveItemAndLeaveOpen(_unused) => {
+                log!("AdminGameDataGearEnhancementsMessage::SaveItemAndLeaveOpen");
                 let self_editing_item = self.editing_item.clone();
                 let self_is_adding = self.is_adding;
 
@@ -324,17 +325,17 @@ impl Component for AdminGameDataEdges {
                         let api_root = ctx.props().global_vars.api_root.to_owned();
                         let global_vars = ctx.props().global_vars.clone();
                         // let item_name = editing_item.name.to_owned();
-                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                        let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
                         let new_item_callback =
-                            ctx.link().callback(AdminGameDataEdgesMessage::NewItem);
+                            ctx.link().callback(AdminGameDataGearEnhancementsMessage::NewItem);
 
-                        let update_edge_callback = ctx
+                        let update_gear_enhancement_callback = ctx
                             .link()
-                            .callback(AdminGameDataEdgesMessage::UpdateEdgeAndRefresh);
+                            .callback(AdminGameDataGearEnhancementsMessage::UpdateGearEnhancementAndRefresh);
 
                         spawn_local(async move {
                             let result = fetch_api_save_game_data_row(
-                                (api_root + "/admin/game-data/edges/save").to_owned(),
+                                (api_root + "/admin/game-data/gear_enhancements/save").to_owned(),
                                 req,
                             )
                             .await;
@@ -351,13 +352,13 @@ impl Component for AdminGameDataEdges {
                                                         new_item_callback.emit(edit_item_book_id);
                                                     }
 
-                                                    let mut rv: Vec<Edge> = Vec::new();
+                                                    let mut rv: Vec<GearEnhancement> = Vec::new();
                                                     for mut data in vec_val.into_iter() {
                                                         data.created_by_user = None;
                                                         data.updated_by_user = None;
                                                         data.updated_by_user = None;
 
-                                                        let item = data.to_edge().unwrap();
+                                                        let item = data.to_gear_enhancement().unwrap();
 
                                                         // log!("data", format!("{:?}", data) );
 
@@ -384,11 +385,11 @@ impl Component for AdminGameDataEdges {
                                                         };
                                                     global_vars.add_alert.emit(alert_def);
 
-                                                    let mut new_item = Edge::default();
+                                                    let mut new_item = GearEnhancement::default();
                                                     new_item.book_id = edit_item_book_id;
                                                     new_item.active = edit_item_active;
                                                     new_item.page = edit_item_book_page;
-                                                    update_edge_callback.emit(new_item);
+                                                    update_gear_enhancement_callback.emit(new_item);
                                                 }
 
                                                 None => {
@@ -440,13 +441,13 @@ impl Component for AdminGameDataEdges {
                 }
             }
 
-            AdminGameDataEdgesMessage::DeleteItem(id) => {
-                log!("AdminGameDataEdgesMessage::DeleteItem ", id);
+            AdminGameDataGearEnhancementsMessage::DeleteItem(id) => {
+                log!("AdminGameDataGearEnhancementsMessage::DeleteItem ", id);
 
                 let api_root = ctx.props().global_vars.api_root.to_owned();
                 let global_vars = ctx.props().global_vars.clone();
                 let login_token = Some(ctx.props().global_vars.login_token.to_owned());
-                let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
                 let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
 
                 for item in self.items.clone().into_iter() {
@@ -463,7 +464,7 @@ impl Component for AdminGameDataEdges {
 
                             html: None,
                             text: Some(
-                                "Are you sure you would like to delete the edge '".to_owned()
+                                "Are you sure you would like to delete the gear_enhancement '".to_owned()
                                     + &item.name
                                     + &"'?",
                             ),
@@ -491,7 +492,7 @@ impl Component for AdminGameDataEdges {
                                 // let item_name = editing_item.name.to_owned();
                                 spawn_local(async move {
                                     let result = fetch_api_delete_game_data_row(
-                                        (api_root + "/admin/game-data/edges/delete").to_owned(),
+                                        (api_root + "/admin/game-data/gear_enhancements/delete").to_owned(),
                                         req,
                                     )
                                     .await;
@@ -504,13 +505,14 @@ impl Component for AdminGameDataEdges {
                                                 Ok(save_result_data) => {
                                                     match save_result_data.game_data {
                                                         Some(vec_val) => {
-                                                            let mut rv: Vec<Edge> = Vec::new();
+                                                            let mut rv: Vec<GearEnhancement> = Vec::new();
                                                             for mut data in vec_val.into_iter() {
                                                                 data.created_by_user = None;
                                                                 data.updated_by_user = None;
                                                                 data.updated_by_user = None;
 
-                                                                let item = data.to_edge().unwrap();
+                                                                let item =
+                                                                    data.to_gear_enhancement().unwrap();
 
                                                                 rv.push(item)
                                                             }
@@ -581,8 +583,8 @@ impl Component for AdminGameDataEdges {
                 }
             }
 
-            AdminGameDataEdgesMessage::DuplicateItem(id) => {
-                log!("AdminGameDataEdgesMessage::DuplicateItem", id);
+            AdminGameDataGearEnhancementsMessage::DuplicateItem(id) => {
+                log!("AdminGameDataGearEnhancementsMessage::DuplicateItem", id);
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
@@ -591,7 +593,7 @@ impl Component for AdminGameDataEdges {
 
                         let api_root = ctx.props().global_vars.api_root.to_owned();
                         let login_token = Some(ctx.props().global_vars.login_token.to_owned());
-                        let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                        let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
                         let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
                         let item = item.clone();
                         let global_vars = ctx.props().global_vars.clone();
@@ -603,7 +605,7 @@ impl Component for AdminGameDataEdges {
 
                             html: None,
                             text: Some(
-                                "Are you sure you would like to duplicate the edge '".to_owned()
+                                "Are you sure you would like to duplicate the gear_enhancement '".to_owned()
                                     + &item_name
                                     + &"'?",
                             ),
@@ -634,7 +636,7 @@ impl Component for AdminGameDataEdges {
 
                                 spawn_local(async move {
                                     let result = fetch_api_save_game_data_row(
-                                        (api_root + "/admin/game-data/edges/save").to_owned(),
+                                        (api_root + "/admin/game-data/gear_enhancements/save").to_owned(),
                                         req,
                                     )
                                     .await;
@@ -647,13 +649,14 @@ impl Component for AdminGameDataEdges {
                                                 Ok(save_result_data) => {
                                                     match save_result_data.game_data {
                                                         Some(vec_val) => {
-                                                            let mut rv: Vec<Edge> = Vec::new();
+                                                            let mut rv: Vec<GearEnhancement> = Vec::new();
                                                             for mut data in vec_val.into_iter() {
                                                                 data.created_by_user = None;
                                                                 data.updated_by_user = None;
                                                                 data.updated_by_user = None;
 
-                                                                let item = data.to_edge().unwrap();
+                                                                let item =
+                                                                    data.to_gear_enhancement().unwrap();
 
                                                                 rv.push(item)
                                                             }
@@ -661,7 +664,7 @@ impl Component for AdminGameDataEdges {
 
                                                             let alert_def: AlertDefinition = AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some("Edge '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
+                                                                    text: Some("GearEnhancement '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
                                                                     ..Default::default()
                                                                 };
                                                             global_vars.add_alert.emit(alert_def);
@@ -727,26 +730,26 @@ impl Component for AdminGameDataEdges {
                 }
             }
 
-            AdminGameDataEdgesMessage::Cancel(_new_value) => {
-                log!("AdminGameDataEdgesMessage::Cancel");
+            AdminGameDataGearEnhancementsMessage::Cancel(_new_value) => {
+                log!("AdminGameDataGearEnhancementsMessage::Cancel");
                 self.editing_item = None;
             }
 
-            AdminGameDataEdgesMessage::UpdateEdge(new_value) => {
+            AdminGameDataGearEnhancementsMessage::UpdateGearEnhancement(new_value) => {
                 self.editing_item = Some(new_value);
                 return false;
             }
-            AdminGameDataEdgesMessage::UpdateEdgeAndRefresh(new_value) => {
+            AdminGameDataGearEnhancementsMessage::UpdateGearEnhancementAndRefresh(new_value) => {
                 self.editing_item = Some(new_value);
                 return true;
             }
 
-            AdminGameDataEdgesMessage::SetItems(new_value) => {
+            AdminGameDataGearEnhancementsMessage::SetItems(new_value) => {
                 self.items = new_value;
                 self.loading = false;
             }
 
-            AdminGameDataEdgesMessage::SetPagingStats(new_value) => {
+            AdminGameDataGearEnhancementsMessage::SetPagingStats(new_value) => {
                 match new_value {
                     Some(mut nv) => {
                         match nv.book_list {
@@ -770,17 +773,17 @@ impl Component for AdminGameDataEdges {
                 self.loading = false;
             }
 
-            AdminGameDataEdgesMessage::SetFetchAdminParams(new_value) => {
+            AdminGameDataGearEnhancementsMessage::SetFetchAdminParams(new_value) => {
                 let mut paging_sorting_and_filter = new_value.clone();
                 self.paging_sorting_and_filter = new_value.clone();
 
                 let global_vars = ctx.props().global_vars.clone();
 
                 let login_token = global_vars.login_token.clone();
-                let set_items = ctx.link().callback(AdminGameDataEdgesMessage::SetItems);
+                let set_items = ctx.link().callback(AdminGameDataGearEnhancementsMessage::SetItems);
                 let set_paging = ctx
                     .link()
-                    .callback(AdminGameDataEdgesMessage::SetPagingStats);
+                    .callback(AdminGameDataGearEnhancementsMessage::SetPagingStats);
 
                 set_local_storage_u32(
                     "admin_page_count",
@@ -818,11 +821,11 @@ impl Component for AdminGameDataEdges {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let callback_fetch_admin_params = ctx
             .link()
-            .callback(AdminGameDataEdgesMessage::SetFetchAdminParams)
+            .callback(AdminGameDataGearEnhancementsMessage::SetFetchAdminParams)
             .clone();
         let callback_fetch_admin_params_2 = ctx
             .link()
-            .callback(AdminGameDataEdgesMessage::SetFetchAdminParams)
+            .callback(AdminGameDataGearEnhancementsMessage::SetFetchAdminParams)
             .clone();
 
         let mut non_filtered_count: u32 = 0;
@@ -860,7 +863,7 @@ impl Component for AdminGameDataEdges {
         let mut edit_modal = html! {<></>};
         match &self.editing_item {
             Some(editing_item) => {
-                let mut editing_title = Some("Viewing Edge".to_owned());
+                let mut editing_title = Some("Viewing GearEnhancement".to_owned());
 
                 let mut save_callback: Option<Callback<bool>> = None;
                 let mut add_callback: Option<Callback<bool>> = None;
@@ -870,35 +873,35 @@ impl Component for AdminGameDataEdges {
                 let mut read_only = true;
 
                 if self.is_adding {
-                    editing_title = Some("Adding Edge".to_owned());
+                    editing_title = Some("Adding GearEnhancement".to_owned());
                     add_callback = Some(
                         ctx.link()
-                            .callback(AdminGameDataEdgesMessage::SaveItem)
+                            .callback(AdminGameDataGearEnhancementsMessage::SaveItem)
                             .clone(),
                     );
                     save_and_leave_open_callback = Some(
                         ctx.link()
-                            .callback(AdminGameDataEdgesMessage::SaveItemAndLeaveOpen)
+                            .callback(AdminGameDataGearEnhancementsMessage::SaveItemAndLeaveOpen)
                             .clone(),
                     );
                     read_only = false;
                 }
 
                 if self.is_editing {
-                    editing_title = Some("Editing Edge".to_owned());
+                    editing_title = Some("Editing GearEnhancement".to_owned());
                     save_callback = Some(
                         ctx.link()
-                            .callback(AdminGameDataEdgesMessage::SaveItem)
+                            .callback(AdminGameDataGearEnhancementsMessage::SaveItem)
                             .clone(),
                     );
                     save_as_new_callback = Some(
                         ctx.link()
-                            .callback(AdminGameDataEdgesMessage::SaveItem)
+                            .callback(AdminGameDataGearEnhancementsMessage::SaveItem)
                             .clone(),
                     );
                     save_and_leave_open_callback = Some(
                         ctx.link()
-                            .callback(AdminGameDataEdgesMessage::SaveItemAndLeaveOpen)
+                            .callback(AdminGameDataGearEnhancementsMessage::SaveItemAndLeaveOpen)
                             .clone(),
                     );
                     read_only = false;
@@ -917,19 +920,19 @@ impl Component for AdminGameDataEdges {
                 <StandardModal
                     xl={true}
                     title={editing_title}
-                    close_cancel_callback={Some(ctx.link().callback(AdminGameDataEdgesMessage::Cancel).clone())}
+                    close_cancel_callback={Some(ctx.link().callback(AdminGameDataGearEnhancementsMessage::Cancel).clone())}
                     save_callback={save_callback}
                     add_callback={add_callback}
                     save_as_new_callback={save_as_new_callback}
                     save_and_leave_open_callback={save_and_leave_open_callback}
                 >
-                    <EditEdge
+                    <EditGearEnhancement
                         for_admin={true}
                         global_vars={global_vars.clone()}
                         readonly={read_only}
                         edit_item={editing_item.clone()}
                         book_list={book_list}
-                        on_changed_callback={ctx.link().callback(AdminGameDataEdgesMessage::UpdateEdge).clone()}
+                        on_changed_callback={ctx.link().callback(AdminGameDataGearEnhancementsMessage::UpdateGearEnhancement).clone()}
                     />
 
                 </StandardModal>
@@ -940,12 +943,12 @@ impl Component for AdminGameDataEdges {
 
         let add_item = ctx
             .link()
-            .callback(AdminGameDataEdgesMessage::AddItemDialog);
+            .callback(AdminGameDataGearEnhancementsMessage::AddItemDialog);
 
         html! {
         <UIPage
             global_vars={global_vars.clone()}
-            page_title="Admin Edges"
+            page_title="Admin Gear Enhancements"
 
             modal={Some(edit_modal)}
         >
@@ -954,9 +957,8 @@ impl Component for AdminGameDataEdges {
             server_side_renderer={global_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
-            current_tag={"edges".to_owned()}
+            current_tag={"gear_enhancements".to_owned()}
         />
-
         <div class="pull-right">
             <AdminTableFilterSearch
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
@@ -966,7 +968,7 @@ impl Component for AdminGameDataEdges {
                 show_no_select={true}
             />
         </div>
-                <h2><i class="fa fa-items" /><Nbsp />{"Admin Edges"}</h2>
+                <h2><i class="fa fa-items" /><Nbsp />{"Admin Gear Enhancements"}</h2>
 
                     <table class="admin-table">
                     <thead>
@@ -1059,24 +1061,26 @@ impl Component for AdminGameDataEdges {
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_view_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::ViewItem));
+                                    callback_view_item = Some(ctx.link().callback(AdminGameDataGearEnhancementsMessage::ViewItem));
                                 }
                                 if global_vars.current_user.admin_can_write_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::EditItemDialog));
-                                    callback_duplicate_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::DuplicateItem));
+                                    callback_edit_item = Some(ctx.link().callback(AdminGameDataGearEnhancementsMessage::EditItemDialog));
+                                    callback_duplicate_item = Some(ctx.link().callback(AdminGameDataGearEnhancementsMessage::DuplicateItem));
                                 }
                                 if global_vars.current_user.admin_can_delete_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
                                 ) {
-                                    callback_delete_item = Some(ctx.link().callback(AdminGameDataEdgesMessage::DeleteItem));
+                                    callback_delete_item = Some(ctx.link().callback(AdminGameDataGearEnhancementsMessage::DeleteItem));
                                 }
+
                                 let row_summary = row.get_summary();
+
                                 html!{
                                     <tbody>
                                     <tr>
@@ -1086,12 +1090,14 @@ impl Component for AdminGameDataEdges {
                                             value={row.book_short_name.unwrap_or("???".to_owned())}
                                         />
                                     }
+
                                     <AdminTableFieldActive
                                         active={row.active}
                                         rowspan={2}
                                         no_select={row.no_select}
                                         td_class="larger-icon min-width text-center"
                                     />
+
                                     <AdminTableFieldText
                                         value={row.name}
                                     />
@@ -1165,13 +1171,13 @@ impl Component for AdminGameDataEdges {
 async fn _get_data(
     global_vars: GlobalVars,
     paging_sorting_and_filter: FetchAdminParameters,
-    set_items: Callback<Vec<Edge>>,
+    set_items: Callback<Vec<GearEnhancement>>,
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
     let api_root = global_vars.api_root.clone();
 
     let result = fetch_admin_api(
-        (api_root.to_owned() + "/admin/game-data/edges/get").to_owned(),
+        (api_root.to_owned() + "/admin/game-data/gear_enhancements/get").to_owned(),
         paging_sorting_and_filter.clone(),
     )
     .await;
@@ -1182,13 +1188,14 @@ async fn _get_data(
                 JsValueSerdeExt::into_serde(&value);
             match vec_val_result {
                 Ok(vec_val) => {
-                    let mut rv: Vec<Edge> = Vec::new();
+                    let mut rv: Vec<GearEnhancement> = Vec::new();
                     for data in vec_val.into_iter() {
-                        let item = data.to_edge().unwrap();
-                        // log!(format!("edge {} {}", &item.name, mem::size_of_val(&item)));
+                        // log!(format!("data.data {}", &data.data));
+                        let item = data.to_gear_enhancement().unwrap();
+                        // log!(format!("gear_enhancement {} {}", &item.name, mem::size_of_val(&item)));
                         rv.push(item);
                     }
-                    // log!(format!("rv {}", mem::size_of_val(&rv)));
+                    // // log!(format!("rv {}", mem::size_of_val(&rv)));
                     set_items.emit(rv);
                 }
                 Err(err) => {
@@ -1205,7 +1212,7 @@ async fn _get_data(
     }
 
     let result = fetch_admin_api(
-        (api_root + "/admin/game-data/edges/paging").to_owned(),
+        (api_root + "/admin/game-data/gear_enhancements/paging").to_owned(),
         paging_sorting_and_filter.clone(),
     )
     .await;

@@ -11,7 +11,7 @@ use yew_router::prelude::*;
 
 use super::AdminRoute;
 
-#[derive(Clone, Routable, PartialEq)]
+#[derive(Clone, PartialEq, Routable)]
 pub enum AdminUsersRoute {
     #[at("/admin/users/activity")]
     Activity,

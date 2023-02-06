@@ -415,7 +415,7 @@ pub async fn upload_user_image(
     return Ok(JsValue::from_str(""));
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct FileUploadResults {
     pub success: bool,
     pub message: String,

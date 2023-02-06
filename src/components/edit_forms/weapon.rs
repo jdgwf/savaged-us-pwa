@@ -51,6 +51,7 @@ pub enum EditWeaponMessage {
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+    UpdateNoSelect(bool),
 }
 
 pub struct EditWeapon {
@@ -112,7 +113,11 @@ impl Component for EditWeapon {
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
-
+            EditWeaponMessage::UpdateNoSelect(new_value) => {
+                self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
             EditWeaponMessage::UpdateEffects( new_value ) => {
                 // let mut nv: Vec<String> = Vec::new();
 
@@ -215,7 +220,7 @@ impl Component for EditWeapon {
             }
             None => {}
         }
-        let mut header = html! {
+        let header = html! {
             <>
                 <TertiaryMenu
                     server_side_renderer={ctx.props().global_vars.server_side_renderer}
@@ -256,15 +261,21 @@ impl Component for EditWeapon {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <InputCheckbox
                                 label="Active"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditWeaponMessage::UpdateActive )}
                             />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditWeaponMessage::UpdateNoSelect )}
+                            />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <BookSelect
                                 readonly={ctx.props().readonly}
                                 current_user={ctx.props().global_vars.current_user.clone()}
@@ -273,8 +284,6 @@ impl Component for EditWeapon {
                                 value={self.edit_item.book_id}
                                 onchange={ ctx.link().callback( EditWeaponMessage::UpdateBookID) }
                             />
-                        </div>
-                        <div class="col-md-4">
                             <InputText
                                 readonly={ctx.props().readonly}
                                 label={"Page Number"}
@@ -283,6 +292,7 @@ impl Component for EditWeapon {
                                 onchange={ ctx.link().callback( EditWeaponMessage::UpdatePage) }
                             />
                         </div>
+
                     </div>
                 </fieldset>
 

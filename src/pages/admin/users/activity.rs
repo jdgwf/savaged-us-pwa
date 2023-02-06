@@ -14,7 +14,7 @@ pub struct AdminUsersActivityProps {
 pub fn admin_home(props: &AdminUsersActivityProps) -> Html {
     let mut global_vars = props.global_vars.clone();
     global_vars.current_menu = "main-admin".to_owned();
-    global_vars.current_sub_menu = "admin-home".to_owned();
+    global_vars.current_sub_menu = "admin-users".to_owned();
     let global_vars_server_side_renderer = global_vars.server_side_renderer;
     html! {
     <UIPage

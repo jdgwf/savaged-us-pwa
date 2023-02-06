@@ -24,7 +24,7 @@ use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-#[derive(Clone, Routable, PartialEq)]
+#[derive(Clone, PartialEq, Routable)]
 pub enum UserRoute {
     #[at("/me/settings-private")]
     SettingsPrivate,

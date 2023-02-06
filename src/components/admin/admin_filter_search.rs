@@ -4,13 +4,16 @@ use savaged_libs::{
     book::Book,
 };
 use standard_components::{
-    libs::local_storage_shortcuts::set_local_storage_u32, ui::input_text::InputText,
+    libs::local_storage_shortcuts::set_local_storage_u32,
+    ui::{input_text::InputText, input_checkbox::InputCheckbox},
+    libs::local_storage_shortcuts::set_local_storage_bool,
 };
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableFilterSearchProps {
     pub global_vars: GlobalVars,
+    pub show_no_select: bool,
     pub paging_sorting_and_filter: FetchAdminParameters,
     pub callback_fetch_admin_params: Callback<FetchAdminParameters>,
     #[prop_or_default]
@@ -21,8 +24,10 @@ pub struct AdminTableFilterSearchProps {
 pub fn edit_view_delete_buttons(props: &AdminTableFilterSearchProps) -> Html {
     let callback_fetch_admin_params_1 = props.callback_fetch_admin_params.clone();
     let callback_fetch_admin_params_2 = props.callback_fetch_admin_params.clone();
+    let callback_fetch_admin_params_3 = props.callback_fetch_admin_params.clone();
     let paging_sorting_and_filter_1 = props.paging_sorting_and_filter.clone();
     let paging_sorting_and_filter_2 = props.paging_sorting_and_filter.clone();
+    let paging_sorting_and_filter_3 = props.paging_sorting_and_filter.clone();
     let search_value_opt = props.paging_sorting_and_filter.filter.clone();
     let search_value = search_value_opt.unwrap_or("".to_owned());
 
@@ -61,11 +66,29 @@ pub fn edit_view_delete_buttons(props: &AdminTableFilterSearchProps) -> Html {
         callback_fetch_admin_params_2.emit(nv)
     });
 
+    let callback_set_hide_no_select = Callback::from(move |new_value: bool| {
+        let mut nv = paging_sorting_and_filter_3.clone();
+
+        nv.hide_no_select = new_value;
+        nv.current_page = 0;
+
+        set_local_storage_bool("admin_hide_no_select", nv.hide_no_select);
+
+        callback_fetch_admin_params_3.emit(nv)
+    });
+
     let global_vars = props.global_vars.clone();
 
     return html! {
 
         <div class="admin-filter">
+        if props.show_no_select {
+            <InputCheckbox
+                checked={props.paging_sorting_and_filter.hide_no_select}
+                onchange={callback_set_hide_no_select}
+                label="Hide No Select"
+            />
+        }
             if book_list.len() > 0 {
                 <BookSelect
                     current_user={global_vars.current_user}

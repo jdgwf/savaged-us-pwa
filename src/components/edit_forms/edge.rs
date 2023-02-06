@@ -51,6 +51,7 @@ pub enum EditEdgeMessage {
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+    UpdateNoSelect(bool),
 }
 
 pub struct EditEdge {
@@ -120,6 +121,11 @@ impl Component for EditEdge {
             // }
             EditEdgeMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditEdgeMessage::UpdateNoSelect(new_value) => {
+                self.edit_item.no_select = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -275,15 +281,21 @@ impl Component for EditEdge {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <InputCheckbox
                                 label="Active"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditEdgeMessage::UpdateActive )}
                             />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditEdgeMessage::UpdateNoSelect )}
+                            />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <BookSelect
                                 readonly={ctx.props().readonly}
                                 current_user={ctx.props().global_vars.current_user.clone()}
@@ -292,8 +304,6 @@ impl Component for EditEdge {
                                 value={self.edit_item.book_id}
                                 onchange={ ctx.link().callback( EditEdgeMessage::UpdateBookID) }
                             />
-                        </div>
-                        <div class="col-md-4">
                             <InputText
                                 readonly={ctx.props().readonly}
                                 label={"Page Number"}
@@ -302,6 +312,7 @@ impl Component for EditEdge {
                                 onchange={ ctx.link().callback( EditEdgeMessage::UpdatePage) }
                             />
                         </div>
+
                     </div>
                 </fieldset>
 

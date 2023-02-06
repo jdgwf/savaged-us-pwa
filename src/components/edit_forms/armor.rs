@@ -54,6 +54,7 @@ pub enum EditArmorMessage {
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+    UpdateNoSelect(bool),
 
     UpdateCost( f32 ),
     UpdateWeight( f32 ),
@@ -162,6 +163,11 @@ impl Component for EditArmor {
 
             EditArmorMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditArmorMessage::UpdateNoSelect(new_value) => {
+                self.edit_item.no_select = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -409,7 +415,7 @@ impl Component for EditArmor {
             }
             None => {}
         }
-        let mut header = html! {
+        let header = html! {
             <>
                 <TertiaryMenu
                     server_side_renderer={ctx.props().global_vars.server_side_renderer}
@@ -450,15 +456,21 @@ impl Component for EditArmor {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <InputCheckbox
                                 label="Active"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditArmorMessage::UpdateActive )}
                             />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditArmorMessage::UpdateNoSelect )}
+                            />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <BookSelect
                                 readonly={ctx.props().readonly}
                                 current_user={ctx.props().global_vars.current_user.clone()}
@@ -467,8 +479,6 @@ impl Component for EditArmor {
                                 value={self.edit_item.book_id}
                                 onchange={ ctx.link().callback( EditArmorMessage::UpdateBookID) }
                             />
-                        </div>
-                        <div class="col-md-4">
                             <InputText
                                 readonly={ctx.props().readonly}
                                 label={"Page Number"}
@@ -477,6 +487,7 @@ impl Component for EditArmor {
                                 onchange={ ctx.link().callback( EditArmorMessage::UpdatePage) }
                             />
                         </div>
+
                     </div>
                 </fieldset>
 
@@ -795,29 +806,6 @@ impl Component for EditArmor {
                 <fieldset class={"fieldset"}>
                     <legend>{"Integrated Weapons"}</legend>
 
-                    <div class="row full-width">
-                        <div class="col-md-6">
-
-                            // <EffectsEntry
-                            //     readonly={ctx.props().readonly}
-                            //     description="These effects will apply when this item is equipped"
-                            //     label={"Effects"}
-                            //     value={self.edit_item.effects.clone()}
-                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
-                            // />
-
-                        </div>
-                        <div class="col-md-6">
-
-                            // <AbilitiesEntry
-                            //     readonly={ctx.props().readonly}
-                            //     description="These abilities will be added to the summary when this item is equipped"
-                            //     label={"Abilities"}
-                            //     value={self.edit_item.abilities.clone()}
-                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateAbilities) }
-                            // />
-                        </div>
-                    </div>
                 </fieldset>
             }
 
@@ -825,29 +813,83 @@ impl Component for EditArmor {
                 <fieldset class={"fieldset"}>
                     <legend>{"Alternate Modes"}</legend>
 
-                    <div class="row full-width">
-                        <div class="col-md-6">
 
-                            // <EffectsEntry
-                            //     readonly={ctx.props().readonly}
-                            //     description="These effects will apply when this item is equipped"
-                            //     label={"Effects"}
-                            //     value={self.edit_item.effects.clone()}
-                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
-                            // />
 
-                        </div>
-                        <div class="col-md-6">
+                    /*
+    pub name: String,
+    pub armor_value: u32,
+    pub minimum_strength: String,
+    pub secondary_armor_value: u32,
+    pub toughness: u32,
+    pub heavy: bool,
+    pub effects: Vec<String>,
+    pub weight: u32,
+                    */
+                    <table class="edit-table">
+                        <tbody>
+                            <tr>
+                                <td colspan={2} class="small-text">
+                                    <InputText
+                                        readonly={ctx.props().readonly}
+                                        label={"Name"}
+                                        value={(self.edit_item.name).to_owned()}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateName) }
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <SelectMinimumStrength
+                                        label={"Minimum Strength"}
+                                        readonly={ctx.props().readonly}
+                                        inline={true}
+                                        value={(self.edit_item.minimum_strength.to_string()).to_owned()}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateMinimumStrength) }
+                                    />
+                                    <InputNumber
+                                        readonly={ctx.props().readonly}
+                                        label={"Armor Value"}
+                                        step={"1"}
+                                        inline={true}
+                                        value={self.edit_item.armor_value as f32}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateArmor) }
+                                    />
+                                    <InputNumber
+                                        readonly={ctx.props().readonly}
+                                        label={"Secondary Armor Value"}
+                                        step={"1"}
+                                        inline={true}
+                                        value={self.edit_item.secondary_armor_value as f32}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateSecondaryArmor) }
+                                    />
+                                    <InputNumber
+                                        readonly={ctx.props().readonly}
+                                        label={"Toughness Bonus"}
+                                        step={"1"}
+                                        inline={true}
+                                        value={self.edit_item.toughness as f32}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateToughness) }
+                                    />
+                                    <InputCheckbox
+                                        label="Heavy Armor"
+                                        readonly={ctx.props().readonly}
+                                        checked={self.edit_item.heavy}
+                                        onchange={ctx.link().callback( EditArmorMessage::UpdateHeavyArmor )}
+                                    />
+                                </td>
+                                <td>
+                                    <EffectsEntry
+                                        readonly={ctx.props().readonly}
+                                        description="These effects will apply when this item is equipped"
+                                        label={"Effects"}
+                                        value={self.edit_item.effects.clone()}
+                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                            // <AbilitiesEntry
-                            //     readonly={ctx.props().readonly}
-                            //     description="These abilities will be added to the summary when this item is equipped"
-                            //     label={"Abilities"}
-                            //     value={self.edit_item.abilities.clone()}
-                            //     onchange={ ctx.link().callback( EditArmorMessage::UpdateAbilities) }
-                            // />
-                        </div>
-                    </div>
                 </fieldset>
             }
                 </div>

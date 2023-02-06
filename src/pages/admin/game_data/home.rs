@@ -57,6 +57,11 @@ pub fn admin_game_data_home(props: &AdminGameDataHomeProps) -> Html {
                          {"Weapons"}
                      </Link<AdminGameDataRoute>>
                 </div>
+                <div>
+                <Link<AdminGameDataRoute> to={AdminGameDataRoute::GearEnhancements}>
+                    {"Gear Enhancements"}
+                </Link<AdminGameDataRoute>>
+           </div>
             </div>
         </UIPage>
     }

@@ -71,8 +71,17 @@ body {
                     // background-color: var(--content-box-bg);
                     border-left: solid 2px var(--borders-color);
                     border-bottom: solid 2px var(--borders-color);
+                    &.larger-icon {
+                        i {
+                            font-size: 2rem;
+                        }
+                    }
                 }
-                &:hover {
+
+
+            }
+            &:hover {
+                tr {
                     td {
                         background-color: var(--table-td-hover-bg);
 

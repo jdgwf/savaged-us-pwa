@@ -9,7 +9,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::history::AnyHistory;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct GlobalVars {
     pub api_root: String,
     pub current_menu: String,

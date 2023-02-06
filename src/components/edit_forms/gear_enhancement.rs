@@ -2,7 +2,7 @@ use crate::components::admin::book_select::BookSelect;
 use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
-use savaged_libs::player_character::hindrance::Hindrance;
+use savaged_libs::player_character::gear_enhancement::GearEnhancement;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::{get_local_storage_string, get_local_storage_bool, set_local_storage_bool};
 use standard_components::ui::input_checkbox::InputCheckbox;
@@ -12,14 +12,14 @@ use standard_components::ui::markdown_editor::MarkdownEditor;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
-pub struct EditHindranceProps {
+pub struct EditGearEnhancementProps {
     pub global_vars: GlobalVars,
-    pub edit_item: Hindrance,
+    pub edit_item: GearEnhancement,
 
     #[prop_or_default]
     pub book_list: Vec<Book>,
 
-    pub on_changed_callback: Callback< Hindrance >,
+    pub on_changed_callback: Callback< GearEnhancement >,
 
     #[prop_or_default]
     pub form_title: Option<String>,
@@ -31,7 +31,7 @@ pub struct EditHindranceProps {
     pub for_admin: bool,
 }
 
-pub enum EditHindranceMessage {
+pub enum EditGearEnhancementMessage {
     ChangePage(String),
     ToggleNoPages( String ),
 
@@ -40,8 +40,8 @@ pub enum EditHindranceMessage {
     UpdateSummary(String),
     UpdateDescription(String),
 
-    // SetMinorOrMajorHindrance(bool),
-    // SetMajorHindrance(bool),
+    // SetMinorOrMajorGearEnhancement(bool),
+    // SetMajorGearEnhancement(bool),
 
     // UpdateConflicts( String ),
     // UpdateEffects( Vec<String> ),
@@ -55,32 +55,32 @@ pub enum EditHindranceMessage {
     UpdateNoSelect(bool),
 }
 
-pub struct EditHindrance {
-    edit_item: Hindrance,
+pub struct EditGearEnhancement {
+    edit_item: GearEnhancement,
     local_storage_page_name: String,
 }
 
-impl Component for EditHindrance {
-    type Message = EditHindranceMessage;
-    type Properties = EditHindranceProps;
+impl Component for EditGearEnhancement {
+    type Message = EditGearEnhancementMessage;
+    type Properties = EditGearEnhancementProps;
 
     fn create(
         ctx: &Context<Self>,
     ) -> Self {
 
-        EditHindrance {
+        EditGearEnhancement {
             edit_item: ctx.props().edit_item.clone(),
-            local_storage_page_name: "hindrance_edit_form_page".to_owned(),
+            local_storage_page_name: "gear_enhancement_edit_form_page".to_owned(),
         }
     }
 
     fn update(
         &mut self,
         ctx: &Context<Self>,
-        msg: EditHindranceMessage,
+        msg: EditGearEnhancementMessage,
     ) -> bool {
         match msg {
-            EditHindranceMessage::ChangePage( new_value ) => {
+            EditGearEnhancementMessage::ChangePage( new_value ) => {
                 if new_value != "__all__".to_owned() {
                     set_local_storage_string( &self.local_storage_page_name, new_value);
 
@@ -89,58 +89,58 @@ impl Component for EditHindrance {
 
             }
 
-            EditHindranceMessage::ToggleNoPages( _new_value ) => {
+            EditGearEnhancementMessage::ToggleNoPages( _new_value ) => {
                 let new_value = get_local_storage_bool("edit_forms_one_page", false);
                 set_local_storage_bool( "edit_forms_one_page", !new_value);
                 return true;
             }
 
-            EditHindranceMessage::UpdateName( new_value ) => {
+            EditGearEnhancementMessage::UpdateName( new_value ) => {
                 self.edit_item.name = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
             }
-            EditHindranceMessage::UpdatePage( new_value ) => {
+            EditGearEnhancementMessage::UpdatePage( new_value ) => {
                 self.edit_item.page = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
             }
 
-            EditHindranceMessage::UpdateSummary( new_value ) => {
+            EditGearEnhancementMessage::UpdateSummary( new_value ) => {
                 self.edit_item.summary = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
             }
 
-            EditHindranceMessage::UpdateDescription( new_value ) => {
+            EditGearEnhancementMessage::UpdateDescription( new_value ) => {
                 self.edit_item.description = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 return true;
             }
 
-            // EditHindranceMessage::SetMinorOrMajorHindrance( new_value ) => {
+            // EditGearEnhancementMessage::SetMinorOrMajorGearEnhancement( new_value ) => {
             //     self.edit_item.minor_or_major = new_value.to_owned();
             //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
             //     return true;
             // }
 
-            // EditHindranceMessage::SetMajorHindrance( new_value ) => {
+            // EditGearEnhancementMessage::SetMajorGearEnhancement( new_value ) => {
             //     self.edit_item.major = new_value.to_owned();
             //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
             //     return true;
             // }
 
-            EditHindranceMessage::UpdateActive( new_value ) => {
+            EditGearEnhancementMessage::UpdateActive( new_value ) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit( self.edit_item.clone());
                 return true;
             }
-            EditHindranceMessage::UpdateNoSelect(new_value) => {
-                self.edit_item.active = new_value.to_owned();
+            EditGearEnhancementMessage::UpdateNoSelect(new_value) => {
+                self.edit_item.no_select = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
-            // EditHindranceMessage::UpdateConflicts( new_value ) => {
+            // EditGearEnhancementMessage::UpdateConflicts( new_value ) => {
 
             //     let mut nv: Vec<String> = Vec::new();
 
@@ -153,7 +153,7 @@ impl Component for EditHindrance {
             //     return true;
             // }
 
-            // EditHindranceMessage::UpdateEffects( new_value ) => {
+            // EditGearEnhancementMessage::UpdateEffects( new_value ) => {
             //     let mut nv: Vec<String> = Vec::new();
 
             //     for val in new_value.as_str().split("\n") {
@@ -165,7 +165,7 @@ impl Component for EditHindrance {
             //     return true;
             // }
 
-            // EditHindranceMessage::UpdateMinorEffects( new_value ) => {
+            // EditGearEnhancementMessage::UpdateMinorEffects( new_value ) => {
 
             //     let mut nv: Vec<String> = Vec::new();
 
@@ -178,13 +178,13 @@ impl Component for EditHindrance {
             //     return true;
             // }
 
-            // EditHindranceMessage::UpdateSummaryMinor( new_value ) => {
+            // EditGearEnhancementMessage::UpdateSummaryMinor( new_value ) => {
             //     self.edit_item.summary_minor = new_value.to_owned();
             //     ctx.props().on_changed_callback.emit( self.edit_item.clone() );
             //     return true;
             // }
 
-            EditHindranceMessage::UpdateBookID( new_value ) => {
+            EditGearEnhancementMessage::UpdateBookID( new_value ) => {
                 self.edit_item.book_id = new_value;
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
@@ -254,7 +254,7 @@ impl Component for EditHindrance {
             );
         }
 
-        let toggle_no_pages = ctx.link().callback( EditHindranceMessage::ToggleNoPages);
+        let toggle_no_pages = ctx.link().callback( EditGearEnhancementMessage::ToggleNoPages);
 
         if all {
             sub_menu_items = vec![
@@ -283,7 +283,7 @@ impl Component for EditHindrance {
             );
         }
 
-        let change_page_callback_form = ctx.link().callback(EditHindranceMessage::ChangePage);
+        let change_page_callback_form = ctx.link().callback(EditGearEnhancementMessage::ChangePage);
         let mut title = html!{<></>};
         match &ctx.props().form_title {
             Some( form_title ) => {
@@ -331,39 +331,39 @@ impl Component for EditHindrance {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                    <div class="col-md-6">
-                        <InputCheckbox
-                            label="Active"
-                            readonly={ctx.props().readonly}
-                            checked={self.edit_item.active}
-                            onchange={ctx.link().callback( EditHindranceMessage::UpdateActive )}
-                        />
-                        <InputCheckbox
-                            label="No Select"
-                            readonly={ctx.props().readonly}
-                            checked={self.edit_item.no_select}
-                            onchange={ctx.link().callback( EditHindranceMessage::UpdateNoSelect )}
-                        />
-                    </div>
-                    <div class="col-md-6">
-                        <BookSelect
-                            readonly={ctx.props().readonly}
-                            current_user={ctx.props().global_vars.current_user.clone()}
-                            book_list={book_list}
-                            label={"Book"}
-                            value={self.edit_item.book_id}
-                            onchange={ ctx.link().callback( EditHindranceMessage::UpdateBookID) }
-                        />
-                        <InputText
-                            readonly={ctx.props().readonly}
-                            label={"Page Number"}
-                            inline={true}
-                            value={(self.edit_item.page).to_owned()}
-                            onchange={ ctx.link().callback( EditHindranceMessage::UpdatePage) }
-                        />
-                    </div>
+                        <div class="col-md-6">
+                            <InputCheckbox
+                                label="Active"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.active}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateActive )}
+                            />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateNoSelect )}
+                            />
+                        </div>
+                        <div class="col-md-6">
+                            <BookSelect
+                                readonly={ctx.props().readonly}
+                                current_user={ctx.props().global_vars.current_user.clone()}
+                                book_list={book_list}
+                                label={"Book"}
+                                value={self.edit_item.book_id}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateBookID) }
+                            />
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Page Number"}
+                                inline={true}
+                                value={(self.edit_item.page).to_owned()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdatePage) }
+                            />
+                        </div>
 
-                </div>
+                    </div>
                 </fieldset>
 
             }
@@ -377,20 +377,20 @@ impl Component for EditHindrance {
                                 readonly={ctx.props().readonly}
                                 label={"Name"}
                                 value={(self.edit_item.name).to_owned()}
-                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateName) }
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateName) }
                             />
 
                             // <InputCheckbox
-                            //     label="Major Hindrance"
+                            //     label="Major GearEnhancement"
                             //     readonly={ctx.props().readonly}
                             //     checked={self.edit_item.major}
-                            //     onchange={ctx.link().callback( EditHindranceMessage::SetMajorHindrance )}
+                            //     onchange={ctx.link().callback( EditGearEnhancementMessage::SetMajorGearEnhancement )}
                             // />
                             // <InputCheckbox
-                            //     label="Minor or Major Hindrance"
+                            //     label="Minor or Major GearEnhancement"
                             //     readonly={ctx.props().readonly}
                             //     checked={self.edit_item.minor_or_major}
-                            //     onchange={ctx.link().callback( EditHindranceMessage::SetMinorOrMajorHindrance )}
+                            //     onchange={ctx.link().callback( EditGearEnhancementMessage::SetMinorOrMajorGearEnhancement )}
                             // />
 
                             // if self.edit_item.minor_or_major {
@@ -399,13 +399,13 @@ impl Component for EditHindrance {
                             //         readonly={ctx.props().readonly}
                             //         label={"Major Summary"}
                             //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummary) }
                             //     />
                             //     <InputText
                             //         readonly={ctx.props().readonly}
                             //         label={"Minor Summary"}
                             //         value={(self.edit_item.summary_minor).to_owned()}
-                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummaryMinor) }
+                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummaryMinor) }
                             //     />
                             // } else {
                             //     <InputText
@@ -413,7 +413,7 @@ impl Component for EditHindrance {
                             //         label={"Summary"}
 
                             //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateSummary) }
+                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummary) }
                             //     />
                             // }
 
@@ -429,7 +429,7 @@ impl Component for EditHindrance {
                                 label={"Description"}
                                 starting_height={175}
                                 value={(self.edit_item.description).to_owned()}
-                                onchange={ ctx.link().callback( EditHindranceMessage::UpdateDescription) }
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateDescription) }
                             />
                         </div>
                     </div>
@@ -447,7 +447,7 @@ impl Component for EditHindrance {
                     //                 readonly={ctx.props().readonly}
                     //                 label={"Major Effects"}
                     //                 value={self.edit_item.effects.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                    //                 onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateEffects) }
                     //             />
                     //         </div>
                     //         <div class="col-md-6">
@@ -455,7 +455,7 @@ impl Component for EditHindrance {
                     //                 readonly={ctx.props().readonly}
                     //                 label={"Minor Effects"}
                     //                 value={self.edit_item.effects_minor.join("\n")}
-                    //                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateMinorEffects ) }
+                    //                 onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateMinorEffects ) }
                     //             />
                     //         </div>
                     //     </div>
@@ -464,7 +464,7 @@ impl Component for EditHindrance {
                     //         readonly={ctx.props().readonly}
                     //         label={"Effects"}
                     //         value={self.edit_item.effects.join("\n")}
-                    //         onchange={ ctx.link().callback( EditHindranceMessage::UpdateEffects) }
+                    //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateEffects) }
                     //     />
                     // }
                 </fieldset>
@@ -477,7 +477,7 @@ impl Component for EditHindrance {
                     //     readonly={ctx.props().readonly}
                     //     label={"Conflicts"}
                     //     value={self.edit_item.conflicts.join("\n")}
-                    //     onchange={ ctx.link().callback( EditHindranceMessage::UpdateConflicts) }
+                    //     onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateConflicts) }
                     // />
                 </fieldset>
             }

@@ -56,6 +56,7 @@ pub enum EditHindranceMessage {
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+    UpdateNoSelect(bool),
 
     UpdateHiddenOnCharacterSheet(bool),
     UpdateNeedsToSpecify(bool),
@@ -133,6 +134,11 @@ impl Component for EditHindrance {
             }
 
             EditHindranceMessage::UpdateActive(new_value) => {
+                self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditHindranceMessage::UpdateNoSelect(new_value) => {
                 self.edit_item.active = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
@@ -294,7 +300,7 @@ impl Component for EditHindrance {
             }
             None => {}
         }
-        let mut header = html! {
+        let header = html! {
             <>
                 <TertiaryMenu
                     server_side_renderer={ctx.props().global_vars.server_side_renderer}
@@ -335,15 +341,21 @@ impl Component for EditHindrance {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <InputCheckbox
                                 label="Active"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditHindranceMessage::UpdateActive )}
                             />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditHindranceMessage::UpdateNoSelect )}
+                            />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <BookSelect
                                 readonly={ctx.props().readonly}
                                 current_user={ctx.props().global_vars.current_user.clone()}
@@ -352,8 +364,6 @@ impl Component for EditHindrance {
                                 value={self.edit_item.book_id}
                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdateBookID) }
                             />
-                        </div>
-                        <div class="col-md-4">
                             <InputText
                                 readonly={ctx.props().readonly}
                                 label={"Page Number"}
@@ -362,6 +372,7 @@ impl Component for EditHindrance {
                                 onchange={ ctx.link().callback( EditHindranceMessage::UpdatePage) }
                             />
                         </div>
+
                     </div>
                 </fieldset>
 

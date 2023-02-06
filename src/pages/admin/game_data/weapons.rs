@@ -1,5 +1,5 @@
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
+use crate::components::admin::admin_table_field::active::AdminTableFieldActive;
 use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
@@ -27,7 +27,7 @@ use savaged_libs::player_character::weapon::Weapon;
 use savaged_libs::{admin_libs::new_fetch_admin_params, admin_libs::FetchAdminParameters};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{
-    get_local_storage_u32, set_local_storage_u32,
+    get_local_storage_u32, set_local_storage_u32, get_local_storage_bool
 };
 use standard_components::ui::nbsp::Nbsp;
 // use std::mem;
@@ -92,6 +92,8 @@ impl Component for AdminGameDataWeapons {
         );
         paging_sorting_and_filter.filter_book =
             get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
+        paging_sorting_and_filter.hide_no_select =
+            get_local_storage_bool("admin_hide_no_select", paging_sorting_and_filter.hide_no_select);
         let paging = paging_sorting_and_filter.clone();
         spawn_local(async move {
             _get_data(
@@ -144,10 +146,10 @@ impl Component for AdminGameDataWeapons {
 
             AdminGameDataWeaponsMessage::AddItemDialog(_nv) => {
                 log!("AdminGameDataWeaponsMessage::AddItemDialog");
-                let mut new_hind = Weapon::new();
-                new_hind.book_id = self.paging_sorting_and_filter.filter_book;
-                new_hind.active = true;
-                self.editing_item = Some(new_hind);
+                let mut new_item = Weapon::default();
+                new_item.book_id = self.paging_sorting_and_filter.filter_book;
+                new_item.active = true;
+                self.editing_item = Some(new_item);
 
                 self.is_editing = false;
                 self.is_adding = true;
@@ -276,7 +278,7 @@ impl Component for AdminGameDataWeapons {
 
             AdminGameDataWeaponsMessage::NewItem(book_id) => {
                 let self_editing_item = self.editing_item.clone();
-                let mut hind = Weapon::new();
+                let mut hind = Weapon::default();
                 match self_editing_item {
                     Some(editing_item) => {
                         hind.active = editing_item.active;
@@ -382,11 +384,11 @@ impl Component for AdminGameDataWeapons {
                                                         };
                                                     global_vars.add_alert.emit(alert_def);
 
-                                                    let mut new_hind = Weapon::new();
-                                                    new_hind.book_id = edit_item_book_id;
-                                                    new_hind.active = edit_item_active;
-                                                    new_hind.page = edit_item_book_page;
-                                                    update_weapon_callback.emit(new_hind);
+                                                    let mut new_item = Weapon::default();
+                                                    new_item.book_id = edit_item_book_id;
+                                                    new_item.active = edit_item_active;
+                                                    new_item.page = edit_item_book_page;
+                                                    update_weapon_callback.emit(new_item);
                                                 }
 
                                                 None => {
@@ -962,6 +964,7 @@ impl Component for AdminGameDataWeapons {
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
                 global_vars={global_vars.clone()}
+                show_no_select={true}
             />
         </div>
                 <h2><i class="fa fa-items" /><Nbsp />{"Admin Weapons"}</h2>
@@ -1008,36 +1011,42 @@ impl Component for AdminGameDataWeapons {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        if self.loading {
-                            <tr>
-                            <td colspan="5" class="text-center">
-                                <br />
-                                {"Loading..."}<br />
-                                <br />
 
-                            </td>
-                        </tr>
+                        if self.loading {
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <br />
+                                        {"Loading..."}<br />
+                                        <br />
+
+                                    </td>
+                                </tr>
+                            </tbody>
                         } else {
                             if self.items.len() == 0 {
                                 if non_filtered_count != filtered_count {
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            <br />
-                                            {"There are no items with this filter result. Please revise your filter term."}<br />
-                                            <br />
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <br />
+                                                {"There are no items with this filter result. Please revise your filter term."}<br />
+                                                <br />
 
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    </tbody>
 
                                 } else {
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            <br />
-                                            {"There are no items."}<br />
-                                            <br />
-                                        </td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <br />
+                                                {"There are no items."}<br />
+                                                <br />
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 }
                             } else {
                             {self.items.clone().into_iter().map( move |row| {
@@ -1070,17 +1079,24 @@ impl Component for AdminGameDataWeapons {
                                 ) {
                                     callback_delete_item = Some(ctx.link().callback(AdminGameDataWeaponsMessage::DeleteItem));
                                 }
-                                html!{<tr>
+                                let row_summary = row.get_summary();
+
+                                html!{
+                                    <tbody>
+                                    <tr>
 
                                     if show_book_column {
                                         <AdminTableFieldText
                                             value={row.book_short_name.unwrap_or("???".to_owned())}
                                         />
                                     }
-                                    <AdminTableFieldBool
-                                        value={row.active}
-                                        td_class="min-width text-center"
+                                    <AdminTableFieldActive
+                                        active={row.active}
+                                        rowspan={2}
+                                        no_select={row.no_select}
+                                        td_class="larger-icon min-width text-center"
                                     />
+
                                     <AdminTableFieldText
                                         value={row.name}
                                     />
@@ -1090,7 +1106,7 @@ impl Component for AdminGameDataWeapons {
                                     // />
 
                                     // <AdminTableFieldText
-                                    //     value={row.username}
+                                    //     value={row.username.to_owned()}
                                     // />
                                     <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
@@ -1107,7 +1123,7 @@ impl Component for AdminGameDataWeapons {
                                         />
                                     </td>
 
-                                    <td>
+                                    <td rowspan={2}>
                                         <EditViewDeleteButtons
                                             id={row.id}
                                             name={row_name.to_owned()}
@@ -1123,11 +1139,17 @@ impl Component for AdminGameDataWeapons {
                                     </td>
 
                                 </tr>
+                                <tr>
+                                    <td colspan={2} class="small-text">
+                                        {row_summary}
+                                    </td>
+                                </tr>
+                                </tbody>
                                 }
                             }).collect::<Html>()}
                             }
                         }
-                    </tbody>
+
                     <tfoot>
                         <tr>
                             <th colspan="5">

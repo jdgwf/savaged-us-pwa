@@ -18,7 +18,7 @@ use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-#[derive(Clone, Debug, Routable, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Routable)]
 pub enum InfoRoute {
     #[at("/info/about")]
     InfoAbout,

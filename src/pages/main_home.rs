@@ -30,40 +30,6 @@ impl Component for MainHome {
         let global_vars = ctx.props().global_vars.clone();
         // let global_vars2 = ctx.props().global_vars.clone();
 
-        let mut saves_html = html! {<></>};
-        let mut game_data_html = html! {<></>};
-
-        match &global_vars.game_data {
-            Some(game_data) => {
-                game_data_html = html! {
-                    <>
-                    {"Books: "}{game_data.books.len()}<br />
-                    {"Edges: "}{game_data.edges.len()}<br />
-                    {"Hindrances: "}{game_data.hindrances.len()}<br />
-                    <br />
-                    {"Gear: "}{game_data.gear.len()}<br />
-                    {"Armor: "}{game_data.armor.len()}<br />
-                    {"Weapons: "}{game_data.weapons.len()}<br />
-                    </>
-                };
-            }
-            None => {
-                // log!("main_home view no game_data?")
-            }
-        }
-        match &global_vars.saves {
-            Some(saves) => {
-                saves_html = html! {
-                    <>
-                        {"saves: "}{saves.len()}<br />
-                    </>
-                };
-            }
-            None => {
-                // log!("main_home view no saves?")
-            }
-        }
-
         // let global_vars_copy = ctx.props().global_vars.clone();
         html! {
             <UIPage

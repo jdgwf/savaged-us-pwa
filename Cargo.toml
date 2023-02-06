@@ -60,6 +60,7 @@ features = [
     "FormData",
     "TouchList",
     "Touch",
+    "Navigator",
 #    "Document",
 #    "HtmlElement",
 #    "MouseEvent",

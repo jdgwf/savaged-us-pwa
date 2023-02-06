@@ -1,5 +1,5 @@
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
+use crate::components::admin::admin_table_field::active::AdminTableFieldActive;
 use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
@@ -27,7 +27,7 @@ use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::{admin_libs::new_fetch_admin_params, admin_libs::FetchAdminParameters};
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{
-    get_local_storage_u32, set_local_storage_u32,
+    get_local_storage_u32, set_local_storage_u32, get_local_storage_bool
 };
 use standard_components::ui::nbsp::Nbsp;
 // use std::mem;
@@ -94,6 +94,8 @@ impl Component for AdminGameDataHindrances {
         );
         paging_sorting_and_filter.filter_book =
             get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
+        paging_sorting_and_filter.hide_no_select =
+            get_local_storage_bool("admin_hide_no_select", paging_sorting_and_filter.hide_no_select);
         let paging = paging_sorting_and_filter.clone();
         spawn_local(async move {
             _get_data(
@@ -146,10 +148,10 @@ impl Component for AdminGameDataHindrances {
 
             AdminGameDataHindrancesMessage::AddItemDialog(_nv) => {
                 log!("AdminGameDataHindrancesMessage::AddItemDialog");
-                let mut new_hind = Hindrance::new();
-                new_hind.book_id = self.paging_sorting_and_filter.filter_book;
-                new_hind.active = true;
-                self.editing_item = Some(new_hind);
+                let mut new_item = Hindrance::default();
+                new_item.book_id = self.paging_sorting_and_filter.filter_book;
+                new_item.active = true;
+                self.editing_item = Some(new_item);
 
                 self.is_editing = false;
                 self.is_adding = true;
@@ -280,19 +282,19 @@ impl Component for AdminGameDataHindrances {
 
             AdminGameDataHindrancesMessage::NewItem(book_id) => {
                 let self_editing_item = self.editing_item.clone();
-                let mut hind = Hindrance::new();
+                let mut new_item = Hindrance::default();
                 match self_editing_item {
                     Some(editing_item) => {
-                        hind.active = editing_item.active;
-                        hind.book_id = editing_item.book_id;
+                        new_item.active = editing_item.active;
+                        new_item.book_id = editing_item.book_id;
                     }
                     None => {
-                        hind.active = true;
-                        hind.book_id = book_id;
+                        new_item.active = true;
+                        new_item.book_id = book_id;
                     }
                 }
 
-                self.editing_item = Some(hind);
+                self.editing_item = Some(new_item);
 
                 return true;
             }
@@ -388,11 +390,11 @@ impl Component for AdminGameDataHindrances {
                                                         };
                                                     global_vars.add_alert.emit(alert_def);
 
-                                                    let mut new_hind = Hindrance::new();
-                                                    new_hind.book_id = edit_item_book_id;
-                                                    new_hind.active = edit_item_active;
-                                                    new_hind.page = edit_item_book_page;
-                                                    update_hindrance_callback.emit(new_hind);
+                                                    let mut new_item = Hindrance::default();
+                                                    new_item.book_id = edit_item_book_id;
+                                                    new_item.active = edit_item_active;
+                                                    new_item.page = edit_item_book_page;
+                                                    update_hindrance_callback.emit(new_item);
                                                 }
 
                                                 None => {
@@ -977,6 +979,7 @@ impl Component for AdminGameDataHindrances {
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
                 global_vars={global_vars.clone()}
+                show_no_select={true}
             />
         </div>
                 <h2><i class="fa fa-items" /><Nbsp />{"Admin Hindrances"}</h2>
@@ -1023,36 +1026,42 @@ impl Component for AdminGameDataHindrances {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        if self.loading {
-                            <tr>
-                            <td colspan="5" class="text-center">
-                                <br />
-                                {"Loading..."}<br />
-                                <br />
 
-                            </td>
-                        </tr>
+                        if self.loading {
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <br />
+                                        {"Loading..."}<br />
+                                        <br />
+
+                                    </td>
+                                </tr>
+                            </tbody>
                         } else {
                             if self.items.len() == 0 {
                                 if non_filtered_count != filtered_count {
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            <br />
-                                            {"There are no items with this filter result. Please revise your filter term."}<br />
-                                            <br />
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <br />
+                                                {"There are no items with this filter result. Please revise your filter term."}<br />
+                                                <br />
 
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    </tbody>
 
                                 } else {
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            <br />
-                                            {"There are no items."}<br />
-                                            <br />
-                                        </td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <br />
+                                                {"There are no items."}<br />
+                                                <br />
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 }
                             } else {
                             {self.items.clone().into_iter().map( move |row| {
@@ -1085,16 +1094,23 @@ impl Component for AdminGameDataHindrances {
                                 ) {
                                     callback_delete_item = Some(ctx.link().callback(AdminGameDataHindrancesMessage::DeleteItem));
                                 }
-                                html!{<tr>
+
+                                let row_summary = row.get_summary();
+
+                                html!{
+                                    <tbody>
+                                    <tr>
 
                                     if show_book_column {
                                         <AdminTableFieldText
                                             value={row.book_short_name.unwrap_or("???".to_owned())}
                                         />
                                     }
-                                    <AdminTableFieldBool
-                                        value={row.active}
-                                        td_class="min-width text-center"
+                                    <AdminTableFieldActive
+                                        active={row.active}
+                                        rowspan={2}
+                                        no_select={row.no_select}
+                                        td_class="larger-icon min-width text-center"
                                     />
                                     <AdminTableFieldText
                                         value={row.name}
@@ -1105,7 +1121,7 @@ impl Component for AdminGameDataHindrances {
                                     // />
 
                                     // <AdminTableFieldText
-                                    //     value={row.username}
+                                    //     value={row.username.to_owned()}
                                     // />
                                     <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
@@ -1122,7 +1138,7 @@ impl Component for AdminGameDataHindrances {
                                         />
                                     </td>
 
-                                    <td>
+                                    <td rowspan={2}>
                                         <EditViewDeleteButtons
                                             id={row.id}
                                             name={row_name.to_owned()}
@@ -1138,11 +1154,17 @@ impl Component for AdminGameDataHindrances {
                                     </td>
 
                                 </tr>
+                                <tr>
+                                    <td colspan={2} class="small-text">
+                                        {row_summary}
+                                    </td>
+                                </tr>
+                                </tbody>
                                 }
                             }).collect::<Html>()}
                             }
                         }
-                    </tbody>
+
                     <tfoot>
                         <tr>
                             <th colspan="5">

@@ -2,7 +2,7 @@ use crate::libs::global_vars::GlobalVars;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct ConfirmationDialogDefinition {
     pub title: Option<String>,
     pub callback: Callback<bool>,

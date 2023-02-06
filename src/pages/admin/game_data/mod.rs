@@ -4,10 +4,12 @@ pub mod gear;
 pub mod hindrances;
 pub mod home;
 pub mod weapons;
+pub mod gear_enhancements;
 
 use self::armor::AdminGameDataArmor;
 use self::edges::AdminGameDataEdges;
 use self::gear::AdminGameDataGear;
+use self::gear_enhancements::AdminGameDataGearEnhancements;
 use self::hindrances::AdminGameDataHindrances;
 use self::weapons::AdminGameDataWeapons;
 use crate::components::tertiary_links_menu::TertiaryLinksMenuItem;
@@ -18,7 +20,7 @@ use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-#[derive(Clone, Routable, PartialEq)]
+#[derive(Clone, PartialEq, Routable)]
 pub enum AdminGameDataRoute {
     #[at("/admin/game-data/hindrances")]
     Hindrances,
@@ -28,6 +30,9 @@ pub enum AdminGameDataRoute {
 
     #[at("/admin/game-data/gear")]
     Gear,
+
+    #[at("/admin/game-data/gear-enhancements")]
+    GearEnhancements,
 
     #[at("/admin/game-data/armor")]
     Armor,
@@ -69,6 +74,14 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::Gear => html! {
             <AdminGameDataGear
+                global_vars={global_vars}
+                sub_menu_items={sub_menu_items}
+
+            />
+        },
+
+        AdminGameDataRoute::GearEnhancements => html! {
+            <AdminGameDataGearEnhancements
                 global_vars={global_vars}
                 sub_menu_items={sub_menu_items}
 
@@ -228,6 +241,14 @@ pub fn get_game_data_submenu_items() -> Vec<TertiaryLinksMenuItem> {
         TertiaryLinksMenuItem {
             link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::Gear}>{"Gear"}</Link<AdminGameDataRoute>>},
             tag: "gear".to_owned(),
+            class: None,
+            title: None,
+            icon_class: None,
+            separate: false,
+        },
+        TertiaryLinksMenuItem {
+            link: html! {<Link<AdminGameDataRoute> to={AdminGameDataRoute::GearEnhancements}>{"Gear Enhancements"}</Link<AdminGameDataRoute>>},
+            tag: "gear-enhancements".to_owned(),
             class: None,
             title: None,
             icon_class: None,

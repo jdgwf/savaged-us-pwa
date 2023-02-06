@@ -60,6 +60,7 @@ pub enum EditGearMessage {
     UpdateBookID(u32),
     UpdatePage(String),
     UpdateActive(bool),
+    UpdateNoSelect(bool),
 
     UpdateIsContainer(bool),
     UpdateContainerNoWeight(bool),
@@ -158,6 +159,11 @@ impl Component for EditGear {
 
             EditGearMessage::UpdateActive(new_value) => {
                 self.edit_item.active = new_value.to_owned();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+            EditGearMessage::UpdateNoSelect(new_value) => {
+                self.edit_item.no_select = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -328,15 +334,21 @@ impl Component for EditGear {
                     <legend>{"Admin"}</legend>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <InputCheckbox
                                 label="Active"
                                 readonly={ctx.props().readonly}
                                 checked={self.edit_item.active}
                                 onchange={ctx.link().callback( EditGearMessage::UpdateActive )}
                             />
+                            <InputCheckbox
+                                label="No Select"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.no_select}
+                                onchange={ctx.link().callback( EditGearMessage::UpdateNoSelect )}
+                            />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <BookSelect
                                 readonly={ctx.props().readonly}
                                 current_user={ctx.props().global_vars.current_user.clone()}
@@ -345,8 +357,6 @@ impl Component for EditGear {
                                 value={self.edit_item.book_id}
                                 onchange={ ctx.link().callback( EditGearMessage::UpdateBookID) }
                             />
-                        </div>
-                        <div class="col-md-4">
                             <InputText
                                 readonly={ctx.props().readonly}
                                 label={"Page Number"}
@@ -355,6 +365,7 @@ impl Component for EditGear {
                                 onchange={ ctx.link().callback( EditGearMessage::UpdatePage) }
                             />
                         </div>
+
                     </div>
                 </fieldset>
 

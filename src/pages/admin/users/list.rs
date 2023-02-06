@@ -1,7 +1,7 @@
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
 use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
+use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
@@ -17,7 +17,7 @@ use savaged_libs::{
 };
 use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::{
-    get_local_storage_u32, set_local_storage_u32,
+    get_local_storage_u32, set_local_storage_u32, get_local_storage_bool
 };
 use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
@@ -61,6 +61,8 @@ impl Component for AdminUsersList {
         );
         paging_sorting_and_filter.filter_book =
             get_local_storage_u32("admin_selected_book", paging_sorting_and_filter.filter_book);
+        paging_sorting_and_filter.hide_no_select =
+            get_local_storage_bool("admin_hide_no_select", paging_sorting_and_filter.hide_no_select);
         let paging = paging_sorting_and_filter.clone();
         spawn_local(async move {
             _get_data(
@@ -170,6 +172,7 @@ impl Component for AdminUsersList {
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
                 global_vars={global_vars.clone()}
+                show_no_select={false}
             />
         </div>
                 <h2><i class="fa fa-users" /><Nbsp />{"Admin Users"}</h2>
@@ -226,11 +229,15 @@ impl Component for AdminUsersList {
                             } else {
                             {self.users.clone().into_iter().map( move |row| {
                                 let row_name = &row.get_admin_name().to_owned();
-                                html!{<tr>
+                                let row_summary = row.get_summary();
+                                html!{
+                                    <>
+                                    <tr>
 
                                     <AdminTableFieldBool
                                         value={row.activated}
-                                        td_class="min-width text-center"
+                                        rowspan={2}
+                                        td_class="larger-icon min-width text-center"
                                     />
 
                                     <AdminTableFieldText
@@ -242,16 +249,22 @@ impl Component for AdminUsersList {
                                     />
 
                                     <AdminTableFieldText
-                                        value={row.username}
+                                        value={row.username.to_owned()}
                                     />
 
-                                    <td>
+                                    <td rowspan={2}>
                                         <EditViewDeleteButtons
                                             id={row.id}
                                             name={row_name.to_owned()}
                                         />
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td colspan={3} class="small-text">
+                                        {row_summary}
+                                    </td>
+                                </tr>
+                                </>
                                 }
                             }).collect::<Html>()}
                             }
@@ -281,7 +294,8 @@ async fn _get_data(
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
     let api_root = global_vars.api_root.clone();
-    let paging_sorting_and_filter = paging_sorting_and_filter.clone();
+    let mut paging_sorting_and_filter = paging_sorting_and_filter.clone();
+    paging_sorting_and_filter.hide_no_select = false;
     let result = fetch_admin_api(
         (api_root.to_owned() + "/admin/users/get").to_owned(),
         paging_sorting_and_filter.clone(),

@@ -36,7 +36,7 @@ use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-#[derive(Clone, Routable, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Routable, Debug)]
 pub enum MainRoute {
     #[at("/")]
     Home,
@@ -503,8 +503,10 @@ impl Component for MainApp {
                         .emit(global_vars);
                 }
 
+                let window = web_sys::window().expect("Missing Window");
+                let navigator = window.navigator();
 
-                if offline {
+                if offline && navigator.on_line() {
                     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
                     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
 

@@ -3,7 +3,7 @@ use savaged_libs::alert_level::AlertLevel;
 use uuid::Uuid;
 use yew::prelude::*;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct AlertDefinition {
     pub level: AlertLevel,
     pub html: Option<Html>,

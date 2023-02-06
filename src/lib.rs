@@ -23,14 +23,14 @@ use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
 
-#[derive(Properties, PartialEq, Debug)]
+#[derive(Properties ,PartialEq, Debug)]
 pub struct ServerAppProps {
     pub url: AttrValue,
     pub web_content: WebContent,
     // pub queries: HashMap<String, String>,
 }
 
-#[derive(Clone, Routable, Debug, PartialEq)]
+#[derive(Clone, PartialEq, Routable, Debug)]
 pub enum MainServerRoute {
     #[at("/")]
     Home,

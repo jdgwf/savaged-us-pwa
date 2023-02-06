@@ -191,6 +191,42 @@ impl Component for UserLogin {
         let mut global_vars = global_vars.clone();
         global_vars.current_menu = "main-user-login".to_owned();
 
+
+        let mut saves_html = html! {<></>};
+        let mut game_data_html = html! {<></>};
+
+        match &global_vars.game_data {
+            Some(game_data) => {
+                game_data_html = html! {
+                    <>
+                    {"Books: "}{game_data.books.len()}<br />
+                    {"Edges: "}{game_data.edges.len()}<br />
+                    {"Hindrances: "}{game_data.hindrances.len()}<br />
+                    <br />
+                    {"Gear: "}{game_data.gear.len()}<br />
+                    {"Armor: "}{game_data.armor.len()}<br />
+                    {"Weapons: "}{game_data.weapons.len()}<br />
+                    </>
+                };
+            }
+            None => {
+                // log!("main_home view no game_data?")
+            }
+        }
+        match &global_vars.saves {
+            Some(saves) => {
+                saves_html = html! {
+                    <>
+                        {"saves: "}{saves.len()}<br />
+                    </>
+                };
+            }
+            None => {
+                // log!("main_home view no saves?")
+            }
+        }
+
+
         if global_vars.user_loading {
             html!(
                     <UIPage
@@ -224,7 +260,17 @@ impl Component for UserLogin {
                             <strong>{"Display Name: "}</strong>{&global_vars.current_user.get_name()}<br />
                             <strong>{"Twitter: "}</strong>{&global_vars.current_user.twitter}<br />
                             </div>
-
+                            <hr />
+                                            <div class="row">
+                    <div class="col-6">
+                        <h4>{"GameDataRow Data Counts"}</h4>
+                        {game_data_html}
+                    </div>
+                    <div class="col-6">
+                        <h4>{"Saves Count"}</h4>
+                        {saves_html}
+                    </div>
+                </div>
                         </fieldset>
                     } else {
                         <div class="row equal-heights">
@@ -254,7 +300,7 @@ impl Component for UserLogin {
                                     <form onsubmit={do_login_submit}>
                                         <InputText
                                             label={"Email Address"}
-                                            inline={true}
+                                            // inline={true}
                                             input_type={"text"}
                                             placeholder={"me@example.com"}
                                             value={self.username.clone()}
@@ -263,7 +309,7 @@ impl Component for UserLogin {
                                         />
                                         <InputText
                                             label={"Password"}
-                                            inline={true}
+                                            // inline={true}
                                             input_type={"password"}
                                             placeholder={"Password"}
                                             value={self.password.clone()}

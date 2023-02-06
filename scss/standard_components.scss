@@ -42,6 +42,16 @@ body {
 
         }
 
+        &.inline {
+            select,
+            input[type=email],
+            input[type=text],
+            input[type=number],
+            input[type=password] {
+                width: auto !important;
+            }
+        }
+
         input[type=checkbox] {
             padding: 0;
             margin: 0 .5rem 0 0;

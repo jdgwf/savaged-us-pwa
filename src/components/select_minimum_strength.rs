@@ -66,10 +66,14 @@ pub fn select_minimum_strength( props: &SelectMinimumStrengthProps) -> Html {
             </div>
         );
     }
+    let mut label_class = props.label_class.to_owned();
 
+    if props.inline {
+        label_class = label_class + &" inline";
+    }
     html! {
         <label
-            class={props.label_class.to_owned()}
+            class={label_class.to_owned()}
             title={props.title.to_owned()}
         >
             <InputLabel
