@@ -5,7 +5,8 @@ use crate::components::select_minimum_strength::SelectMinimumStrength;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
-use savaged_libs::player_character::armor::Armor;
+use savaged_libs::player_character::armor::{Armor, ArmorAlternateMode};
+use savaged_libs::player_character::weapon::{Weapon, WeaponProfile};
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::{
     get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
@@ -14,9 +15,13 @@ use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_number::InputNumber;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
-use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
+// use standard_components::ui::textarea::TextArea;
+use gloo_console::log;
+use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
+
+use super::weapon_profile::EditWeaponProfile;
 
 #[derive(Properties, PartialEq)]
 pub struct EditArmorProps {
@@ -87,6 +92,12 @@ pub enum EditArmorMessage {
     UpdateSetStrength( String ),
     UpdateRun( String ),
     UpdatePace( f32 ),
+
+    UpdateAlternateModes( Vec<ArmorAlternateMode> ),
+    AddAlternateMode( MouseEvent ),
+    RemoveAlternateMode( usize ),
+
+    UpdateIntegratedWeapon( Vec<WeaponProfile> ),
 }
 
 pub struct EditArmor {
@@ -107,6 +118,38 @@ impl Component for EditArmor {
 
     fn update(&mut self, ctx: &Context<Self>, msg: EditArmorMessage) -> bool {
         match msg {
+
+
+            EditArmorMessage::UpdateIntegratedWeapon(new_value) => {
+
+                self.edit_item.integrated_weapons = new_value.clone();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::AddAlternateMode( _event ) => {
+                self.edit_item.alternate_modes.push(
+                    ArmorAlternateMode::default()
+                );
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::RemoveAlternateMode(new_value) => {
+
+                self.edit_item.alternate_modes.remove( new_value );
+
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditArmorMessage::UpdateAlternateModes(new_value) => {
+
+                self.edit_item.alternate_modes = new_value.clone();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
             EditArmorMessage::ChangePage(new_value) => {
                 if new_value != "__all__".to_owned() {
                     set_local_storage_string(&self.local_storage_page_name, new_value);
@@ -385,6 +428,7 @@ impl Component for EditArmor {
 
         let toggle_no_pages = ctx.link().callback(EditArmorMessage::ToggleNoPages);
 
+        let mut am_index = 0;
         if all {
             sub_menu_items = vec![TertiaryMenuItem {
                 tag: "__all__".to_owned(),
@@ -445,6 +489,10 @@ impl Component for EditArmor {
         }
 
         let book_list = ctx.props().book_list.clone();
+
+        let readonly = ctx.props().readonly;
+        let integrated_weapons = self.edit_item.integrated_weapons.clone();
+        let update_integrated_weapons = ctx.link().callback(EditArmorMessage::UpdateIntegratedWeapon);
 
         html! {
             <div class="edit-form">
@@ -806,6 +854,21 @@ impl Component for EditArmor {
                 <fieldset class={"fieldset"}>
                     <legend>{"Integrated Weapons"}</legend>
 
+                    <EditWeaponProfile
+                        // global_vars={self.props().global_var}
+                        readonly={readonly}
+                        weapon_profiles={integrated_weapons}
+                        description={Some("Some armor has integrated weaponry, perhaps blades or even a built-in short ranged cannon in a shield.".to_owned())}
+                        weapon_profiles_updated={move |nv| {
+                            // let update_integrated_weapons = ctx.link().callback( EditArmorMessage::UpdateIntegratedWeapon);
+                            update_integrated_weapons.emit( nv )
+                        }
+
+                        }
+                    />
+
+
+
                 </fieldset>
             }
 
@@ -813,7 +876,14 @@ impl Component for EditArmor {
                 <fieldset class={"fieldset"}>
                     <legend>{"Alternate Modes"}</legend>
 
-
+                    <button
+                        class="btn btn-primary pull-right"
+                        type="button"
+                        onclick={ctx.link().callback( EditArmorMessage::AddAlternateMode )}
+                    >
+                        <fa class="fa-plus" /><Nbsp />{"Add Mode"}
+                    </button>
+                    <p>{"This is where you can select a different mode to this armor, such as adding armor plates or turning on a force field. It'll appear as a dropdown selection on the purchase screen."}</p>
 
                     /*
     pub name: String,
@@ -825,70 +895,165 @@ impl Component for EditArmor {
     pub effects: Vec<String>,
     pub weight: u32,
                     */
-                    <table class="edit-table">
-                        <tbody>
-                            <tr>
-                                <td colspan={2} class="small-text">
-                                    <InputText
-                                        readonly={ctx.props().readonly}
-                                        label={"Name"}
-                                        value={(self.edit_item.name).to_owned()}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateName) }
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <SelectMinimumStrength
-                                        label={"Minimum Strength"}
-                                        readonly={ctx.props().readonly}
-                                        inline={true}
-                                        value={(self.edit_item.minimum_strength.to_string()).to_owned()}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateMinimumStrength) }
-                                    />
-                                    <InputNumber
-                                        readonly={ctx.props().readonly}
-                                        label={"Armor Value"}
-                                        step={"1"}
-                                        inline={true}
-                                        value={self.edit_item.armor_value as f32}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateArmor) }
-                                    />
-                                    <InputNumber
-                                        readonly={ctx.props().readonly}
-                                        label={"Secondary Armor Value"}
-                                        step={"1"}
-                                        inline={true}
-                                        value={self.edit_item.secondary_armor_value as f32}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateSecondaryArmor) }
-                                    />
-                                    <InputNumber
-                                        readonly={ctx.props().readonly}
-                                        label={"Toughness Bonus"}
-                                        step={"1"}
-                                        inline={true}
-                                        value={self.edit_item.toughness as f32}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateToughness) }
-                                    />
-                                    <InputCheckbox
-                                        label="Heavy Armor"
-                                        readonly={ctx.props().readonly}
-                                        checked={self.edit_item.heavy}
-                                        onchange={ctx.link().callback( EditArmorMessage::UpdateHeavyArmor )}
-                                    />
-                                </td>
-                                <td>
-                                    <EffectsEntry
-                                        readonly={ctx.props().readonly}
-                                        description="These effects will apply when this item is equipped"
-                                        label={"Effects"}
-                                        value={self.edit_item.effects.clone()}
-                                        onchange={ ctx.link().callback( EditArmorMessage::UpdateEffects) }
-                                    />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    if self.edit_item.alternate_modes.len() == 0 {
+                        <div class="text-center">
+                            <hr />
+                            {"There are no alternate modes for this armor, click on the Add Mode button to add one."}
+                        </div>
+                    } else {
+                        <>
+                        {self.edit_item.alternate_modes.clone().into_iter().map( move |alternate_mode| {
+
+                                let edit_item = self.edit_item.clone();
+                                let read_only = ctx.props().readonly;
+                                am_index += 1;
+
+                                let alternate_modes_name = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_min_str = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_av = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_sav = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_tb = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_ha = self.edit_item.alternate_modes.clone();
+                                let alternate_modes_effects = self.edit_item.alternate_modes.clone();
+                                let update_alternate_modes_callback_name = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_min_str = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_av = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_sav = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_tb = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_ha = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let update_alternate_modes_callback_effects = ctx.link().callback(EditArmorMessage::UpdateAlternateModes).clone();
+                                let remove_alternate_mode = ctx.link().callback(EditArmorMessage::RemoveAlternateMode).clone();
+
+                                html!{
+                                <fieldset class="fieldset">
+                                    <table class="full-width">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <button
+                                                        class="btn btn-danger pull-right"
+                                                        type="button"
+                                                        onclick={ Callback::from( move | nv | {
+                                                            let remove_alternate_mode = remove_alternate_mode.clone();
+
+                                                            remove_alternate_mode.emit(am_index - 1)
+                                                        }) }
+                                                    >
+                                                        <fa class="fa fa-trash" /><Nbsp />{"Remove Mode"}
+                                                    </button>
+                                                    <InputText
+                                                        readonly={read_only}
+                                                        label={"Alternate Name"}
+                                                        value={(alternate_mode.name).to_owned()}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_name = alternate_modes_name.clone();
+                                                            let update_alternate_modes_callback_name = update_alternate_modes_callback_name.clone();
+
+                                                            alternate_modes_name[ am_index - 1 ].name = nv;
+                                                            update_alternate_modes_callback_name.emit(alternate_modes_name)
+                                                        }) }
+                                                    />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <SelectMinimumStrength
+                                                        label={"Minimum Strength"}
+                                                        readonly={read_only}
+                                                        inline={true}
+                                                        value={(alternate_mode.minimum_strength.to_string()).to_owned()}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_min_str = alternate_modes_min_str.clone();
+                                                            let update_alternate_modes_callback_min_str = update_alternate_modes_callback_min_str.clone();
+
+                                                            alternate_modes_min_str[ am_index - 1 ].minimum_strength = nv;
+                                                            update_alternate_modes_callback_min_str.emit(alternate_modes_min_str)
+                                                        }) }
+                                                    />
+
+                                                    <InputNumber
+                                                        readonly={read_only}
+                                                        label={"Armor Value"}
+                                                        step={"1"}
+                                                        inline={true}
+                                                        value={alternate_mode.armor_value as f32}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_av = alternate_modes_av.clone();
+                                                            let update_alternate_modes_callback_av = update_alternate_modes_callback_av.clone();
+
+                                                            alternate_modes_av[ am_index - 1 ].armor_value = nv as u32;
+                                                            update_alternate_modes_callback_av.emit(alternate_modes_av)
+                                                        }) }
+                                                    />
+
+                                                    <InputNumber
+                                                        readonly={read_only}
+                                                        label={"Secondary Armor Value"}
+                                                        step={"1"}
+                                                        inline={true}
+                                                        value={alternate_mode.secondary_armor_value as f32}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_sav = alternate_modes_sav.clone();
+                                                            let update_alternate_modes_callback_sav = update_alternate_modes_callback_sav.clone();
+
+                                                            alternate_modes_sav[ am_index - 1 ].secondary_armor_value = nv as u32;
+                                                            update_alternate_modes_callback_sav.emit(alternate_modes_sav)
+                                                        }) }
+                                                    />
+
+                                                    <InputNumber
+                                                        readonly={read_only}
+                                                        label={"Toughness Bonus"}
+                                                        step={"1"}
+                                                        inline={true}
+                                                        value={alternate_mode.toughness as f32}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_tb = alternate_modes_tb.clone();
+                                                            let update_alternate_modes_callback_tb = update_alternate_modes_callback_tb.clone();
+
+                                                            alternate_modes_tb[ am_index - 1 ].toughness = nv as u32;
+                                                            update_alternate_modes_callback_tb.emit(alternate_modes_tb)
+                                                        }) }
+                                                    />
+
+                                                    <InputCheckbox
+                                                        label="Heavy Armor"
+                                                        readonly={read_only}
+                                                        checked={alternate_mode.heavy}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_ha = alternate_modes_ha.clone();
+                                                            let update_alternate_modes_callback_ha = update_alternate_modes_callback_ha.clone();
+
+                                                            alternate_modes_ha[ am_index - 1 ].heavy = nv;
+                                                            update_alternate_modes_callback_ha.emit(alternate_modes_ha)
+                                                        }) }
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <EffectsEntry
+                                                        readonly={read_only}
+                                                        description="These effects will apply when this item is equipped"
+                                                        label={"Effects"}
+                                                        value={alternate_mode.effects.clone()}
+                                                        onchange={ Callback::from( move | nv | {
+                                                            let mut alternate_modes_effects = alternate_modes_effects.clone();
+                                                            let update_alternate_modes_callback_effects = update_alternate_modes_callback_effects.clone();
+
+                                                            alternate_modes_effects[ am_index - 1 ].effects = nv;
+                                                            update_alternate_modes_callback_effects.emit(alternate_modes_effects)
+                                                        }) }
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                                }
+                            }
+
+                        ).collect::<Html>()}
+                        </>
+                    }
 
                 </fieldset>
             }

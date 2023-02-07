@@ -3,6 +3,13 @@ body {
     table {
         border-spacing: 0;
         border-collapse: separate;
+        tbody, thead, tfoot {
+            tr {
+                td, th {
+                    vertical-align: top;
+                }
+            }
+        }
     }
 
     .edit-table {

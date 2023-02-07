@@ -1155,7 +1155,7 @@ impl Component for AdminGameDataHindrances {
 
                                 </tr>
                                 <tr>
-                                    <td colspan={2} class="small-text">
+                                    <td colspan="2" class="small-text">
                                         {row_summary}
                                     </td>
                                 </tr>

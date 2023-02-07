@@ -5,7 +5,7 @@ use crate::components::effects_entry::EffectsEntry;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
-use savaged_libs::player_character::weapon::Weapon;
+use savaged_libs::player_character::weapon::{Weapon, WeaponProfile};
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::{
     get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
@@ -16,6 +16,9 @@ use standard_components::ui::markdown_editor::MarkdownEditor;
 use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
+
+use super::weapon_profile::EditWeaponProfile;
+
 
 #[derive(Properties, PartialEq)]
 pub struct EditWeaponProps {
@@ -52,6 +55,8 @@ pub enum EditWeaponMessage {
     UpdatePage(String),
     UpdateActive(bool),
     UpdateNoSelect(bool),
+
+    UpdateWeaponProfiles( Vec<WeaponProfile> ),
 }
 
 pub struct EditWeapon {
@@ -76,6 +81,13 @@ impl Component for EditWeapon {
                 if new_value != "__all__".to_owned() {
                     set_local_storage_string(&self.local_storage_page_name, new_value);
                 }
+                return true;
+            }
+
+            EditWeaponMessage::UpdateWeaponProfiles(new_value) => {
+
+                self.edit_item.profiles = new_value.clone();
+                ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
@@ -150,6 +162,15 @@ impl Component for EditWeapon {
             TertiaryMenuItem {
                 tag: "general".to_owned(),
                 label: "General".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+            TertiaryMenuItem {
+                tag: "profiles".to_owned(),
+                label: "Profiles".to_owned(),
                 class: None,
                 callback: None,
                 title: None,
@@ -237,7 +258,7 @@ impl Component for EditWeapon {
         let mut current_page =
             get_local_storage_string(&self.local_storage_page_name, "general".to_owned());
 
-        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        let valid_pages = vec!["general", "admin", "profiles", "effects", "selection"];
         if (current_page.as_str() == "admin"
             && !ctx.props().global_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
@@ -250,6 +271,11 @@ impl Component for EditWeapon {
         }
 
         let book_list = ctx.props().book_list.clone();
+
+        let readonly = ctx.props().readonly;
+        let weapon_profiles = self.edit_item.profiles.clone();
+        let update_weapon_profiles = ctx.link().callback(EditWeaponMessage::UpdateWeaponProfiles);
+
 
         html! {
             <div class="edit-form">
@@ -310,42 +336,13 @@ impl Component for EditWeapon {
                                 onchange={ ctx.link().callback( EditWeaponMessage::UpdateName) }
                             />
 
-                            // <InputCheckbox
-                            //     label="Major Weapon"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.major}
-                            //     onchange={ctx.link().callback( EditWeaponMessage::SetMajorWeapon )}
-                            // />
-                            // <InputCheckbox
-                            //     label="Minor or Major Weapon"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.minor_or_major}
-                            //     onchange={ctx.link().callback( EditWeaponMessage::SetMinorOrMajorWeapon )}
-                            // />
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Summary"}
 
-                            // if self.edit_item.minor_or_major {
-
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Major Summary"}
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditWeaponMessage::UpdateSummary) }
-                            //     />
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Minor Summary"}
-                            //         value={(self.edit_item.summary_minor).to_owned()}
-                            //         onchange={ ctx.link().callback( EditWeaponMessage::UpdateSummaryMinor) }
-                            //     />
-                            // } else {
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Summary"}
-
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditWeaponMessage::UpdateSummary) }
-                            //     />
-                            // }
+                                value={(self.edit_item.summary).to_owned()}
+                                onchange={ ctx.link().callback( EditWeaponMessage::UpdateSummary) }
+                            />
 
                             <InputText
                                 label={"UUID"}
@@ -363,6 +360,30 @@ impl Component for EditWeapon {
                             />
                         </div>
                     </div>
+                </fieldset>
+            }
+
+
+            if current_page.as_str() == "profiles" || current_page.as_str() == "__all__"  {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Weapon Profiles"}</legend>
+
+                    <EditWeaponProfile
+                        // global_vars={self.props().global_var}
+                        readonly={readonly}
+                        disable_removal_of_first={true}
+                        weapon_profiles={weapon_profiles}
+                        description={Some("All weapons have at least one profile, and cannot be deleted. Some weapons have more than one attack mode, either multiple ammunition types or different stats for one or two hands.".to_owned())}
+                        weapon_profiles_updated={move |nv| {
+                            // let update_profiles = ctx.link().callback( EditArmorMessage::UpdateIntegratedWeapon);
+                            update_weapon_profiles.emit( nv )
+                        }
+
+                        }
+                    />
+
+
+
                 </fieldset>
             }
 

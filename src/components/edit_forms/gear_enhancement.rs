@@ -53,6 +53,15 @@ pub enum EditGearEnhancementMessage {
     UpdatePage(String),
     UpdateActive(bool),
     UpdateNoSelect(bool),
+
+
+    UpdateForArmor(bool),
+    UpdateForAmmo(bool),
+    UpdateForShield(bool),
+    UpdateForWeapon(bool),
+
+    UpdateNamePrefix(String),
+    UpdateNameSuffix(String),
 }
 
 pub struct EditGearEnhancement {
@@ -118,17 +127,26 @@ impl Component for EditGearEnhancement {
                 return true;
             }
 
-            // EditGearEnhancementMessage::SetMinorOrMajorGearEnhancement( new_value ) => {
-            //     self.edit_item.minor_or_major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
-
-            // EditGearEnhancementMessage::SetMajorGearEnhancement( new_value ) => {
-            //     self.edit_item.major = new_value.to_owned();
-            //     ctx.props().on_changed_callback.emit( self.edit_item.clone());
-            //     return true;
-            // }
+            EditGearEnhancementMessage::UpdateForArmor( new_value ) => {
+                self.edit_item.for_armor = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
+            EditGearEnhancementMessage::UpdateForAmmo( new_value ) => {
+                self.edit_item.for_ammo = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
+            EditGearEnhancementMessage::UpdateForShield( new_value ) => {
+                self.edit_item.for_shield = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
+            EditGearEnhancementMessage::UpdateForWeapon( new_value ) => {
+                self.edit_item.for_weapon = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
 
             EditGearEnhancementMessage::UpdateActive( new_value ) => {
                 self.edit_item.active = new_value.to_owned();
@@ -138,6 +156,18 @@ impl Component for EditGearEnhancement {
             EditGearEnhancementMessage::UpdateNoSelect(new_value) => {
                 self.edit_item.no_select = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
+                return true;
+            }
+
+            EditGearEnhancementMessage::UpdateNamePrefix( new_value ) => {
+                self.edit_item.name_prefix = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
+                return true;
+            }
+
+            EditGearEnhancementMessage::UpdateNameSuffix( new_value ) => {
+                self.edit_item.name_suffix = new_value.to_owned();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
             }
             // EditGearEnhancementMessage::UpdateConflicts( new_value ) => {
@@ -220,25 +250,64 @@ impl Component for EditGearEnhancement {
                 icon_class: None,
                 separate: false,
             },
-            TertiaryMenuItem {
-                tag: "selection".to_owned(),
-                label: "Selection".to_owned(),
-                class: None,
-                callback: None,
-                title: None,
-                icon_class: None,
-                separate: false,
-            },
-            TertiaryMenuItem {
-                tag: "effects".to_owned(),
-                label: "Effects".to_owned(),
-                class: None,
-                callback: None,
-                title: None,
-                icon_class: None,
-                separate: false,
-            },
         ];
+
+
+        if self.edit_item.for_ammo {
+            sub_menu_items.push(
+                TertiaryMenuItem {
+                    tag: "ammo".to_owned(),
+                    label: "For Ammo".to_owned(),
+                    class: None,
+                    callback: None,
+                    title: None,
+                    icon_class: None,
+                    separate: false,
+                },
+            );
+        }
+
+        if self.edit_item.for_armor {
+            sub_menu_items.push(
+                TertiaryMenuItem {
+                    tag: "armor".to_owned(),
+                    label: "For Armor".to_owned(),
+                    class: None,
+                    callback: None,
+                    title: None,
+                    icon_class: None,
+                    separate: false,
+                },
+            );
+        }
+
+        if self.edit_item.for_shield {
+            sub_menu_items.push(
+                TertiaryMenuItem {
+                    tag: "shield".to_owned(),
+                    label: "For Shield".to_owned(),
+                    class: None,
+                    callback: None,
+                    title: None,
+                    icon_class: None,
+                    separate: false,
+                },
+            );
+        }
+
+        if self.edit_item.for_weapon {
+            sub_menu_items.push(
+                TertiaryMenuItem {
+                    tag: "weapon".to_owned(),
+                    label: "For Weapon".to_owned(),
+                    class: None,
+                    callback: None,
+                    title: None,
+                    icon_class: None,
+                    separate: false,
+                },
+            );
+        }
 
         if ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
             sub_menu_items.push(
@@ -307,7 +376,7 @@ impl Component for EditGearEnhancement {
 
         let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
-        let valid_pages = vec!["general", "admin", "effects", "selection"];
+        let valid_pages = vec!["general", "admin", "ammo", "armor", "weapon", "shield"];
         if (current_page.as_str() == "admin"  && !ctx.props().global_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
         {
@@ -380,50 +449,63 @@ impl Component for EditGearEnhancement {
                                 onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateName) }
                             />
 
-                            // <InputCheckbox
-                            //     label="Major GearEnhancement"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.major}
-                            //     onchange={ctx.link().callback( EditGearEnhancementMessage::SetMajorGearEnhancement )}
-                            // />
-                            // <InputCheckbox
-                            //     label="Minor or Major GearEnhancement"
-                            //     readonly={ctx.props().readonly}
-                            //     checked={self.edit_item.minor_or_major}
-                            //     onchange={ctx.link().callback( EditGearEnhancementMessage::SetMinorOrMajorGearEnhancement )}
-                            // />
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Summary"}
 
-                            // if self.edit_item.minor_or_major {
-
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Major Summary"}
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummary) }
-                            //     />
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Minor Summary"}
-                            //         value={(self.edit_item.summary_minor).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummaryMinor) }
-                            //     />
-                            // } else {
-                            //     <InputText
-                            //         readonly={ctx.props().readonly}
-                            //         label={"Summary"}
-
-                            //         value={(self.edit_item.summary).to_owned()}
-                            //         onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummary) }
-                            //     />
-                            // }
+                                value={(self.edit_item.summary).to_owned()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateSummary) }
+                            />
 
                             <InputText
                                 label={"UUID"}
                                 readonly={true}
                                 value={(self.edit_item.uuid.to_string()).to_owned()}
                             />
+
+                            <hr />
+
+                            <InputCheckbox
+                                label="For Armor"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.for_armor}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateActive )}
+                            />
+
+                            <InputCheckbox
+                                label="For Ammo"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.for_ammo}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateActive )}
+                            />
+                            <InputCheckbox
+                                label="For Shield"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.for_shield}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateActive )}
+                            />
+                            <InputCheckbox
+                                label="For Weapon"
+                                readonly={ctx.props().readonly}
+                                checked={self.edit_item.for_weapon}
+                                onchange={ctx.link().callback( EditGearEnhancementMessage::UpdateActive )}
+                            />
                         </div>
                         <div class="col-md-6">
+                        <InputText
+                            readonly={ctx.props().readonly}
+                            label={"Prefix"}
+
+                            value={(self.edit_item.name_prefix).to_owned()}
+                            onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNamePrefix) }
+                        />
+                        <InputText
+                            readonly={ctx.props().readonly}
+                            label={"Suffix"}
+
+                            value={(self.edit_item.name_suffix).to_owned()}
+                            onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNameSuffix) }
+                        />
                             <MarkdownEditor
                                 readonly={ctx.props().readonly}
                                 label={"Description"}
@@ -436,9 +518,9 @@ impl Component for EditGearEnhancement {
                 </fieldset>
             }
 
-            if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
+            if self.edit_item.for_ammo && (current_page.as_str() == "ammo" || current_page.as_str() == "__all__")  {
                 <fieldset class={"fieldset"}>
-                    <legend>{"Effects"}</legend>
+                    <legend>{"For Ammo"}</legend>
 
                     // if self.edit_item.minor_or_major {
                     //     <div class="row full-width">
@@ -470,9 +552,31 @@ impl Component for EditGearEnhancement {
                 </fieldset>
             }
 
-            if current_page.as_str() == "selection" || current_page.as_str() == "__all__" {
+            if self.edit_item.for_armor && (current_page.as_str() == "armor" || current_page.as_str() == "__all__") {
                 <fieldset class={"fieldset"}>
-                    <legend>{"Selection"}</legend>
+                    <legend>{"For Armor"}</legend>
+                    // <TextArea
+                    //     readonly={ctx.props().readonly}
+                    //     label={"Conflicts"}
+                    //     value={self.edit_item.conflicts.join("\n")}
+                    //     onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateConflicts) }
+                    // />
+                </fieldset>
+            }
+            if self.edit_item.for_shield && (current_page.as_str() == "shield" || current_page.as_str() == "__all__") {
+                <fieldset class={"fieldset"}>
+                    <legend>{"For Shield"}</legend>
+                    // <TextArea
+                    //     readonly={ctx.props().readonly}
+                    //     label={"Conflicts"}
+                    //     value={self.edit_item.conflicts.join("\n")}
+                    //     onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateConflicts) }
+                    // />
+                </fieldset>
+            }
+            if self.edit_item.for_weapon && (current_page.as_str() == "weapon" || current_page.as_str() == "__all__") {
+                <fieldset class={"fieldset"}>
+                    <legend>{"For Weapon"}</legend>
                     // <TextArea
                     //     readonly={ctx.props().readonly}
                     //     label={"Conflicts"}

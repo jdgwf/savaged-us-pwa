@@ -12,7 +12,7 @@ use standard_components::libs::local_storage_shortcuts::{
 use standard_components::ui::input_checkbox::InputCheckbox;
 use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
-use standard_components::ui::textarea::TextArea;
+// use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
 use yew::prelude::*;
 
@@ -96,14 +96,20 @@ impl Component for EditEdge {
                 return true;
             }
 
-            EditEdgeMessage::UpdateSummary(new_value) => {
-                self.edit_item.summary = new_value.to_owned();
+            // EditEdgeMessage::UpdateSummary(new_value) => {
+            //     self.edit_item.summary = new_value.to_owned();
+            //     ctx.props().on_changed_callback.emit(self.edit_item.clone());
+            //     return true;
+            // }
+
+            EditEdgeMessage::UpdateDescription(new_value) => {
+                self.edit_item.description = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
 
-            EditEdgeMessage::UpdateDescription(new_value) => {
-                self.edit_item.description = new_value.to_owned();
+            EditEdgeMessage::UpdateSummary(new_value) => {
+                self.edit_item.summary = new_value.to_owned();
                 ctx.props().on_changed_callback.emit(self.edit_item.clone());
                 return true;
             }
@@ -334,6 +340,14 @@ impl Component for EditEdge {
                                 label={"UUID"}
                                 readonly={true}
                                 value={(self.edit_item.uuid.to_string()).to_owned()}
+                            />
+
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Summary"}
+
+                                value={(self.edit_item.summary).to_owned()}
+                                onchange={ ctx.link().callback( EditEdgeMessage::UpdateSummary) }
                             />
                         </div>
                         <div class="col-md-6">

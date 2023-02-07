@@ -664,7 +664,7 @@ impl Component for AdminGameDataGearEnhancements {
 
                                                             let alert_def: AlertDefinition = AlertDefinition {
                                                                     level: save_result_data.level,
-                                                                    text: Some("GearEnhancement '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
+                                                                    text: Some("Gear Enhancement '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
                                                                     ..Default::default()
                                                                 };
                                                             global_vars.add_alert.emit(alert_def);
@@ -863,7 +863,7 @@ impl Component for AdminGameDataGearEnhancements {
         let mut edit_modal = html! {<></>};
         match &self.editing_item {
             Some(editing_item) => {
-                let mut editing_title = Some("Viewing GearEnhancement".to_owned());
+                let mut editing_title = Some("Viewing Gear Enhancement".to_owned());
 
                 let mut save_callback: Option<Callback<bool>> = None;
                 let mut add_callback: Option<Callback<bool>> = None;
@@ -888,7 +888,7 @@ impl Component for AdminGameDataGearEnhancements {
                 }
 
                 if self.is_editing {
-                    editing_title = Some("Editing GearEnhancement".to_owned());
+                    editing_title = Some("Editing Gear Enhancement".to_owned());
                     save_callback = Some(
                         ctx.link()
                             .callback(AdminGameDataGearEnhancementsMessage::SaveItem)
@@ -957,7 +957,7 @@ impl Component for AdminGameDataGearEnhancements {
             server_side_renderer={global_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
-            current_tag={"gear_enhancements".to_owned()}
+            current_tag={"gear-enhancements".to_owned()}
         />
         <div class="pull-right">
             <AdminTableFilterSearch
@@ -1141,7 +1141,7 @@ impl Component for AdminGameDataGearEnhancements {
 
                                 </tr>
                                 <tr>
-                                    <td colspan={2} class="small-text">
+                                    <td colspan="2" class="small-text">
                                         {row_summary}
                                     </td>
                                 </tr>

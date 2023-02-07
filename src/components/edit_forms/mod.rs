@@ -5,3 +5,4 @@ pub mod armor;
 pub mod gear;
 pub mod weapon;
 pub mod gear_enhancement;
+pub mod weapon_profile;

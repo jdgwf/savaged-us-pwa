@@ -491,7 +491,7 @@ impl Component for UserNotifications {
                         <tr>
                             <th class={"min-width"}>{"Read"}</th>
                             <th class={"min-width"}>{"Date"}</th>
-                            <th colspan={2}>{"Subject"}</th>
+                            <th colspan="2">{"Subject"}</th>
                         </tr>
                     </thead>
                     if self.loading {
