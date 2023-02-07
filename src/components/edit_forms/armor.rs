@@ -6,7 +6,7 @@ use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::libs::global_vars::GlobalVars;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::armor::{Armor, ArmorAlternateMode};
-use savaged_libs::player_character::weapon::{Weapon, WeaponProfile};
+use savaged_libs::player_character::weapon::WeaponProfile;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::{
     get_local_storage_bool, get_local_storage_string, set_local_storage_bool,
@@ -17,7 +17,7 @@ use standard_components::ui::input_text::InputText;
 use standard_components::ui::markdown_editor::MarkdownEditor;
 // use standard_components::ui::textarea::TextArea;
 // use standard_components::ui::textarea::TextArea;
-use gloo_console::log;
+// use gloo_console::log;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
@@ -904,7 +904,7 @@ impl Component for EditArmor {
                         <>
                         {self.edit_item.alternate_modes.clone().into_iter().map( move |alternate_mode| {
 
-                                let edit_item = self.edit_item.clone();
+                                // let edit_item = self.edit_item.clone();
                                 let read_only = ctx.props().readonly;
                                 am_index += 1;
 
@@ -933,7 +933,7 @@ impl Component for EditArmor {
                                                     <button
                                                         class="btn btn-danger pull-right"
                                                         type="button"
-                                                        onclick={ Callback::from( move | nv | {
+                                                        onclick={ Callback::from( move | _nv | {
                                                             let remove_alternate_mode = remove_alternate_mode.clone();
 
                                                             remove_alternate_mode.emit(am_index - 1)

@@ -1,5 +1,5 @@
 use crate::components::admin::admin_filter_search::AdminTableFilterSearch;
-use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
+// use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::admin::admin_table_field::active::AdminTableFieldActive;
 use crate::components::admin::admin_table_ownership_badge::AdminTableOwnershipBadge;
 use crate::components::admin::admin_table_paging::AdminTablePaging;
@@ -1087,6 +1087,7 @@ impl Component for AdminGameDataGearEnhancements {
 
                                     if show_book_column {
                                         <AdminTableFieldText
+                                            rowspan={2}
                                             value={row.book_short_name.unwrap_or("???".to_owned())}
                                         />
                                     }

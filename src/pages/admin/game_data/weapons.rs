@@ -1087,6 +1087,7 @@ impl Component for AdminGameDataWeapons {
 
                                     if show_book_column {
                                         <AdminTableFieldText
+                                            rowspan={2}
                                             value={row.book_short_name.unwrap_or("???".to_owned())}
                                         />
                                     }

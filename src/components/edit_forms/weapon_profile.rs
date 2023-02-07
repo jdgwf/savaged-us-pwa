@@ -1,6 +1,6 @@
-use crate::libs::global_vars::GlobalVars;
+// use crate::libs::global_vars::GlobalVars;
 use savaged_libs::player_character::weapon::WeaponProfile;
-use gloo_console::log;
+// use gloo_console::log;
 use standard_components::ui::{nbsp::Nbsp, input_text::InputText};
 use yew::prelude::*;
 
@@ -193,7 +193,7 @@ name:  "".to_string(),
                                             <button
                                                 class="btn btn-danger pull-right"
                                                 type="button"
-                                                onclick={ Callback::from( move | nv | {
+                                                onclick={ Callback::from( move | _nv | {
                                                     let remove_profile = remove_profile.clone();
 
                                                     remove_profile.emit(profile_index - 1)
