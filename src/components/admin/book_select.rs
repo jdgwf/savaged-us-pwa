@@ -43,6 +43,9 @@ pub fn book_select(props: &BookSelectProps) -> Html {
         onchange.emit(filter_book)
     });
 
+    let mut book_list = props.book_list.clone();
+    book_list.sort_by_key(|d| d.name.to_lowercase().to_owned());
+
     if props.readonly {
         return html! {
             <>
@@ -60,7 +63,7 @@ pub fn book_select(props: &BookSelectProps) -> Html {
                     } else {
                         <></>
                     }
-                    {props.book_list.clone().into_iter().map( | book | {
+                    {book_list.clone().into_iter().map( | book | {
                         if props.value == book.id {
                             html!{<>{book.name}</>}
                         } else {
@@ -75,12 +78,12 @@ pub fn book_select(props: &BookSelectProps) -> Html {
     }
 
     let current_user = props.current_user.clone();
+    let book_list_option = Some(book_list.clone());
 
-    let book_list_option = Some(props.book_list.clone());
     return html! {
             <>
 
-            if props.book_list.len() > 0 {
+            if book_list.len() > 0 {
                 <label>
                     <InputLabel
                         label={props.label.to_owned()}
@@ -95,7 +98,7 @@ pub fn book_select(props: &BookSelectProps) -> Html {
                         <option selected={props.value == 0} value="0">{"- No Book Selected -"}</option>
                     }
                     <optgroup label="Core Books">
-                    {props.book_list.clone().into_iter().map( | book | {
+                    {book_list.clone().into_iter().map( | book | {
                         if book.primary {
                             html! {
                                 <option disabled={current_user.admin_can_write_book(&book_list_option, book.id) == false} selected={props.value == book.id} value={book.id.to_string()}>{book.name}</option>
@@ -106,7 +109,7 @@ pub fn book_select(props: &BookSelectProps) -> Html {
                     }).collect::<Html>()}
                     </optgroup>
                     <optgroup label="Companion Books">
-                    {props.book_list.clone().into_iter().map( | book | {
+                    {book_list.clone().into_iter().map( | book | {
                         if book.core && !book.primary {
                             html! {
                                 <option disabled={current_user.admin_can_write_book(&book_list_option, book.id) == false} selected={props.value == book.id} value={book.id.to_string()}>{book.name}</option>
@@ -117,7 +120,7 @@ pub fn book_select(props: &BookSelectProps) -> Html {
                     }).collect::<Html>()}
                     </optgroup>
                     <optgroup label="Setting Books">
-                    {props.book_list.clone().into_iter().map( | book | {
+                    {book_list.clone().into_iter().map( | book | {
                         if !book.core && !book.primary {
                             html! {
                                 <option disabled={current_user.admin_can_write_book(&book_list_option, book.id) == false} selected={props.value == book.id} value={book.id.to_string()}>{book.name}</option>

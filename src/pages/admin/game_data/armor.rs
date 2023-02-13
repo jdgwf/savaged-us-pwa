@@ -1082,7 +1082,7 @@ impl Component for AdminGameDataArmor {
                                     callback_delete_item = Some(ctx.link().callback(AdminGameDataArmorMessage::DeleteItem));
                                 }
 
-                                let row_summary = row.get_summary();
+                                let row_summary = row.basic_info();
                                 html!{
                                     <tbody>
                                     <tr>

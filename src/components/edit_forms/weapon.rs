@@ -373,7 +373,7 @@ impl Component for EditWeapon {
                         readonly={readonly}
                         disable_removal_of_first={true}
                         weapon_profiles={weapon_profiles}
-                        description={Some("All weapons have at least one profile, and cannot be deleted. Some weapons have more than one attack mode, either multiple ammunition types or different stats for one or two hands.".to_owned())}
+                        description={Some("All weapons have at least one profile, and the first, primary profile cannot be deleted. Some weapons have more than one attack mode, either multiple ammunition types or different stats for one or two hands.".to_owned())}
                         weapon_profiles_updated={move |nv| {
                             // let update_profiles = ctx.link().callback( EditArmorMessage::UpdateIntegratedWeapon);
                             update_weapon_profiles.emit( nv )

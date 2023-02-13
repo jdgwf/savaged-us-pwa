@@ -134,13 +134,23 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
 
 #[function_component]
 pub fn ServerApp(props: &ServerAppProps) -> Html {
-    let server_root = "https://v4/savaged.us".to_owned();
+    let server_root = "https://v4.savaged.us".to_owned();
+
+    let mut user = User::default();
+
+    match props.web_content.user.clone() {
+        Some( found_user ) => {
+            user = found_user;
+        }
+        None => {}
+    }
+
 
     let global_vars_state = use_reducer(|| GlobalVars {
         api_root: server_root.to_owned() + &"/_api",
         current_menu: "".to_string(),
         current_sub_menu: "".to_string(),
-        current_user: User::default(),
+        current_user: user,
         game_data: None,
         hide_popup_menus_callback: Callback::noop(),
         login_token: "".to_owned(),

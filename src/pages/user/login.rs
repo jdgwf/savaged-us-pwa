@@ -147,7 +147,8 @@ impl Component for UserLogin {
                 //     api_root.clone() + "/auth/login-for-token"
                 // );
                 let result = savaged_login(
-                    (api_root + "/auth/login-for-token").to_owned(),
+                    // (api_root + "/auth/login-for-token").to_owned(),
+                    (api_root + "/auth/login").to_owned(),
                     username,
                     password,
                 )

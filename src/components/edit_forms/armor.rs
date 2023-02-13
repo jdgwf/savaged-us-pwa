@@ -555,7 +555,7 @@ impl Component for EditArmor {
 
                             <InputText
                                 readonly={ctx.props().readonly}
-                                label={"Name"}
+                                label={"Summary"}
                                 value={(self.edit_item.summary).to_owned()}
                                 onchange={ ctx.link().callback( EditArmorMessage::UpdateSummary) }
                             />

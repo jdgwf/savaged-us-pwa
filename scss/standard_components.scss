@@ -139,6 +139,9 @@ body {
             color: var(--body-color);
             background-color: var(--borders-color);
             border: solid 2px var(--borders-color);
+            &.small-text {
+                font-size: 0.9rem;
+            }
         }
 
         .content-box-label {
