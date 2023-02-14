@@ -2,10 +2,13 @@ pub mod edit;
 pub mod list;
 pub mod view;
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::error404::Error404;
 use crate::pages::user::saves::edit::UserSavesEdit;
 use crate::pages::user::saves::list::UserSavesList;
 use crate::pages::user::saves::view::UserSavesView;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
+use savaged_libs::save_db_row::SaveDBRow;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -38,13 +41,16 @@ pub enum UserSavesRoute {
     NotFound,
 }
 
-fn content_switch(routes: UserSavesRoute, global_vars: GlobalVars) -> Html {
-    let mut global_vars = global_vars.clone();
+fn content_switch(
+    routes: UserSavesRoute,
+    global_vars: GlobalVars,
+) -> Html {
+    let mut site_vars = global_vars.site_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_menu = "main-my-stuff".to_owned();
+    if site_vars.current_user.id > 0 {
+        site_vars.current_menu = "main-my-stuff".to_owned();
     } else {
-        global_vars.current_menu = "".to_owned();
+        site_vars.current_menu = "".to_owned();
     }
 
     match routes {
@@ -87,7 +93,7 @@ fn content_switch(routes: UserSavesRoute, global_vars: GlobalVars) -> Html {
 
         UserSavesRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -100,7 +106,7 @@ pub struct UserSavesRouterProps {
 
 pub enum UserSavesRouterMessage {}
 pub struct UserSavesRouter {
-    // global_vars: GlobalVars,
+    // site_vars: SiteVars,
 }
 
 impl Component for UserSavesRouter {
@@ -109,7 +115,7 @@ impl Component for UserSavesRouter {
 
     fn create(_ctx: &Context<Self>) -> Self {
         UserSavesRouter {
-            // global_vars: ctx.props().global_vars.clone(),
+            // site_vars: ctx.props().site_vars.clone(),
         }
     }
 
@@ -134,16 +140,17 @@ impl Component for UserSavesRouter {
     // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().global_vars.site_vars.server_side_renderer {
             let history = ctx
                 .props()
                 .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
+            // let site_vars = ctx.props().site_vars.clone();
             let global_vars = ctx.props().global_vars.clone();
-
             html! {
 
                     <Router
@@ -156,6 +163,7 @@ impl Component for UserSavesRouter {
                                     content_switch(
                                         routes,
                                         global_vars.clone(),
+
                                     )
                                 }
                             />

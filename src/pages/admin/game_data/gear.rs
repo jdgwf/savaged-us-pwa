@@ -11,6 +11,7 @@ use crate::components::tertiary_links_menu::{TertiaryLinksMenu, TertiaryLinksMen
 use crate::components::ui_page::UIPage;
 use crate::libs::admin_api::{fetch_api_delete_game_data_row, fetch_api_save_game_data_row};
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::{
     components::admin::admin_table_field::text::AdminTableFieldText,
     libs::fetch_api::fetch_admin_api,
@@ -36,7 +37,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataGearProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
 }
 
@@ -74,9 +75,9 @@ impl Component for AdminGameDataGear {
     type Properties = AdminGameDataGearProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
-        let login_token = global_vars.login_token.clone();
+        let login_token = site_vars.login_token.clone();
         let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
         let set_paging = ctx
             .link()
@@ -97,7 +98,7 @@ impl Component for AdminGameDataGear {
         let paging = paging_sorting_and_filter.clone();
         spawn_local(async move {
             _get_data(
-                global_vars,
+                site_vars,
                 paging_sorting_and_filter,
                 set_items,
                 set_paging,
@@ -171,12 +172,12 @@ impl Component for AdminGameDataGear {
                             data: serde_json::to_string(&editing_item).unwrap(),
                             name: editing_item.name,
                             book_id: editing_item.book_id,
-                            login_token: Some(ctx.props().global_vars.login_token.to_owned()),
+                            login_token: Some(ctx.props().site_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
-                        let api_root = ctx.props().global_vars.api_root.to_owned();
-                        let global_vars = ctx.props().global_vars.clone();
+                        let api_root = ctx.props().site_vars.api_root.to_owned();
+                        let site_vars = ctx.props().site_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
                         spawn_local(async move {
@@ -224,7 +225,7 @@ impl Component for AdminGameDataGear {
                                                             text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
                                                 }
 
                                                 None => {
@@ -235,7 +236,7 @@ impl Component for AdminGameDataGear {
                                                             text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
                                                 }
                                             }
                                         }
@@ -251,7 +252,7 @@ impl Component for AdminGameDataGear {
                                                 ..Default::default()
                                             };
 
-                                            global_vars.add_alert.emit(alert_def);
+                                            site_vars.add_alert.emit(alert_def);
                                         }
                                     }
                                 }
@@ -265,7 +266,7 @@ impl Component for AdminGameDataGear {
                                         ..Default::default()
                                     };
 
-                                    global_vars.add_alert.emit(alert_def);
+                                    site_vars.add_alert.emit(alert_def);
                                 }
                             }
                         });
@@ -312,7 +313,7 @@ impl Component for AdminGameDataGear {
                             data: serde_json::to_string(&editing_item).unwrap(),
                             name: editing_item_name,
                             book_id: editing_item.book_id,
-                            login_token: Some(ctx.props().global_vars.login_token.to_owned()),
+                            login_token: Some(ctx.props().site_vars.login_token.to_owned()),
                             api_key: None,
                         };
 
@@ -321,8 +322,8 @@ impl Component for AdminGameDataGear {
                         let edit_item_book_id = editing_item.book_id;
                         let edit_item_book_page = editing_item.page.to_owned();
 
-                        let api_root = ctx.props().global_vars.api_root.to_owned();
-                        let global_vars = ctx.props().global_vars.clone();
+                        let api_root = ctx.props().site_vars.api_root.to_owned();
+                        let site_vars = ctx.props().site_vars.clone();
                         // let item_name = editing_item.name.to_owned();
                         let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
                         let new_item_callback =
@@ -382,7 +383,7 @@ impl Component for AdminGameDataGear {
                                                             text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
 
                                                     let mut new_item = Gear::default();
                                                     new_item.book_id = edit_item_book_id;
@@ -399,7 +400,7 @@ impl Component for AdminGameDataGear {
                                                             text: Some(save_result_data.message),
                                                             ..Default::default()
                                                         };
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
                                                 }
                                             }
                                         }
@@ -415,7 +416,7 @@ impl Component for AdminGameDataGear {
                                                 ..Default::default()
                                             };
 
-                                            global_vars.add_alert.emit(alert_def);
+                                            site_vars.add_alert.emit(alert_def);
                                         }
                                     }
                                 }
@@ -429,7 +430,7 @@ impl Component for AdminGameDataGear {
                                         ..Default::default()
                                     };
 
-                                    global_vars.add_alert.emit(alert_def);
+                                    site_vars.add_alert.emit(alert_def);
                                 }
                             }
                         });
@@ -443,17 +444,17 @@ impl Component for AdminGameDataGear {
             AdminGameDataGearMessage::DeleteItem(id) => {
                 log!("AdminGameDataGearMessage::DeleteItem ", id);
 
-                let api_root = ctx.props().global_vars.api_root.to_owned();
-                let global_vars = ctx.props().global_vars.clone();
-                let login_token = Some(ctx.props().global_vars.login_token.to_owned());
+                let api_root = ctx.props().site_vars.api_root.to_owned();
+                let site_vars = ctx.props().site_vars.clone();
+                let login_token = Some(ctx.props().site_vars.login_token.to_owned());
                 let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
                 let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
 
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
                         let open_confirmation_dialog =
-                            ctx.props().global_vars.open_confirmation_dialog.clone();
-                        let global_vars = global_vars.clone();
+                            ctx.props().site_vars.open_confirmation_dialog.clone();
+                        let site_vars = site_vars.clone();
                         let set_items = set_items.clone();
                         let api_root = api_root.clone();
                         let paging_sorting_and_filter = paging_sorting_and_filter.clone();
@@ -471,7 +472,7 @@ impl Component for AdminGameDataGear {
                             label_no: None,
                             callback: Callback::from(move |_clicked_yes| {
                                 let api_root = api_root.to_owned();
-                                let global_vars = global_vars.clone();
+                                let site_vars = site_vars.clone();
                                 let login_token = login_token.clone();
                                 let set_items = set_items.clone();
                                 let paging_sorting_and_filter = paging_sorting_and_filter.clone();
@@ -523,7 +524,7 @@ impl Component for AdminGameDataGear {
                                                                     ),
                                                                     ..Default::default()
                                                                 };
-                                                            global_vars.add_alert.emit(alert_def);
+                                                            site_vars.add_alert.emit(alert_def);
                                                         }
 
                                                         None => {
@@ -537,7 +538,7 @@ impl Component for AdminGameDataGear {
                                                                     ),
                                                                     ..Default::default()
                                                                 };
-                                                            global_vars.add_alert.emit(alert_def);
+                                                            site_vars.add_alert.emit(alert_def);
                                                         }
                                                     }
                                                 }
@@ -554,7 +555,7 @@ impl Component for AdminGameDataGear {
                                                             ..Default::default()
                                                         };
 
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
                                                 }
                                             }
                                         }
@@ -568,7 +569,7 @@ impl Component for AdminGameDataGear {
                                                 ..Default::default()
                                             };
 
-                                            global_vars.add_alert.emit(alert_def);
+                                            site_vars.add_alert.emit(alert_def);
                                         }
                                     }
                                 });
@@ -587,14 +588,14 @@ impl Component for AdminGameDataGear {
                 for item in self.items.clone().into_iter() {
                     if item.id == id {
                         let open_confirmation_dialog =
-                            ctx.props().global_vars.open_confirmation_dialog.clone();
+                            ctx.props().site_vars.open_confirmation_dialog.clone();
 
-                        let api_root = ctx.props().global_vars.api_root.to_owned();
-                        let login_token = Some(ctx.props().global_vars.login_token.to_owned());
+                        let api_root = ctx.props().site_vars.api_root.to_owned();
+                        let login_token = Some(ctx.props().site_vars.login_token.to_owned());
                         let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
                         let paging_sorting_and_filter = self.paging_sorting_and_filter.clone();
                         let item = item.clone();
-                        let global_vars = ctx.props().global_vars.clone();
+                        let site_vars = ctx.props().site_vars.clone();
                         let item_name = item.name.clone();
 
                         // let editing_item_name = item.name.to_owned();
@@ -610,7 +611,7 @@ impl Component for AdminGameDataGear {
                             label_yes: None,
                             label_no: None,
                             callback: Callback::from(move |_clicked_yes| {
-                                let global_vars = global_vars.clone();
+                                let site_vars = site_vars.clone();
                                 let item_name = item_name.clone();
 
                                 let api_root = api_root.to_owned();
@@ -664,7 +665,7 @@ impl Component for AdminGameDataGear {
                                                                     text: Some("Gear '".to_owned() + &item_name.to_owned() + &"' has been duplicated."),
                                                                     ..Default::default()
                                                                 };
-                                                            global_vars.add_alert.emit(alert_def);
+                                                            site_vars.add_alert.emit(alert_def);
                                                         }
 
                                                         None => {
@@ -678,7 +679,7 @@ impl Component for AdminGameDataGear {
                                                                     ),
                                                                     ..Default::default()
                                                                 };
-                                                            global_vars.add_alert.emit(alert_def);
+                                                            site_vars.add_alert.emit(alert_def);
                                                             // error!("get_items Err()", &err );
                                                         }
                                                     }
@@ -696,7 +697,7 @@ impl Component for AdminGameDataGear {
                                                             ..Default::default()
                                                         };
 
-                                                    global_vars.add_alert.emit(alert_def);
+                                                    site_vars.add_alert.emit(alert_def);
 
                                                     error!(&err_string);
                                                 }
@@ -712,7 +713,7 @@ impl Component for AdminGameDataGear {
                                                 ..Default::default()
                                             };
 
-                                            global_vars.add_alert.emit(alert_def);
+                                            site_vars.add_alert.emit(alert_def);
                                         }
                                     }
                                 });
@@ -774,9 +775,9 @@ impl Component for AdminGameDataGear {
                 let mut paging_sorting_and_filter = new_value.clone();
                 self.paging_sorting_and_filter = new_value.clone();
 
-                let global_vars = ctx.props().global_vars.clone();
+                let site_vars = ctx.props().site_vars.clone();
 
-                let login_token = global_vars.login_token.clone();
+                let login_token = site_vars.login_token.clone();
                 let set_items = ctx.link().callback(AdminGameDataGearMessage::SetItems);
                 let set_paging = ctx
                     .link()
@@ -803,7 +804,7 @@ impl Component for AdminGameDataGear {
                 }
                 spawn_local(async move {
                     _get_data(
-                        global_vars,
+                        site_vars,
                         paging_sorting_and_filter,
                         set_items,
                         set_paging,
@@ -836,9 +837,9 @@ impl Component for AdminGameDataGear {
             None => {}
         }
 
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-admin".to_owned();
-        global_vars.current_sub_menu = "admin-game-data".to_owned();
+        let mut site_vars = ctx.props().site_vars.clone();
+        site_vars.current_menu = "main-admin".to_owned();
+        site_vars.current_sub_menu = "admin-game-data".to_owned();
 
         let mut show_book_column = true;
 
@@ -925,7 +926,7 @@ impl Component for AdminGameDataGear {
                 >
                     <EditGear
                         for_admin={true}
-                        global_vars={global_vars.clone()}
+                        site_vars={site_vars.clone()}
                         readonly={read_only}
                         edit_item={editing_item.clone()}
                         book_list={book_list}
@@ -942,14 +943,15 @@ impl Component for AdminGameDataGear {
 
         html! {
         <UIPage
-            global_vars={global_vars.clone()}
+        site_vars={site_vars.clone()}
+
             page_title="Admin Gear"
 
             modal={Some(edit_modal)}
         >
 
         <TertiaryLinksMenu
-            server_side_renderer={global_vars.server_side_renderer}
+            server_side_renderer={site_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
             current_tag={"gear".to_owned()}
@@ -959,7 +961,7 @@ impl Component for AdminGameDataGear {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
-                global_vars={global_vars.clone()}
+                current_user={site_vars.current_user.clone()}
                 show_no_select={true}
             />
         </div>
@@ -987,7 +989,7 @@ impl Component for AdminGameDataGear {
                                 {"Updated"}
                             </th>
                             <th class="min-width">
-                            if global_vars.current_user.admin_can_write_book(
+                            if site_vars.current_user.admin_can_write_book(
                                 &book_list,
                                 current_book_id,
                             ) {
@@ -1052,14 +1054,14 @@ impl Component for AdminGameDataGear {
 
                                 let row_name = &row.name.to_owned();
 
-                                if global_vars.current_user.admin_can_read_item (
+                                if site_vars.current_user.admin_can_read_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
                                 ) {
                                     callback_view_item = Some(ctx.link().callback(AdminGameDataGearMessage::ViewItem));
                                 }
-                                if global_vars.current_user.admin_can_write_item (
+                                if site_vars.current_user.admin_can_write_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
@@ -1067,7 +1069,7 @@ impl Component for AdminGameDataGear {
                                     callback_edit_item = Some(ctx.link().callback(AdminGameDataGearMessage::EditItemDialog));
                                     callback_duplicate_item = Some(ctx.link().callback(AdminGameDataGearMessage::DuplicateItem));
                                 }
-                                if global_vars.current_user.admin_can_delete_item (
+                                if site_vars.current_user.admin_can_delete_item (
                                     &book_list,
                                     row.created_by,
                                     row.book_id,
@@ -1106,7 +1108,7 @@ impl Component for AdminGameDataGear {
                                     // />
                                     <td class="min-width no-wrap">
                                         <AdminTableOwnershipBadge
-                                            current_user={ctx.props().global_vars.current_user.clone()}
+                                            current_user={ctx.props().site_vars.current_user.clone()}
 
                                             created_by={row.created_by_obj}
                                             created_on={row.created_on}
@@ -1164,12 +1166,12 @@ impl Component for AdminGameDataGear {
 }
 
 async fn _get_data(
-    global_vars: GlobalVars,
+    site_vars: SiteVars,
     paging_sorting_and_filter: FetchAdminParameters,
     set_items: Callback<Vec<Gear>>,
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
-    let api_root = global_vars.api_root.clone();
+    let api_root = site_vars.api_root.clone();
 
     let result = fetch_admin_api(
         (api_root.to_owned() + "/admin/game-data/gear/get").to_owned(),

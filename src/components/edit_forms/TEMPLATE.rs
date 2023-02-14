@@ -1,6 +1,6 @@
 use crate::components::admin::book_select::BookSelect;
 use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::hindrance::Hindrance;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
@@ -13,7 +13,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct EditHindranceProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
     pub edit_item: Hindrance,
 
     #[prop_or_default]
@@ -240,7 +240,7 @@ impl Component for EditHindrance {
             },
         ];
 
-        if ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
+        if ctx.props().site_vars.current_user.has_admin_access() && ctx.props().for_admin {
             sub_menu_items.push(
                 TertiaryMenuItem {
                     tag: "admin".to_owned(),
@@ -294,7 +294,7 @@ impl Component for EditHindrance {
         let header = html!{
             <>
                 <TertiaryMenu
-                    server_side_renderer={ctx.props().global_vars.server_side_renderer}
+                    server_side_renderer={ctx.props().site_vars.server_side_renderer}
                     menu_items={sub_menu_items}
                     menu_changed_callback={change_page_callback_form}
                     local_storage_variable={self.local_storage_page_name.to_owned()}
@@ -308,7 +308,7 @@ impl Component for EditHindrance {
         let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
         let valid_pages = vec!["general", "admin", "effects", "selection"];
-        if (current_page.as_str() == "admin"  && !ctx.props().global_vars.current_user.has_admin_access())
+        if (current_page.as_str() == "admin"  && !ctx.props().site_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
         {
             current_page = "general".to_owned();
@@ -325,7 +325,7 @@ impl Component for EditHindrance {
             <div class="edit-form">
             {header}
             <div class="form-flex">
-            if (current_page.as_str() == "admin" || current_page.as_str() == "__all__" ) && ctx.props().global_vars.current_user.has_admin_access() && ctx.props().for_admin {
+            if (current_page.as_str() == "admin" || current_page.as_str() == "__all__" ) && ctx.props().site_vars.current_user.has_admin_access() && ctx.props().for_admin {
 
                 <fieldset class={"fieldset"}>
                     <legend>{"Admin"}</legend>
@@ -348,7 +348,7 @@ impl Component for EditHindrance {
                     <div class="col-md-6">
                         <BookSelect
                             readonly={ctx.props().readonly}
-                            current_user={ctx.props().global_vars.current_user.clone()}
+                            current_user={ctx.props().site_vars.current_user.clone()}
                             book_list={book_list}
                             label={"Book"}
                             value={self.edit_item.book_id}

@@ -1,4 +1,5 @@
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::local_storage::clear_all_local_data;
 use crate::local_storage::clear_game_data_local_data;
 use crate::local_storage::get_game_data_from_index_db;
@@ -6,7 +7,6 @@ use crate::local_storage::get_saves_from_index_db;
 use crate::local_storage::index_db_save_game_data;
 use crate::local_storage::index_db_save_saves;
 use gloo_console::error;
-use gloo_console::log;
 use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
@@ -17,9 +17,10 @@ use yew::prelude::*;
 pub fn handle_message(
     msg: WebSocketMessage,
     global_vars: GlobalVars,
+    update_site_vars: Callback<SiteVars>,
     update_global_vars: Callback<GlobalVars>,
 ) {
-    if global_vars.server_side_renderer {
+    if global_vars.site_vars.server_side_renderer {
         return;
     }
     // log!(format!("handle_message called"));
@@ -27,20 +28,20 @@ pub fn handle_message(
         WebsocketMessageType::Online => {
             // log!(format!("handle_message Online"));
             let mut new_global_vars = global_vars.clone();
-            new_global_vars.offline = false;
-            new_global_vars.user_loading = false;
+            new_global_vars.site_vars.offline = false;
+            new_global_vars.site_vars.user_loading = false;
 
             new_global_vars.web_content = msg.web_content;
             match msg.user {
                 Some(user) => {
                     // log!( format!("user {} {}", user.id, user.unread_notifications));
-                    new_global_vars.current_user = user.clone();
+                    new_global_vars.site_vars.current_user = user.clone();
 
                 }
                 None => {}
             }
 
-            if new_global_vars.current_user.id > 0 {
+            if new_global_vars.site_vars.current_user.id > 0 {
                 let mut global_vars_future = new_global_vars.clone();
                 spawn_local(async move {
                     global_vars_future.game_data = get_game_data_from_index_db().await;
@@ -48,7 +49,7 @@ pub fn handle_message(
 
                     update_global_vars.emit(global_vars_future);
                 });
-                set_local_storage_string( "UI_THEME", new_global_vars.current_user.theme_css.to_owned());
+                set_local_storage_string( "UI_THEME", new_global_vars.site_vars.current_user.theme_css.to_owned());
             } else {
 
                 set_local_storage_string( "UI_THEME", "_default_".to_string());
@@ -58,8 +59,8 @@ pub fn handle_message(
                     global_vars_future.game_data = get_game_data_from_index_db().await;
                     global_vars_future.saves = get_saves_from_index_db().await;
 
-                    global_vars_future.offline = false;
-                    global_vars_future.user_loading = false;
+                    global_vars_future.site_vars.offline = false;
+                    global_vars_future.site_vars.user_loading = false;
                     // update_global_vars.emit(global_vars_future);
                     // global_vars_future.saves = global_vars_future.saves;
                     // global_vars_future.game_data = global_vars_future.game_data;
@@ -88,31 +89,31 @@ pub fn handle_message(
 
                     msg.token = None;
                     msg.kind = WebsocketMessageType::GameDataPackage;
-                    new_global_vars.send_websocket.emit(msg);
+                    new_global_vars.site_vars.send_websocket.emit(msg);
                 });
             }
 
             // spawn_local(async move {
 
-            //     update_global_vars.emit(global_vars_future);
+            //     update_site_vars.emit(site_vars_future);
             // });
-            // log!( format!("handle_message new_global_vars {:?}", &new_global_vars ) );
-            // update_global_vars.emit( new_global_vars );
+            // log!( format!("handle_message new_site_vars {:?}", &new_site_vars ) );
+            // update_site_vars.emit( new_site_vars );
         }
 
         WebsocketMessageType::Offline => {
             // log!(format!("handle_message Offline"));
 
-            let mut new_global_vars = global_vars.clone();
-            new_global_vars.offline = true;
-            new_global_vars.user_loading = false;
-            update_global_vars.emit(new_global_vars);
+            let mut new_site_vars = global_vars.site_vars.clone();
+            new_site_vars.offline = true;
+            new_site_vars.user_loading = false;
+            update_site_vars.emit(new_site_vars);
         }
 
         WebsocketMessageType::GameDataPackage => {
             // log!(format!("handle_message GameDataPackage"));
-            let mut new_global_vars = global_vars.clone();
-            new_global_vars.game_data = msg.game_data.clone();
+            let new_global_vars = global_vars.clone();
+            // let server_root = site_vars.server_root.to_owned();
 
             let game_data_user_level = get_local_storage_string("game_data_user_level", "".to_owned());
             let game_data_last_updated = get_local_storage_string("game_data_last_updated", "".to_owned());
@@ -134,7 +135,7 @@ pub fn handle_message(
         WebsocketMessageType::Saves => {
             // log!(format!("handle_message Saves"));
             let new_global_vars = global_vars.clone();
-            let server_root = global_vars.server_root.to_owned();
+            let server_root = new_global_vars.site_vars.server_root.to_owned();
 
             match msg.saves {
                 Some(saves) => {
@@ -155,18 +156,18 @@ pub fn handle_message(
                 None => {}
             }
 
-            // new_global_vars.offline = true;
-            // new_global_vars.user_loading = false;
-            // update_global_vars.emit( new_global_vars );
+            // new_site_vars.offline = true;
+            // new_site_vars.user_loading = false;
+            // update_site_vars.emit( new_site_vars );
         }
 
         _ => {
-            if !global_vars.server_side_renderer {
+            if !global_vars.site_vars.server_side_renderer {
                 error!(format!("Unhandled Message Type! {:?}", msg));
             }
-            let mut new_global_vars = global_vars.clone();
-            new_global_vars.offline = false;
-            // global_vars.update_global_vars.emit( new_global_vars );
+            let mut new_site_vars = global_vars.site_vars.clone();
+            new_site_vars.offline = false;
+            // site_vars.update_site_vars.emit( new_site_vars );
         }
     }
 }

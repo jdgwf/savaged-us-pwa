@@ -1,14 +1,16 @@
 use crate::components::menu_main::MenuMain;
 use crate::components::menu_mobile::MenuMobile;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::libs::set_document_title::set_document_title;
 use yew::virtual_dom::VNode;
-use yew::{function_component, html, AttrValue, Children, Html, Properties};
+use yew::{function_component, html, Children, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct UIPageProps {
-    pub global_vars: GlobalVars,
-    pub page_title: AttrValue,
+    // pub site_vars: SiteVars,
+    pub site_vars: SiteVars,
+
+    pub page_title: String,
 
     #[prop_or_default]
     pub children: Children,
@@ -19,11 +21,11 @@ pub struct UIPageProps {
 
 #[function_component(UIPage)]
 pub fn ui_page(props: &UIPageProps) -> Html {
-    if !props.global_vars.server_side_renderer {
+    if !props.site_vars.server_side_renderer {
         set_document_title(
-            props.global_vars.site_title.to_owned(),
+            props.site_vars.site_title.to_owned(),
             props.page_title.to_string(),
-            props.global_vars.server_side_renderer,
+            props.site_vars.server_side_renderer,
         );
     }
 
@@ -33,13 +35,13 @@ pub fn ui_page(props: &UIPageProps) -> Html {
 
     let mut active_class = "content-pane";
 
-    if props.global_vars.show_mobile_menu {
+    if props.site_vars.show_mobile_menu {
         active_class = "content-pane show-mobile-menu";
     }
 
     let mut mobile_active_class = "mobile-menu";
 
-    if props.global_vars.show_mobile_menu {
+    if props.site_vars.show_mobile_menu {
         mobile_active_class = "mobile-menu show-mobile-menu";
     }
 
@@ -60,7 +62,7 @@ pub fn ui_page(props: &UIPageProps) -> Html {
             </div>
             <h1>{"Savaged.us v4"}</h1>
             <MenuMain
-                global_vars={props.global_vars.clone()}
+                site_vars={props.site_vars.to_owned()}
             />
             // <div class={"width-limit"}>
             //     // {submenu}
@@ -71,7 +73,7 @@ pub fn ui_page(props: &UIPageProps) -> Html {
 
             <div class={mobile_active_class}>
                 <MenuMobile
-                    global_vars={props.global_vars.clone()}
+                    site_vars={props.site_vars.to_owned()}
                 />
             </div>
 
@@ -85,7 +87,7 @@ pub fn ui_page(props: &UIPageProps) -> Html {
                 </div>
             </div>
         </div>
-        <footer class="text-center">{("Using server ").to_owned() + &props.global_vars.server_root}</footer>
+        <footer class="text-center">{("Using server ").to_owned() + &props.site_vars.server_root}</footer>
         </>
     }
 }

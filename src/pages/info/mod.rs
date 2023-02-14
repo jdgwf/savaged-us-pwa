@@ -5,10 +5,11 @@ pub mod privacy_policy;
 pub mod tech;
 pub mod todos;
 
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::libs::websocket_set_location;
 use crate::pages::error404::Error404;
 use about::InfoAbout;
+use savaged_libs::web_content::WebContent;
 use contact_us::InfoContactUs;
 use partners::InfoPartners;
 use privacy_policy::InfoPrivacyPolicy;
@@ -42,55 +43,59 @@ pub enum InfoRoute {
     NotFound,
 }
 
-fn content_switch(routes: InfoRoute, global_vars: GlobalVars) -> Html {
-    // let mut global_vars = global_vars.clone();
+fn content_switch(
+    routes: InfoRoute,
+    site_vars: SiteVars,
+    web_content: Option<WebContent>,
+) -> Html {
+    // let mut site_vars = site_vars.clone();
 
     websocket_set_location(
-        global_vars.send_websocket.clone(),
+        site_vars.send_websocket.clone(),
         format!("{:?}", routes ),
     );
 
     match routes {
         InfoRoute::InfoAbout => html! {
             <InfoAbout
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         InfoRoute::InfoTech => html! {
             <InfoTech
-                global_vars={global_vars}
+                site_vars={site_vars}
 
             />
         },
 
         InfoRoute::InfoTodos => html! {
             <InfoTodos
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         InfoRoute::InfoContactUs => html! {
             <InfoContactUs
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         InfoRoute::InfoPrivacyPolicy => html! {
             <InfoPrivacyPolicy
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         InfoRoute::InfoPartners => html! {
             <InfoPartners
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         InfoRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -98,7 +103,8 @@ fn content_switch(routes: InfoRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct InfoRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
+    pub web_content: Option<WebContent>,
 }
 
 pub struct InfoRouterMessage {}
@@ -114,14 +120,14 @@ impl Component for InfoRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_menu = "main-info".to_owned();
-
-        if ctx.props().global_vars.server_side_renderer {
+        site_vars.current_menu = "main-info".to_owned();
+        let web_content = ctx.props().web_content.clone();
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
@@ -138,7 +144,8 @@ impl Component for InfoRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
+                                    web_content.clone(),
                                 )
                             }
                         />
@@ -155,7 +162,8 @@ impl Component for InfoRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
+                                    web_content.clone(),
                                 )
                             }
                         />

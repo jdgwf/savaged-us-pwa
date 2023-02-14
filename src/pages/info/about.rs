@@ -1,22 +1,22 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::ui::content_box::ContentBox;
 use standard_components::ui::nbsp::Nbsp;
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct InfoAboutProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 #[function_component(InfoAbout)]
 pub fn info_about(props: &InfoAboutProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
+    let mut site_vars = props.site_vars.clone();
 
-    global_vars.current_sub_menu = "info-about".to_owned();
+    site_vars.current_sub_menu = "info-about".to_owned();
 
     html! {
     <UIPage
-        global_vars={global_vars}
+        site_vars={site_vars}
         page_title="About Savaged.us"
     >
             // <h2><i class="fa fa-circle-info" /><Nbsp />{"About Savaged.us"}</h2>

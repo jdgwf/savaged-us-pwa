@@ -3,6 +3,7 @@ use crate::components::alerts::AlertDefinition;
 use crate::components::alerts::Alerts;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::libs::site_vars::SiteVars;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
 use crate::pages::admin::AdminRouter;
@@ -30,7 +31,7 @@ use serde_json::Error;
 use standard_components::libs::local_storage_shortcuts::clear_local_storage;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
-use standard_components::libs::set_body_class::set_body_class;
+// use standard_components::libs::set_body_class::set_body_class;
 use uuid::Uuid;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -87,6 +88,7 @@ pub enum MainAppMessage {
     ToggleMobileMenu(bool),
     HidePopupMenus(bool),
 
+    UpdateSiteVars(SiteVars),
     UpdateGlobalVars(GlobalVars),
     ContextUpdated(GlobalVarsContext),
     LogOut(String),
@@ -123,17 +125,17 @@ fn content_switch(
     on_click_hide_popup_menus: &Callback<MouseEvent>,
     toggle_mobile_menu_callback: &Callback<MouseEvent>,
 ) -> Html {
-    let mut global_vars = global_vars.clone();
-    global_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
-    global_vars.current_sub_menu = "".to_string();
-    global_vars.hide_popup_menus_callback = on_click_hide_popup_menus.clone();
-    global_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.clone();
-    global_vars.logout_callback = on_logout_action.clone();
+    let mut site_vars = global_vars.site_vars.clone();
+    site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
+    site_vars.current_sub_menu = "".to_string();
+    site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.clone();
+    site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.clone();
+    site_vars.logout_callback = on_logout_action.clone();
     match routes {
         MainRoute::Home => {
             html! {
                 <MainHome
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -141,24 +143,24 @@ fn content_switch(
         MainRoute::InfoRouter => {
             html! {
                 <InfoRouter
-                    global_vars={global_vars}
-
+                    site_vars={site_vars}
+                    web_content={global_vars.web_content}
                 />
             }
         }
         MainRoute::HelpRouter => {
             html! {
                 <HelpRouter
-                    global_vars={global_vars}
-
+                    site_vars={site_vars}
+                    //web_content={global_vars.help_content}
                 />
             }
         }
         MainRoute::HelpHome => {
             html! {
                 <HelpHome
-                    global_vars={global_vars}
-
+                    site_vars={site_vars}
+                    //web_content={global_vars.help_content}
                 />
             }
         }
@@ -177,7 +179,7 @@ fn content_switch(
         MainRoute::AdminRouter => {
             html! {
                 <AdminRouter
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -186,7 +188,7 @@ fn content_switch(
         MainRoute::AdminHome => {
             html! {
                 <AdminHome
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -196,7 +198,6 @@ fn content_switch(
             html! {
                 <UserRouter
                     global_vars={global_vars}
-
                 />
             }
         }
@@ -204,7 +205,7 @@ fn content_switch(
         MainRoute::UserLogin => {
             html! {
                 <UserLogin
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -212,7 +213,7 @@ fn content_switch(
         MainRoute::ForgotPassword => {
             html! {
                 <ForgotPassword
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -220,7 +221,7 @@ fn content_switch(
         MainRoute::Register => {
             html! {
                 <Register
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -228,7 +229,7 @@ fn content_switch(
         MainRoute::NotFound => {
             html! {
                 <Error404
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                 />
             }
         }
@@ -247,20 +248,42 @@ impl Component for MainApp {
 
         let mut global_vars = (*global_vars_context).clone();
 
+        let (global_saves_context, _saves_context_handler) = ctx
+            .link()
+            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
+            .expect("global_saves context was not set");
+
+        let mut global_saves = (*global_saves_context).clone();
+
+        let (global_data_context, _global_data_context_handler) = ctx
+            .link()
+            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
+            .expect("global_data context was not set");
+
+        let mut global_data = (*global_data_context).clone();
+
+        let (web_content_context, _web_content_context_handler) = ctx
+            .link()
+            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
+            .expect("web_content context was not set");
+
+        let mut web_content = (*web_content_context).clone();
+
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
-        global_vars.send_websocket = send_websocket;
-        global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
-        global_vars.add_alert = ctx.link().callback(MainAppMessage::AddAlert);
+        global_vars.site_vars.send_websocket = send_websocket;
+        global_vars.site_vars.update_site_vars = ctx.link().callback(MainAppMessage::UpdateSiteVars);
+        global_vars.site_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+        global_vars.site_vars.add_alert = ctx.link().callback(MainAppMessage::AddAlert);
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
-        global_vars.open_confirmation_dialog =  ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
+        global_vars.site_vars.open_confirmation_dialog =  ctx.link().callback(MainAppMessage::OpenConfirmationDialog);
 
         let wss = connect_to_websocket(
-            global_vars.server_root.to_owned(),
+            global_vars.site_vars.server_root.to_owned(),
             &received_message_callback,
             &websocket_offline_callback,
-            global_vars.login_token.to_owned(),
+            global_vars.site_vars.login_token.to_owned(),
         );
 
         global_vars.game_data = None;
@@ -280,12 +303,12 @@ impl Component for MainApp {
         match msg {
             MainAppMessage::ToggleMobileMenu(_new_value) => {
                 // log!("ToggleMobileMenu called");
-                self.global_vars.show_mobile_menu = !self.global_vars.show_mobile_menu;
+                self.global_vars.site_vars.show_mobile_menu = !self.global_vars.site_vars.show_mobile_menu;
                 return true;
             }
 
             MainAppMessage::HidePopupMenus(_new_value) => {
-                self.global_vars.show_mobile_menu = false;
+                self.global_vars.site_vars.show_mobile_menu = false;
                 return true;
             }
 
@@ -411,35 +434,47 @@ impl Component for MainApp {
                 return true;
             }
 
-            MainAppMessage::UpdateGlobalVars(new_value) => {
-                // log!( format!("MainAppMessage::UpdateGlobalVars called {:?}", &new_value) );
+            MainAppMessage::UpdateSiteVars(new_value) => {
+                // log!( format!("MainAppMessage::UpdateSiteVars called {:?}", &new_value) );
 
-                self.global_vars = new_value.clone();
-                self.global_vars.send_websocket =
+                self.global_vars.site_vars = new_value.clone();
+                self.global_vars.site_vars.send_websocket =
                     ctx.link().callback(MainAppMessage::SendWebSocket);
-                self.global_vars_context.dispatch(new_value.to_owned());
+                self.global_vars_context.dispatch(self.global_vars.to_owned());
 
                 return true;
             }
 
+            MainAppMessage::UpdateGlobalVars(new_value) => {
+                // log!( format!("MainAppMessage::UpdateSiteVars called {:?}", &new_value) );
+
+                self.global_vars= new_value.clone();
+                self.global_vars.site_vars.send_websocket =
+                    ctx.link().callback(MainAppMessage::SendWebSocket);
+                self.global_vars_context.dispatch(self.global_vars.to_owned());
+
+                return true;
+            }
+
+
             MainAppMessage::LogOut(_new_value) => {
                 // log!("LogOut?");
-                self.global_vars.current_user = User::default();
+                self.global_vars.site_vars.current_user = User::default();
                 self.show_mobile_menu = false;
                 self.global_vars.saves = None;
                 self.global_vars.game_data = None;
 
-                self.global_vars.user_loading = false;
+                self.global_vars.site_vars.user_loading = false;
                 clear_local_storage();
 
                 let mut logout = WebSocketMessage::default();
                 logout.kind = WebsocketMessageType::Logout;
-                logout.token = Some(self.global_vars.login_token.clone());
-                self.global_vars.send_websocket.emit(logout);
+                logout.token = Some(self.global_vars.site_vars.login_token.clone());
+                self.global_vars.site_vars.send_websocket.emit(logout);
 
-                self.global_vars.login_token = "".to_owned();
+                self.global_vars.site_vars.login_token = "".to_owned();
 
-                let send_websocket = self.global_vars.send_websocket.clone();
+                let send_websocket = self.global_vars.site_vars.send_websocket.clone();
                 spawn_local(async move {
                     clear_all_local_data().await;
                     let mut msg = WebSocketMessage::default();
@@ -476,7 +511,7 @@ impl Component for MainApp {
                         }
                     }
                     Err(err) => {
-                        if !self.global_vars.server_side_renderer {
+                        if !self.global_vars.site_vars.server_side_renderer {
                             error!(format!(
                                 "MainWebAppMessages::SendWebSocket json to_str error {} {:?}",
                                 err.to_string(),
@@ -491,10 +526,10 @@ impl Component for MainApp {
             MainAppMessage::WebsocketOffline(offline) => {
                 let mut global_vars = self.global_vars.clone();
 
-                if global_vars.offline != offline {
-                    global_vars.offline = offline;
+                if global_vars.site_vars.offline != offline {
+                    global_vars.site_vars.offline = offline;
 
-                    // if !global_vars.server_side_renderer {
+                    // if !global_vars.site_vars.server_side_renderer {
                     //     log!("WebsocketOffline called", offline);
                     // }
 
@@ -512,10 +547,10 @@ impl Component for MainApp {
 
 
                     self.wss = connect_to_websocket(
-                        self.global_vars.server_root.to_owned(),
+                        self.global_vars.site_vars.server_root.to_owned(),
                         &received_message_callback,
                         &websocket_offline_callback,
-                        self.global_vars.login_token.to_owned(),
+                        self.global_vars.site_vars.login_token.to_owned(),
                     );
 
 
@@ -530,22 +565,23 @@ impl Component for MainApp {
                 // log!( format!("ReceivedWebSocket {}", &sent_data ) );
                 let msg_result: Result<WebSocketMessage, Error> = serde_json::from_str(&sent_data);
                 let mut global_vars = self.global_vars.clone();
-                // global_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
+                // global_vars.update_site_vars = ctx.link().callback(MainAppMessage::UpdateSiteVars);
                 match msg_result {
                     Ok(msg) => {
                         // global_vars.offline = false;
-                        // global_vars.user_loading = false;
+                        // global_vars.site_vars.user_loading = false;
 
                         // log!( format!("calling handle_message {:?}", msg ));
                         handle_message(
                             msg,
                             global_vars,
+                            ctx.link().callback(MainAppMessage::UpdateSiteVars),
                             ctx.link().callback(MainAppMessage::UpdateGlobalVars),
                         );
                         return false;
                     }
                     Err(err) => {
-                        if !self.global_vars.server_side_renderer {
+                        if !self.global_vars.site_vars.server_side_renderer {
                             error!(
                                 "MainWebAppMessages::ReceivedWebSocket json from_str error",
                                 err.to_string(),
@@ -561,7 +597,7 @@ impl Component for MainApp {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let show_mobile_menu = self.show_mobile_menu;
-        // // log!("main_app view", self.global_vars.current_user.unread_notifications);
+        // // log!("main_app view", self.global_vars.site_vars.current_user.unread_notifications);
         // let submenu = self.submenu.clone();
         // let mobile_submenu = self.submenu.clone();
 
@@ -597,17 +633,17 @@ impl Component for MainApp {
 
         let mut body_class = get_local_storage_string( "UI_THEME", "".to_string());
 
-        if self.global_vars.current_user.id > 0 && body_class.is_empty() {
-            body_class = self.global_vars.current_user.theme_css.to_owned();
+        if self.global_vars.site_vars.current_user.id > 0 {
+            body_class = self.global_vars.site_vars.current_user.theme_css.to_owned();
             set_local_storage_string( "UI_THEME", body_class.to_string())
         }
 
 
-        set_body_class( body_class.replace("_default_", ""), self.global_vars.server_side_renderer );
+        // set_body_class( body_class.replace("_default_", ""), self.global_vars.site_vars.server_side_renderer );
 
         html! {
 
-            <>
+            <div id="main-container" class={"theme-".to_owned() + &body_class.replace("_default_", "default")}>
                 if self.confirmation_dialog_open {
                     <ConfirmationDialog
                         global_vars={global_vars4}
@@ -639,7 +675,7 @@ impl Component for MainApp {
                     // </div>
                 // </div>
                 </BrowserRouter>
-            </>
+            </div>
         }
     }
 }
@@ -664,7 +700,7 @@ impl MainApp {
         // if global_varsoffline {
         //     log!("reconnect_interval called");
 
-        //     let login_token = self.global_vars.login_token.to_owned();
+        //     let login_token = self.global_vars.site_vars.login_token.to_owned();
 
         //     let mut login_token_send: Option<String> = None;
         //     if !login_token.is_empty() {
@@ -678,7 +714,7 @@ impl MainApp {
         //     };
 
         //     log!(format!("reconnection l {:?}", msg));
-        //     self.global_vars.send_websocket.emit( msg );
+        //     self.global_vars.site_vars.send_websocket.emit( msg );
         // }
         // return;
         // log!("reconnect_interval called");
@@ -698,7 +734,7 @@ impl MainApp {
         //             move || {
 
         //                 // Do something...
-        //                 let login_token = global_vars.login_token.to_owned();
+        //                 let login_token = global_vars.site_vars.login_token.to_owned();
 
         //                 let mut login_token_send: Option<String> = None;
         //                 if !login_token.is_empty() {
@@ -712,7 +748,7 @@ impl MainApp {
         //                 };
 
         //                 log!(format!("reconnection l {:?}", msg));
-        //                 global_vars.send_websocket.emit( msg );
+        //                 global_vars.site_vars.send_websocket.emit( msg );
         //             }
         //         ));
         //     // }

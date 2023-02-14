@@ -1,14 +1,15 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use yew::html;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserCampaignsProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
-    // pub update_global_vars: Callback<GlobalVars>,
+
+
+
+    // pub update_site_vars: Callback<SiteVars>,
     pub global_vars: GlobalVars,
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
 }
@@ -30,13 +31,14 @@ impl Component for UserCampaigns {
     // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-my-stuff".to_owned();
-        global_vars.current_sub_menu = "user-data".to_owned();
-        if global_vars.user_loading {
+        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+        site_vars.current_menu = "main-my-stuff".to_owned();
+        site_vars.current_sub_menu = "user-data".to_owned();
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                  site_vars={site_vars}
+
                     page_title="My Saves"
 
                 >
@@ -49,10 +51,10 @@ impl Component for UserCampaigns {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="My Saves"
 
                 >
@@ -65,12 +67,12 @@ impl Component for UserCampaigns {
             };
         }
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
-        global_vars.current_sub_menu = "user-data-campaigns".to_owned();
+        site_vars.current_menu = "main-my-stuff".to_owned();
+        site_vars.current_sub_menu = "user-data-campaigns".to_owned();
 
         html! {
             <UIPage
-                global_vars={global_vars}
+                site_vars={site_vars}
                 page_title="My Campaigns"
 
             >

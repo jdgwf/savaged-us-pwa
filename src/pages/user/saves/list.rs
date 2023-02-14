@@ -2,7 +2,9 @@ use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::tertiary_menu::{TertiaryMenu, TertiaryMenuItem};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::user::saves::UserSavesRoute;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::save_db_row::SaveDBRow;
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
@@ -14,10 +16,8 @@ use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesListProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
     pub global_vars: GlobalVars,
+
 }
 
 pub enum UserSavesListMessage {
@@ -50,18 +50,19 @@ impl Component for UserSavesList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_sub_menu = "user-data".to_owned();
+        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+        let mut saves = ctx.props().global_vars.saves.clone();
+        site_vars.current_sub_menu = "user-data".to_owned();
         let mut filter_type = "character".to_owned();
 
-        if !ctx.props().global_vars.server_side_renderer {
+        if !ctx.props().global_vars.site_vars.server_side_renderer {
             filter_type = get_local_storage_string("saves_filter", "character".to_string());
         }
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="My Saves"
 
                 >
@@ -74,10 +75,10 @@ impl Component for UserSavesList {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="My Saves"
 
                 >
@@ -91,12 +92,12 @@ impl Component for UserSavesList {
         }
 
 
-        global_vars.current_sub_menu = "user-data-saves".to_owned();
-        global_vars.current_menu = "main-my-stuff".to_owned();
+        site_vars.current_sub_menu = "user-data-saves".to_owned();
+        site_vars.current_menu = "main-my-stuff".to_owned();
 
         let mut saves: Vec<SaveDBRow> = Vec::new();
 
-        match &global_vars.saves {
+        match &ctx.props().global_vars.saves {
             Some(save_items) => {
                 saves = save_items.to_vec();
             }
@@ -158,7 +159,7 @@ impl Component for UserSavesList {
         let mut bestiary_count = 0;
         let mut trash_count = 0;
 
-        for item in global_vars.clone().saves.unwrap_or(Vec::new()) {
+        for item in saves.clone() {
             if item.deleted {
                 trash_count += 1;
             } else {
@@ -331,7 +332,7 @@ impl Component for UserSavesList {
             },
         ];
 
-        if ctx.props().global_vars.current_user.has_premium_access() {
+        if ctx.props().global_vars.site_vars.current_user.has_premium_access() {
             sub_menu_items.push(TertiaryMenuItem {
                 tag: "_!_trash_|_".to_owned(),
                 label: "Trash".to_owned() + &" (" + &trash_count.to_string() + &")",
@@ -357,15 +358,15 @@ impl Component for UserSavesList {
         let change_folder_callback1 = change_folder_callback.clone();
         let change_folder_callback2 = change_folder_callback.clone();
 
-        let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+        let open_confirmation_dialog = ctx.props().global_vars.site_vars.open_confirmation_dialog.clone();
         html! {
             <UIPage
-                global_vars={global_vars.clone()}
+                site_vars={site_vars.clone()}
                 page_title="My Saves"
 
             >
                 <TertiaryMenu
-                    server_side_renderer={global_vars.server_side_renderer}
+                    server_side_renderer={site_vars.server_side_renderer}
                     menu_items={sub_menu_items}
                     menu_changed_callback={change_filter_callback_character}
                     local_storage_variable={"saves_filter".to_owned()}
@@ -497,7 +498,7 @@ impl Component for UserSavesList {
                     let mut updated_on_html = html!{ <></> };
                     match save.created_on {
                         Some( created_on ) => {
-                            created_on_html = html!{ <div class="small-text"><strong>{"Created On"}</strong><br />{global_vars.current_user.format_datetime(created_on, false, true, false)}</div> };
+                            created_on_html = html!{ <div class="small-text"><strong>{"Created On"}</strong><br />{site_vars.current_user.format_datetime(created_on, false, true, false)}</div> };
                         }
                         None => {
 
@@ -507,7 +508,7 @@ impl Component for UserSavesList {
                     match save.updated_on {
                         Some( updated_on ) => {
                             if &save.created_on != &save.updated_on {
-                                updated_on_html = html!{ <div class="small-text"><strong>{"Updated On"}</strong><br />{global_vars.current_user.format_datetime(updated_on, false, true, false)}</div> };
+                                updated_on_html = html!{ <div class="small-text"><strong>{"Updated On"}</strong><br />{site_vars.current_user.format_datetime(updated_on, false, true, false)}</div> };
                             }
                         }
                         None => {

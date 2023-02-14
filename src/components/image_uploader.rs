@@ -1,5 +1,5 @@
 use crate::libs::fetch_api::upload_user_image;
-use crate::libs::global_vars::GlobalVars;
+// use crate::libs::global_vars::GlobalVars;
 use chrono::Utc;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::File;
@@ -8,7 +8,8 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ImageUploaderProps {
-    pub global_vars: GlobalVars,
+    pub login_token: String,
+    pub api_root: String,
     pub image_url: String,
     pub label: String,
     pub image_name: String,
@@ -54,8 +55,8 @@ impl Component for ImageUploader {
         match msg {
             ImageUploaderMessage::SelectFile(file) => {
                 self.file = file.clone();
-                let api_root = ctx.props().global_vars.api_root.clone();
-                let login_token = ctx.props().global_vars.login_token.clone();
+                let api_root = ctx.props().api_root.clone();
+                let login_token = ctx.props().login_token.clone();
                 let file = file.clone();
                 let upload_url_callback = ctx.props().on_changed_callback.clone();
                 spawn_local(async move {

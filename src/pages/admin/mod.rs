@@ -6,7 +6,7 @@ use self::game_data::get_game_data_submenu_items;
 use self::users::get_admin_users_submenu_items;
 use self::users::list::AdminUsersList;
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::admin::game_data::home::AdminGameDataHome;
 use crate::pages::admin::game_data::AdminGameDataRouter;
 use crate::pages::admin::users::AdminUsersRouter;
@@ -37,11 +37,12 @@ pub enum AdminRoute {
     NotFound,
 }
 
-fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
-    if global_vars.user_loading || global_vars.server_side_renderer {
+fn content_switch(routes: AdminRoute, site_vars: SiteVars) -> Html {
+    if site_vars.user_loading || site_vars.server_side_renderer {
         return html! {
             <UIPage
-                global_vars={global_vars}
+                site_vars={site_vars}
+
                 page_title="Admin"
             >
                 <h1>{ "Verifying user..." }</h1>
@@ -49,10 +50,10 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
         };
     }
 
-    if !global_vars.current_user.has_developer_access() {
+    if !site_vars.current_user.has_developer_access() {
         return html! {
             <UIPage
-                global_vars={global_vars}
+                site_vars={site_vars}
                 page_title="Admin"
             >
                 <h1>{ "Access Denied" }</h1>
@@ -63,13 +64,13 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
     match routes {
         AdminRoute::AdminUsersRouter => html! {
             <AdminUsersRouter
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         AdminRoute::AdminUsersList => html! {
             <AdminUsersList
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={get_admin_users_submenu_items()}
             />
         },
@@ -79,7 +80,7 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
 
             html! {
                 <AdminGameDataHome
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     sub_menu_items={sub_menu_items}
                 />
             }
@@ -87,19 +88,19 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
 
         AdminRoute::AdminGameDataRouter => html! {
             <AdminGameDataRouter
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
         AdminRoute::AdminHome => html! {
             <AdminHome
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
 
         },
 
         AdminRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -107,7 +108,7 @@ fn content_switch(routes: AdminRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct AdminRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum AdminRouterMessage {}
@@ -122,13 +123,13 @@ impl Component for AdminRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-admin".to_owned();
+        let mut site_vars = ctx.props().site_vars.clone();
+        site_vars.current_menu = "main-admin".to_owned();
 
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
@@ -145,7 +146,7 @@ impl Component for AdminRouter {
                                     move |routes|
                                     content_switch(
                                         routes,
-                                        global_vars.clone(),
+                                        site_vars.clone(),
                                     )
                                 }
                             />
@@ -162,7 +163,7 @@ impl Component for AdminRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
                                 )
                             }
                         />

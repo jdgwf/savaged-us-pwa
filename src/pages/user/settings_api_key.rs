@@ -1,7 +1,7 @@
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::fetch_api;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use gloo_console::error;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::user::User;
@@ -13,7 +13,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsAPIKeyProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum SettingsAPIKeyMessage {
@@ -28,12 +28,12 @@ impl Component for SettingsAPIKey {
     type Properties = SettingsAPIKeyProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "API Key".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         SettingsAPIKey {}
     }
@@ -42,10 +42,10 @@ impl Component for SettingsAPIKey {
         match msg {
             SettingsAPIKeyMessage::ConfirmYes(bool) => {
                 if bool {
-                    let mut global_vars = ctx.props().global_vars.clone();
-                    let login_token = global_vars.login_token.to_owned();
-                    let api_root = global_vars.api_root.to_owned();
-                    let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                    let mut site_vars = ctx.props().site_vars.clone();
+                    let login_token = site_vars.login_token.to_owned();
+                    let api_root = site_vars.api_root.to_owned();
+                    let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                     spawn_local(async move {
                         let result = fetch_api(
@@ -71,8 +71,8 @@ impl Component for SettingsAPIKey {
                                         match vec_val_result {
                                             Ok(vec_val) => {
                                                 // update_current_user.emit( vec_val.clone() );
-                                                global_vars.current_user = vec_val.clone();
-                                                update_global_vars.emit(global_vars);
+                                                site_vars.current_user = vec_val.clone();
+                                                update_site_vars.emit(site_vars);
                                             }
                                             Err(err) => {
                                                 let err_string: String = format!(
@@ -111,7 +111,7 @@ impl Component for SettingsAPIKey {
                 };
 
                 ctx.props()
-                    .global_vars
+                    .site_vars
                     .open_confirmation_dialog
                     .emit(dialog);
 
@@ -121,14 +121,14 @@ impl Component for SettingsAPIKey {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_sub_menu = "settings-apikey".to_owned();
-        global_vars.current_menu = "main-user-login".to_owned();
-        if global_vars.user_loading {
+        site_vars.current_sub_menu = "settings-apikey".to_owned();
+        site_vars.current_menu = "main-user-login".to_owned();
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -140,10 +140,10 @@ impl Component for SettingsAPIKey {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -155,10 +155,10 @@ impl Component for SettingsAPIKey {
             };
         }
 
-        if !global_vars.current_user.is_premium {
+        if !site_vars.current_user.is_premium {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -172,9 +172,8 @@ impl Component for SettingsAPIKey {
 
         html! {
             <UIPage
-                global_vars={global_vars.clone()}
+                site_vars={site_vars.clone()}
                 page_title="API Key"
-
             >
                 <h2><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</h2>
                 <p>{"If you're planning on using the Savaged.us API and want to get more data than unregistered users, then you'll have to generate an API key to get to your data."}</p>
@@ -195,7 +194,7 @@ impl Component for SettingsAPIKey {
                         type={"text"}
                         class={"text-center"}
                         readonly={true}
-                        value={global_vars.current_user.api_key}
+                        value={site_vars.current_user.api_key}
                     />
                 </label>
 

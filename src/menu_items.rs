@@ -5,7 +5,8 @@ use crate::pages::info::InfoRoute;
 use crate::{main_app::MainRoute, pages::user::UserRoute};
 use savaged_libs::user::User;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{html, Html};
+use web_sys::MouseEvent;
+use yew::{html, Html, Callback};
 use yew_router::prelude::Link;
 #[derive(Debug, Clone)]
 pub struct MenuItem {
@@ -14,7 +15,6 @@ pub struct MenuItem {
     pub wildcard_only: bool,
     pub developer_only: bool,
     pub admin_only: bool,
-
     pub submenu: Option<Vec<MenuItem>>,
 
     pub link_class: Option<String>,
@@ -30,7 +30,10 @@ pub struct MenuItem {
     pub hardcoded: bool,
 }
 
-pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
+pub fn get_menu_items(
+    current_user: &User,
+    logout_callback: Callback<MouseEvent>,
+) -> Vec<MenuItem> {
     let mut menu = vec![
         MenuItem {
             hardcoded: false,
@@ -46,6 +49,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
             wildcard_only: false,
             developer_only: false,
             admin_only: false,
+
 
             submenu: None,
 
@@ -76,6 +80,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
 
             link_class: None,
 
+
             title: "Your Data".to_owned(),
             icon_class: None, // "fa fa-house".to_owned(),
             label: "My Stuff".to_owned(),
@@ -101,6 +106,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                     admin_only: false,
 
                     submenu: None,
+
 
                     link_class: None,
 
@@ -499,7 +505,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
         },
     ];
 
-    menu = _add_admin_tab(&global_vars, menu);
+    menu = _add_admin_tab(&current_user, menu);
 
     menu.push(
 
@@ -514,7 +520,6 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                     {"User Settings"}
                 </Link<UserRoute>>
             }),
-
             registered_only: true,
             wildcard_only: true,
             developer_only: true,
@@ -593,11 +598,11 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                             <Link<UserRoute> to={UserRoute::Notifications}>
                                 <i class={"fa-solid fa-radio"}></i><Nbsp />{"Notifications"}
 
-                                if global_vars.current_user.unread_notifications > 0 {
+                                if current_user.unread_notifications > 0 {
                                     <>
                                         <div class={"notification-spacer"} />
                                         <div id="unread-notifications" class={"unread-notifications"}>
-                                            {global_vars.current_user.unread_notifications}
+                                            {current_user.unread_notifications}
                                         </div>
 
                                     </>
@@ -609,8 +614,8 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         wildcard_only: false,
                         developer_only: false,
                         admin_only: false,
-
                         link_class: None,
+
 
                         submenu: None,
 
@@ -631,8 +636,8 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         wildcard_only: false,
                         developer_only: false,
                         admin_only: false,
-
                         link_class: None,
+
 
                         submenu: None,
 
@@ -653,6 +658,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         wildcard_only: false,
                         developer_only: false,
                         admin_only: false,
+
 
                         link_class: None,
 
@@ -677,6 +683,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                         developer_only: false,
                         admin_only: false,
 
+
                         link_class: None,
 
                         submenu: None,
@@ -693,7 +700,7 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
                     MenuItem {
                         hardcoded: false,
                         html: Some( html!{
-                            <a href="#" onclick={&global_vars.logout_callback}><i class={"fa-solid fa-sign-out"}></i><Nbsp />{"Logout"}</a>
+                            <a href="#" onclick={&logout_callback}><i class={"fa-solid fa-sign-out"}></i><Nbsp />{"Logout"}</a>
                         }),
                         registered_only: true,
                         wildcard_only: false,
@@ -721,8 +728,8 @@ pub fn get_menu_items(global_vars: &GlobalVars) -> Vec<MenuItem> {
     return menu;
 }
 
-fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<MenuItem> {
-    if global_vars.current_user.has_developer_access() {
+fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem> {
+    if current_user.has_developer_access() {
         menu.push(MenuItem {
             hardcoded: false,
             html: Some(html! {
@@ -738,6 +745,7 @@ fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<Menu
             developer_only: false,
             admin_only: false,
             link_class: None,
+
 
             title: "The Administration Section".to_owned(),
             icon_class: None, // "fa fa-house".to_owned(),
@@ -762,6 +770,7 @@ fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<Menu
                     developer_only: false,
                     admin_only: false,
                     link_class: None,
+
 
                     submenu: None,
 
@@ -790,6 +799,7 @@ fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<Menu
 
                     submenu: None,
 
+
                     title: "Users Administration".to_owned(),
                     icon_class: None, // "fa fa-house".to_owned(),
                     label: "Users".to_owned(),
@@ -812,6 +822,7 @@ fn _add_admin_tab(global_vars: &GlobalVars, mut menu: Vec<MenuItem>) -> Vec<Menu
                     developer_only: false,
                     admin_only: false,
                     link_class: None,
+
 
                     title: "Game Data Administration".to_owned(),
                     icon_class: None, // "fa fa-house".to_owned(),

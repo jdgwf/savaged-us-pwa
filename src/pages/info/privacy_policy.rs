@@ -1,5 +1,5 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::info::InfoRoute;
 use standard_components::ui::{nbsp::Nbsp, content_box::ContentBox};
 use yew::{function_component, html, Html, Properties};
@@ -7,18 +7,18 @@ use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
 pub struct InfoPrivacyPolicyProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 #[function_component(InfoPrivacyPolicy)]
 pub fn info_privacy_policy(props: &InfoPrivacyPolicyProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
+    let mut site_vars = props.site_vars.clone();
 
-    global_vars.current_sub_menu = "info-privacy-policy".to_owned();
+    site_vars.current_sub_menu = "info-privacy-policy".to_owned();
 
     let title = html!{<><i class="fa fa-user-secret" /><Nbsp />{"Privacy Policy"}</>};
     html! {
     <UIPage
-        global_vars={global_vars}
+        site_vars={site_vars}
         page_title="Our Privacy Policy"
     >
         <ContentBox label_html={title}>

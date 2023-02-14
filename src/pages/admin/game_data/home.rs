@@ -1,6 +1,7 @@
 use crate::components::tertiary_links_menu::{TertiaryLinksMenu, TertiaryLinksMenuItem};
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::admin::game_data::AdminGameDataRoute;
 use standard_components::ui::nbsp::Nbsp;
 use yew::{function_component, html, Html, Properties};
@@ -8,23 +9,24 @@ use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataHomeProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
 }
 #[function_component(AdminGameDataHome)]
 pub fn admin_game_data_home(props: &AdminGameDataHomeProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
-    global_vars.current_sub_menu = "admin-game-data".to_owned();
+    let mut site_vars = props.site_vars.clone();
+    site_vars.current_sub_menu = "admin-game-data".to_owned();
 
     html! {
     <UIPage
-        global_vars={global_vars}
+    site_vars={site_vars.clone()}
+
         page_title="Game Data Administration"
 
     >
 
     <TertiaryLinksMenu
-        server_side_renderer={props.global_vars.server_side_renderer}
+        server_side_renderer={props.site_vars.server_side_renderer}
         menu_items={props.sub_menu_items.clone()}
 
         current_tag={"home".to_owned()}

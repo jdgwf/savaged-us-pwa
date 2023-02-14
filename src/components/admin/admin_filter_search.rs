@@ -1,7 +1,7 @@
 use crate::{components::admin::book_select::BookSelect, libs::global_vars::GlobalVars};
 use savaged_libs::{
     admin_libs::{AdminPagingStatistics, FetchAdminParameters},
-    book::Book,
+    book::Book, user::User,
 };
 use standard_components::{
     libs::local_storage_shortcuts::set_local_storage_u32,
@@ -12,7 +12,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminTableFilterSearchProps {
-    pub global_vars: GlobalVars,
+    pub current_user: User,
     pub show_no_select: bool,
     pub paging_sorting_and_filter: FetchAdminParameters,
     pub callback_fetch_admin_params: Callback<FetchAdminParameters>,
@@ -77,7 +77,7 @@ pub fn edit_view_delete_buttons(props: &AdminTableFilterSearchProps) -> Html {
         callback_fetch_admin_params_3.emit(nv)
     });
 
-    let global_vars = props.global_vars.clone();
+    // let global_vars = props.global_vars.clone();
 
     return html! {
 
@@ -91,7 +91,7 @@ pub fn edit_view_delete_buttons(props: &AdminTableFilterSearchProps) -> Html {
         }
             if book_list.len() > 0 {
                 <BookSelect
-                    current_user={global_vars.current_user}
+                    current_user={props.current_user.clone()}
                     onchange={callback_set_filter_book}
                     value={props.paging_sorting_and_filter.filter_book}
                     book_list={book_list}

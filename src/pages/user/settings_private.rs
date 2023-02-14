@@ -1,6 +1,6 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::update_user;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use gloo_console::error;
 use savaged_libs::hidden_banner::HiddenBanner;
 use savaged_libs::user::User;
@@ -17,7 +17,7 @@ use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsPrivateProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum SettingsPrivateMessage {
@@ -83,18 +83,18 @@ impl Component for SettingsPrivate {
     type Properties = SettingsPrivateProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "Private Settings".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         SettingsPrivate {
-            current_user: global_vars.current_user.clone(),
-            first_name: global_vars.current_user.first_name.to_owned(),
-            last_name: global_vars.current_user.last_name.to_owned(),
-            email: global_vars.current_user.email.to_owned(),
+            current_user: site_vars.current_user.clone(),
+            first_name: site_vars.current_user.first_name.to_owned(),
+            last_name: site_vars.current_user.last_name.to_owned(),
+            email: site_vars.current_user.email.to_owned(),
             update_info_message: "".to_owned(),
             password_reset_message:
                 "To update your password, just type it twice in the fields above.".to_owned(),
@@ -115,15 +115,15 @@ impl Component for SettingsPrivate {
                     .link()
                     .callback(SettingsPrivateMessage::UpdateInformationSaved)
                     .clone();
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     updated_user_notification,
                     "".to_owned(),
                     false,
@@ -143,14 +143,14 @@ impl Component for SettingsPrivate {
                     .link()
                     .callback(SettingsPrivateMessage::PasswordsUpdated)
                     .clone();
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     updated_user_notification,
                     self.password.to_owned(),
                     false,
@@ -162,14 +162,14 @@ impl Component for SettingsPrivate {
             SettingsPrivateMessage::SetReceiveNotifications(new_value) => {
                 self.current_user.notify_email = new_value;
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     Callback::noop(),
                     "".to_owned(),
                     false,
@@ -181,15 +181,15 @@ impl Component for SettingsPrivate {
             SettingsPrivateMessage::SetTurnOffAdvanceOptions(new_value) => {
                 self.current_user.turn_off_advance_limits = new_value;
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     Callback::noop(),
                     "".to_owned(),
                     false,
@@ -207,15 +207,15 @@ impl Component for SettingsPrivate {
 
                 self.current_user.theme_css = body_class.to_owned();
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     Callback::noop(),
                     "".to_owned(),
                     false,
@@ -298,14 +298,14 @@ impl Component for SettingsPrivate {
                 match to_string_result {
                     Ok(string_value) => {
                         self.current_user.hidden_banners = string_value.clone();
-                        let mut global_vars = ctx.props().global_vars.clone();
+                        let mut site_vars = ctx.props().site_vars.clone();
 
-                        global_vars.current_user = self.current_user.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        site_vars.current_user = self.current_user.clone();
+                        let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                         update_user(
-                            global_vars,
-                            update_global_vars,
+                            site_vars,
+                            update_site_vars,
                             Callback::noop(),
                             "".to_owned(),
                             false,
@@ -320,7 +320,7 @@ impl Component for SettingsPrivate {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _props: &SettingsPrivateProps) -> bool {
-        self.current_user = ctx.props().global_vars.current_user.clone();
+        self.current_user = ctx.props().site_vars.current_user.clone();
 
         self.first_name = self.current_user.first_name.to_owned();
         self.last_name = self.current_user.last_name.to_owned();
@@ -330,16 +330,16 @@ impl Component for SettingsPrivate {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let global_vars = ctx.props().global_vars.clone();
-        let mut global_vars = ctx.props().global_vars.clone();
+        // let site_vars = ctx.props().site_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_sub_menu = "settings-private".to_owned();
-        global_vars.current_menu = "main-user-login".to_owned();
+        site_vars.current_sub_menu = "settings-private".to_owned();
+        site_vars.current_menu = "main-user-login".to_owned();
 
-        if ctx.props().global_vars.user_loading {
+        if ctx.props().site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -351,10 +351,10 @@ impl Component for SettingsPrivate {
             };
         }
 
-        if ctx.props().global_vars.current_user.id == 0 {
+        if ctx.props().site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -392,7 +392,7 @@ impl Component for SettingsPrivate {
 
         html! {
             <UIPage
-                global_vars={global_vars}
+site_vars={site_vars}
                 page_title="Private Settings"
 
             >

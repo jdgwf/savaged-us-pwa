@@ -2,7 +2,7 @@ use crate::components::image_uploader::ImageUploader;
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::fetch_api_with_value;
 use crate::libs::fetch_api::update_user;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use chrono::Utc;
 use chrono_tz::TZ_VARIANTS;
 use gloo_console::error;
@@ -21,7 +21,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SettingsPublicProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum SettingsPublicMessage {
@@ -82,21 +82,21 @@ impl Component for SettingsPublic {
     type Properties = SettingsPublicProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "Public Settings".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         SettingsPublic {
-            edit_username: global_vars.current_user.username.clone(),
-            edit_bio: global_vars.current_user.share_bio.clone(),
-            edit_share_display_name: global_vars.current_user.share_display_name.clone(),
-            edit_twitter: global_vars.current_user.twitter.clone(),
-            edit_share_show_profile_image: global_vars.current_user.share_show_profile_image,
-            edit_show_user_page: global_vars.current_user.show_user_page,
-            current_user: global_vars.current_user.clone(),
+            edit_username: site_vars.current_user.username.clone(),
+            edit_bio: site_vars.current_user.share_bio.clone(),
+            edit_share_display_name: site_vars.current_user.share_display_name.clone(),
+            edit_twitter: site_vars.current_user.twitter.clone(),
+            edit_share_show_profile_image: site_vars.current_user.share_show_profile_image,
+            edit_show_user_page: site_vars.current_user.show_user_page,
+            current_user: site_vars.current_user.clone(),
             update_shared_settings_message: "".to_owned(),
             update_tz_message: "".to_owned(),
             update_username_message:
@@ -110,17 +110,17 @@ impl Component for SettingsPublic {
     fn update(&mut self, ctx: &Context<Self>, msg: SettingsPublicMessage) -> bool {
         match msg {
             SettingsPublicMessage::SaveYourInformation(_event) => {
-                let api_root = ctx.props().global_vars.api_root.clone();
-                let login_token = ctx.props().global_vars.login_token.clone();
+                let api_root = ctx.props().site_vars.api_root.clone();
+                let login_token = ctx.props().site_vars.login_token.clone();
 
                 let updated_username_notification = ctx
                     .link()
                     .callback(SettingsPublicMessage::UpdateUsernameSaved)
                     .clone();
 
-                let global_vars = ctx.props().global_vars.clone();
+                let site_vars = ctx.props().site_vars.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
                 let username = self.edit_username.clone();
                 let edit_share_display_name = self.edit_share_display_name.clone();
                 spawn_local(async move {
@@ -129,7 +129,7 @@ impl Component for SettingsPublic {
 
                     let username = username.clone();
                     let edit_share_display_name = edit_share_display_name.clone();
-                    let global_vars = global_vars.clone();
+                    let site_vars = site_vars.clone();
 
                     let result = fetch_api_with_value(
                         (api_root + "/user/save-username").to_owned(),
@@ -148,15 +148,15 @@ impl Component for SettingsPublic {
                             match success_result {
                                 Ok(_is_available_value) => {
                                     let edit_share_display_name = edit_share_display_name.clone();
-                                    let mut global_vars = global_vars.clone();
+                                    let mut site_vars = site_vars.clone();
                                     // self.current_user.share_display_name = edit_share_display_name.to_owned();
-                                    global_vars.current_user.share_display_name =
+                                    site_vars.current_user.share_display_name =
                                         edit_share_display_name.to_owned();
-                                    global_vars.current_user.username = username.clone();
+                                    site_vars.current_user.username = username.clone();
 
                                     update_user(
-                                        global_vars,
-                                        update_global_vars,
+                                        site_vars,
+                                        update_site_vars,
                                         updated_username_notification,
                                         "".to_owned(),
                                         false,
@@ -199,14 +199,14 @@ impl Component for SettingsPublic {
                     .callback(SettingsPublicMessage::UpdateTimezoneMessage)
                     .clone();
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     updated_tz_notification,
                     "".to_owned(),
                     false,
@@ -225,14 +225,14 @@ impl Component for SettingsPublic {
                 self.current_user.show_user_page = new_value;
                 // let updated_tz_notification = ctx.link().callback(SettingsPublicMessage::UpdateTimezoneMessage).clone();
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     Callback::noop(),
                     "".to_owned(),
                     false,
@@ -265,8 +265,8 @@ impl Component for SettingsPublic {
 
                 self.edit_username = s.replace(" ", "").clone();
 
-                let api_root = ctx.props().global_vars.api_root.clone();
-                let login_token = ctx.props().global_vars.login_token.clone();
+                let api_root = ctx.props().site_vars.api_root.clone();
+                let login_token = ctx.props().site_vars.login_token.clone();
                 let set_is_available = ctx
                     .link()
                     .callback(SettingsPublicMessage::UsernameIsAvailable);
@@ -318,32 +318,32 @@ impl Component for SettingsPublic {
             SettingsPublicMessage::ImageChanged(new_url) => {
                 let mut remove_image = false;
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user.updated_on = Some(Utc::now());
+                site_vars.current_user.updated_on = Some(Utc::now());
                 if new_url == "".to_owned() {
                     // log!("Removing User Image");
                     remove_image = true;
-                    global_vars.current_user.image_url = "".to_owned();
-                    global_vars.current_user.profile_image = "".to_owned();
+                    site_vars.current_user.image_url = "".to_owned();
+                    site_vars.current_user.profile_image = "".to_owned();
                 } else {
-                    global_vars.current_user.image_url = new_url.to_owned();
-                    global_vars.current_user.profile_image = "webp".to_owned();
+                    site_vars.current_user.image_url = new_url.to_owned();
+                    site_vars.current_user.profile_image = "webp".to_owned();
                 }
 
-                // ctx.props().global_vars = global_vars.clone();
+                // ctx.props().site_vars = site_vars.clone();
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
-                update_global_vars.emit(global_vars.clone());
+                update_site_vars.emit(site_vars.clone());
 
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     Callback::noop(),
                     "".to_owned(),
                     remove_image,
@@ -441,15 +441,15 @@ impl Component for SettingsPublic {
                     .clone();
                 // let reset_user_notification = ctx.link().callback(SettingsPublicMessage::ResetShareSettings(())).clone();
 
-                let mut global_vars = ctx.props().global_vars.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
 
-                global_vars.current_user = self.current_user.clone();
+                site_vars.current_user = self.current_user.clone();
 
-                let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
                 update_user(
-                    global_vars,
-                    update_global_vars,
+                    site_vars,
+                    update_site_vars,
                     updated_user_notification,
                     "".to_owned(),
                     false,
@@ -478,7 +478,7 @@ impl Component for SettingsPublic {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _props: &SettingsPublicProps) -> bool {
-        self.current_user = ctx.props().global_vars.current_user.clone();
+        self.current_user = ctx.props().site_vars.current_user.clone();
 
         self.edit_username = self.current_user.username.clone();
         self.edit_bio = self.current_user.share_bio.clone();
@@ -491,16 +491,16 @@ impl Component for SettingsPublic {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let global_vars = ctx.props().global_vars.clone();
-        let mut global_vars = ctx.props().global_vars.clone();
+        // let site_vars = ctx.props().site_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_menu = "main-user-login".to_owned();
-        global_vars.current_sub_menu = "settings-public".to_owned();
+        site_vars.current_menu = "main-user-login".to_owned();
+        site_vars.current_sub_menu = "settings-public".to_owned();
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -512,10 +512,10 @@ impl Component for SettingsPublic {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -529,16 +529,18 @@ impl Component for SettingsPublic {
 
         let mut share_settings_save_disabled = true;
 
-        if global_vars.current_user.share_display_name != self.edit_share_display_name
+        if site_vars.current_user.share_display_name != self.edit_share_display_name
             || self.current_user.share_bio != self.edit_bio
             || self.current_user.twitter != self.edit_twitter
         {
             share_settings_save_disabled = false;
         }
 
+        let login_token = site_vars.login_token.to_owned();
+        let api_root = site_vars.api_root.to_owned();
         html! {
             <UIPage
-                global_vars={global_vars.clone()}
+site_vars={site_vars}
                 page_title="Public Settings"
 
             >
@@ -699,14 +701,15 @@ impl Component for SettingsPublic {
                         <fieldset class={"fieldset"}>
                             <legend>{"User Portrait"}</legend>
                             <ImageUploader
-                                global_vars={global_vars.clone()}
+                                login_token={login_token}
+                                api_root={api_root}
                                 upload_url={"".to_owned()}
                                 label={"User Image Upload".to_owned()}
                                 is_default_image={self.current_user.profile_image.is_empty()}
                                 image_name={"user".to_owned()}
                                 image_style={"border-radius: 50%;".to_owned()}
                                 on_changed_callback={ctx.link().callback( SettingsPublicMessage::ImageChanged )}
-                                image_url={self.current_user.get_image(&ctx.props().global_vars.server_root ).clone()}
+                                image_url={self.current_user.get_image(&ctx.props().site_vars.server_root ).clone()}
                             />
                             <br />
 

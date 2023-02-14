@@ -1,4 +1,3 @@
-use crate::libs::global_vars::GlobalVars;
 use gloo_console::error;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::admin_libs::FetchAdminParameters;
@@ -16,6 +15,8 @@ use web_sys::File;
 use web_sys::FormData;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 use yew::prelude::*;
+
+use super::site_vars::SiteVars;
 
 pub async fn fetch_api(
     endpoint: String,
@@ -281,21 +282,21 @@ pub async fn savaged_login(
 }
 
 pub fn update_user(
-    global_vars: GlobalVars,
-    update_global_vars: Callback<GlobalVars>,
+    site_vars: SiteVars,
+    update_site_vars: Callback<SiteVars>,
     updated_user_notification: Callback<String>,
     new_password: String,
     remove_image: bool,
 ) {
     spawn_local(async move {
-        let global_vars = global_vars.clone();
+        let site_vars = site_vars.clone();
         let updated_user_notification = updated_user_notification.clone();
 
         let result = update_current_user(
-            global_vars.api_root.clone(),
+            site_vars.api_root.clone(),
             "".to_owned(),
-            global_vars.login_token.clone(),
-            global_vars.current_user.clone(),
+            site_vars.login_token.clone(),
+            site_vars.current_user.clone(),
             new_password.to_owned(),
             new_password.to_owned(),
             remove_image,
@@ -304,8 +305,8 @@ pub fn update_user(
 
         match result {
             Ok(value) => {
-                // log!("update_user global_vars.current_user.username", &global_vars.current_user.username);
-                update_global_vars.emit(global_vars.clone());
+                // log!("update_user site_vars.current_user.username", &site_vars.current_user.username);
+                update_site_vars.emit(site_vars.clone());
                 // let update_value_result = value.into_serde::<UserUpdateResult>();
                 let update_value_result: Result<UserUpdateResult, Error> =
                     JsValueSerdeExt::into_serde(&value);

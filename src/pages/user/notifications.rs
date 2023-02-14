@@ -2,7 +2,7 @@ use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::fetch_api;
 use crate::libs::fetch_api::fetch_api_for_id;
 use crate::libs::fetch_api::fetch_api_for_id_with_value;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use gloo_console::error;
 use gloo_utils::format::JsValueSerdeExt;
 use savaged_libs::notification::Notification;
@@ -17,7 +17,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserNotificationsProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum UserNotificationsMessage {
@@ -310,20 +310,20 @@ impl Component for UserNotifications {
     type Properties = UserNotificationsProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
-        let login_token = global_vars.login_token.to_owned();
+        let site_vars = ctx.props().site_vars.clone();
+        let login_token = site_vars.login_token.to_owned();
         let set_notifications = ctx
             .link()
             .callback(UserNotificationsMessage::SetNotifications);
-        let api_root = global_vars.api_root.to_owned();
+        let api_root = site_vars.api_root.to_owned();
 
-        if !global_vars.server_side_renderer {
+        if !site_vars.server_side_renderer {
             get_notifications(api_root, login_token, set_notifications);
 
             set_document_title(
-                global_vars.site_title.to_owned(),
+                site_vars.site_title.to_owned(),
                 "Notifications".to_owned(),
-                global_vars.server_side_renderer,
+                site_vars.server_side_renderer,
             );
         }
         UserNotifications {
@@ -345,25 +345,25 @@ impl Component for UserNotifications {
                     }
                 }
 
-                // let mut updated_user = ctx.props().global_vars.current_user.clone();
-                let mut global_vars = ctx.props().global_vars.clone();
-                global_vars.current_user.unread_notifications = new_count;
+                // let mut updated_user = ctx.props().site_vars.current_user.clone();
+                let mut site_vars = ctx.props().site_vars.clone();
+                site_vars.current_user.unread_notifications = new_count;
 
                 // log!("SetNotifications updated_user", updated_user.id, new_count);
-                if global_vars.current_user.id > 0 {
-                    let update_global_vars = global_vars.update_global_vars.clone();
-                    update_global_vars.emit(global_vars.clone());
+                if site_vars.current_user.id > 0 {
+                    let update_site_vars = site_vars.update_site_vars.clone();
+                    update_site_vars.emit(site_vars.clone());
                 }
 
                 return true;
             }
             UserNotificationsMessage::DeleteMessage(message_id) => {
                 // reload notifications
-                let login_token = ctx.props().global_vars.login_token.to_owned();
+                let login_token = ctx.props().site_vars.login_token.to_owned();
                 let set_notifications = ctx
                     .link()
                     .callback(UserNotificationsMessage::SetNotifications);
-                let api_root = ctx.props().global_vars.api_root.to_owned();
+                let api_root = ctx.props().site_vars.api_root.to_owned();
 
                 delete_notification(api_root, login_token, set_notifications, message_id);
 
@@ -371,11 +371,11 @@ impl Component for UserNotifications {
             }
 
             UserNotificationsMessage::SetMessageReadUnread(message_id, read_unread) => {
-                let login_token = ctx.props().global_vars.login_token.to_owned();
+                let login_token = ctx.props().site_vars.login_token.to_owned();
                 let set_notifications = ctx
                     .link()
                     .callback(UserNotificationsMessage::SetNotifications);
-                let api_root = ctx.props().global_vars.api_root.to_owned();
+                let api_root = ctx.props().site_vars.api_root.to_owned();
 
                 // log!(&(format!("read_unread: {}", &read_unread)) );
 
@@ -391,22 +391,22 @@ impl Component for UserNotifications {
             }
 
             UserNotificationsMessage::MarkAllRead() => {
-                let login_token = ctx.props().global_vars.login_token.to_owned();
+                let login_token = ctx.props().site_vars.login_token.to_owned();
                 let set_notifications = ctx
                     .link()
                     .callback(UserNotificationsMessage::SetNotifications);
-                let api_root = ctx.props().global_vars.api_root.to_owned();
+                let api_root = ctx.props().site_vars.api_root.to_owned();
 
                 mark_all_read(api_root, login_token, set_notifications);
 
                 return true;
             }
             UserNotificationsMessage::DeleteBasicAdmin() => {
-                let login_token = ctx.props().global_vars.login_token.to_owned();
+                let login_token = ctx.props().site_vars.login_token.to_owned();
                 let set_notifications = ctx
                     .link()
                     .callback(UserNotificationsMessage::SetNotifications);
-                let api_root = ctx.props().global_vars.api_root.to_owned();
+                let api_root = ctx.props().site_vars.api_root.to_owned();
 
                 delete_basic_admin(api_root, login_token, set_notifications);
 
@@ -416,14 +416,14 @@ impl Component for UserNotifications {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         let notifications = self.notifications.clone();
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             return html! {
-                <UIPage
-                    global_vars={global_vars.clone()}
+                    <UIPage
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -435,10 +435,10 @@ impl Component for UserNotifications {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -450,13 +450,13 @@ impl Component for UserNotifications {
             };
         }
 
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_sub_menu = "settings-notifications".to_owned();
-        global_vars.current_menu = "main-user-login".to_owned();
+        site_vars.current_sub_menu = "settings-notifications".to_owned();
+        site_vars.current_menu = "main-user-login".to_owned();
         html! {
         <UIPage
-            global_vars={global_vars}
+            site_vars={site_vars}
             page_title="Notifications"
 
         >
@@ -474,7 +474,7 @@ impl Component for UserNotifications {
 
                         </button>
                     </div>
-                if ctx.props().global_vars.current_user.is_admin {
+                if ctx.props().site_vars.current_user.is_admin {
                     <div class="width-50-perc text-right">
                         <button
                             type="button"

@@ -1,22 +1,22 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::ui::nbsp::Nbsp;
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct AdminHomeProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 #[function_component(AdminHome)]
 pub fn admin_home(props: &AdminHomeProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
-    global_vars.current_menu = "main-admin".to_owned();
-    global_vars.current_sub_menu = "admin-home".to_owned();
+    let mut site_vars = props.site_vars.clone();
+    site_vars.current_menu = "main-admin".to_owned();
+    site_vars.current_sub_menu = "admin-home".to_owned();
 
     html! {
     <UIPage
-        global_vars={global_vars}
+        site_vars={site_vars}
         page_title="Admin Home"
     >
             <h2><i class="fa fa-microchip" /><Nbsp />{"Admin Home"}</h2>

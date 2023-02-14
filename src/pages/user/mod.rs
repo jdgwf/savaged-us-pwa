@@ -10,6 +10,7 @@ pub mod settings_private;
 pub mod settings_public;
 mod subscription;
 use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::error404::Error404;
 use campaigns::UserCampaigns;
 use notifications::UserNotifications;
@@ -23,6 +24,10 @@ use subscription::UserSubscription;
 use yew::html;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use savaged_libs::{
+    player_character::game_data_package::GameDataPackage,
+    save_db_row::SaveDBRow,
+};
 
 #[derive(Clone, PartialEq, Routable)]
 pub enum UserRoute {
@@ -52,13 +57,16 @@ pub enum UserRoute {
     NotFound,
 }
 
-fn content_switch(routes: UserRoute, global_vars: GlobalVars) -> Html {
-    let mut global_vars = global_vars.clone();
+fn content_switch(
+    routes: UserRoute,
+    global_vars: GlobalVars,
+) -> Html {
+    let mut site_vars = global_vars.site_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_sub_menu = "user".to_owned();
+    if site_vars.current_user.id > 0 {
+        site_vars.current_sub_menu = "user".to_owned();
     } else {
-        global_vars.current_sub_menu = "".to_owned();
+        site_vars.current_sub_menu = "".to_owned();
     }
 
     match routes {
@@ -79,41 +87,41 @@ fn content_switch(routes: UserRoute, global_vars: GlobalVars) -> Html {
         },
         UserRoute::SettingsAPIKey => html! {
             <SettingsAPIKey
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         UserRoute::SettingsPrivate => html! {
             <SettingsPrivate
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         UserRoute::SettingsPublic => html! {
             <SettingsPublic
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         UserRoute::Devices => html! {
             <SettingsDevices
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
 
         UserRoute::Notifications => html! {
             <UserNotifications
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
         UserRoute::Subscription => html! {
             <UserSubscription
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
         UserRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -121,8 +129,6 @@ fn content_switch(routes: UserRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct UserRouterProps {
-    #[prop_or_default]
-    // pub on_logout_action: Callback<MouseEvent>,
     pub global_vars: GlobalVars,
 }
 
@@ -139,19 +145,20 @@ impl Component for UserRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
-        // let open_confirmation_dialog = ctx.props().global_vars.open_confirmation_dialog.clone();
+        // let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
+        // let open_confirmation_dialog = ctx.props().site_vars.open_confirmation_dialog.clone();
 
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().global_vars.site_vars.server_side_renderer {
             let history = ctx
                 .props()
                 .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
             let mut global_vars = ctx.props().global_vars.clone();
-            global_vars.current_menu = "main-register".to_string();
+            global_vars.site_vars.current_menu = "main-register".to_string();
             html! {
 
                     <Router
@@ -171,7 +178,7 @@ impl Component for UserRouter {
                     </Router>
             }
         } else {
-            let global_vars = ctx.props().global_vars.clone();
+            let mut global_vars = ctx.props().global_vars.clone();
             html! {
 
                 <BrowserRouter>
@@ -182,6 +189,7 @@ impl Component for UserRouter {
                                 content_switch(
                                     routes,
                                     global_vars.clone(),
+
                                 )
                             }
                         />

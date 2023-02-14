@@ -2,7 +2,7 @@ pub mod list;
 pub mod activity;
 
 use crate::components::tertiary_links_menu::TertiaryLinksMenuItem;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::error404::Error404;
 use activity::AdminUsersActivity;
 use yew::html;
@@ -19,27 +19,27 @@ pub enum AdminUsersRoute {
     NotFound,
 }
 
-fn content_switch(routes: AdminUsersRoute, global_vars: GlobalVars) -> Html {
-    let mut global_vars = global_vars.clone();
+fn content_switch(routes: AdminUsersRoute, site_vars: SiteVars) -> Html {
+    let mut site_vars = site_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_sub_menu = "user".to_owned();
+    if site_vars.current_user.id > 0 {
+        site_vars.current_sub_menu = "user".to_owned();
     } else {
-        global_vars.current_sub_menu = "".to_owned();
+        site_vars.current_sub_menu = "".to_owned();
     }
 
     match routes {
         AdminUsersRoute::Activity => html! {
             <AdminUsersActivity
-                // update_global_vars={update_global_vars}
-                global_vars={global_vars}
+                // update_site_vars={update_site_vars}
+                site_vars={site_vars}
                 sub_menu_items={get_admin_users_submenu_items()}
                 // open_confirmation_dialog={open_confirmation_dialog}
             />
         },
         AdminUsersRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -47,7 +47,7 @@ fn content_switch(routes: AdminUsersRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum AdminUsersRouterMessage {}
@@ -76,15 +76,15 @@ impl Component for AdminUsersRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
-            let global_vars = ctx.props().global_vars.clone();
+            let site_vars = ctx.props().site_vars.clone();
 
             html! {
 
@@ -97,7 +97,7 @@ impl Component for AdminUsersRouter {
                                     move |routes|
                                     content_switch(
                                         routes,
-                                        global_vars.clone(),
+                                        site_vars.clone(),
                                     )
                                 }
                             />
@@ -105,7 +105,7 @@ impl Component for AdminUsersRouter {
                     </Router>
             }
         } else {
-            let global_vars = ctx.props().global_vars.clone();
+            let site_vars = ctx.props().site_vars.clone();
             html! {
 
                 <BrowserRouter>
@@ -115,7 +115,7 @@ impl Component for AdminUsersRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
                                 )
                             }
                         />

@@ -12,6 +12,7 @@ use chrono::Utc;
 use gloo_console::{error, log};
 use savaged_libs::player_character::armor::Armor;
 use savaged_libs::player_character::edge::Edge;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::player_character::gear::Gear;
 use savaged_libs::player_character::hindrance::Hindrance;
 use savaged_libs::player_character::weapon::Weapon;
@@ -26,13 +27,14 @@ use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesEditProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
+
+
+
     #[prop_or_default]
     pub new_save_type: Option<String>,
 
     pub uuid: String,
+
     pub global_vars: GlobalVars,
 }
 
@@ -66,6 +68,7 @@ pub struct UserSavesEdit {
 
     is_adding: bool,
     redirect_back: bool,
+
 }
 
 impl Component for UserSavesEdit {
@@ -82,7 +85,7 @@ impl Component for UserSavesEdit {
         let mut editing_gear: Option<Gear> = None;
         let mut editing_armor: Option<Armor> = None;
 
-        match ctx.props().global_vars.clone().saves {
+        match &ctx.props().global_vars.saves {
             Some(local_saves) => {
                 for item in local_saves {
                     if item.uuid == ctx.props().uuid {
@@ -146,7 +149,7 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
-                        if !ctx.props().global_vars.server_side_renderer {
+                        if !ctx.props().global_vars.site_vars.server_side_renderer {
                             error!(format!("Unhandled add save type: {}", &save_type));
                         }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
@@ -214,7 +217,7 @@ impl Component for UserSavesEdit {
                     }
 
                     _ => {
-                        if !ctx.props().global_vars.server_side_renderer {
+                        if !ctx.props().global_vars.site_vars.server_side_renderer {
                             error!(format!("Unhandled save type: {}", &save.save_type));
                         }
                         // html!{ <div class="text-center">{format!("Unhandled Save Type: {}", &save.save_type) }</div>};
@@ -222,7 +225,7 @@ impl Component for UserSavesEdit {
                 }
             }
             None => {
-                if !ctx.props().global_vars.server_side_renderer {
+                if !ctx.props().global_vars.site_vars.server_side_renderer {
                     error!("create() Cannot find save!");
                 }
             }
@@ -257,18 +260,19 @@ impl Component for UserSavesEdit {
                 match editing_hindrance {
                     Some(editing_hindrance) => {
                         let item = editing_hindrance.clone();
-                        let server_root = ctx.props().global_vars.server_root.clone();
-                        let mut global_vars = ctx.props().global_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
+                        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+                        let update_site_vars = ctx.props().global_vars.site_vars.update_site_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = global_vars.current_user.id;
+                        save.updated_by = site_vars.current_user.id;
                         close_callback(true);
+                        // let saves = ctx.props().saves.clone();
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            global_vars.saves = get_saves_from_index_db().await;
-                            update_global_vars.emit(global_vars);
+                            let saves = get_saves_from_index_db().await;
+                            update_site_vars.emit(site_vars);
                         });
                         self.close_and_cancel();
                     }
@@ -280,6 +284,7 @@ impl Component for UserSavesEdit {
                 // log!("ChangeFilter", filter_type);
                 self.editing_armor = Some(new_value);
             }
+
             UserSavesEditMessage::SaveArmor(_new_value) => {
                 let editing_armor = self.editing_armor.clone();
                 let mut save = self.save.clone().unwrap();
@@ -287,14 +292,15 @@ impl Component for UserSavesEdit {
                 match editing_armor {
                     Some(editing_armor) => {
                         let item = editing_armor.clone();
-                        let server_root = ctx.props().global_vars.server_root.clone();
-                        let mut global_vars = ctx.props().global_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
+                        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = global_vars.current_user.id;
+                        save.updated_by = site_vars.current_user.id;
                         close_callback(true);
+                        let mut global_vars = ctx.props().global_vars.clone();
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
                             global_vars.saves = get_saves_from_index_db().await;
@@ -317,13 +323,13 @@ impl Component for UserSavesEdit {
                 match editing_gear {
                     Some(editing_gear) => {
                         let item = editing_gear.clone();
-                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
                         let mut global_vars = ctx.props().global_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = global_vars.current_user.id;
+                        save.updated_by = global_vars.site_vars.current_user.id;
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
@@ -347,13 +353,13 @@ impl Component for UserSavesEdit {
                 match editing_weapon {
                     Some(editing_weapon) => {
                         let item = editing_weapon.clone();
-                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
                         let mut global_vars = ctx.props().global_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = global_vars.current_user.id;
+                        save.updated_by = global_vars.site_vars.current_user.id;
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
@@ -377,13 +383,13 @@ impl Component for UserSavesEdit {
                 match editing_edge {
                     Some(editing_edge) => {
                         let item = editing_edge.clone();
-                        let server_root = ctx.props().global_vars.server_root.clone();
+                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
                         let mut global_vars = ctx.props().global_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = global_vars.current_user.id;
+                        save.updated_by = global_vars.site_vars.current_user.id;
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
@@ -408,7 +414,7 @@ impl Component for UserSavesEdit {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _props: &UserSavesEditProps) -> bool {
-        // ctx.props().global_vars = ctx.props().global_vars.clone();
+        // ctx.props().global_vars.site_vars = ctx.props().global_vars.site_vars.clone();
 
         self.editing_hindrance = None;
         self.editing_edge = None;
@@ -416,7 +422,7 @@ impl Component for UserSavesEdit {
         self.editing_gear = None;
         self.editing_armor = None;
 
-        match ctx.props().global_vars.clone().saves {
+        match &ctx.props().global_vars.saves {
             Some(local_saves) => {
                 for item in local_saves {
                     if item.uuid == ctx.props().uuid {
@@ -494,19 +500,19 @@ impl Component for UserSavesEdit {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().global_vars.site_vars.clone();
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
-        global_vars.current_sub_menu = "user-data-saves".to_owned();
+        site_vars.current_menu = "main-my-stuff".to_owned();
+        site_vars.current_sub_menu = "user-data-saves".to_owned();
 
         if self.redirect_back {
             return html! { <Redirect<UserRoute> to={UserRoute::UserSavesList}/> };
         }
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="Editing Save"
 
                 >
@@ -519,10 +525,10 @@ impl Component for UserSavesEdit {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="Editing Save"
 
                 >
@@ -571,7 +577,7 @@ impl Component for UserSavesEdit {
                         form = html! {
                             <>
                             <EditHindrance
-                                global_vars={global_vars.clone()}
+                                site_vars={site_vars.clone()}
                                 readonly={false}
                                 edit_item={hindrance.clone()}
                                 form_title={Some("Editing Hindrance")}
@@ -612,7 +618,7 @@ impl Component for UserSavesEdit {
                         form = html! {
                             <>
                             <EditEdge
-                                global_vars={global_vars.clone()}
+                                site_vars={site_vars.clone()}
                                 readonly={false}
                                 edit_item={edge.clone()}
                                 form_title={Some("Editing Edge")}
@@ -659,7 +665,7 @@ impl Component for UserSavesEdit {
                         form = html! {
                             <>
                             <EditWeapon
-                                global_vars={global_vars.clone()}
+                                site_vars={site_vars.clone()}
                                 readonly={false}
                                 edit_item={weapon.clone()}
                                 form_title={Some("Editing Weapon")}
@@ -700,7 +706,7 @@ impl Component for UserSavesEdit {
                         form = html! {
                             <>
                             <EditGear
-                                global_vars={global_vars.clone()}
+                                site_vars={site_vars.clone()}
                                 readonly={false}
                                 edit_item={gear.clone()}
                                 form_title={Some("Editing Gear")}
@@ -741,7 +747,7 @@ impl Component for UserSavesEdit {
                         form = html! {
                             <>
                             <EditArmor
-                                global_vars={global_vars.clone()}
+                                site_vars={site_vars.clone()}
                                 readonly={false}
                                 edit_item={armor.clone()}
                                 form_title={Some("Editing Armor")}
@@ -765,7 +771,7 @@ impl Component for UserSavesEdit {
 
                 return html! {
                     <UIPage
-                        global_vars={global_vars.clone()}
+site_vars={site_vars}
                         page_title={page_title}
 
                     >
@@ -777,7 +783,7 @@ impl Component for UserSavesEdit {
                 return html! {
                     html! {
                         <Error404
-                            global_vars={global_vars}
+                            site_vars={site_vars}
                         />
                     }
                 }

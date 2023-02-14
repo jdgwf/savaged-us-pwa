@@ -1,20 +1,20 @@
-// use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::pages::error404::Error404;
 use savaged_libs::save_db_row::SaveDBRow;
-// use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
 use standard_components::ui::nbsp::Nbsp;
 use yew::html;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesViewProps {
-    // #[prop_or_default]
-    // pub set_submenu: Callback<SubmenuData>,
-    // pub on_logout_action: Callback<MouseEvent>,
+
+
+
     pub uuid: String,
+
     pub global_vars: GlobalVars,
+
 }
 
 pub enum UserSavesViewMessage {
@@ -22,7 +22,7 @@ pub enum UserSavesViewMessage {
     // ChangeFolder(String),
 }
 pub struct UserSavesView {
-    // global_vars: GlobalVars,
+    // site_vars: SiteVars,
     // save: Option<SaveDBRow>,
 }
 
@@ -32,7 +32,7 @@ impl Component for UserSavesView {
 
     fn create(_ctx: &Context<Self>) -> Self {
         UserSavesView {
-            // global_vars: ctx.props().global_vars.clone(),
+            // site_vars: ctx.props().site_vars.clone(),
         }
     }
 
@@ -53,15 +53,15 @@ impl Component for UserSavesView {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().global_vars.site_vars.clone();
 
-        global_vars.current_menu = "main-my-stuff".to_owned();
-        global_vars.current_sub_menu = "user-data-saves".to_owned();
+        site_vars.current_menu = "main-my-stuff".to_owned();
+        site_vars.current_sub_menu = "user-data-saves".to_owned();
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="My Saves"
 
                 >
@@ -74,10 +74,10 @@ impl Component for UserSavesView {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                     page_title="My Saves"
 
                 >
@@ -92,7 +92,7 @@ impl Component for UserSavesView {
 
         let mut save: Option<SaveDBRow> = None;
 
-        match ctx.props().global_vars.clone().saves {
+        match ctx.props().global_vars.saves.clone() {
             Some(local_saves) => {
                 for item in local_saves {
                     if item.uuid == ctx.props().uuid {
@@ -155,7 +155,7 @@ impl Component for UserSavesView {
                 }
                 return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Viewing Save"
 
                 >
@@ -170,7 +170,7 @@ impl Component for UserSavesView {
                 return html! {
                     html! {
                         <Error404
-                            global_vars={global_vars}
+                            site_vars={site_vars}
                         />
                     }
                 }

@@ -4,7 +4,7 @@ pub mod article;
 
 use article::HelpArticle;
 use savaged_libs::help_article::HelpArticleSection;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::libs::websocket_set_location;
 use crate::pages::error404::Error404;
 // use about::HelpAbout;
@@ -39,46 +39,46 @@ pub enum HelpRoute {
     NotFound,
 }
 
-fn content_switch(routes: HelpRoute, global_vars: GlobalVars) -> Html {
-    // let mut global_vars = global_vars.clone();
+fn content_switch(routes: HelpRoute, site_vars: SiteVars) -> Html {
+    // let mut site_vars = site_vars.clone();
 
     websocket_set_location(
-        global_vars.send_websocket.clone(),
+        site_vars.send_websocket.clone(),
         format!("{:?}", routes ),
     );
 
     match routes {
         HelpRoute::HelpRegistration{ tag } => html! {
             <HelpArticle
-                global_vars={global_vars}
+                site_vars={site_vars}
                 tag={tag}
                 section={HelpArticleSection::Registration.to_owned()}
             />
         },
         HelpRoute::HelpSaves{ tag } => html! {
             <HelpArticle
-                global_vars={global_vars}
+                site_vars={site_vars}
                 tag={tag}
                 section={HelpArticleSection::Saves.to_owned()}
             />
         },
         HelpRoute::HelpCharacters{ tag } => html! {
             <HelpArticle
-                global_vars={global_vars}
+                site_vars={site_vars}
                 tag={tag}
                 section={HelpArticleSection::Characters.to_owned()}
             />
         },
         HelpRoute::HelpCampaigns{ tag } => html! {
             <HelpArticle
-                global_vars={global_vars}
+                site_vars={site_vars}
                 tag={tag}
                 section={HelpArticleSection::Campaigns.to_owned()}
             />
         },
         HelpRoute::HelpVehicles{ tag } => html! {
             <HelpArticle
-                global_vars={global_vars}
+                site_vars={site_vars}
                 tag={tag}
                 section={HelpArticleSection::Vehicles.to_owned()}
             />
@@ -86,7 +86,7 @@ fn content_switch(routes: HelpRoute, global_vars: GlobalVars) -> Html {
 
         HelpRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -94,7 +94,7 @@ fn content_switch(routes: HelpRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct HelpRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub struct HelpRouterMessage {}
@@ -110,14 +110,14 @@ impl Component for HelpRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
-        global_vars.current_menu = "main-help".to_owned();
+        site_vars.current_menu = "main-help".to_owned();
 
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
@@ -134,7 +134,7 @@ impl Component for HelpRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
                                 )
                             }
                         />
@@ -151,7 +151,7 @@ impl Component for HelpRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
                                 )
                             }
                         />

@@ -1,29 +1,31 @@
 use crate::components::lds_spinner::LDSSpinner;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
 use crate::pages::user::UserRoute;
-use yew::{function_component, html, Html, Properties};
+use savaged_libs::user::User;
+use web_sys::MouseEvent;
+use yew::{function_component, html, Html, Properties, Callback};
 use yew_router::prelude::Link;
 
 #[derive(Properties, PartialEq)]
 pub struct MenuMainProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 #[function_component(MenuMain)]
 pub fn menu_main(props: &MenuMainProps) -> Html {
-    let current_submenu_tag = props.global_vars.current_sub_menu.clone();
-    let current_menu_tag = props.global_vars.current_menu.clone();
+    let current_submenu_tag = props.site_vars.current_sub_menu.clone();
+    let current_menu_tag = props.site_vars.current_menu.clone();
 
     let mut show_submenu = false;
 
-    let submenu = get_menu_items(&props.global_vars).into_iter().map( | menu | {
+    let submenu = get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
         match &menu.menu_tag {
             Some( menu_tag ) => {
-                // log!("menu_tag == &props.submenu_tag", submenu_tag, &current_submenu_tag);
+                // log!("menu_tag == &props.site_vars.submenu_tag", submenu_tag, &current_submenu_tag);
                 if
                     current_menu_tag.as_str() == menu_tag.as_str()
-                    && user_can_see_menu_item( &props.global_vars.current_user, &menu)
+                    && user_can_see_menu_item( &props.site_vars.current_user, &menu)
                 {
                     match menu.submenu {
                         Some( submenu_items ) => {
@@ -50,7 +52,7 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
                                             <li class={li_class} title={sub_item.title}>
                                             {html}
                                         //    <br />{&sub_item.sub_menu_tag}
-                                        //    <br />{&props.global_vars.current_sub_menu}
+                                        //    <br />{&props.site_vars.current_sub_menu}
                                             </li>
                                         };
                                     }
@@ -89,16 +91,16 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
         login_class_active = "login-item active".to_owned();
     }
 
-    // log!( format!("props.global_vars.current_user.updated_on {:?}", props.global_vars.current_user.updated_on) );
+    // log!( format!("props.site_vars.current_user.updated_on {:?}", props.site_vars.current_user.updated_on) );
     html! {
         <>
-        // {"props.global_vars.current_menu: "}{&props.global_vars.current_menu}<br />
+        // {"props.site_vars.current_menu: "}{&props.site_vars.current_menu}<br />
         <div class={"top-menu-bottom"}>
         <div class={"width-limit"}>
         <ul class={"top-menu"}>
             <li class={"mobile-menu-button"}>
                 <svg
-                    onclick={props.global_vars.toggle_mobile_menu_callback.clone()}
+                    onclick={props.site_vars.toggle_mobile_menu_callback.clone()}
                     stroke="currentColor"
                     fill="currentColor"
                     stroke-width="0"
@@ -110,8 +112,8 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
                     <path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path>
                 </svg>
             </li>
-            {get_menu_items(&props.global_vars).into_iter().map( | menu | {
-                if user_can_see_menu_item( &props.global_vars.current_user, &menu) {
+            {get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
+                if user_can_see_menu_item( &props.site_vars.current_user, &menu) {
                     let mut li_class = "".to_string();
                     if menu.hardcoded {
                         return html!(<></>);
@@ -148,30 +150,30 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
 
             }).collect::<Html>()}
 
-            if !props.global_vars.server_side_renderer {
+            if !props.site_vars.server_side_renderer {
                 <li class={login_class_active}>
-                    if props.global_vars.offline {
+                    if props.site_vars.offline {
                         <div style={"margin-top: -2rem; margin-right: .5rem;text-align: center;"}>
                             {"OFFLINE"}
                             <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
                         </div>
                     }
-                    if props.global_vars.current_user.id > 0 && !props.global_vars.offline {
+                    if props.site_vars.current_user.id > 0 && !props.site_vars.offline {
                         <div class="user-login-badge">
 
-                            if props.global_vars.current_user.unread_notifications > 0 {
+                            if props.site_vars.current_user.unread_notifications > 0 {
                                 <Link<UserRoute> to={UserRoute::Notifications}>
-                                    <div class={"unread-notifications"}>{props.global_vars.current_user.unread_notifications}</div>
+                                    <div class={"unread-notifications"}>{props.site_vars.current_user.unread_notifications}</div>
                                 </Link<UserRoute>>
                             }
                             <Link<UserRoute> to={UserRoute::SettingsPrivate}><img
-                            src={props.global_vars.current_user.get_image( &props.global_vars.server_root )}
+                            src={props.site_vars.current_user.get_image( &props.site_vars.server_root )}
                             /></Link<UserRoute>>
 
                         </div>
                     } else {
                         <>
-                            if !props.global_vars.offline {
+                            if !props.site_vars.offline {
                                 <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
                             }
                         </>

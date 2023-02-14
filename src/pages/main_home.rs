@@ -1,6 +1,6 @@
 // use crate::components::alerts::AlertDefinition;
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::ui::content_box::ContentBox;
 // use gloo_console::log;
 // use savaged_libs::alert_level::AlertLevel;
@@ -9,7 +9,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct MainHomeProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum MainHomeMessage {}
@@ -21,19 +21,19 @@ impl Component for MainHome {
     type Properties = MainHomeProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        // let global_vars = ctx.props().global_vars.clone();
+        // let site_vars = ctx.props().site_vars.clone();
 
         MainHome {}
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let global_vars = ctx.props().global_vars.clone();
-        // let global_vars2 = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
+        // let site_vars2 = ctx.props().site_vars.clone();
 
-        // let global_vars_copy = ctx.props().global_vars.clone();
+        // let site_vars_copy = ctx.props().site_vars.clone();
         html! {
             <UIPage
-                global_vars={global_vars.clone()}
+                site_vars={site_vars}
                 page_title="Home"
             >
 
@@ -79,7 +79,7 @@ impl Component for MainHome {
                 // <button
                 //     class="btn"
                 //         onclick={ move |_e| {
-                //         global_vars_copy.add_alert.emit(
+                //         site_vars_copy.add_alert.emit(
                 //             AlertDefinition {
                 //                 level: AlertLevel::Info,
                 //                 text: Some("Hello!".to_owned()),
@@ -95,7 +95,7 @@ impl Component for MainHome {
                 // <button
                 //     class="btn"
                 //     onclick={ move |_e| {
-                //         let login_token = global_vars.login_token.to_owned();
+                //         let login_token = site_vars.login_token.to_owned();
                 //         let mut login_token_send: Option<String> = None;
                 //         if !login_token.is_empty() {
                 //             login_token_send = Some(login_token);
@@ -106,17 +106,17 @@ impl Component for MainHome {
                 //         msg.token = login_token_send;
                 //         msg.kind = WebsocketMessageType::GameDataPackage;
 
-                //         global_vars.send_websocket.emit( msg );
+                //         site_vars.send_websocket.emit( msg );
                 //     }}
                 // >
                 //     {"Request GameDataRow Data"}
                 // </button>
 
-                // if global_vars2.current_user.id > 0 {
+                // if site_vars2.current_user.id > 0 {
                 // <button
                 //     class="btn"
                 //     onclick={ move |_e| {
-                //         let login_token = global_vars2.login_token.to_owned();
+                //         let login_token = site_vars2.login_token.to_owned();
                 //         let mut login_token_send: Option<String> = None;
                 //         if !login_token.is_empty() {
                 //             login_token_send = Some(login_token);
@@ -127,7 +127,7 @@ impl Component for MainHome {
                 //         msg.token = login_token_send;
                 //         msg.kind = WebsocketMessageType::Saves;
 
-                //         global_vars2.send_websocket.emit( msg );
+                //         site_vars2.send_websocket.emit( msg );
                 //     }}
                 // >
                 //     {"Request Saves"}

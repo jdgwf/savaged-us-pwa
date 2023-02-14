@@ -1,12 +1,12 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSubscriptionProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum UserSubscriptionMessage {}
@@ -18,12 +18,12 @@ impl Component for UserSubscription {
     type Properties = UserSubscriptionProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "Subscriptions and Purchases".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         UserSubscription {}
     }
@@ -40,13 +40,13 @@ impl Component for UserSubscription {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let global_vars = ctx.props().global_vars.clone();
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-user-login".to_owned();
-        if global_vars.user_loading {
+        // let site_vars = ctx.props().site_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
+        site_vars.current_menu = "main-user-login".to_owned();
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -58,10 +58,10 @@ impl Component for UserSubscription {
             };
         }
 
-        if global_vars.current_user.id == 0 {
+        if site_vars.current_user.id == 0 {
             return html! {
                 <UIPage
-                    global_vars={global_vars.clone()}
+                    site_vars={site_vars}
                     page_title="Settings"
 
                 >
@@ -73,11 +73,11 @@ impl Component for UserSubscription {
             };
         }
 
-        global_vars.current_sub_menu = "settings-subscription".to_owned();
+        site_vars.current_sub_menu = "settings-subscription".to_owned();
 
         html! {
             <UIPage
-                global_vars={global_vars}
+site_vars={site_vars}
                 page_title="Subscriptions"
 
             >

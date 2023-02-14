@@ -1,11 +1,11 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::fetch_api::savaged_login;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::local_storage::clear_all_local_data;
 use crate::main_app::MainRoute;
 use gloo_console::error;
-use gloo_console::log;
 use gloo_utils::format::JsValueSerdeExt;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::user::LoginTokenResult;
 use savaged_libs::websocket_message::WebSocketMessage;
 use savaged_libs::websocket_message::WebsocketMessageType;
@@ -17,10 +17,13 @@ use standard_components::ui::nbsp::Nbsp;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use savaged_libs::save_db_row::SaveDBRow;
 
 #[derive(Properties, PartialEq)]
 pub struct UserLoginProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,
 }
 
 pub enum UserLoginMessage {
@@ -42,12 +45,12 @@ impl Component for UserLogin {
     type Properties = UserLoginProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "Login".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         UserLogin {
             username: "".to_owned(),
@@ -60,12 +63,12 @@ impl Component for UserLogin {
         match msg {
             UserLoginMessage::UpdateCurrentUser(login_result) => {
                 // log!("UserLoginMessage::UpdateCurrentUser", login_result.success);
-                let mut global_vars = ctx.props().global_vars.clone();
-                global_vars.current_user = login_result.user.clone();
-                global_vars.login_token = login_result.login_token.clone();
-                global_vars.user_loading = false;
+                let mut site_vars = ctx.props().site_vars.clone();
+                site_vars.current_user = login_result.user.clone();
+                site_vars.login_token = login_result.login_token.clone();
+                site_vars.user_loading = false;
 
-                ctx.props().global_vars.update_global_vars.emit(global_vars);
+                ctx.props().site_vars.update_site_vars.emit(site_vars);
 
                 // clear out local data
                 spawn_local(async move {
@@ -79,14 +82,14 @@ impl Component for UserLogin {
                 msg.token = Some(login_result.login_token.to_owned());
                 msg.kind = WebsocketMessageType::GameDataPackage;
 
-                ctx.props().global_vars.send_websocket.emit(msg);
+                ctx.props().site_vars.send_websocket.emit(msg);
 
                 let mut msg_saves = WebSocketMessage::default();
 
                 msg_saves.token = Some(login_result.login_token.to_owned());
                 msg_saves.kind = WebsocketMessageType::Saves;
 
-                ctx.props().global_vars.send_websocket.emit(msg_saves);
+                ctx.props().site_vars.send_websocket.emit(msg_saves);
 
                 // set_local_storage_string( "saves_owner_id", login_result.user.id.to_string() );
                 set_local_storage_string("login_token", login_result.login_token.to_owned());
@@ -115,8 +118,8 @@ impl Component for UserLogin {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let global_vars = ctx.props().global_vars.clone();
-        let global_vars_event = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
+        let site_vars_event = ctx.props().site_vars.clone();
 
         let update_username = ctx.link().callback(UserLoginMessage::UpdateUsername);
         let update_password = ctx.link().callback(UserLoginMessage::UpdatePassword);
@@ -126,15 +129,15 @@ impl Component for UserLogin {
 
         let username = self.username.to_owned();
         let password = self.password.to_owned();
-        let api_root = ctx.props().global_vars.api_root.to_owned();
+        let api_root = ctx.props().site_vars.api_root.to_owned();
 
-        let update_global_vars = ctx.props().global_vars.update_global_vars.clone();
+        let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
 
         let do_login_submit = move |e: SubmitEvent| {
             // log!("trying do_login_submit");
             e.prevent_default();
-            let global_vars = global_vars_event.clone();
-            let update_global_vars = update_global_vars.clone();
+            let site_vars = site_vars_event.clone();
+            let update_site_vars = update_site_vars.clone();
             let username = username.to_owned();
             let password = password.to_owned();
             let api_root = api_root.to_owned();
@@ -156,9 +159,9 @@ impl Component for UserLogin {
 
                 match result {
                     Ok(value) => {
-                        // let mut global_vars = global_vars.clone();
-                        // global_vars.offline = false;
-                        // global_vars.update_global_vars.emit( global_vars.clone() );
+                        // let mut site_vars = site_vars.clone();
+                        // site_vars.offline = false;
+                        // site_vars.update_site_vars.emit( site_vars.clone() );
 
                         let vec_val_result: Result<LoginTokenResult, Error> =
                             JsValueSerdeExt::into_serde(&value);
@@ -182,21 +185,21 @@ impl Component for UserLogin {
                     Err(err) => {
                         error!("savaged_login Err()", &err);
                         set_login_message.emit("Can't connect to server".to_owned());
-                        let mut global_vars = global_vars.clone();
-                        global_vars.offline = true;
-                        update_global_vars.emit(global_vars.clone());
+                        let mut site_vars = site_vars.clone();
+                        site_vars.offline = true;
+                        update_site_vars.emit(site_vars.clone());
                     }
                 }
             });
         };
-        let mut global_vars = global_vars.clone();
-        global_vars.current_menu = "main-user-login".to_owned();
+        let mut site_vars = site_vars.clone();
+        site_vars.current_menu = "main-user-login".to_owned();
 
 
         let mut saves_html = html! {<></>};
         let mut game_data_html = html! {<></>};
 
-        match &global_vars.game_data {
+        match &ctx.props().game_data {
             Some(game_data) => {
                 game_data_html = html! {
                     <>
@@ -214,7 +217,7 @@ impl Component for UserLogin {
                 // log!("main_home view no game_data?")
             }
         }
-        match &global_vars.saves {
+        match &ctx.props().saves {
             Some(saves) => {
                 saves_html = html! {
                     <>
@@ -228,10 +231,10 @@ impl Component for UserLogin {
         }
 
 
-        if global_vars.user_loading {
+        if site_vars.user_loading {
             html!(
                     <UIPage
-                        global_vars={global_vars.clone()}
+                        site_vars={site_vars}
                         page_title="Login"
 
                     >
@@ -241,25 +244,25 @@ impl Component for UserLogin {
         } else {
             html! {
             <UIPage
-                global_vars={global_vars.clone()}
+                site_vars={site_vars.clone()}
                 page_title="Login"
 
             >
                 <div class={"main-content"}>
                     <h1>{ "Savaged.us Login" }</h1>
-                    // {"ID: "}{global_vars.current_user.id}<br />
-                    if global_vars.current_user.id > 0 {
+                    // {"ID: "}{site_vars.current_user.id}<br />
+                    if site_vars.current_user.id > 0 {
                         <fieldset class={"fieldset"}>
                             <legend>{"Current User"}</legend>
                             <div class="user-profile">
 
-                                <img src={global_vars.current_user.get_image(&global_vars.server_root)} />
+                                <img src={site_vars.current_user.get_image(&site_vars.server_root)} />
 
-                            <h3>{&global_vars.current_user.username}</h3>
-                            <strong>{"ID: "}</strong>{&global_vars.current_user.id}<br />
-                            <strong>{"Unread Notifications: "}</strong>{&global_vars.current_user.unread_notifications}<br />
-                            <strong>{"Display Name: "}</strong>{&global_vars.current_user.get_name()}<br />
-                            <strong>{"Twitter: "}</strong>{&global_vars.current_user.twitter}<br />
+                            <h3>{&site_vars.current_user.username}</h3>
+                            <strong>{"ID: "}</strong>{&site_vars.current_user.id}<br />
+                            <strong>{"Unread Notifications: "}</strong>{&site_vars.current_user.unread_notifications}<br />
+                            <strong>{"Display Name: "}</strong>{&site_vars.current_user.get_name()}<br />
+                            <strong>{"Twitter: "}</strong>{&site_vars.current_user.twitter}<br />
                             </div>
                             <hr />
                                             <div class="row">

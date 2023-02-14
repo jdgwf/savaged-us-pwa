@@ -6,6 +6,7 @@ use web_sys;
 pub mod admin_api;
 pub mod fetch_api;
 pub mod global_vars;
+pub mod site_vars;
 
 pub fn websocket_set_location(
     send_websocket: Callback<WebSocketMessage>,

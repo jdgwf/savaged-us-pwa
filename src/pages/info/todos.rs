@@ -1,23 +1,23 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::ui::{nbsp::Nbsp, content_box::ContentBox};
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct InfoTodosProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 #[function_component(InfoTodos)]
 pub fn info_todos(props: &InfoTodosProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
+    let mut site_vars = props.site_vars.clone();
 
-    global_vars.current_sub_menu = "info-todos".to_owned();
+    site_vars.current_sub_menu = "info-todos".to_owned();
 
     let title = html!{<><i class="fa fa-list" /><Nbsp />{ "Development To-Dos (the short list)" }</>};
     html! {
     <UIPage
-        global_vars={global_vars}
+        site_vars={site_vars}
         page_title="Development To-Dos"
     >
 

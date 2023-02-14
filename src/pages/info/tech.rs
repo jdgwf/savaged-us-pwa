@@ -1,22 +1,22 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::ui::{nbsp::Nbsp, content_box::ContentBox};
 use yew::{function_component, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct InfoTechProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 #[function_component(InfoTech)]
 pub fn info_tech(props: &InfoTechProps) -> Html {
-    let mut global_vars = props.global_vars.clone();
+    let mut site_vars = props.site_vars.clone();
 
-    global_vars.current_sub_menu = "info-tech".to_owned();
+    site_vars.current_sub_menu = "info-tech".to_owned();
 
     let title= html!{<><i class="fa fa-microchip" /><Nbsp />{"Technologies Used"}</>};
     html! {
     <UIPage
-        global_vars={global_vars}
+        site_vars={site_vars}
         page_title="Technologies Used"
     >
         <ContentBox label_html={title}>

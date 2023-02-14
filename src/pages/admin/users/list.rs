@@ -4,7 +4,7 @@ use crate::components::admin::edit_view_delete_buttons::EditViewDeleteButtons;
 use crate::components::admin::admin_table_field::bool::AdminTableFieldBool;
 use crate::components::tertiary_links_menu::{TertiaryLinksMenuItem, TertiaryLinksMenu};
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::{
     components::admin::admin_table_field::text::AdminTableFieldText,
     libs::fetch_api::fetch_admin_api,
@@ -25,7 +25,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AdminUsersListProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
     pub sub_menu_items: Vec<TertiaryLinksMenuItem>,
 }
 
@@ -46,9 +46,9 @@ impl Component for AdminUsersList {
     type Properties = AdminUsersListProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
-        let login_token = global_vars.login_token.clone();
+        let login_token = site_vars.login_token.clone();
         let set_users = ctx.link().callback(AdminUsersListMessage::SetUsers);
         let set_paging = ctx.link().callback(AdminUsersListMessage::SetPagingStats);
 
@@ -66,7 +66,7 @@ impl Component for AdminUsersList {
         let paging = paging_sorting_and_filter.clone();
         spawn_local(async move {
             _get_data(
-                global_vars,
+                site_vars,
                 paging_sorting_and_filter,
                 set_users,
                 set_paging,
@@ -98,9 +98,9 @@ impl Component for AdminUsersList {
                 let mut paging_sorting_and_filter = new_value.clone();
                 self.paging_sorting_and_filter = new_value.clone();
 
-                let global_vars = ctx.props().global_vars.clone();
+                let site_vars = ctx.props().site_vars.clone();
 
-                let login_token = global_vars.login_token.clone();
+                let login_token = site_vars.login_token.clone();
                 let set_users = ctx.link().callback(AdminUsersListMessage::SetUsers);
                 let set_paging = ctx.link().callback(AdminUsersListMessage::SetPagingStats);
 
@@ -114,7 +114,7 @@ impl Component for AdminUsersList {
 
                 spawn_local(async move {
                     _get_data(
-                        global_vars,
+                        site_vars,
                         paging_sorting_and_filter,
                         set_users,
                         set_paging,
@@ -150,18 +150,17 @@ impl Component for AdminUsersList {
             None => {}
         }
 
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-admin".to_owned();
-        global_vars.current_sub_menu = "admin-users".to_owned();
+        let mut site_vars = ctx.props().site_vars.clone();
+        site_vars.current_menu = "main-admin".to_owned();
+        site_vars.current_sub_menu = "admin-users".to_owned();
 
         html! {
         <UIPage
-            global_vars={global_vars.clone()}
             page_title="Admin Users"
-
+            site_vars={site_vars.clone()}
         >
         <TertiaryLinksMenu
-            server_side_renderer={global_vars.server_side_renderer}
+            server_side_renderer={site_vars.server_side_renderer}
             menu_items={ctx.props().sub_menu_items.clone()}
 
             current_tag={"users-list".to_owned()}
@@ -171,7 +170,7 @@ impl Component for AdminUsersList {
                 callback_fetch_admin_params={callback_fetch_admin_params_2}
                 paging_sorting_and_filter={self.paging_sorting_and_filter.clone()}
                 stats={self.paging_data.clone()}
-                global_vars={global_vars.clone()}
+                current_user={site_vars.current_user.clone()}
                 show_no_select={false}
             />
         </div>
@@ -288,12 +287,12 @@ impl Component for AdminUsersList {
 }
 
 async fn _get_data(
-    global_vars: GlobalVars,
+    site_vars: SiteVars,
     paging_sorting_and_filter: FetchAdminParameters,
     set_users: Callback<Vec<User>>,
     set_paging: Callback<Option<AdminPagingStatistics>>,
 ) {
-    let api_root = global_vars.api_root.clone();
+    let api_root = site_vars.api_root.clone();
     let mut paging_sorting_and_filter = paging_sorting_and_filter.clone();
     paging_sorting_and_filter.hide_no_select = false;
     let result = fetch_admin_api(
@@ -313,7 +312,7 @@ async fn _get_data(
                 Err(err) => {
                     let err_string: String = format!("get_users Serde Err(): {}", &err);
                     set_users.emit(Vec::new());
-                    if !global_vars.server_side_renderer {
+                    if !site_vars.server_side_renderer {
                         error!(&err_string);
                     }
                 }
@@ -321,7 +320,7 @@ async fn _get_data(
         }
         Err(err) => {
             set_users.emit(Vec::new());
-            if !global_vars.server_side_renderer {
+            if !site_vars.server_side_renderer {
                 error!("get_users Err()", &err);
             }
         }
@@ -345,7 +344,7 @@ async fn _get_data(
                 Err(err) => {
                     let err_string: String = format!("get_users paging Serde Err(): {}", &err);
                     set_paging.emit(None);
-                    if !global_vars.server_side_renderer {
+                    if !site_vars.server_side_renderer {
                         error!(&err_string);
                     }
                 }
@@ -353,7 +352,7 @@ async fn _get_data(
         }
         Err(err) => {
             set_paging.emit(None);
-            if !global_vars.server_side_renderer {
+            if !site_vars.server_side_renderer {
                 error!("get_users paging Err()", &err);
             }
         }

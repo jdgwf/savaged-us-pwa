@@ -1,18 +1,18 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use standard_components::libs::set_document_title::set_document_title;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ForgotPasswordProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum ForgotPasswordMessage {}
 
 pub struct ForgotPassword {
-    // global_vars: GlobalVars,
+    // site_vars: SiteVars,
 }
 
 impl Component for ForgotPassword {
@@ -20,25 +20,25 @@ impl Component for ForgotPassword {
     type Properties = ForgotPasswordProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let global_vars = ctx.props().global_vars.clone();
+        let site_vars = ctx.props().site_vars.clone();
 
         set_document_title(
-            global_vars.site_title.to_owned(),
+            site_vars.site_title.to_owned(),
             "Recover Password".to_owned(),
-            global_vars.server_side_renderer,
+            site_vars.server_side_renderer,
         );
         ForgotPassword {
-            // global_vars: global_vars,
+            // site_vars: site_vars,
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut global_vars = ctx.props().global_vars.clone();
-        global_vars.current_menu = "main-user-forgot-password".to_string();
-        if global_vars.user_loading {
+        let mut site_vars = ctx.props().site_vars.clone();
+        site_vars.current_menu = "main-user-forgot-password".to_string();
+        if site_vars.user_loading {
             return html! {
                 <UIPage
-                global_vars={global_vars.clone()}
+site_vars={site_vars}
                 page_title="Forgot Password"
 
             >
@@ -49,10 +49,10 @@ impl Component for ForgotPassword {
                 </UIPage>
             };
         }
-        if global_vars.current_user.id > 0 {
+        if site_vars.current_user.id > 0 {
             return html! {
                 <UIPage
-                global_vars={global_vars.clone()}
+site_vars={site_vars}
                 page_title="Forgot Password"
 
             >                <div class={"text-center"}>
@@ -64,7 +64,7 @@ impl Component for ForgotPassword {
         }
         html! {
             <UIPage
-                global_vars={global_vars.clone()}
+site_vars={site_vars}
                 page_title="Forgot Password"
 
             >

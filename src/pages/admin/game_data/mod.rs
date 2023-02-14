@@ -13,7 +13,7 @@ use self::gear_enhancements::AdminGameDataGearEnhancements;
 use self::hindrances::AdminGameDataHindrances;
 use self::weapons::AdminGameDataWeapons;
 use crate::components::tertiary_links_menu::TertiaryLinksMenuItem;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::admin::AdminRoute;
 use crate::pages::error404::Error404;
 use yew::html;
@@ -44,13 +44,13 @@ pub enum AdminGameDataRoute {
     NotFound,
 }
 
-fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
-    let mut global_vars = global_vars.clone();
+fn content_switch(routes: AdminGameDataRoute, site_vars: SiteVars) -> Html {
+    let mut site_vars = site_vars.clone();
 
-    if global_vars.current_user.id > 0 {
-        global_vars.current_sub_menu = "user".to_owned();
+    if site_vars.current_user.id > 0 {
+        site_vars.current_sub_menu = "user".to_owned();
     } else {
-        global_vars.current_sub_menu = "".to_owned();
+        site_vars.current_sub_menu = "".to_owned();
     }
 
     let sub_menu_items = get_game_data_submenu_items();
@@ -58,7 +58,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
     match routes {
         AdminGameDataRoute::Hindrances => html! {
             <AdminGameDataHindrances
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -66,7 +66,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::Edges => html! {
             <AdminGameDataEdges
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -74,7 +74,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::Gear => html! {
             <AdminGameDataGear
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -82,7 +82,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::GearEnhancements => html! {
             <AdminGameDataGearEnhancements
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -90,7 +90,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::Armor => html! {
             <AdminGameDataArmor
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -98,7 +98,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::Weapons => html! {
             <AdminGameDataWeapons
-                global_vars={global_vars}
+                site_vars={site_vars}
                 sub_menu_items={sub_menu_items}
 
             />
@@ -106,7 +106,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
         AdminGameDataRoute::NotFound => html! {
             <Error404
-                global_vars={global_vars}
+                site_vars={site_vars}
             />
         },
     }
@@ -114,7 +114,7 @@ fn content_switch(routes: AdminGameDataRoute, global_vars: GlobalVars) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct AdminGameDataRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 pub enum AdminGameDataRouterMessage {}
@@ -145,15 +145,15 @@ impl Component for AdminGameDataRouter {
     // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if ctx.props().global_vars.server_side_renderer {
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
+                .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
-            let global_vars = ctx.props().global_vars.clone();
+            let site_vars = ctx.props().site_vars.clone();
 
             html! {
 
@@ -166,7 +166,7 @@ impl Component for AdminGameDataRouter {
                                     move |routes|
                                     content_switch(
                                         routes,
-                                        global_vars.clone(),
+                                        site_vars.clone(),
                                     )
                                 }
                             />
@@ -174,7 +174,7 @@ impl Component for AdminGameDataRouter {
                     </Router>
             }
         } else {
-            let global_vars = ctx.props().global_vars.clone();
+            let site_vars = ctx.props().site_vars.clone();
 
             html! {
 
@@ -185,7 +185,7 @@ impl Component for AdminGameDataRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    site_vars.clone(),
                                 )
                             }
                         />

@@ -1,12 +1,14 @@
 // use gloo_console::log;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::menu_items::{get_menu_items, MenuItem};
+use savaged_libs::user::User;
 use standard_components::ui::nbsp::Nbsp;
-use yew::{function_component, html, Html, Properties};
+use web_sys::MouseEvent;
+use yew::{function_component, html, Html, Properties, Callback};
 
 #[derive(Properties, PartialEq)]
 pub struct MenuMobileProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
 }
 
 #[function_component(MenuMobile)]
@@ -15,18 +17,18 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
 
     html! {
         <div class={active_class}>
-            <ul onclick={props.global_vars.hide_popup_menus_callback.clone()} class={"main-menu"}>
-            {get_menu_items(&props.global_vars).into_iter().map( | menu | {
+            <ul onclick={props.site_vars.hide_popup_menus_callback.clone()} class={"main-menu"}>
+            {get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
 
-                // log!("&menu.sub_menu_tag.clone().unwrap() == &props.global_vars.current_menu", &menu.menu_tag.clone().unwrap(), &props.global_vars.current_menu);
-                // log!("&props.global_vars.current_sub_menu", &props.global_vars.current_sub_menu);
+                // log!("&menu.sub_menu_tag.clone().unwrap() == &props.site_vars.current_menu", &menu.menu_tag.clone().unwrap(), &props.site_vars.current_menu);
+                // log!("&props.site_vars.current_sub_menu", &props.site_vars.current_sub_menu);
                 // log!("&menu.sub_menu_tag.clone().unwrap()", &menu.sub_menu_tag.clone().unwrap());
-                // if user_can_see_menu_item( &props.global_vars.current_user, &menu)
+                // if user_can_see_menu_item( &props.site_vars.current_user, &menu)
                 // {
                     let mut li_class = "".to_string();
                     if menu.menu_tag != None
-                        && props.global_vars.current_sub_menu.is_empty()
-                        && &menu.menu_tag.clone().unwrap() == &props.global_vars.current_menu {
+                        && props.site_vars.current_sub_menu.is_empty()
+                        && &menu.menu_tag.clone().unwrap() == &props.site_vars.current_menu {
                         li_class = "active".to_string();
                     }
                     match &menu.link_class {
@@ -35,7 +37,7 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
                         }
                         None => {}
                     }
-                    let submenu = make_submenu( menu.clone(), props.global_vars.clone() );
+                    let submenu = make_submenu( menu.clone(), props.site_vars.current_sub_menu.clone(), props.site_vars.current_menu.clone() );
                     match menu.html {
                         Some( html ) => {
                             return html! {
@@ -70,7 +72,11 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
     }
 }
 
-fn make_submenu(menu: MenuItem, global_vars: GlobalVars) -> Html {
+fn make_submenu(
+    menu: MenuItem,
+    current_sub_menu: String,
+    current_menu: String,
+) -> Html {
     match &menu.submenu {
         Some(submenu_items) => {
             return html! {
@@ -82,8 +88,8 @@ fn make_submenu(menu: MenuItem, global_vars: GlobalVars) -> Html {
 
                 let mut li_class = "".to_string();
                 if sub_item.sub_menu_tag != None
-                    && !global_vars.current_sub_menu.is_empty()
-                    && sub_item.sub_menu_tag.unwrap() == global_vars.current_sub_menu
+                    && !current_sub_menu.is_empty()
+                    && sub_item.sub_menu_tag.unwrap() == current_sub_menu
                 {
                     li_class = "active".to_string();
                 }
@@ -99,7 +105,7 @@ fn make_submenu(menu: MenuItem, global_vars: GlobalVars) -> Html {
                             <li class={li_class} title={sub_item.title.clone()}>
                             {html}
                             // <br />{&sub_item.sub_menu_tag}
-                            // <br />{&props.global_vars.current_sub_menu}
+                            // <br />{&props.site_vars.current_sub_menu}
                             </li>
                         };
                     }

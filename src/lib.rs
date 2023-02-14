@@ -18,6 +18,7 @@ use crate::pages::user::register::Register;
 use pages::user::UserRouter;
 use savaged_libs::user::User;
 use savaged_libs::web_content::WebContent;
+use crate::libs::site_vars::SiteVars;
 use std::collections::HashMap;
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
@@ -66,18 +67,19 @@ pub struct SubmenuData {
 pub struct MainServerApp {}
 
 fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
+    let site_vars = global_vars.site_vars.clone();
     match routes {
         MainServerRoute::Home => {
             html! {
                 <MainHome
-                    global_vars={global_vars}
+                site_vars={site_vars}
                 />
             }
         }
         MainServerRoute::InfoRouter => {
             html! {
                 <InfoRouter
-                    global_vars={global_vars}
+                site_vars={site_vars}
                 />
             }
         }
@@ -86,6 +88,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
             html! {
                 <UserRouter
                     global_vars={global_vars}
+
                 />
             }
         }
@@ -93,7 +96,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::AdminRouter => {
             html! {
                 <AdminRouter
-                    global_vars={global_vars}
+                site_vars={site_vars}
                 />
             }
         }
@@ -101,14 +104,14 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::UserLogin => {
             html! {
                 <UserLogin
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                 />
             }
         }
         MainServerRoute::ForgotPassword => {
             html! {
                 <ForgotPassword
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -116,7 +119,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::Register => {
             html! {
                 <Register
-                    global_vars={global_vars}
+                    site_vars={site_vars}
 
                 />
             }
@@ -125,7 +128,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::NotFound => {
             html! {
                 <Error404
-                    global_vars={global_vars}
+                    site_vars={site_vars}
                 />
             }
         }
@@ -147,27 +150,9 @@ pub fn ServerApp(props: &ServerAppProps) -> Html {
 
 
     let global_vars_state = use_reducer(|| GlobalVars {
-        api_root: server_root.to_owned() + &"/_api",
-        current_menu: "".to_string(),
-        current_sub_menu: "".to_string(),
-        current_user: user,
         game_data: None,
-        hide_popup_menus_callback: Callback::noop(),
-        login_token: "".to_owned(),
-        logout_callback: Callback::noop(),
-        offline: true,
-        add_alert: Callback::noop(),
-        open_confirmation_dialog: Callback::noop(),
         saves: None,
-        send_websocket: Callback::noop(),
-        server_root: server_root.to_owned(),
-        server_side_renderer: true,
-        server_side_renderer_history: None,
-        show_mobile_menu: false,
-        site_title: "Savaged.us v4".to_owned(),
-        toggle_mobile_menu_callback: Callback::noop(),
-        update_global_vars: Callback::noop(),
-        user_loading: false,
+        site_vars:SiteVars::default(),
         web_content: Some(props.web_content.clone()),
     });
 
@@ -177,12 +162,18 @@ pub fn ServerApp(props: &ServerAppProps) -> Html {
 
     let mut global_vars: GlobalVars = (*global_vars_state).clone();
 
-    global_vars.server_side_renderer_history = Some(history.clone());
+    global_vars.site_vars.server_side_renderer_history = Some(history.clone());
+
+    let mut body_class = "".to_owned();
+    if global_vars.site_vars.current_user.id > 0 {
+        body_class = global_vars.site_vars.current_user.theme_css.to_owned();
+    }
+
     let callback_content = move |routes| content_switch(routes, global_vars.clone());
 
     html! {
 
-        <>
+        <div class={"theme-".to_owned() + &body_class.replace("_default_", "default")}>
             <Router
                 history={history}
             >
@@ -190,6 +181,6 @@ pub fn ServerApp(props: &ServerAppProps) -> Html {
             <Switch<MainServerRoute> render={callback_content} />
 
             </Router>
-        </>
+        </div>
     }
 }
