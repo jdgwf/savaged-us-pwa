@@ -58,7 +58,6 @@ pub fn standard_modal(props: &StandardModalProps) -> Html {
         None => {}
     }
 
-
     let mut add_button = html! {<></>};
     let mut save_button = html! {<></>};
     let mut close_cancel_callback = Callback::noop();
@@ -90,7 +89,6 @@ pub fn standard_modal(props: &StandardModalProps) -> Html {
         None => {}
     }
 
-
     match &props.save_callback {
         Some(cb) => {
             let the_callback = cb.clone();
@@ -110,7 +108,6 @@ pub fn standard_modal(props: &StandardModalProps) -> Html {
         }
         None => {}
     }
-
 
     let close_button = html! {
         <button
@@ -154,9 +151,7 @@ pub fn standard_modal(props: &StandardModalProps) -> Html {
         }
     }
 
-
     let mut modal_footer = html!(<></>);
-
 
     match &props.close_cancel_callback {
         Some(_close_cancel_callback) => {

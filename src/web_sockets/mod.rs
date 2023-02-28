@@ -28,81 +28,92 @@ impl WebsocketService {
             .replace("https://", "wss://")
             + &"/_ws".to_owned();
 
-        log!("server_root", &server_root);
-        log!("wss_url", &wss_url);
-        let ws: WebSocket = WebSocket::open(&wss_url).unwrap();
+        // log!("server_root", &server_root);
+        // log!("wss_url", &wss_url);
+        let ws_result = WebSocket::open(&wss_url);
 
-        let (mut write, mut read) = ws.split();
+        match ws_result {
+            Ok( ws ) => {
 
-        let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);
+                let (mut write, mut read) = ws.split();
 
-        let websocket_offline_callback_send = websocket_offline_callback.clone();
-        spawn_local(async move {
-            while let Some(s) = in_rx.next().await {
-                // log!("got event from channel! {}", &s);
-                write.send(Message::Text(s)).await.unwrap();
-                websocket_offline_callback_send.clone().emit(false);
-            }
-        });
+                let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);
 
-        // websocket_offline_callback.emit( false );
-
-        // spawn_local(async move {
-        //     send_ping( &mut &ws );
-        // });
-
-        let received_message_callback = received_message_callback.clone();
-        let websocket_offline_callback = websocket_offline_callback.clone();
-        spawn_local(async move {
-            while let Some(msg) = read.next().await {
-                match msg {
-                    Ok(Message::Text(val)) => {
-                        // log!("Message::Text", &val);
-                        received_message_callback.emit(val.to_string());
-                        websocket_offline_callback.emit(false);
+                let websocket_offline_callback_send = websocket_offline_callback.clone();
+                spawn_local(async move {
+                    while let Some(s) = in_rx.next().await {
+                        // log!("got event from channel! {}", &s);
+                        write.send(Message::Text(s)).await.unwrap();
+                        websocket_offline_callback_send.clone().emit(false);
                     }
+                });
 
-                    Ok(Message::Bytes(b)) => {
-                        let decoded = std::str::from_utf8(&b);
-                        if let Ok(val) = decoded {
-                            received_message_callback.emit(val.to_string());
+                // websocket_offline_callback.emit( false );
 
-                            websocket_offline_callback.emit(false);
+                // spawn_local(async move {
+                //     send_ping( &mut &ws );
+                // });
+
+                let received_message_callback = received_message_callback.clone();
+                let websocket_offline_callback = websocket_offline_callback.clone();
+                spawn_local(async move {
+                    while let Some(msg) = read.next().await {
+                        match msg {
+                            Ok(Message::Text(val)) => {
+                                // log!("Message::Text", &val);
+                                received_message_callback.emit(val.to_string());
+                                websocket_offline_callback.emit(false);
+                            }
+
+                            Ok(Message::Bytes(b)) => {
+                                let decoded = std::str::from_utf8(&b);
+                                if let Ok(val) = decoded {
+                                    received_message_callback.emit(val.to_string());
+
+                                    websocket_offline_callback.emit(false);
+                                }
+                            }
+
+                            Err(_e) => {
+                                //error!( format!)"ws: {:?}", e.to_string()) );
+                                error!("WebSocket connection failure - will try to reconnect periodically.");
+
+                                websocket_offline_callback.emit(true);
+                            }
                         }
                     }
+                    log!("WebSocket Closed...sleeping");
+                    let _ = sleep(Duration::from_secs(15)).await;
+                    log!("I'm awake, trying to reconnect...");
+                    websocket_offline_callback.emit(true);
+                });
 
-                    Err(_e) => {
-                        //error!( format!)"ws: {:?}", e.to_string()) );
-                        error!("WebSocket connection failure - will try to reconnect periodically.");
+                let mut msg = WebSocketMessage::default();
 
-                        websocket_offline_callback.emit(true);
+                msg.token = Some(login_token);
+                msg.kind = WebsocketMessageType::Online;
+
+                // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
+                let send_data_result = serde_json::to_string(&msg);
+
+                log!("MainWebAppMessages::SendWebSocket called");
+                match send_data_result {
+                    Ok(send_data) => {
+                        // write.send( send_data );
+                        let _ = in_tx.clone().try_send(send_data.to_owned());
                     }
+                    Err(_err) => {}
                 }
+                return Self { tx: in_tx };
             }
-            log!("WebSocket Closed...sleeping");
-            let _ = sleep(Duration::from_secs(15)).await;
-            log!("I'm awake, trying to reconnect...");
-            websocket_offline_callback.emit(true);
-        });
 
-        let mut msg = WebSocketMessage::default();
-
-        msg.token = Some(login_token);
-        msg.kind = WebsocketMessageType::Online;
-
-        // let global_vars_future_callback = ctx.link().callback( MainAppMessage::UpdateGlobalVars );
-        let send_data_result = serde_json::to_string(&msg);
-
-        // log!("MainWebAppMessages::SendWebSocket called");
-        match send_data_result {
-            Ok(send_data) => {
-                // write.send( send_data );
-                let _ = in_tx.clone().try_send(send_data.to_owned());
+            Err( err ) => {
+                error!( format!("Error opening web socket! {} {}", wss_url, err));
             }
-            Err(_err) => {}
         }
-
+        let (in_tx, mut in_rx) = futures::channel::mpsc::channel::<String>(1000);
         Self { tx: in_tx }
+
     }
 }
 

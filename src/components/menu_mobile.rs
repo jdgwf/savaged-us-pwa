@@ -1,6 +1,7 @@
 // use gloo_console::log;
 use crate::libs::site_vars::SiteVars;
-use crate::menu_items::{get_menu_items, MenuItem};
+use crate::menu_items::{get_menu_items,user_can_see_menu_item, MenuItem};
+
 use savaged_libs::user::User;
 use standard_components::ui::nbsp::Nbsp;
 use web_sys::MouseEvent;
@@ -18,7 +19,7 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
     html! {
         <div class={active_class}>
             <ul onclick={props.site_vars.hide_popup_menus_callback.clone()} class={"main-menu"}>
-            {get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
+            {get_menu_items(&props.site_vars).into_iter().map( | menu | {
 
                 // log!("&menu.sub_menu_tag.clone().unwrap() == &props.site_vars.current_menu", &menu.menu_tag.clone().unwrap(), &props.site_vars.current_menu);
                 // log!("&props.site_vars.current_sub_menu", &props.site_vars.current_sub_menu);
@@ -37,27 +38,31 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
                         }
                         None => {}
                     }
-                    let submenu = make_submenu( menu.clone(), props.site_vars.current_sub_menu.clone(), props.site_vars.current_menu.clone() );
-                    match menu.html {
-                        Some( html ) => {
-                            return html! {
-                                <li class={li_class} title={menu.title}>
-                                {html}
+                    let submenu = make_submenu( menu.clone(), &props.site_vars.current_user, props.site_vars.current_sub_menu.clone(), props.site_vars.current_menu.clone() );
+                    if menu.show_mobile && user_can_see_menu_item( &props.site_vars.current_user, &menu) {
+                        match menu.html {
+                            Some( html ) => {
+                                return html! {
+                                    <li class={li_class} title={menu.title}>
+                                    {html}
 
-                                {submenu}
-                                </li>
-                            };
-                        }
-                        None => {
-                            return html! {
-                                <li class={li_class} title={menu.title}>
-                                    <i class={menu.icon_class.clone()} /><Nbsp />
-                                    {menu.label}
                                     {submenu}
+                                    </li>
+                                };
+                            }
+                            None => {
+                                return html! {
+                                    <li class={li_class} title={menu.title}>
+                                        <i class={menu.icon_class.clone()} /><Nbsp />
+                                        {menu.label}
+                                        {submenu}
 
-                                </li>
-                            };
+                                    </li>
+                                };
+                            }
                         }
+                    } else {
+                        return html!{<></>}
                     }
 
                 // } else {
@@ -74,6 +79,7 @@ pub fn menu_mobile(props: &MenuMobileProps) -> Html {
 
 fn make_submenu(
     menu: MenuItem,
+    current_user: &User,
     current_sub_menu: String,
     current_menu: String,
 ) -> Html {
@@ -99,24 +105,29 @@ fn make_submenu(
                     }
                     None => {}
                 }
-                match sub_item.html.clone() {
-                    Some( html ) => {
-                        return html! {
-                            <li class={li_class} title={sub_item.title.clone()}>
-                            {html}
-                            // <br />{&sub_item.sub_menu_tag}
-                            // <br />{&props.site_vars.current_sub_menu}
-                            </li>
-                        };
+
+                if sub_item.show_mobile {
+                    match sub_item.html.clone() {
+                        Some( html ) => {
+                            return html! {
+                                <li class={li_class} title={sub_item.title.clone()}>
+                                {html}
+                                // <br />{&sub_item.sub_menu_tag}
+                                // <br />{&props.site_vars.current_sub_menu}
+                                </li>
+                            };
+                        }
+                        None => {
+                            return html! {
+                                <li class={li_class} title={sub_item.title.clone()}>
+                                    <i class={sub_item.icon_class.clone()} /><Nbsp />
+                                    {sub_item.label.clone()}
+                                </li>
+                            };
+                        }
                     }
-                    None => {
-                        return html! {
-                            <li class={li_class} title={sub_item.title.clone()}>
-                                <i class={sub_item.icon_class.clone()} /><Nbsp />
-                                {sub_item.label.clone()}
-                            </li>
-                        };
-                    }
+                } else {
+                    return html!{<></>}
                 }
                 }).collect::<Html>()}
                 </ul>

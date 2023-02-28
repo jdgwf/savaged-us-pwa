@@ -44,14 +44,12 @@ impl Component for EditWeaponProfile {
     fn update(&mut self, ctx: &Context<Self>, msg: EditWeaponProfileMessage) -> bool {
         match msg {
 
-
             EditWeaponProfileMessage::UpdateIntegratedWeapon(new_value) => {
 
                 self.weapon_profiles = new_value.clone();
                 ctx.props().weapon_profiles_updated.emit(self.weapon_profiles.clone());
                 return true;
             }
-
 
             EditWeaponProfileMessage::AddIntegratedWeapon( _event ) => {
                 self.weapon_profiles.push(
@@ -78,7 +76,6 @@ impl Component for EditWeaponProfile {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
 
         let mut description = html! {<></>};
         match &ctx.props().description {
@@ -146,7 +143,6 @@ name:  "".to_string(),
             skill_name:  "".to_string(),
             skill_value:  "".to_string(),
                     */
-
 
             if self.weapon_profiles.len() == 0 {
                 <div class="text-center">
@@ -230,7 +226,6 @@ name:  "".to_string(),
                                 <div class="row">
                                     <div class="col-md-6">
 
-
                                             // <SelectMinimumStrength
                                             //     label={"Minimum Strength"}
                                             //     readonly={read_only}
@@ -271,8 +266,6 @@ name:  "".to_string(),
                                                 }) }
                                             />
 
-
-
                                             <InputNumber
                                                 readonly={read_only}
                                                 label={"Armor Penetration (AP)"}
@@ -287,7 +280,6 @@ name:  "".to_string(),
                                                     update_profiles_callback_ap.emit(profile_ap)
                                                 }) }
                                             />
-
 
                                             <InputCheckbox
                                                 readonly={read_only}
@@ -315,8 +307,6 @@ name:  "".to_string(),
                                                 }) }
                                             />
 
-
-
                                             <InputText
                                                 readonly={read_only}
                                                 label={"Range"}
@@ -329,7 +319,6 @@ name:  "".to_string(),
                                                     update_profiles_callback_range.emit(profile_range)
                                                 }) }
                                             />
-
 
                                             // <InputNumber
                                             //     readonly={read_only}
@@ -424,7 +413,6 @@ name:  "".to_string(),
                 ).collect::<Html>()}
                 </>
             }
-
 
             </div>
         }

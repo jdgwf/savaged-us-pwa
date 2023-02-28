@@ -14,7 +14,7 @@ use web_sys::{DomException, Request, RequestInit, Response};
 static INDEX_DB_DB_NAME: &str = "savaged";
 static INDEX_DB_BOOKS_STORE_NAME: &str = "books";
 static INDEX_DB_SAVES_STORE_NAME: &str = "saves";
-static INDEX_DB_VERSION: u32 = 9;
+static INDEX_DB_VERSION: u32 = 10;
 
 #[derive(Debug)]
 pub struct GameDataSyncUpdateResults {
@@ -175,7 +175,7 @@ pub async fn index_db_put_save(server_root: String, save: SaveDBRow) -> SavesSyn
                 let (image_data, image_mime) = get_image_file(image_url).await;
 
                 // log!("image_data", image_data);
-                // log!("image_mime", image_mime);
+                // log!("image_mime", &image_mime);
 
                 edit_save.image_base64 = Some(image_data);
                 edit_save.image_base64_mime = Some(image_mime);
@@ -196,7 +196,7 @@ pub async fn index_db_put_save(server_root: String, save: SaveDBRow) -> SavesSyn
 
             let value_to_put: JsValue = serde_json::to_string(&edit_save).unwrap().into();
 
-            // log!( format!("value_to_put {:?}", value_to_put) );
+            // log!( format!("value_to_put {:?}", &value_to_put) );
             let err = store.put_key_val_owned(save.uuid.clone(), &value_to_put);
             match err {
                 Ok(_) => {
@@ -213,7 +213,7 @@ pub async fn index_db_put_save(server_root: String, save: SaveDBRow) -> SavesSyn
                     }
                 }
                 Err(_err) => {
-                    log!(format!(
+                    error!(format!(
                         "index_db_put_save store data error ID: {} / {:?}",
                         save.id, _err
                     ));
@@ -392,8 +392,9 @@ pub async fn index_db_save_game_data(game_data: GameDataPackage) -> GameDataSync
         Err(_err) => {}
     }
     /* Edges */
-    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
-    match db_req_result {
+
+    let db_req_result_edges = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result_edges {
         Ok(db_req) => {
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_game_data 3");
@@ -429,8 +430,8 @@ pub async fn index_db_save_game_data(game_data: GameDataPackage) -> GameDataSync
         Err(_err) => {}
     }
     /* Hindrances */
-    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
-    match db_req_result {
+    let db_req_result_hindrances = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result_hindrances {
         Ok(db_req) => {
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_game_data 4");
@@ -470,8 +471,8 @@ pub async fn index_db_save_game_data(game_data: GameDataPackage) -> GameDataSync
     }
 
     /* weapons */
-    let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
-    match db_req_result {
+    let db_req_result_weapons = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
+    match db_req_result_weapons {
         Ok(db_req) => {
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             // log!("index_db_save_game_data 4");
@@ -645,12 +646,13 @@ pub async fn index_db_save_game_data(game_data: GameDataPackage) -> GameDataSync
 //     Ok(())
 // }
 
-pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
-    log!("get_saves_from_index_db called");
+pub async fn index_db_get_saves() -> Option<Vec<SaveDBRow>> {
+    // log!("index_db_get_saves called");
     let db_req_result = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
     match db_req_result {
         Ok(mut db_req) => {
+            // log!("index_db_get_saves calling _create_tables");
             _create_tables(&mut db_req).await;
 
             // Saves.
@@ -670,6 +672,7 @@ pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
                 .ok_or_else(|| "need to pass iterable JS values!")
                 .unwrap();
 
+            // log!("index_db_get_saves calling iterator");
             for row_result in iterator {
                 match row_result {
                     Ok(row) => {
@@ -687,7 +690,7 @@ pub async fn get_saves_from_index_db() -> Option<Vec<SaveDBRow>> {
                     Err(_err) => {}
                 }
             }
-
+            // log!("index_db_get_saves finished");
             return Some(saves);
         }
         Err(_err) => {}
@@ -744,19 +747,17 @@ pub async fn clear_game_data_local_data() {
     clear_data_store("game_data_armor").await;
 }
 
-pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
+pub async fn index_db_get_game_data() -> Option<GameDataPackage> {
     let mut game_data = GameDataPackage::default();
-
-
 
     let db_req_result_books = IdbDatabase::open_u32(INDEX_DB_DB_NAME, INDEX_DB_VERSION);
 
     match db_req_result_books {
         Ok(mut db_req) => {
-            // log!("get_game_data_from_index_db CALLED");
+            // log!("index_db_get_game_data CALLED");
             _create_tables(&mut db_req).await;
 
-            // log!("get_game_data_from_index_db CALLED 2");
+            // log!("index_db_get_game_data CALLED 2");
             // Books.
             let db: IdbDatabase = db_req.into_future().await.unwrap();
             let tx = db.transaction_on_one(INDEX_DB_BOOKS_STORE_NAME).unwrap();
@@ -1056,6 +1057,7 @@ pub async fn get_game_data_from_index_db() -> Option<GameDataPackage> {
 pub async fn get_image_file(url: String) -> (String, String) {
     let mut opts = RequestInit::new();
 
+    // log!("get_image_file", &url);
     opts.method("GET");
 
     let request = Request::new_with_str_and_init(&url, &opts).unwrap();

@@ -17,13 +17,13 @@ use yew_router::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct UserSavesListProps {
     pub global_vars: GlobalVars,
-
 }
 
 pub enum UserSavesListMessage {
     ChangeFilter(String),
     ChangeFolder(String),
 }
+
 pub struct UserSavesList {}
 
 impl Component for UserSavesList {
@@ -90,7 +90,6 @@ impl Component for UserSavesList {
                 </UIPage>
             };
         }
-
 
         site_vars.current_sub_menu = "user-data-saves".to_owned();
         site_vars.current_menu = "main-my-stuff".to_owned();

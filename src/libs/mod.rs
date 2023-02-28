@@ -4,6 +4,7 @@ use yew::Callback;
 use web_sys;
 
 pub mod admin_api;
+pub mod data_api;
 pub mod fetch_api;
 pub mod global_vars;
 pub mod site_vars;

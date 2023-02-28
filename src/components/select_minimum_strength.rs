@@ -108,7 +108,6 @@ pub fn select_minimum_strength( props: &SelectMinimumStrengthProps) -> Html {
                 <option selected={props.value == "d12+11"} value="d12+11">{"d12+11"}</option>
                 <option selected={props.value == "d12+12"} value="d12+12">{"d12+12"}</option>
 
-
             </select>
 
             { for props.children.iter() }

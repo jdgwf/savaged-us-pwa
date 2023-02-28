@@ -23,7 +23,6 @@ pub fn info_todos(props: &InfoTodosProps) -> Html {
 
     <ContentBox label_html={title}>
 
-
             <div class={"row"}>
                 <div class={"col-md"}>
 

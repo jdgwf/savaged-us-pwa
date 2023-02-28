@@ -203,7 +203,7 @@ impl Component for SettingsPrivate {
 
                 let body_class = input.value();
 
-                set_local_storage_string( "UI_THEME", body_class.to_owned());
+                // set_local_storage_string( "UI_THEME", body_class.to_owned());
 
                 self.current_user.theme_css = body_class.to_owned();
 
@@ -258,8 +258,6 @@ impl Component for SettingsPrivate {
                     check_passwords(self.password.clone(), self.verify_password.clone());
                 true
             }
-
-
 
             SettingsPrivateMessage::UpdateFirstName(new_value) => {
                 self.first_name = new_value.to_owned();

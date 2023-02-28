@@ -72,7 +72,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::Home => {
             html! {
                 <MainHome
-                site_vars={site_vars}
+                    site_vars={site_vars}
                 />
             }
         }
@@ -132,22 +132,48 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
                 />
             }
         }
+
+
+        MainServerRoute::UserLogin => {
+            html! {
+                <UserLogin
+                    site_vars={site_vars}
+                    game_data={global_vars.game_data}
+                    saves={global_vars.saves}
+                />
+            }
+        }
+        MainServerRoute::ForgotPassword => {
+            html! {
+                <ForgotPassword
+                    site_vars={site_vars}
+
+                />
+            }
+        }
+        MainServerRoute::Register => {
+            html! {
+                <Register
+                    site_vars={site_vars}
+
+                />
+            }
+        }
     }
 }
 
 #[function_component]
 pub fn ServerApp(props: &ServerAppProps) -> Html {
-    let server_root = "https://v4.savaged.us".to_owned();
+    // let server_root = "https://v4.savaged.us".to_owned();
 
-    let mut user = User::default();
+    // let mut user = User::default();
 
-    match props.web_content.user.clone() {
-        Some( found_user ) => {
-            user = found_user;
-        }
-        None => {}
-    }
-
+    // match props.web_content.user.clone() {
+    //     Some( found_user ) => {
+    //         user = found_user;
+    //     }
+    //     None => {}
+    // }
 
     let global_vars_state = use_reducer(|| GlobalVars {
         game_data: None,
@@ -163,6 +189,7 @@ pub fn ServerApp(props: &ServerAppProps) -> Html {
     let mut global_vars: GlobalVars = (*global_vars_state).clone();
 
     global_vars.site_vars.server_side_renderer_history = Some(history.clone());
+    global_vars.site_vars.server_side_renderer = true;
 
     let mut body_class = "".to_owned();
     if global_vars.site_vars.current_user.id > 0 {

@@ -104,8 +104,6 @@ body {
             }
         }
 
-
-
         .content-holder {
             background-color: var(--body-bg-color);
             position: relative;
@@ -349,7 +347,7 @@ body {
 
                     &.mobile-menu-button {
                         display: inline;
-                        padding: 0 1rem;
+                        padding: 0;
                         svg {
                             height: 2rem;
                             cursor: pointer;
@@ -600,6 +598,7 @@ body {
         > div {
         .mobile-menu {
             left: -302px !important;
+            display: none;
         }
 
         header {
@@ -654,7 +653,7 @@ body {
                 display: flex;
                 text-align: center;
                 list-style: none;
-                margin: -1.4rem 0 1rem 0;
+                margin: -1rem 0 1rem 0;
                 padding: 0;
                 min-height: 2.5rem;
                 width: 100%;
@@ -669,8 +668,9 @@ body {
                         display: block;
                         background-color: var(--header-bg-color);
                         border: solid 2px var(--header-bg-color);
-                        border-bottom-right-radius: 1rem;
-                        border-bottom-left-radius: 1rem;
+                        // border-bottom-right-radius: 1rem;
+                        // border-bottom-left-radius: 1rem;
+                        border-radius: .5rem;
                         cursor: pointer;
                         margin: 0.25rem 0.125rem 0 0;
                         padding: 0.5rem 0.75rem;
@@ -678,7 +678,7 @@ body {
                         white-space: nowrap;
                         text-align: center;
                         color: var(--body-font-color);
-                        border-top-color: var(--header-bg-color) !important;
+                        // border-top-color: var(--header-bg-color) !important;
                         &:hover {
                             background-color: var(--borders-color-lighten);
                             border-color: var(--borders-color-lighten);

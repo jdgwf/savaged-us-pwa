@@ -1,4 +1,4 @@
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::admin::AdminRoute;
 use crate::pages::help::HelpRoute;
 use crate::pages::info::InfoRoute;
@@ -9,6 +9,7 @@ use web_sys::MouseEvent;
 use yew::{html, Html, Callback};
 use yew_router::prelude::Link;
 #[derive(Debug, Clone)]
+
 pub struct MenuItem {
     pub html: Option<Html>,
     pub registered_only: bool,
@@ -28,11 +29,13 @@ pub struct MenuItem {
     pub sub_menu_tag: Option<String>,
 
     pub hardcoded: bool,
+
+    pub show_mobile: bool,
+    pub show_main: bool,
 }
 
 pub fn get_menu_items(
-    current_user: &User,
-    logout_callback: Callback<MouseEvent>,
+    site_vars: &SiteVars,
 ) -> Vec<MenuItem> {
     let mut menu = vec![
         MenuItem {
@@ -50,7 +53,6 @@ pub fn get_menu_items(
             developer_only: false,
             admin_only: false,
 
-
             submenu: None,
 
             link_class: None,
@@ -62,91 +64,108 @@ pub fn get_menu_items(
 
             menu_tag: Some("main-home".to_owned()),
             sub_menu_tag: None,
+
+            show_mobile: true,
+            show_main: true,
         },
-        MenuItem {
-            hardcoded: false,
-            html: Some(html! {
-                <Link<UserRoute>
-                    to={UserRoute::UserSavesList}
-                >
-                    <i class="fa fa-boxes-stacked" /><Nbsp />
-                    {"My Stuff"}
-                </Link<UserRoute>>
-            }),
-            registered_only: true,
-            wildcard_only: false,
-            developer_only: false,
-            admin_only: false,
+    ];
 
-            link_class: None,
+    if site_vars.current_user.id > 0 {
+        menu.push(
+            MenuItem {
+                hardcoded: false,
+                html: Some(html! {
+                    <Link<UserRoute>
+                        to={UserRoute::UserSavesList}
+                    >
+                        <i class="fa fa-boxes-stacked" /><Nbsp />
+                        {"My Stuff"}
+                    </Link<UserRoute>>
+                }),
+                registered_only: true,
+                wildcard_only: false,
+                developer_only: false,
+                admin_only: false,
 
+                link_class: None,
 
-            title: "Your Data".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "My Stuff".to_owned(),
-            url: None,
+                title: "Your Data".to_owned(),
+                icon_class: None, // "fa fa-house".to_owned(),
+                label: "My Stuff".to_owned(),
+                url: None,
 
-            menu_tag: Some("main-my-stuff".to_owned()),
-            sub_menu_tag: None,
+                menu_tag: Some("main-my-stuff".to_owned()),
+                sub_menu_tag: None,
+                show_mobile: true,
+                show_main: true,
 
-            submenu: Some(vec![
-                MenuItem {
-                    hardcoded: false,
-                    html: Some(html! {
-                        <Link<UserRoute>
-                            to={UserRoute::UserSavesList}
-                        >
-                            <i class="fa fa-boxes-stacked" /><Nbsp />
-                            {"My Saves"}
-                        </Link<UserRoute>>
-                    }),
-                    registered_only: true,
-                    wildcard_only: false,
-                    developer_only: false,
-                    admin_only: false,
+                submenu: Some(vec![
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some(html! {
+                            <Link<UserRoute>
+                                to={UserRoute::UserSavesList}
+                            >
+                                <i class="fa fa-boxes-stacked" /><Nbsp />
+                                {"My Saves"}
+                            </Link<UserRoute>>
+                        }),
+                        registered_only: true,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
 
-                    submenu: None,
+                        submenu: None,
 
+                        link_class: None,
 
-                    link_class: None,
+                        title: "The My Saves Page".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "My Saves".to_owned(),
+                        url: None,
 
-                    title: "The My Saves Page".to_owned(),
-                    icon_class: None, // "fa fa-house".to_owned(),
-                    label: "My Saves".to_owned(),
-                    url: None,
+                        menu_tag: None,
+                        sub_menu_tag: Some("user-data-saves".to_owned()),
 
-                    menu_tag: None,
-                    sub_menu_tag: Some("user-data-saves".to_owned()),
-                },
-                MenuItem {
-                    hardcoded: false,
-                    html: Some(html! {
-                        <Link<UserRoute>
-                            to={UserRoute::UserCampaigns}
-                        >
-                            <i class="fa fa-dice" /><Nbsp />
-                            {"Campaigns"}
-                        </Link<UserRoute>>
-                    }),
-                    registered_only: true,
-                    wildcard_only: false,
-                    developer_only: false,
-                    admin_only: false,
+                        show_mobile: true,
+                        show_main: true,
+                    },
+                    MenuItem {
+                        hardcoded: false,
+                        html: Some(html! {
+                            <Link<UserRoute>
+                                to={UserRoute::UserCampaigns}
+                            >
+                                <i class="fa fa-dice" /><Nbsp />
+                                {"Campaigns"}
+                            </Link<UserRoute>>
+                        }),
+                        registered_only: true,
+                        wildcard_only: false,
+                        developer_only: false,
+                        admin_only: false,
 
-                    submenu: None,
+                        submenu: None,
 
-                    link_class: None,
+                        link_class: None,
 
-                    title: "The Campaigns Page".to_owned(),
-                    icon_class: None, // "fa fa-house".to_owned(),
-                    label: "Campaigns".to_owned(),
-                    url: None,
+                        title: "The Campaigns Page".to_owned(),
+                        icon_class: None, // "fa fa-house".to_owned(),
+                        label: "Campaigns".to_owned(),
+                        url: None,
 
-                    menu_tag: None,
-                    sub_menu_tag: Some("user-data-campaigns".to_owned()),
-                },
-            ]),
-        },
+                        menu_tag: None,
+                        sub_menu_tag: Some("user-data-campaigns".to_owned()),
+
+                        show_mobile: true,
+                        show_main: true,
+                    },
+                ]),
+            },
+        );
+    }
+
+    menu.push(
         MenuItem {
             hardcoded: false,
             html: Some(html! {
@@ -168,6 +187,9 @@ pub fn get_menu_items(
             url: None,
             menu_tag: Some("main-info".to_owned()),
             sub_menu_tag: None,
+
+            show_mobile: true,
+            show_main: true,
 
             submenu: Some(vec![
                 MenuItem {
@@ -194,6 +216,9 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("info-about".to_owned()),
+
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -220,6 +245,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("info-contact-us".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -246,6 +273,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("info-partners".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -272,6 +301,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("info-privacy-policy".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -298,6 +329,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("info-tech".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -325,9 +358,13 @@ pub fn get_menu_items(
 
                     menu_tag: None,
                     sub_menu_tag: Some("info-todos".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
             ]),
-        },
+        }
+    );
+    menu.push(
         MenuItem {
             hardcoded: false,
             html: Some(html! {
@@ -349,7 +386,8 @@ pub fn get_menu_items(
             url: None,
             menu_tag: Some("main-help".to_owned()),
             sub_menu_tag: None,
-
+            show_mobile: true,
+            show_main: true,
             submenu: Some(vec![
                 MenuItem {
                     hardcoded: false,
@@ -375,6 +413,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-home".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -400,6 +440,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-registration".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -425,6 +467,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-saves".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -450,6 +494,9 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-characters".to_owned()),
+
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -475,6 +522,8 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-campaigns".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -500,230 +549,285 @@ pub fn get_menu_items(
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("help-vehicles".to_owned()),
+                    show_mobile: true,
+                    show_main: true,
                 },
             ]),
         },
-    ];
-
-    menu = _add_admin_tab(&current_user, menu);
-
-    menu.push(
-
-        MenuItem {
-            hardcoded: true,
-
-            html: Some( html!{
-                <Link<UserRoute>
-                    to={UserRoute::SettingsPrivate}
-                >
-                    <i class={"fa-solid fa-cogs"}></i><Nbsp />
-                    {"User Settings"}
-                </Link<UserRoute>>
-            }),
-            registered_only: true,
-            wildcard_only: true,
-            developer_only: true,
-            admin_only: true,
-
-            link_class: None,
-
-            title: "Settings".to_owned(),
-            icon_class: None, // "fa fa-house".to_owned(),
-            label: "Settings".to_owned(),
-            url: None,
-
-            menu_tag: Some("main-user-login".to_owned()),
-            sub_menu_tag: None,
-
-            submenu: Some(
-                vec![
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute>
-                                to={UserRoute::SettingsPrivate}
-                            >
-                                <i class={"fa-solid fa-user-secret"}></i><Nbsp />
-                                {"Private Settings"}
-                            </Link<UserRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-
-                        link_class: None,
-
-                        submenu: None,
-
-                        title: "The Private Settings Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Private Settings".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-private".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute>
-                                to={UserRoute::SettingsPublic}
-                            >
-                                <i class={"fa-solid fa-globe"}></i><Nbsp />
-                                {"Public Settings"}
-                            </Link<UserRoute>>
-                        }),
-                        registered_only: false,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-
-                        link_class: None,
-
-                        submenu: None,
-
-                        title: "The Public Settings Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Public Settings".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-public".to_owned()),
-                    },
-
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute> to={UserRoute::Notifications}>
-                                <i class={"fa-solid fa-radio"}></i><Nbsp />{"Notifications"}
-
-                                if current_user.unread_notifications > 0 {
-                                    <>
-                                        <div class={"notification-spacer"} />
-                                        <div id="unread-notifications" class={"unread-notifications"}>
-                                            {current_user.unread_notifications}
-                                        </div>
-
-                                    </>
-                                }
-
-                            </Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-                        link_class: None,
-
-
-                        submenu: None,
-
-                        title: "The Notifications Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Notifications".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-notifications".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute> to={UserRoute::Subscription}><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"Subscriptions"}</Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-                        link_class: None,
-
-
-                        submenu: None,
-
-                        title: "The Subscription Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Subscription".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-subscription".to_owned()),
-                    },
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute> to={UserRoute::Devices}><i class={"fa-solid fa-computer"}></i><Nbsp />{"Devices"}</Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-
-
-                        link_class: None,
-
-                        submenu: None,
-
-                        title: "The Devices Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Devices Settings".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-devices".to_owned()),
-                    },
-
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <Link<UserRoute> to={UserRoute::SettingsAPIKey}><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</Link<UserRoute>>
-                        }),
-                        registered_only: true,
-                        wildcard_only: true,
-                        developer_only: false,
-                        admin_only: false,
-
-
-                        link_class: None,
-
-                        submenu: None,
-
-                        title: "The API Key Page".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "API Key".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-apikey".to_owned()),
-                    },
-
-                    MenuItem {
-                        hardcoded: false,
-                        html: Some( html!{
-                            <a href="#" onclick={&logout_callback}><i class={"fa-solid fa-sign-out"}></i><Nbsp />{"Logout"}</a>
-                        }),
-                        registered_only: true,
-                        wildcard_only: false,
-                        developer_only: false,
-                        admin_only: false,
-
-                        link_class: Some("logout-item".to_string()),
-
-                        submenu: None,
-
-                        title: "Click here to log out".to_owned(),
-                        icon_class: None, // "fa fa-house".to_owned(),
-                        label: "Logout".to_owned(),
-                        url: None,
-
-                        menu_tag: None,
-                        sub_menu_tag: Some("settings-logout".to_owned()),
-                    },
-                ]
-            ),
-
-        },
     );
+
+    menu = _add_admin_tab(&site_vars.current_user, menu);
+
+    if site_vars.current_user.id > 0 {
+        menu.push(
+
+            MenuItem {
+                hardcoded: true,
+
+                html: Some( html!{
+                    <Link<UserRoute>
+                        to={UserRoute::SettingsPrivate}
+                    >
+                        <i class={"fa-solid fa-cogs"}></i><Nbsp />
+                        {"User Settings"}
+                    </Link<UserRoute>>
+                }),
+                registered_only: true,
+                wildcard_only: true,
+                developer_only: true,
+                admin_only: true,
+
+                link_class: None,
+
+                title: "Settings".to_owned(),
+                icon_class: None, // "fa fa-house".to_owned(),
+                label: "Settings".to_owned(),
+                url: None,
+
+                menu_tag: Some("main-user-login".to_owned()),
+                sub_menu_tag: None,
+                show_mobile: true,
+                show_main: true,
+                submenu: Some(
+                    vec![
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute>
+                                    to={UserRoute::SettingsPrivate}
+                                >
+                                    <i class={"fa-solid fa-user-secret"}></i><Nbsp />
+                                    {"Private Settings"}
+                                </Link<UserRoute>>
+                            }),
+                            registered_only: false,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The Private Settings Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Private Settings".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-private".to_owned()),
+                            show_mobile: true,
+                            show_main: true,
+                        },
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute>
+                                    to={UserRoute::SettingsPublic}
+                                >
+                                    <i class={"fa-solid fa-globe"}></i><Nbsp />
+                                    {"Public Settings"}
+                                </Link<UserRoute>>
+                            }),
+                            registered_only: false,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The Public Settings Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Public Settings".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-public".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute> to={UserRoute::Notifications}>
+                                    <i class={"fa-solid fa-radio"}></i><Nbsp />{"Notifications"}
+
+                                    if site_vars.current_user.unread_notifications > 0 {
+                                        <>
+                                            <div class={"notification-spacer"} />
+                                            <div id="unread-notifications" class={"unread-notifications"}>
+                                                {site_vars.current_user.unread_notifications}
+                                            </div>
+
+                                        </>
+                                    }
+
+                                </Link<UserRoute>>
+                            }),
+                            registered_only: true,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The Notifications Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Notifications".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-notifications".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute> to={UserRoute::Subscription}><i class={"fa-solid fa-credit-card"}></i><Nbsp />{"Subscriptions"}</Link<UserRoute>>
+                            }),
+                            registered_only: true,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The Subscription Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Subscription".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-subscription".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute> to={UserRoute::Devices}><i class={"fa-solid fa-computer"}></i><Nbsp />{"Devices"}</Link<UserRoute>>
+                            }),
+                            registered_only: true,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The Devices Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Devices Settings".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-devices".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <Link<UserRoute> to={UserRoute::SettingsAPIKey}><i class={"fa-solid fa-key"}></i><Nbsp />{"API Key"}</Link<UserRoute>>
+                            }),
+                            registered_only: true,
+                            wildcard_only: true,
+                            developer_only: false,
+                            admin_only: false,
+
+                            link_class: None,
+
+                            submenu: None,
+
+                            title: "The API Key Page".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "API Key".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-apikey".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+
+                        MenuItem {
+                            hardcoded: false,
+                            html: Some( html!{
+                                <a href="#" onclick={site_vars.logout_callback.to_owned()}><i class={"fa-solid fa-sign-out"}></i><Nbsp />{"Logout"}</a>
+                            }),
+                            registered_only: true,
+                            wildcard_only: false,
+                            developer_only: false,
+                            admin_only: false,
+
+                            link_class: Some("logout-item".to_string()),
+
+                            submenu: None,
+
+                            title: "Click here to log out".to_owned(),
+                            icon_class: None, // "fa fa-house".to_owned(),
+                            label: "Logout".to_owned(),
+                            url: None,
+
+                            menu_tag: None,
+                            sub_menu_tag: Some("settings-logout".to_owned()),
+
+                            show_mobile: true,
+                            show_main: true,
+                        },
+                    ]
+                ),
+
+            },
+        );
+    } else {
+        menu.push(
+            MenuItem {
+                hardcoded: false,
+                show_mobile: true,
+                show_main: false,
+                html: Some(html! {
+                    <Link<MainRoute>
+                        to={MainRoute::UserLogin}
+                    >
+                        <i class="fa fa-sign-in" /><Nbsp />
+                        {"Login/Logout"}
+                    </Link<MainRoute>>
+                }),
+                registered_only: false,
+                wildcard_only: false,
+                developer_only: false,
+                admin_only: false,
+
+                submenu: None,
+
+                link_class: None,
+
+                title: "Login/Logout".to_owned(),
+                icon_class: None, // "fa fa-house".to_owned(),
+                label: "Login/Logout".to_owned(),
+                url: None,
+
+                sub_menu_tag: None,
+
+                menu_tag: Some("settings-login".to_owned()),
+
+            },
+        );
+    }
 
     return menu;
 }
@@ -746,13 +850,15 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
             admin_only: false,
             link_class: None,
 
-
             title: "The Administration Section".to_owned(),
             icon_class: None, // "fa fa-house".to_owned(),
             label: "Admin".to_owned(),
             url: None,
             menu_tag: Some("main-admin".to_owned()),
             sub_menu_tag: None,
+
+            show_mobile: true,
+            show_main: true,
 
             submenu: Some(vec![
                 MenuItem {
@@ -771,7 +877,6 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
                     admin_only: false,
                     link_class: None,
 
-
                     submenu: None,
 
                     title: "Administration Home".to_owned(),
@@ -780,6 +885,9 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("admin-home".to_owned()),
+
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -799,13 +907,15 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
 
                     submenu: None,
 
-
                     title: "Users Administration".to_owned(),
                     icon_class: None, // "fa fa-house".to_owned(),
                     label: "Users".to_owned(),
                     url: None,
                     menu_tag: None,
                     sub_menu_tag: Some("admin-users".to_owned()),
+
+                    show_mobile: true,
+                    show_main: true,
                 },
                 MenuItem {
                     hardcoded: false,
@@ -823,7 +933,6 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
                     admin_only: false,
                     link_class: None,
 
-
                     title: "Game Data Administration".to_owned(),
                     icon_class: None, // "fa fa-house".to_owned(),
                     label: "Game Data".to_owned(),
@@ -832,6 +941,9 @@ fn _add_admin_tab(current_user: &User, mut menu: Vec<MenuItem>) -> Vec<MenuItem>
                     sub_menu_tag: Some("admin-game-data".to_owned()),
 
                     submenu: None,
+
+                    show_mobile: true,
+                    show_main: true,
                 },
             ]),
         });

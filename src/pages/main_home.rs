@@ -37,7 +37,6 @@ impl Component for MainHome {
                 page_title="Home"
             >
 
-
             <div class="row home-points">
             <div class="col-md-6"></div>
             <div class="col-md-6">
@@ -104,7 +103,7 @@ impl Component for MainHome {
                 //         let mut msg = WebSocketMessage::default();
 
                 //         msg.token = login_token_send;
-                //         msg.kind = WebsocketMessageType::GameDataPackage;
+                //         msg.kind = WebsocketMessageType::GameDataPackageUpdated;
 
                 //         site_vars.send_websocket.emit( msg );
                 //     }}
@@ -125,7 +124,7 @@ impl Component for MainHome {
                 //         let mut msg = WebSocketMessage::default();
 
                 //         msg.token = login_token_send;
-                //         msg.kind = WebsocketMessageType::Saves;
+                //         msg.kind = WebsocketMessageType::SavesUpdated;
 
                 //         site_vars2.send_websocket.emit( msg );
                 //     }}

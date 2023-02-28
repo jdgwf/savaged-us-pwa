@@ -19,7 +19,6 @@ use yew::prelude::*;
 
 use super::weapon_profile::EditWeaponProfile;
 
-
 #[derive(Properties, PartialEq)]
 pub struct EditWeaponProps {
     pub site_vars: SiteVars,
@@ -276,7 +275,6 @@ impl Component for EditWeapon {
         let weapon_profiles = self.edit_item.profiles.clone();
         let update_weapon_profiles = ctx.link().callback(EditWeaponMessage::UpdateWeaponProfiles);
 
-
         html! {
             <div class="edit-form">
             {header}
@@ -363,7 +361,6 @@ impl Component for EditWeapon {
                 </fieldset>
             }
 
-
             if current_page.as_str() == "profiles" || current_page.as_str() == "__all__"  {
                 <fieldset class={"fieldset"}>
                     <legend>{"Weapon Profiles"}</legend>
@@ -381,8 +378,6 @@ impl Component for EditWeapon {
 
                         }
                     />
-
-
 
                 </fieldset>
             }

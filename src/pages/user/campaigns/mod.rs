@@ -7,8 +7,6 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct UserCampaignsProps {
 
-
-
     // pub update_site_vars: Callback<SiteVars>,
     pub global_vars: GlobalVars,
     // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,

@@ -5,7 +5,7 @@ use crate::components::edit_forms::hindrance::EditHindrance;
 use crate::components::edit_forms::weapon::EditWeapon;
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
-use crate::local_storage::{get_saves_from_index_db, index_db_put_save};
+use crate::local_storage::{index_db_get_saves, index_db_put_save};
 use crate::pages::error404::Error404;
 use crate::pages::user::UserRoute;
 use chrono::Utc;
@@ -27,8 +27,6 @@ use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesEditProps {
-
-
 
     #[prop_or_default]
     pub new_save_type: Option<String>,
@@ -231,8 +229,6 @@ impl Component for UserSavesEdit {
             }
         }
 
-        // log!( format!("editing_hindrance {:?}", editing_hindrance ));
-
         UserSavesEdit {
             save: save_option,
 
@@ -250,9 +246,9 @@ impl Component for UserSavesEdit {
     fn update(&mut self, ctx: &Context<Self>, msg: UserSavesEditMessage) -> bool {
         match msg {
             UserSavesEditMessage::UpdateHindrance(new_value) => {
-                // log!("ChangeFilter", filter_type);
                 self.editing_hindrance = Some(new_value);
             }
+
             UserSavesEditMessage::SaveHindrance(_new_value) => {
                 let editing_hindrance = self.editing_hindrance.clone();
                 let mut save = self.save.clone().unwrap();
@@ -261,18 +257,18 @@ impl Component for UserSavesEdit {
                     Some(editing_hindrance) => {
                         let item = editing_hindrance.clone();
                         let server_root = ctx.props().global_vars.site_vars.server_root.clone();
-                        let mut site_vars = ctx.props().global_vars.site_vars.clone();
-                        let update_site_vars = ctx.props().global_vars.site_vars.update_site_vars.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = site_vars.current_user.id;
+                        save.updated_by = global_vars.site_vars.current_user.id;
                         close_callback(true);
-                        // let saves = ctx.props().saves.clone();
+
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            let saves = get_saves_from_index_db().await;
-                            update_site_vars.emit(site_vars);
+                            global_vars.saves = index_db_get_saves().await;
+                            update_global_vars.emit(global_vars);
                         });
                         self.close_and_cancel();
                     }
@@ -281,7 +277,6 @@ impl Component for UserSavesEdit {
             }
 
             UserSavesEditMessage::UpdateArmor(new_value) => {
-                // log!("ChangeFilter", filter_type);
                 self.editing_armor = Some(new_value);
             }
 
@@ -292,18 +287,18 @@ impl Component for UserSavesEdit {
                 match editing_armor {
                     Some(editing_armor) => {
                         let item = editing_armor.clone();
-                        let server_root = ctx.props().global_vars.site_vars.server_root.clone();
-                        let mut site_vars = ctx.props().global_vars.site_vars.clone();
-                        let update_global_vars = ctx.props().global_vars.site_vars.update_global_vars.clone();
+                        let mut global_vars = ctx.props().global_vars.clone();
+                        let server_root = global_vars.site_vars.server_root.clone();
+                        let update_global_vars = global_vars.site_vars.update_global_vars.clone();
                         save.data = serde_json::to_string(&item).unwrap();
                         save.name = item.name;
                         save.updated_on = Some(Utc::now());
-                        save.updated_by = site_vars.current_user.id;
+                        save.updated_by = global_vars.site_vars.current_user.id;
                         close_callback(true);
-                        let mut global_vars = ctx.props().global_vars.clone();
+
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            global_vars.saves = get_saves_from_index_db().await;
+                            global_vars.saves = index_db_get_saves().await;
                             update_global_vars.emit(global_vars);
                         });
                         self.close_and_cancel();
@@ -313,9 +308,9 @@ impl Component for UserSavesEdit {
             }
 
             UserSavesEditMessage::UpdateGear(new_value) => {
-                // log!("ChangeFilter", filter_type);
                 self.editing_gear = Some(new_value);
             }
+
             UserSavesEditMessage::SaveGear(_new_value) => {
                 let editing_gear = self.editing_gear.clone();
                 let mut save = self.save.clone().unwrap();
@@ -333,7 +328,7 @@ impl Component for UserSavesEdit {
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            global_vars.saves = get_saves_from_index_db().await;
+                            global_vars.saves = index_db_get_saves().await;
                             update_global_vars.emit(global_vars);
                         });
                         self.close_and_cancel();
@@ -343,9 +338,9 @@ impl Component for UserSavesEdit {
             }
 
             UserSavesEditMessage::UpdateWeapon(new_value) => {
-                // log!("ChangeFilter", filter_type);
                 self.editing_weapon = Some(new_value);
             }
+
             UserSavesEditMessage::SaveWeapon(_new_value) => {
                 let editing_weapon = self.editing_weapon.clone();
                 let mut save = self.save.clone().unwrap();
@@ -363,7 +358,7 @@ impl Component for UserSavesEdit {
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            global_vars.saves = get_saves_from_index_db().await;
+                            global_vars.saves = index_db_get_saves().await;
                             update_global_vars.emit(global_vars);
                         });
                         self.close_and_cancel();
@@ -373,9 +368,9 @@ impl Component for UserSavesEdit {
             }
 
             UserSavesEditMessage::UpdateEdge(new_value) => {
-                // log!("ChangeFilter", filter_type);
                 self.editing_edge = Some(new_value);
             }
+
             UserSavesEditMessage::SaveEdge(_new_value) => {
                 let editing_edge = self.editing_edge.clone();
                 let mut save = self.save.clone().unwrap();
@@ -393,7 +388,7 @@ impl Component for UserSavesEdit {
                         close_callback(true);
                         spawn_local(async move {
                             index_db_put_save(server_root, save).await;
-                            global_vars.saves = get_saves_from_index_db().await;
+                            global_vars.saves = index_db_get_saves().await;
                             update_global_vars.emit(global_vars);
                         });
                         self.close_and_cancel();
@@ -403,12 +398,8 @@ impl Component for UserSavesEdit {
             }
 
             UserSavesEditMessage::Cancel(_new_value) => {
-                // log!("Cancel called");
                 self.close_and_cancel();
-            } // UserSavesEditMessage::ChangeFolder( folder_name ) => {
-              //     // log!("ChangeFolder", folder);
-              //     set_local_storage_string( "saves_folder", folder_name);
-              // }
+            }
         }
         true
     }

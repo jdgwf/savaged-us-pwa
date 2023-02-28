@@ -69,7 +69,6 @@ pub enum EditArmorMessage {
     UpdateArmor( f32 ),
     UpdateToughness( f32 ),
 
-
     UpdateAbilities(Vec<String>),
 
     UpdateCoversHead(bool),
@@ -118,7 +117,6 @@ impl Component for EditArmor {
 
     fn update(&mut self, ctx: &Context<Self>, msg: EditArmorMessage) -> bool {
         match msg {
-
 
             EditArmorMessage::UpdateIntegratedWeapon(new_value) => {
 
@@ -626,7 +624,6 @@ impl Component for EditArmor {
                                 onchange={ ctx.link().callback( EditArmorMessage::UpdateSize) }
                             />
 
-
                         </div>
                     </div>
 
@@ -638,7 +635,6 @@ impl Component for EditArmor {
                     // />
                 </fieldset>
             }
-
 
             if current_page.as_str() == "protection" || current_page.as_str() == "__all__" {
 
@@ -682,7 +678,6 @@ impl Component for EditArmor {
                                     onchange={ctx.link().callback( EditArmorMessage::UpdateRequiresTwoHands )}
                                 />
 
-
                             </div>
                         </div>
                     </fieldset>
@@ -712,7 +707,6 @@ impl Component for EditArmor {
                                     value={self.edit_item.toughness as f32}
                                     onchange={ ctx.link().callback( EditArmorMessage::UpdateToughness) }
                                 />
-
 
                             </div>
                             <div class="col-md-4 text-center">
@@ -776,15 +770,11 @@ impl Component for EditArmor {
                                     onchange={ctx.link().callback( EditArmorMessage::UpdateArmorStacks )}
                                 />
 
-
-
-
                             </div>
                         </div>
                     </fieldset>
                 }
             }
-
 
             if current_page.as_str() == "effects" || current_page.as_str() == "__all__"  {
                 <fieldset class={"fieldset"}>
@@ -824,7 +814,6 @@ impl Component for EditArmor {
                             value={self.edit_item.pace as f32}
                             onchange={ ctx.link().callback( EditArmorMessage::UpdatePace) }
                         />
-
 
                     </div>
                     <div class="col-md-4">
@@ -866,8 +855,6 @@ impl Component for EditArmor {
 
                         }
                     />
-
-
 
                 </fieldset>
             }

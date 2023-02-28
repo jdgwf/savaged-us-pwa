@@ -54,7 +54,6 @@ pub enum EditGearEnhancementMessage {
     UpdateActive(bool),
     UpdateNoSelect(bool),
 
-
     UpdateForArmor(bool),
     UpdateForAmmo(bool),
     UpdateForShield(bool),
@@ -251,7 +250,6 @@ impl Component for EditGearEnhancement {
                 separate: false,
             },
         ];
-
 
         if self.edit_item.for_ammo {
             sub_menu_items.push(

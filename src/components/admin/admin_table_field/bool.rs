@@ -21,7 +21,6 @@ pub fn admin_table_field_bool(props: &AdminTableFieldBoolProps) -> Html {
         td_class = td_class + &" " + &props.td_class;
     }
 
-
     let mut row_span = props.rowspan;
     if row_span < 1 {
         row_span = 1;

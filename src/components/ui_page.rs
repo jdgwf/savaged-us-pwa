@@ -29,6 +29,8 @@ pub fn ui_page(props: &UIPageProps) -> Html {
         );
     }
 
+    let toggle_mobile_menu_callback = props.site_vars.toggle_mobile_menu_callback.clone();
+
     // let on_click_toggle_mobile_menu = Callback::from( move | _e: MouseEvent | {
     //     // toggle_mobile_menu.emit( true );
     // });
@@ -62,7 +64,8 @@ pub fn ui_page(props: &UIPageProps) -> Html {
             </div>
             <h1>{"Savaged.us v4"}</h1>
             <MenuMain
-                site_vars={props.site_vars.to_owned()}
+                toggle_mobile_menu_callback={toggle_mobile_menu_callback}
+                site_vars={props.site_vars.clone()}
             />
             // <div class={"width-limit"}>
             //     // {submenu}
@@ -73,7 +76,7 @@ pub fn ui_page(props: &UIPageProps) -> Html {
 
             <div class={mobile_active_class}>
                 <MenuMobile
-                    site_vars={props.site_vars.to_owned()}
+                    site_vars={props.site_vars.clone()}
                 />
             </div>
 
@@ -83,11 +86,13 @@ pub fn ui_page(props: &UIPageProps) -> Html {
 
                     { for props.children.iter() }
 
-
                 </div>
             </div>
         </div>
-        <footer class="text-center">{("Using server ").to_owned() + &props.site_vars.server_root}</footer>
+        <footer class="text-center">
+            {("Using server ").to_owned() + &props.site_vars.server_root}<br />
+            {("Version ").to_owned() + &props.site_vars.app_version}<br />
+        </footer>
         </>
     }
 }

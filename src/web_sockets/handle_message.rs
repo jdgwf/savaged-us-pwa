@@ -1,12 +1,15 @@
+use crate::libs::data_api::get_game_data;
+use crate::libs::data_api::get_saves;
 use crate::libs::global_vars::GlobalVars;
 use crate::libs::site_vars::SiteVars;
 use crate::local_storage::clear_all_local_data;
 use crate::local_storage::clear_game_data_local_data;
-use crate::local_storage::get_game_data_from_index_db;
-use crate::local_storage::get_saves_from_index_db;
+use crate::local_storage::index_db_get_game_data;
+use crate::local_storage::index_db_get_saves;
 use crate::local_storage::index_db_save_game_data;
 use crate::local_storage::index_db_save_saves;
 use gloo_console::error;
+use gloo_console::log;
 use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
@@ -23,82 +26,115 @@ pub fn handle_message(
     if global_vars.site_vars.server_side_renderer {
         return;
     }
-    // log!(format!("handle_message called"));
+    // log!(format!("handle_message called {:?}", msg.kind));
     match msg.kind {
         WebsocketMessageType::Online => {
             // log!(format!("handle_message Online"));
-            let mut new_global_vars = global_vars.clone();
-            new_global_vars.site_vars.offline = false;
-            new_global_vars.site_vars.user_loading = false;
+            // let mut new_global_vars = global_vars.clone();
+            // new_global_vars.site_vars.offline = false;
+            // new_global_vars.site_vars.user_loading = false;
 
-            new_global_vars.web_content = msg.web_content;
-            match msg.user {
-                Some(user) => {
-                    // log!( format!("user {} {}", user.id, user.unread_notifications));
-                    new_global_vars.site_vars.current_user = user.clone();
+            // new_global_vars.web_content = msg.web_content;
+            // match msg.user {
+            //     Some(user) => {
+            //         // log!( format!("user {} {}", user.id, user.unread_notifications));
+            //         new_global_vars.site_vars.current_user = user.clone();
 
-                }
-                None => {}
-            }
+            //     }
+            //     None => {}
+            // }
 
-            if new_global_vars.site_vars.current_user.id > 0 {
-                let mut global_vars_future = new_global_vars.clone();
-                spawn_local(async move {
-                    global_vars_future.game_data = get_game_data_from_index_db().await;
-                    global_vars_future.saves = get_saves_from_index_db().await;
+            // let mut global_vars_future = new_global_vars.clone();
+            // if new_global_vars.site_vars.current_user.id > 0 {
 
-                    update_global_vars.emit(global_vars_future);
-                });
-                set_local_storage_string( "UI_THEME", new_global_vars.site_vars.current_user.theme_css.to_owned());
-            } else {
+            //     // set_local_storage_string( "UI_THEME", new_global_vars.site_vars.current_user.theme_css.to_owned());
 
-                set_local_storage_string( "UI_THEME", "_default_".to_string());
+            //     spawn_local(async move {
+            //         global_vars_future.game_data = index_db_get_game_data().await;
+            //         global_vars_future.saves = index_db_get_saves().await;
 
-                let mut global_vars_future = new_global_vars.clone();
-                spawn_local(async move {
-                    global_vars_future.game_data = get_game_data_from_index_db().await;
-                    global_vars_future.saves = get_saves_from_index_db().await;
+            //         // let saves = global_vars_future.clone().saves.unwrap_or(Vec::new());
+            //         // let game_data = &global_vars_future
+            //         //     .clone()
+            //         //     .game_data
+            //         //     .unwrap_or(GameDataPackage::default());
 
-                    global_vars_future.site_vars.offline = false;
-                    global_vars_future.site_vars.user_loading = false;
-                    // update_global_vars.emit(global_vars_future);
-                    // global_vars_future.saves = global_vars_future.saves;
-                    // global_vars_future.game_data = global_vars_future.game_data;
 
-                    let saves = global_vars_future.clone().saves.unwrap_or(Vec::new());
-                    let game_data = &global_vars_future
-                        .clone()
-                        .game_data
-                        .unwrap_or(GameDataPackage::default());
+            //         get_game_data(
+            //             global_vars_future.site_vars.login_token.clone(),
+            //             &global_vars_future.site_vars,
+            //             None,
+            //         ).await;
+            //         get_saves(
+            //             global_vars_future.site_vars.login_token.clone(),
+            //             &global_vars_future.site_vars,
+            //             None,
+            //         ).await;
 
-                    // log!("new_global_vars.saves", saves.len());
-                    // log!("game_data.books", game_data.books.len());
-                    // log!("game_data.edges", game_data.edges.len());
-                    // log!("game_data.hindrances", game_data.hindrances.len());
+            //         // log!("new_global_vars.saves", saves.len());
+            //         // log!("game_data.books", game_data.books.len());
+            //         // log!("game_data.edges", game_data.edges.len());
+            //         // log!("game_data.hindrances", game_data.hindrances.len());
 
-                    if saves.len() > 0 || game_data.books.len() != 2 {
-                        clear_all_local_data().await;
+            //         update_global_vars.emit(global_vars_future);
+            //     });
+            // } else {
 
-                        global_vars_future.game_data = None;
-                        global_vars_future.saves = None;
-                    }
+            //     // set_local_storage_string( "UI_THEME", "_default_".to_string());
 
-                    update_global_vars.emit(global_vars_future);
+            //     spawn_local(async move {
+            //         global_vars_future.game_data = index_db_get_game_data().await;
+            //         // global_vars_future.saves = index_db_get_saves().await;
 
-                    let mut msg = WebSocketMessage::default();
+            //         global_vars_future.site_vars.offline = false;
+            //         global_vars_future.site_vars.user_loading = false;
+            //         // update_global_vars.emit(global_vars_future);
+            //         // global_vars_future.saves = global_vars_future.saves;
+            //         // global_vars_future.game_data = global_vars_future.game_data;
 
-                    msg.token = None;
-                    msg.kind = WebsocketMessageType::GameDataPackage;
-                    new_global_vars.site_vars.send_websocket.emit(msg);
-                });
-            }
+            //         // let saves = global_vars_future.clone().saves.unwrap_or(Vec::new());
+            //         // let game_data = &global_vars_future
+            //         //     .clone()
+            //         //     .game_data
+            //         //     .unwrap_or(GameDataPackage::default());
 
-            // spawn_local(async move {
+            //         // log!("new_global_vars.saves", saves.len());
+            //         // log!("game_data.books", game_data.books.len());
+            //         // log!("game_data.edges", game_data.edges.len());
+            //         // log!("game_data.hindrances", game_data.hindrances.len());
 
-            //     update_site_vars.emit(site_vars_future);
-            // });
-            // log!( format!("handle_message new_site_vars {:?}", &new_site_vars ) );
-            // update_site_vars.emit( new_site_vars );
+            //         global_vars_future.saves = None;
+
+            //         match &global_vars_future.game_data {
+            //             Some( game_data ) => {
+
+            //                 if game_data.books.len() != 2 {
+            //                     get_game_data(
+            //                         global_vars_future.site_vars.login_token.clone(),
+            //                         &global_vars_future.site_vars,
+            //                         None,
+            //                     ).await;
+            //                 }
+            //             }
+            //             None => {
+            //                 get_game_data(
+            //                     global_vars_future.site_vars.login_token.clone(),
+            //                     &global_vars_future.site_vars,
+            //                     None,
+            //                 ).await;
+            //             }
+            //         }
+
+            //         update_global_vars.emit(global_vars_future);
+
+            //         let mut msg = WebSocketMessage::default();
+
+            //         msg.token = None;
+            //         msg.kind = WebsocketMessageType::GameDataPackageUpdated;
+            //         new_global_vars.site_vars.send_websocket.emit(msg);
+            //     });
+            // }
+
         }
 
         WebsocketMessageType::Offline => {
@@ -110,7 +146,7 @@ pub fn handle_message(
             update_site_vars.emit(new_site_vars);
         }
 
-        WebsocketMessageType::GameDataPackage => {
+        WebsocketMessageType::GameDataPackageUpdated => {
             // log!(format!("handle_message GameDataPackage"));
             let new_global_vars = global_vars.clone();
             // let server_root = site_vars.server_root.to_owned();
@@ -123,7 +159,7 @@ pub fn handle_message(
                     spawn_local(async move {
                         let _results = clear_game_data_local_data().await;
                         let _results = index_db_save_game_data(game_data).await;
-                        // log!( format!(" results, {:?}", results ) );
+                        // log!( format!("index_db_save_game_data results, {:?}", _results ) );
                     });
                 }
                 None => {}
@@ -132,7 +168,7 @@ pub fn handle_message(
             update_global_vars.emit(new_global_vars);
         }
 
-        WebsocketMessageType::Saves => {
+        WebsocketMessageType::SavesUpdated => {
             // log!(format!("handle_message Saves"));
             let new_global_vars = global_vars.clone();
             let server_root = new_global_vars.site_vars.server_root.to_owned();
@@ -147,9 +183,10 @@ pub fn handle_message(
                     // }
                     spawn_local(async move {
                         let _results = index_db_save_saves(server_root, saves).await;
-                        // log!( format!("÷ results, {:?}", &_results ) );
+
                         let mut global_vars_future = new_global_vars.clone();
-                        global_vars_future.saves = get_saves_from_index_db().await;
+                        global_vars_future.saves = index_db_get_saves().await;
+                        // log!( format!("index_db_get_saves complete" ));
                         update_global_vars.emit(global_vars_future);
                     });
                 }

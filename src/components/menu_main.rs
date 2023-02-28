@@ -11,6 +11,7 @@ use yew_router::prelude::Link;
 #[derive(Properties, PartialEq)]
 pub struct MenuMainProps {
     pub site_vars: SiteVars,
+    pub toggle_mobile_menu_callback: Callback<MouseEvent>,
 }
 #[function_component(MenuMain)]
 pub fn menu_main(props: &MenuMainProps) -> Html {
@@ -19,13 +20,14 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
 
     let mut show_submenu = false;
 
-    let submenu = get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
+    let submenu = get_menu_items(&props.site_vars).into_iter().map( | menu | {
         match &menu.menu_tag {
             Some( menu_tag ) => {
                 // log!("menu_tag == &props.site_vars.submenu_tag", submenu_tag, &current_submenu_tag);
                 if
                     current_menu_tag.as_str() == menu_tag.as_str()
                     && user_can_see_menu_item( &props.site_vars.current_user, &menu)
+                    && menu.show_main
                 {
                     match menu.submenu {
                         Some( submenu_items ) => {
@@ -92,6 +94,7 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
     }
 
     // log!( format!("props.site_vars.current_user.updated_on {:?}", props.site_vars.current_user.updated_on) );
+
     html! {
         <>
         // {"props.site_vars.current_menu: "}{&props.site_vars.current_menu}<br />
@@ -100,7 +103,7 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
         <ul class={"top-menu"}>
             <li class={"mobile-menu-button"}>
                 <svg
-                    onclick={props.site_vars.toggle_mobile_menu_callback.clone()}
+                    onclick={props.toggle_mobile_menu_callback.to_owned()}
                     stroke="currentColor"
                     fill="currentColor"
                     stroke-width="0"
@@ -112,8 +115,10 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
                     <path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path>
                 </svg>
             </li>
-            {get_menu_items(&props.site_vars.current_user, props.site_vars.logout_callback.clone()).into_iter().map( | menu | {
-                if user_can_see_menu_item( &props.site_vars.current_user, &menu) {
+            {get_menu_items(
+                &props.site_vars,
+            ).into_iter().map( | menu | {
+                if menu.show_main && user_can_see_menu_item( &props.site_vars.current_user, &menu) {
                     let mut li_class = "".to_string();
                     if menu.hardcoded {
                         return html!(<></>);

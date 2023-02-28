@@ -16,22 +16,20 @@ use yew::prelude::*;
 
 #[function_component]
 fn App() -> Html {
-    let login_token = get_local_storage_string("login_token", "".to_owned());
-    let mut user_loading = true;
 
-    if login_token.is_empty() {
-        user_loading = false;
-    }
+    let mut site_vars = SiteVars::default();
 
-    let server_root = "https://v4.savaged.us".to_owned();
-    // let server_roxot = "http://localhost:5001".to_owned();
-    // let server_root = "https://savaged.us".to_owned();
-    // let server_root = "https://staging.savaged.us".to_owned();
+    site_vars.server_root = "https://v4.savaged.us".to_owned();
+    // site_vars.server_root = "http://localhost:5001".to_owned();
+    // site_vars.server_root = "https://savaged.us".to_owned();
+    // site_vars.server_root = "https://staging.savaged.us".to_owned();
+
+    site_vars.api_root = site_vars.server_root.to_owned() + "/" + &site_vars.api_root;
 
     let global_vars_state = use_reducer(|| GlobalVars {
         game_data: None,
         saves: None,
-        site_vars: SiteVars::default(),
+        site_vars: site_vars,
         web_content: None,
     });
 

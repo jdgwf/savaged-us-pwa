@@ -1,7 +1,6 @@
 pub mod home;
 pub mod article;
 
-
 use article::HelpArticle;
 use savaged_libs::help_article::HelpArticleSection;
 use crate::libs::site_vars::SiteVars;

@@ -1,11 +1,19 @@
 pub type GlobalVarsContext = UseReducerHandle<GlobalVars>;
+use std::ops::Deref;
+
 use crate::components::alerts::AlertDefinition;
 use crate::components::alerts::Alerts;
 use crate::components::confirmation_dialog::ConfirmationDialog;
 use crate::components::confirmation_dialog::ConfirmationDialogDefinition;
+use crate::libs::data_api::get_game_data;
+use crate::libs::data_api::get_saves;
+use crate::libs::data_api::get_current_user;
+use crate::libs::data_api::logout_session;
 use crate::libs::site_vars::SiteVars;
 use crate::libs::global_vars::GlobalVars;
 use crate::local_storage::clear_all_local_data;
+use crate::local_storage::index_db_get_saves;
+use crate::local_storage::index_db_get_game_data;
 use crate::pages::admin::AdminRouter;
 use crate::pages::admin::home::AdminHome;
 use crate::pages::error404::Error404;
@@ -25,6 +33,8 @@ use crate::web_sockets::handle_message::handle_message;
 use gloo_console::error;
 use gloo_console::log;
 use gloo_timers::future::TimeoutFuture;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
+use savaged_libs::save_db_row::SaveDBRow;
 use savaged_libs::user::User;
 use savaged_libs::websocket_message::{WebSocketMessage, WebsocketMessageType};
 use serde_json::Error;
@@ -104,10 +114,14 @@ pub enum MainAppMessage {
     AlertFadeIn(Uuid),
     AlertDisplayNone(Uuid),
     AlertFadeOut(Uuid),
+
+    UpdateGameData( Option<GameDataPackage> ),
+    UpdateSaves( Vec<SaveDBRow> ),
+
+    UpdateCurrentUser( User ),
 }
 
 pub struct MainApp {
-    show_mobile_menu: bool,
     global_vars_context: GlobalVarsContext,
     global_vars: GlobalVars,
     alerts: Vec<AlertDefinition>,
@@ -121,16 +135,18 @@ fn content_switch(
     routes: MainRoute,
     global_vars: GlobalVars,
     on_logout_action: &Callback<MouseEvent>,
-    _show_mobile_menu: bool,
     on_click_hide_popup_menus: &Callback<MouseEvent>,
     toggle_mobile_menu_callback: &Callback<MouseEvent>,
 ) -> Html {
     let mut site_vars = global_vars.site_vars.clone();
     site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
     site_vars.current_sub_menu = "".to_string();
-    site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.clone();
-    site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.clone();
-    site_vars.logout_callback = on_logout_action.clone();
+
+    site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
+    site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
+    site_vars.logout_callback = on_logout_action.to_owned();
+
+    site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
     match routes {
         MainRoute::Home => {
             html! {
@@ -206,7 +222,8 @@ fn content_switch(
             html! {
                 <UserLogin
                     site_vars={site_vars}
-
+                    game_data={global_vars.game_data}
+                    saves={global_vars.saves}
                 />
             }
         }
@@ -248,32 +265,14 @@ impl Component for MainApp {
 
         let mut global_vars = (*global_vars_context).clone();
 
-        let (global_saves_context, _saves_context_handler) = ctx
-            .link()
-            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
-            .expect("global_saves context was not set");
-
-        let mut global_saves = (*global_saves_context).clone();
-
-        let (global_data_context, _global_data_context_handler) = ctx
-            .link()
-            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
-            .expect("global_data context was not set");
-
-        let mut global_data = (*global_data_context).clone();
-
-        let (web_content_context, _web_content_context_handler) = ctx
-            .link()
-            .context::<GlobalVarsContext>(ctx.link().callback(MainAppMessage::ContextUpdated))
-            .expect("web_content context was not set");
-
-        let mut web_content = (*web_content_context).clone();
-
         let send_websocket = ctx.link().callback(MainAppMessage::SendWebSocket);
         global_vars.site_vars.send_websocket = send_websocket;
+        global_vars.site_vars.update_game_data = ctx.link().callback(MainAppMessage::UpdateGameData);
+        global_vars.site_vars.update_saves = ctx.link().callback(MainAppMessage::UpdateSaves);
         global_vars.site_vars.update_site_vars = ctx.link().callback(MainAppMessage::UpdateSiteVars);
         global_vars.site_vars.update_global_vars = ctx.link().callback(MainAppMessage::UpdateGlobalVars);
         global_vars.site_vars.add_alert = ctx.link().callback(MainAppMessage::AddAlert);
+        global_vars.site_vars.update_current_user = ctx.link().callback(MainAppMessage::UpdateCurrentUser);
 
         let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
         let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
@@ -288,11 +287,53 @@ impl Component for MainApp {
 
         global_vars.game_data = None;
 
+
+        let site_vars = global_vars.site_vars.clone();
+
+        let mut game_data_update = None;
+        let game_data_last_updated_string = get_local_storage_string("game_data_last_updated", "".to_owned());
+        if !game_data_last_updated_string.is_empty() {
+            game_data_update = Some(game_data_last_updated_string.clone());
+        }
+
+        let mut saves_update = None;
+        let saves_last_updated_string = get_local_storage_string("saves_last_updated", "".to_owned());
+        if !saves_last_updated_string.is_empty() {
+            saves_update = Some(saves_last_updated_string.clone());
+        }
+
+        // log!( format!("game_data_update {:?}", &game_data_update));
+        // log!( format!("saves_update {:?}", &saves_update));
+        spawn_local(async move {
+
+            let game_data = index_db_get_game_data().await;
+            site_vars.update_game_data.emit( game_data );
+            let saves = index_db_get_saves().await;
+            site_vars.update_saves.emit( saves.unwrap_or(Vec::new()) );
+
+            get_current_user(
+                site_vars.login_token.clone(),
+                &site_vars,
+            ).await;
+
+            get_game_data(
+                site_vars.login_token.clone(),
+                &site_vars,
+                game_data_update.clone(),
+            ).await;
+
+            get_saves(
+                site_vars.login_token.clone(),
+                &site_vars,
+                saves_update.clone(),
+            ).await;
+
+        });
+
         MainApp {
             global_vars_context: global_vars_context,
             global_vars: global_vars,
             alerts: Vec::new(),
-            show_mobile_menu: false,
             confirmation_dialog_open: false,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
             wss: wss,
@@ -302,7 +343,7 @@ impl Component for MainApp {
     fn update(&mut self, ctx: &Context<Self>, msg: MainAppMessage) -> bool {
         match msg {
             MainAppMessage::ToggleMobileMenu(_new_value) => {
-                // log!("ToggleMobileMenu called");
+                // log!("ToggleMobileMenu called", self.global_vars.site_vars.show_mobile_menu);
                 self.global_vars.site_vars.show_mobile_menu = !self.global_vars.site_vars.show_mobile_menu;
                 return true;
             }
@@ -440,6 +481,42 @@ impl Component for MainApp {
                 self.global_vars.site_vars = new_value.clone();
                 self.global_vars.site_vars.send_websocket =
                     ctx.link().callback(MainAppMessage::SendWebSocket);
+
+                self.global_vars_context.dispatch(self.global_vars.to_owned());
+
+                return true;
+            }
+
+            MainAppMessage::UpdateSaves(new_value) => {
+                // log!( format!("MainAppMessage::UpdateSaves called {:?}", &new_value) );
+
+                self.global_vars.saves = Some(new_value.clone());
+                self.global_vars.site_vars.send_websocket =
+                    ctx.link().callback(MainAppMessage::SendWebSocket);
+                self.global_vars.site_vars.offline = false;
+                self.global_vars_context.dispatch(self.global_vars.to_owned());
+
+                return true;
+            }
+
+            MainAppMessage::UpdateGameData(new_value) => {
+                // log!( format!("MainAppMessage::UpdateGameData called {:?}", &new_value) );
+
+                self.global_vars.game_data = new_value.clone();
+                self.global_vars.site_vars.offline = false;
+                self.global_vars.site_vars.send_websocket =
+                    ctx.link().callback(MainAppMessage::SendWebSocket);
+                self.global_vars_context.dispatch(self.global_vars.to_owned());
+
+                return true;
+            }
+
+            MainAppMessage::UpdateCurrentUser(new_value) => {
+                // log!( format!("MainAppMessage::UpdateCurrentUser called {:?}", &new_value) );
+
+                self.global_vars.site_vars.current_user= new_value.clone();
+                self.global_vars.site_vars.send_websocket =
+                    ctx.link().callback(MainAppMessage::SendWebSocket);
                 self.global_vars_context.dispatch(self.global_vars.to_owned());
 
                 return true;
@@ -456,11 +533,10 @@ impl Component for MainApp {
                 return true;
             }
 
-
             MainAppMessage::LogOut(_new_value) => {
-                // log!("LogOut?");
+                log!("LogOut?");
                 self.global_vars.site_vars.current_user = User::default();
-                self.show_mobile_menu = false;
+                self.global_vars.site_vars.show_mobile_menu = false;
                 self.global_vars.saves = None;
                 self.global_vars.game_data = None;
 
@@ -470,19 +546,21 @@ impl Component for MainApp {
                 let mut logout = WebSocketMessage::default();
                 logout.kind = WebsocketMessageType::Logout;
                 logout.token = Some(self.global_vars.site_vars.login_token.clone());
-                self.global_vars.site_vars.send_websocket.emit(logout);
 
+                self.global_vars.site_vars.send_websocket.emit(logout);
                 self.global_vars.site_vars.login_token = "".to_owned();
 
                 let send_websocket = self.global_vars.site_vars.send_websocket.clone();
+                let site_vars = self.global_vars.site_vars.clone();
                 spawn_local(async move {
                     clear_all_local_data().await;
+                    logout_session( &site_vars ).await;
                     let mut msg = WebSocketMessage::default();
-                    msg.kind = WebsocketMessageType::GameDataPackage;
+                    msg.kind = WebsocketMessageType::GameDataPackageUpdated;
                     send_websocket.emit(msg);
                 });
 
-                set_local_storage_string( "UI_THEME", "_default_".to_string());
+                // set_local_storage_string( "UI_THEME", "_default_".to_string());
 
                 self.global_vars_context
                     .dispatch(self.global_vars.to_owned());
@@ -545,15 +623,12 @@ impl Component for MainApp {
                     let received_message_callback = ctx.link().callback(MainAppMessage::ReceivedWebSocket);
                     let websocket_offline_callback = ctx.link().callback(MainAppMessage::WebsocketOffline);
 
-
                     self.wss = connect_to_websocket(
                         self.global_vars.site_vars.server_root.to_owned(),
                         &received_message_callback,
                         &websocket_offline_callback,
                         self.global_vars.site_vars.login_token.to_owned(),
                     );
-
-
 
                 }
 
@@ -596,7 +671,6 @@ impl Component for MainApp {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let show_mobile_menu = self.show_mobile_menu;
         // // log!("main_app view", self.global_vars.site_vars.current_user.unread_notifications);
         // let submenu = self.submenu.clone();
         // let mobile_submenu = self.submenu.clone();
@@ -620,11 +694,7 @@ impl Component for MainApp {
             hide_popup_menus.emit(true);
         });
 
-        // let mut active_class = "content-pane";
 
-        // if show_mobile_menu {
-        //     active_class = "content-pane show-mobile-menu"
-        // }
 
         // let global_vars1 = self.global_vars.clone();
         let global_vars2 = self.global_vars.clone();
@@ -635,9 +705,8 @@ impl Component for MainApp {
 
         if self.global_vars.site_vars.current_user.id > 0 {
             body_class = self.global_vars.site_vars.current_user.theme_css.to_owned();
-            set_local_storage_string( "UI_THEME", body_class.to_string())
+            // set_local_storage_string( "UI_THEME", body_class.to_string())
         }
-
 
         // set_body_class( body_class.replace("_default_", ""), self.global_vars.site_vars.server_side_renderer );
 
@@ -665,7 +734,6 @@ impl Component for MainApp {
                                     routes,
                                     global_vars3.clone(),
                                     &on_logout_action,
-                                    show_mobile_menu,
                                     &on_click_hide_popup_menus,
                                     &on_click_toggle_mobile_menu,
                                 )

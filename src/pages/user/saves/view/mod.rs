@@ -9,8 +9,6 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct UserSavesViewProps {
 
-
-
     pub uuid: String,
 
     pub global_vars: GlobalVars,
