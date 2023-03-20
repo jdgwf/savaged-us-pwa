@@ -16,8 +16,9 @@ use yew_router::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesListProps {
-    pub global_vars: GlobalVars,
-}
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,}
 
 pub enum UserSavesListMessage {
     ChangeFilter(String),
@@ -50,12 +51,12 @@ impl Component for UserSavesList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut site_vars = ctx.props().global_vars.site_vars.clone();
-        let mut saves = ctx.props().global_vars.saves.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
+        let mut saves = ctx.props().saves.clone();
         site_vars.current_sub_menu = "user-data".to_owned();
         let mut filter_type = "character".to_owned();
 
-        if !ctx.props().global_vars.site_vars.server_side_renderer {
+        if !ctx.props().site_vars.server_side_renderer {
             filter_type = get_local_storage_string("saves_filter", "character".to_string());
         }
 
@@ -96,7 +97,7 @@ impl Component for UserSavesList {
 
         let mut saves: Vec<SaveDBRow> = Vec::new();
 
-        match &ctx.props().global_vars.saves {
+        match &ctx.props().saves {
             Some(save_items) => {
                 saves = save_items.to_vec();
             }
@@ -331,7 +332,7 @@ impl Component for UserSavesList {
             },
         ];
 
-        if ctx.props().global_vars.site_vars.current_user.has_premium_access() {
+        if ctx.props().site_vars.current_user.has_premium_access() {
             sub_menu_items.push(TertiaryMenuItem {
                 tag: "_!_trash_|_".to_owned(),
                 label: "Trash".to_owned() + &" (" + &trash_count.to_string() + &")",
@@ -357,7 +358,7 @@ impl Component for UserSavesList {
         let change_folder_callback1 = change_folder_callback.clone();
         let change_folder_callback2 = change_folder_callback.clone();
 
-        let open_confirmation_dialog = ctx.props().global_vars.site_vars.open_confirmation_dialog.clone();
+        let open_confirmation_dialog = ctx.props().site_vars.open_confirmation_dialog.clone();
         html! {
             <UIPage
                 site_vars={site_vars.clone()}

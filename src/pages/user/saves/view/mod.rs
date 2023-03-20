@@ -1,6 +1,7 @@
 use crate::components::ui_page::UIPage;
-use crate::libs::global_vars::GlobalVars;
+use crate::libs::site_vars::SiteVars;
 use crate::pages::error404::Error404;
+use savaged_libs::player_character::game_data_package::GameDataPackage;
 use savaged_libs::save_db_row::SaveDBRow;
 use standard_components::ui::nbsp::Nbsp;
 use yew::html;
@@ -11,8 +12,9 @@ pub struct UserSavesViewProps {
 
     pub uuid: String,
 
-    pub global_vars: GlobalVars,
-
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,
 }
 
 pub enum UserSavesViewMessage {
@@ -51,7 +53,7 @@ impl Component for UserSavesView {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
 
         site_vars.current_menu = "main-my-stuff".to_owned();
         site_vars.current_sub_menu = "user-data-saves".to_owned();
@@ -90,7 +92,7 @@ impl Component for UserSavesView {
 
         let mut save: Option<SaveDBRow> = None;
 
-        match ctx.props().global_vars.saves.clone() {
+        match ctx.props().saves.clone() {
             Some(local_saves) => {
                 for item in local_saves {
                     if item.uuid == ctx.props().uuid {

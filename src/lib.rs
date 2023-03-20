@@ -87,7 +87,9 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::UserRouter => {
             html! {
                 <UserRouter
-                    global_vars={global_vars}
+                    site_vars={site_vars}
+                    game_data={None}
+                    saves={None}
 
                 />
             }

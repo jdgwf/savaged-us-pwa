@@ -43,9 +43,11 @@ pub enum UserSavesRoute {
 
 fn content_switch(
     routes: UserSavesRoute,
-    global_vars: GlobalVars,
+    mut site_vars: &SiteVars,
+    game_data: &Option<GameDataPackage>,
+    saves: &Option<Vec<SaveDBRow>>,
 ) -> Html {
-    let mut site_vars = global_vars.site_vars.clone();
+    let mut site_vars = site_vars.clone();
 
     if site_vars.current_user.id > 0 {
         site_vars.current_menu = "main-my-stuff".to_owned();
@@ -56,14 +58,18 @@ fn content_switch(
     match routes {
         UserSavesRoute::List => html! {
             <UserSavesList
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
 
         UserSavesRoute::Edit { uuid } => html! {
             <UserSavesEdit
                 uuid={uuid}
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
 
@@ -71,14 +77,18 @@ fn content_switch(
             <UserSavesEdit
                 uuid={""}
                 new_save_type={Some(save_type)}
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
 
         UserSavesRoute::View { uuid } => html! {
             <UserSavesView
                 uuid={uuid}
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
 
@@ -101,8 +111,9 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct UserSavesRouterProps {
-    pub global_vars: GlobalVars,
-}
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,}
 
 pub enum UserSavesRouterMessage {}
 pub struct UserSavesRouter {
@@ -140,17 +151,20 @@ impl Component for UserSavesRouter {
     // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if ctx.props().global_vars.site_vars.server_side_renderer {
+        let site_vars = ctx.props().site_vars.clone();
+        let game_data = ctx.props().game_data.clone();
+        let saves = ctx.props().saves.clone();
+
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
                 .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
-            // let site_vars = ctx.props().site_vars.clone();
-            let global_vars = ctx.props().global_vars.clone();
+
+
             html! {
 
                     <Router
@@ -162,7 +176,9 @@ impl Component for UserSavesRouter {
                                     move |routes|
                                     content_switch(
                                         routes,
-                                        global_vars.clone(),
+                                        &site_vars,
+                                        &game_data,
+                                        &saves,
 
                                     )
                                 }
@@ -171,7 +187,9 @@ impl Component for UserSavesRouter {
                     </Router>
             }
         } else {
-            let global_vars = ctx.props().global_vars.clone();
+            // let site_vars = ctx.props().site_vars.clone();
+            // let game_data = ctx.props().game_data.clone();
+            // let saves = ctx.props().saves.clone();
             html! {
 
                 <BrowserRouter>
@@ -181,7 +199,9 @@ impl Component for UserSavesRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    &site_vars,
+                                    &game_data,
+                                    &saves,
                                 )
                             }
                         />

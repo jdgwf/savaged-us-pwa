@@ -1,15 +1,19 @@
 use crate::components::ui_page::UIPage;
 use crate::libs::global_vars::GlobalVars;
 use crate::libs::site_vars::SiteVars;
+use savaged_libs::{
+    player_character::game_data_package::GameDataPackage,
+    save_db_row::SaveDBRow,
+};
 use yew::html;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct UserCampaignsProps {
 
-    // pub update_site_vars: Callback<SiteVars>,
-    pub global_vars: GlobalVars,
-    // pub open_confirmation_dialog: Callback<ConfirmationDialogDefinition>,
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,
 }
 
 pub struct UserCampaignsMessage {}
@@ -29,7 +33,7 @@ impl Component for UserCampaigns {
     // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let mut site_vars = ctx.props().global_vars.site_vars.clone();
+        let mut site_vars = ctx.props().site_vars.clone();
         site_vars.current_menu = "main-my-stuff".to_owned();
         site_vars.current_sub_menu = "user-data".to_owned();
         if site_vars.user_loading {

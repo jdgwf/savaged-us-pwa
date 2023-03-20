@@ -132,29 +132,13 @@ pub struct MainApp {
 
 fn content_switch(
     routes: MainRoute,
-    mut global_vars: GlobalVars,
-    // on_logout_action: &Callback<MouseEvent>,
-    // on_click_hide_popup_menus: &Callback<MouseEvent>,
-    // toggle_mobile_menu_callback: &Callback<MouseEvent>,
+    mut global_vars: &GlobalVars,
 ) -> Html {
 
-    global_vars.site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
-    // global_vars.site_vars.current_sub_menu = "".to_string();
-    // global_vars.site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
-    // global_vars.site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
-    // global_vars.site_vars.logout_callback = on_logout_action.to_owned();
-    // global_vars.site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
+    // global_vars.site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
     let mut site_vars = global_vars.site_vars.clone();
-    // site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
-    // site_vars.current_sub_menu = "".to_string();
+    site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
 
-    // site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
-    // site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
-    // site_vars.logout_callback = on_logout_action.to_owned();
-
-    // site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
-
-    // global_vars.site_vars = site_vars.clone();
     match routes {
         MainRoute::Home => {
             html! {
@@ -168,7 +152,7 @@ fn content_switch(
             html! {
                 <InfoRouter
                     site_vars={site_vars}
-                    web_content={global_vars.web_content}
+                    web_content={global_vars.web_content.clone()}
                 />
             }
         }
@@ -221,7 +205,9 @@ fn content_switch(
         MainRoute::UserRouter => {
             html! {
                 <UserRouter
-                    global_vars={global_vars}
+                    site_vars={site_vars}
+                    game_data={global_vars.game_data.clone()}
+                    saves={global_vars.saves.clone()}
                 />
             }
         }
@@ -230,8 +216,8 @@ fn content_switch(
             html! {
                 <UserLogin
                     site_vars={site_vars}
-                    game_data={global_vars.game_data}
-                    saves={global_vars.saves}
+                    game_data={global_vars.game_data.clone()}
+                    saves={global_vars.saves.clone()}
                 />
             }
         }
@@ -701,13 +687,11 @@ impl Component for MainApp {
 
 
         let mut global_vars = self.global_vars.clone();
-
         let mut body_class = get_local_storage_string( "UI_THEME", "".to_string());
 
         if self.global_vars.site_vars.current_user.id > 0 {
             body_class = self.global_vars.site_vars.current_user.theme_css.to_owned();
         }
-
 
         global_vars.site_vars.current_sub_menu = "".to_string();
         global_vars.site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
@@ -735,13 +719,10 @@ impl Component for MainApp {
                             move |routes| {
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    &global_vars,
                                 )
                             }
                         } />
-
-                    // </div>
-                // </div>
                 </BrowserRouter>
             </div>
         }

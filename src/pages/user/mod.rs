@@ -59,9 +59,11 @@ pub enum UserRoute {
 
 fn content_switch(
     routes: UserRoute,
-    global_vars: GlobalVars,
+    mut site_vars: &SiteVars,
+    game_data: &Option<GameDataPackage>,
+    saves: &Option<Vec<SaveDBRow>>,
 ) -> Html {
-    let mut site_vars = global_vars.site_vars.clone();
+    let mut site_vars = site_vars.clone();
 
     if site_vars.current_user.id > 0 {
         site_vars.current_sub_menu = "user".to_owned();
@@ -72,17 +74,23 @@ fn content_switch(
     match routes {
         UserRoute::UserCampaigns => html! {
             <UserCampaigns
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
         UserRoute::UserSavesList => html! {
             <UserSavesList
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
         UserRoute::UserSavesRouter => html! {
             <UserSavesRouter
-                global_vars={global_vars}
+                site_vars={site_vars}
+                game_data={game_data.clone()}
+                saves={saves.clone()}
             />
         },
         UserRoute::SettingsAPIKey => html! {
@@ -94,12 +102,14 @@ fn content_switch(
         UserRoute::SettingsPrivate => html! {
             <SettingsPrivate
                 site_vars={site_vars}
+
             />
         },
 
         UserRoute::SettingsPublic => html! {
             <SettingsPublic
                 site_vars={site_vars}
+
             />
         },
 
@@ -129,7 +139,9 @@ fn content_switch(
 
 #[derive(Properties, PartialEq)]
 pub struct UserRouterProps {
-    pub global_vars: GlobalVars,
+    pub site_vars: SiteVars,
+    pub game_data: Option<GameDataPackage>,
+    pub saves: Option<Vec<SaveDBRow>>,
 }
 
 pub struct UserRouterMessage {}
@@ -145,20 +157,19 @@ impl Component for UserRouter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let update_site_vars = ctx.props().site_vars.update_site_vars.clone();
-        // let open_confirmation_dialog = ctx.props().site_vars.open_confirmation_dialog.clone();
 
-        if ctx.props().global_vars.site_vars.server_side_renderer {
+        let site_vars = ctx.props().site_vars.clone();
+        let game_data = ctx.props().game_data.clone();
+        let saves = ctx.props().saves.clone();
+        if ctx.props().site_vars.server_side_renderer {
             let history = ctx
                 .props()
-                .global_vars
                 .site_vars
                 .server_side_renderer_history
                 .as_ref()
                 .unwrap()
                 .clone();
-            let mut global_vars = ctx.props().global_vars.clone();
-            global_vars.site_vars.current_menu = "main-register".to_string();
+
             html! {
 
                     <Router
@@ -170,7 +181,9 @@ impl Component for UserRouter {
                                     move |routes|
                                     content_switch(
                                         routes,
-                                        global_vars.clone(),
+                                        &site_vars,
+                                        &game_data,
+                                        &saves,
                                     )
                                 }
                             />
@@ -178,7 +191,7 @@ impl Component for UserRouter {
                     </Router>
             }
         } else {
-            let mut global_vars = ctx.props().global_vars.clone();
+
             html! {
 
                 <BrowserRouter>
@@ -188,7 +201,9 @@ impl Component for UserRouter {
                                 move |routes|
                                 content_switch(
                                     routes,
-                                    global_vars.clone(),
+                                    &site_vars,
+                                    &game_data,
+                                    &saves,
 
                                 )
                             }
