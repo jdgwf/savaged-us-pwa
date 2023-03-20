@@ -1,11 +1,13 @@
 [package]
 name = "savaged-front-end"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 yew = { version = "0.20", features = ["csr"] }
+# this is the development version of Yew
+# yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
 yew-router = "0.17"
 
 standard-components = { path="../standard-components" }

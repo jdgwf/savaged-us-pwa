@@ -84,9 +84,8 @@ pub enum MainRoute {
 }
 
 #[derive(Properties, PartialEq)]
-pub struct MainAppProps {
-    // pub global_vars: GlobalVars,
-}
+pub struct MainAppProps {}
+
 #[derive(Clone, Debug)]
 pub struct SubmenuData {
     pub html: Html,
@@ -133,20 +132,29 @@ pub struct MainApp {
 
 fn content_switch(
     routes: MainRoute,
-    global_vars: GlobalVars,
-    on_logout_action: &Callback<MouseEvent>,
-    on_click_hide_popup_menus: &Callback<MouseEvent>,
-    toggle_mobile_menu_callback: &Callback<MouseEvent>,
+    mut global_vars: GlobalVars,
+    // on_logout_action: &Callback<MouseEvent>,
+    // on_click_hide_popup_menus: &Callback<MouseEvent>,
+    // toggle_mobile_menu_callback: &Callback<MouseEvent>,
 ) -> Html {
+
+    global_vars.site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
+    // global_vars.site_vars.current_sub_menu = "".to_string();
+    // global_vars.site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
+    // global_vars.site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
+    // global_vars.site_vars.logout_callback = on_logout_action.to_owned();
+    // global_vars.site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
     let mut site_vars = global_vars.site_vars.clone();
-    site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
-    site_vars.current_sub_menu = "".to_string();
+    // site_vars.current_menu = format!("{}-{:?}", "main", routes).to_lowercase();
+    // site_vars.current_sub_menu = "".to_string();
 
-    site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
-    site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
-    site_vars.logout_callback = on_logout_action.to_owned();
+    // site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
+    // site_vars.toggle_mobile_menu_callback = toggle_mobile_menu_callback.to_owned();
+    // site_vars.logout_callback = on_logout_action.to_owned();
 
-    site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
+    // site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
+
+    // global_vars.site_vars = site_vars.clone();
     match routes {
         MainRoute::Home => {
             html! {
@@ -671,9 +679,6 @@ impl Component for MainApp {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // // log!("main_app view", self.global_vars.site_vars.current_user.unread_notifications);
-        // let submenu = self.submenu.clone();
-        // let mobile_submenu = self.submenu.clone();
 
         let toggle_mobile_menu = ctx.link().callback(MainAppMessage::ToggleMobileMenu);
         let hide_popup_menus = ctx.link().callback(MainAppMessage::HidePopupMenus);
@@ -695,34 +700,32 @@ impl Component for MainApp {
         });
 
 
-
-        // let global_vars1 = self.global_vars.clone();
-        let global_vars2 = self.global_vars.clone();
-        let global_vars3 = self.global_vars.clone();
-        let global_vars4 = self.global_vars.clone();
+        let mut global_vars = self.global_vars.clone();
 
         let mut body_class = get_local_storage_string( "UI_THEME", "".to_string());
 
         if self.global_vars.site_vars.current_user.id > 0 {
             body_class = self.global_vars.site_vars.current_user.theme_css.to_owned();
-            // set_local_storage_string( "UI_THEME", body_class.to_string())
         }
 
-        // set_body_class( body_class.replace("_default_", ""), self.global_vars.site_vars.server_side_renderer );
+
+        global_vars.site_vars.current_sub_menu = "".to_string();
+        global_vars.site_vars.hide_popup_menus_callback = on_click_hide_popup_menus.to_owned();
+        global_vars.site_vars.toggle_mobile_menu_callback = on_click_toggle_mobile_menu.to_owned();
+        global_vars.site_vars.logout_callback = on_logout_action.to_owned();
+        global_vars.site_vars.app_version = env!("CARGO_PKG_VERSION").to_owned();
 
         html! {
 
             <div id="main-container" class={"theme-".to_owned() + &body_class.replace("_default_", "default")}>
                 if self.confirmation_dialog_open {
                     <ConfirmationDialog
-                        global_vars={global_vars4}
                         close_confirmation_dialog={close_confirmation_dialog}
                         definition={self.confirmation_dialog_properties.clone()}
                     />
                 }
 
                 <Alerts
-                    global_vars={global_vars2}
                     alerts={self.alerts.clone()}
                 />
 
@@ -732,10 +735,7 @@ impl Component for MainApp {
                             move |routes| {
                                 content_switch(
                                     routes,
-                                    global_vars3.clone(),
-                                    &on_logout_action,
-                                    &on_click_hide_popup_menus,
-                                    &on_click_toggle_mobile_menu,
+                                    global_vars.clone(),
                                 )
                             }
                         } />

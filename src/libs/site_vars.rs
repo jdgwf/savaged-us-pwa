@@ -10,6 +10,8 @@ use yew_router::history::AnyHistory;
 
 use super::global_vars::GlobalVars;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Clone, PartialEq, Debug)]
 pub struct SiteVars{
     pub add_alert: Callback<AlertDefinition>,
@@ -54,7 +56,7 @@ impl Default for SiteVars {
             open_confirmation_dialog: Callback::noop(),
             send_websocket: Callback::noop(),
             server_root: "".to_owned(),
-            app_version: "vers".to_owned(),
+            app_version: VERSION.to_owned(),
             server_side_renderer: false,
             server_side_renderer_history: None,
             show_mobile_menu: false,

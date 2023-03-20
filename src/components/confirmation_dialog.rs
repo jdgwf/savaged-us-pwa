@@ -1,4 +1,3 @@
-use crate::libs::global_vars::GlobalVars;
 use standard_components::ui::nbsp::Nbsp;
 use yew::prelude::*;
 
@@ -26,7 +25,6 @@ impl Default for ConfirmationDialogDefinition {
 
 #[derive(Properties, PartialEq)]
 pub struct ConfirmationDialogProps {
-    pub global_vars: GlobalVars,
     pub close_confirmation_dialog: Callback<MouseEvent>,
     pub definition: ConfirmationDialogDefinition,
 }
@@ -40,7 +38,6 @@ impl Component for ConfirmationDialog {
     type Properties = ConfirmationDialogProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let _global_vars = ctx.props().global_vars.clone();
 
         ConfirmationDialog {}
     }

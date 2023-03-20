@@ -1,4 +1,3 @@
-use crate::libs::global_vars::GlobalVars;
 use savaged_libs::alert_level::AlertLevel;
 use uuid::Uuid;
 use yew::prelude::*;
@@ -26,7 +25,6 @@ impl Default for AlertDefinition {
 
 #[derive(Properties, PartialEq)]
 pub struct AlertsProps {
-    pub global_vars: GlobalVars,
     pub alerts: Vec<AlertDefinition>,
 }
 
