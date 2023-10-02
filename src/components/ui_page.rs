@@ -54,6 +54,7 @@ pub fn ui_page(props: &UIPageProps) -> Html {
         }
         None => {}
     }
+
     html! {
 
         <>

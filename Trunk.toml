@@ -6,7 +6,7 @@ public_url = "/"
 
 [watch]
 # Paths to watch. The `build.target`'s parent folder is watched by default.
-# watch = ["/home/jeff/Nextcloud/Development/v4.savaged.us/savaged-libs/src/"]
+# watch = ["/home/jeff/Nextcloud/Development/v4-rust.savaged.us/savaged-libs/src/"]
 watch = [".", "../savaged-libs/src/"]
 # Paths to ignore.
 # ignore = ["*/.*.swp"]

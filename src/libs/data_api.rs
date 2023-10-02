@@ -17,12 +17,16 @@ use web_sys::{Request, RequestInit, RequestMode, Response};
 
 pub async fn get_game_data(
     login_token: String,
-    site_vars: &SiteVars,
+    mut site_vars: &SiteVars,
     last_updated: Option<String>,
 ) -> bool {
     if site_vars.server_side_renderer {
         return false;
     }
+
+    // let mut site_vars = site_vars.clone();
+    // site_vars.game_data_loading = true;
+    // site_vars.update_site_vars.emit( site_vars.clone() );
 
     // log!("get_game_data called", last_updated.to_owned());
 
@@ -169,6 +173,10 @@ pub async fn get_saves(
     }
 
 
+    // let mut site_vars = site_vars.clone();
+    // site_vars.saves_loading = true;
+    // site_vars.update_site_vars.emit( site_vars.clone() );
+
     // log!("get_saves called", last_updated.to_owned());
     let endpoint = site_vars.api_root.to_owned() + &"/saves/get";
     let mut opts = RequestInit::new();
@@ -270,6 +278,11 @@ pub async fn get_current_user(
     if site_vars.server_side_renderer {
         return false;
     }
+
+    // let mut site_vars = site_vars.clone();
+    // site_vars.user_loading = true;
+    // site_vars.update_site_vars.emit( site_vars.clone() );
+
     let endpoint = site_vars.api_root.to_owned() + &"/auth/get-user-data";
     let mut opts = RequestInit::new();
     opts.method("POST");
@@ -312,6 +325,7 @@ pub async fn get_current_user(
                         Some( user ) => {
                             // log!("XXXX", user.id);
                             site_vars.update_current_user.emit(user.clone());
+
                             return true;
                         }
                         None => {

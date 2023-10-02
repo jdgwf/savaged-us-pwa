@@ -295,38 +295,45 @@ impl Component for MainApp {
         if !saves_last_updated_string.is_empty() {
             saves_update = Some(saves_last_updated_string.clone());
         }
+        let gv = global_vars.clone();
 
-        // log!( format!("game_data_update {:?}", &game_data_update));
-        // log!( format!("saves_update {:?}", &saves_update));
+        log!( format!("game_data_update {:?}", &game_data_update));
+        log!( format!("saves_update {:?}", &saves_update));
         spawn_local(async move {
 
             let game_data = index_db_get_game_data().await;
             site_vars.update_game_data.emit( game_data );
+
             let saves = index_db_get_saves().await;
             site_vars.update_saves.emit( saves.unwrap_or(Vec::new()) );
 
-            get_current_user(
-                site_vars.login_token.clone(),
-                &site_vars,
-            ).await;
+            // let global_vars = global_vars.clone();
+            // get_current_user(
+            //     site_vars.login_token.clone(),
+            //     &site_vars,
+            // ).await;
 
-            get_game_data(
-                site_vars.login_token.clone(),
-                &site_vars,
-                game_data_update.clone(),
-            ).await;
 
-            get_saves(
-                site_vars.login_token.clone(),
-                &site_vars,
-                saves_update.clone(),
-            ).await;
+            // let site_vars = global_vars.site_vars.clone();
+            // get_game_data(
+            //     site_vars.login_token.clone(),
+            //     &site_vars,
+            //     game_data_update.clone(),
+            // ).await;
+
+            // let site_vars = global_vars.site_vars.clone();
+            // get_saves(
+            //     site_vars.login_token.clone(),
+            //     &site_vars,
+            //     saves_update.clone(),
+            // ).await;
 
         });
 
+
         MainApp {
             global_vars_context: global_vars_context,
-            global_vars: global_vars,
+            global_vars: gv,
             alerts: Vec::new(),
             confirmation_dialog_open: false,
             confirmation_dialog_properties: ConfirmationDialogDefinition::default().clone(),
@@ -488,6 +495,7 @@ impl Component for MainApp {
                 self.global_vars.site_vars.send_websocket =
                     ctx.link().callback(MainAppMessage::SendWebSocket);
                 self.global_vars.site_vars.offline = false;
+                self.global_vars.site_vars.saves_loading = false;
                 self.global_vars_context.dispatch(self.global_vars.to_owned());
 
                 return true;
@@ -498,6 +506,7 @@ impl Component for MainApp {
 
                 self.global_vars.game_data = new_value.clone();
                 self.global_vars.site_vars.offline = false;
+                self.global_vars.site_vars.game_data_loading = false;
                 self.global_vars.site_vars.send_websocket =
                     ctx.link().callback(MainAppMessage::SendWebSocket);
                 self.global_vars_context.dispatch(self.global_vars.to_owned());
@@ -511,6 +520,8 @@ impl Component for MainApp {
                 self.global_vars.site_vars.current_user= new_value.clone();
                 self.global_vars.site_vars.send_websocket =
                     ctx.link().callback(MainAppMessage::SendWebSocket);
+
+                self.global_vars.site_vars.user_loading = false;
                 self.global_vars_context.dispatch(self.global_vars.to_owned());
 
                 return true;

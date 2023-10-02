@@ -1,4 +1,6 @@
 use crate::components::lds_spinner::LDSSpinner;
+use crate::components::lds_roller::LDSRoller;
+
 use crate::libs::site_vars::SiteVars;
 use crate::main_app::MainRoute;
 use crate::menu_items::{get_menu_items, user_can_see_menu_item};
@@ -162,26 +164,43 @@ pub fn menu_main(props: &MenuMainProps) -> Html {
                             {"OFFLINE"}
                             <div class="small-text">{"For now refresh the page"}<br />{"to try to connect again"}</div>
                         </div>
-                    }
-                    if props.site_vars.current_user.id > 0 && !props.site_vars.offline {
-                        <div class="user-login-badge">
-
-                            if props.site_vars.current_user.unread_notifications > 0 {
-                                <Link<UserRoute> to={UserRoute::Notifications}>
-                                    <div class={"unread-notifications"}>{props.site_vars.current_user.unread_notifications}</div>
-                                </Link<UserRoute>>
-                            }
-                            <Link<UserRoute> to={UserRoute::SettingsPrivate}><img
-                            src={props.site_vars.current_user.get_image( &props.site_vars.server_root )}
-                            /></Link<UserRoute>>
-
-                        </div>
                     } else {
-                        <>
-                            if !props.site_vars.offline {
-                                <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
+
+                        if props.site_vars.user_loading {
+                            <LDSSpinner />
+                        } else  if props.site_vars.current_user.id > 0  {
+                            <div class="user-login-badge">
+
+                                if props.site_vars.current_user.unread_notifications > 0 {
+                                    <Link<UserRoute> to={UserRoute::Notifications}>
+                                        <div class={"unread-notifications"}>{props.site_vars.current_user.unread_notifications}</div>
+                                    </Link<UserRoute>>
+                                }
+                                <Link<UserRoute> to={UserRoute::SettingsPrivate}><img
+                                src={props.site_vars.current_user.get_image( &props.site_vars.server_root )}
+                                /></Link<UserRoute>>
+
+                            </div>
+                        } else {
+                            <>
+                                if !props.site_vars.offline {
+                                    <Link<MainRoute> to={MainRoute::UserLogin}>{"Login/Register"}</Link<MainRoute>>
+                                }
+                            </>
+                        }
+
+                        <div class="user-login-sync-statuses">
+                            if  props.site_vars.game_data_loading {
+                                <LDSRoller />
+                            } else {
+                                <LDSRoller />
                             }
-                        </>
+                            if  props.site_vars.saves_loading  {
+                                <LDSRoller />
+                            } else {
+                                <LDSRoller />
+                            }
+                        </div>
                     }
                 </li>
             } else {

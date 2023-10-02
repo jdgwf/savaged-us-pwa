@@ -9,6 +9,7 @@ pub struct InfoPartnersProps {
     pub site_vars: SiteVars,
     pub web_content: Option<WebContent>,
 }
+
 #[function_component(InfoPartners)]
 pub fn info_partners(props: &InfoPartnersProps) -> Html {
     let mut site_vars = props.site_vars.clone();

@@ -22,7 +22,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use savaged_libs::save_db_row::SaveDBRow;
 
-#[derive(Properties, PartialEq)]
+#[derive(yew::Properties, PartialEq)]
 pub struct UserLoginProps {
     pub site_vars: SiteVars,
     pub game_data: Option<GameDataPackage>,
@@ -79,19 +79,19 @@ impl Component for UserLogin {
 
                 // request user and game data data
 
-                let mut msg = WebSocketMessage::default();
+                // let mut msg = WebSocketMessage::default();
 
-                msg.token = Some(login_result.login_token.to_owned());
-                msg.kind = WebsocketMessageType::GameDataPackageUpdated;
+                // msg.token = Some(login_result.login_token.to_owned());
+                // msg.kind = WebsocketMessageType::GameDataPackageUpdated;
 
-                ctx.props().site_vars.send_websocket.emit(msg);
+                // ctx.props().site_vars.send_websocket.emit(msg);
 
-                let mut msg_saves = WebSocketMessage::default();
+                // let mut msg_saves = WebSocketMessage::default();
 
-                msg_saves.token = Some(login_result.login_token.to_owned());
-                msg_saves.kind = WebsocketMessageType::SavesUpdated;
+                // msg_saves.token = Some(login_result.login_token.to_owned());
+                // msg_saves.kind = WebsocketMessageType::SavesUpdated;
 
-                ctx.props().site_vars.send_websocket.emit(msg_saves);
+                // ctx.props().site_vars.send_websocket.emit(msg_saves);
 
                 // set_local_storage_string( "saves_owner_id", login_result.user.id.to_string() );
                 // set_local_storage_string("login_token", login_result.login_token.to_owned());

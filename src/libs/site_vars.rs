@@ -37,6 +37,8 @@ pub struct SiteVars{
     pub update_saves: Callback<Vec<SaveDBRow>>,
     pub update_current_user: Callback<User>,
     pub user_loading: bool,
+    pub saves_loading: bool,
+    pub game_data_loading: bool,
     pub app_version: String,
 
 }
@@ -68,6 +70,8 @@ impl Default for SiteVars {
             update_saves: Callback::noop(),
             update_current_user: Callback::noop(),
             user_loading: false,
+            saves_loading: true,
+            game_data_loading: true,
 
         }
     }

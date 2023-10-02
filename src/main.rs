@@ -10,8 +10,7 @@ pub type WebContentContext = UseReducerHandle<WebContent>;
 use crate::libs::global_vars::GlobalVars;
 use crate::libs::site_vars::SiteVars;
 use main_app::MainApp;
-use savaged_libs::{user::User, web_content::WebContent};
-use standard_components::libs::local_storage_shortcuts::get_local_storage_string;
+use savaged_libs::web_content::WebContent;
 use yew::prelude::*;
 
 #[function_component]
@@ -19,7 +18,7 @@ fn App() -> Html {
 
     let mut site_vars = SiteVars::default();
 
-    site_vars.server_root = "https://v4.savaged.us".to_owned();
+    site_vars.server_root = "https://v4-rust.savaged.us".to_owned();
     // site_vars.server_root = "http://localhost:5001".to_owned();
     // site_vars.server_root = "https://savaged.us".to_owned();
     // site_vars.server_root = "https://staging.savaged.us".to_owned();

@@ -272,8 +272,8 @@ impl Component for UserSavesEdit {
                             index_db_put_save(server_root, save).await;
                             let saves = index_db_get_saves().await;
                             match saves {
-                                Some( savesData ) => {
-                                    update_saves.emit(savesData);
+                                Some( saves_data ) => {
+                                    update_saves.emit(saves_data);
                                 }
                                 None => {
                                     update_saves.emit(Vec::new());
@@ -310,8 +310,8 @@ impl Component for UserSavesEdit {
                             index_db_put_save(server_root, save).await;
                             let saves = index_db_get_saves().await;
                             match saves {
-                                Some( savesData ) => {
-                                    update_saves.emit(savesData);
+                                Some( saves_data ) => {
+                                    update_saves.emit(saves_data);
                                 }
                                 None => {
                                     update_saves.emit(Vec::new());
@@ -348,8 +348,8 @@ impl Component for UserSavesEdit {
                             index_db_put_save(server_root, save).await;
                             let saves = index_db_get_saves().await;
                             match saves {
-                                Some( savesData ) => {
-                                    update_saves.emit(savesData);
+                                Some( saves_data ) => {
+                                    update_saves.emit(saves_data);
                                 }
                                 None => {
                                     update_saves.emit(Vec::new());
@@ -386,8 +386,8 @@ impl Component for UserSavesEdit {
                             index_db_put_save(server_root, save).await;
                             let saves = index_db_get_saves().await;
                             match saves {
-                                Some( savesData ) => {
-                                    update_saves.emit(savesData);
+                                Some( saves_data ) => {
+                                    update_saves.emit(saves_data);
                                 }
                                 None => {
                                     update_saves.emit(Vec::new());
@@ -425,8 +425,8 @@ impl Component for UserSavesEdit {
                             let saves = index_db_get_saves().await;
 
                             match saves {
-                                Some( savesData ) => {
-                                    update_saves.emit(savesData);
+                                Some( saves_data ) => {
+                                    update_saves.emit(saves_data);
                                 }
                                 None => {
                                     update_saves.emit(Vec::new());

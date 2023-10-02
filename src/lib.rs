@@ -79,7 +79,8 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
         MainServerRoute::InfoRouter => {
             html! {
                 <InfoRouter
-                site_vars={site_vars}
+                    site_vars={site_vars}
+                    web_content={global_vars.web_content}
                 />
             }
         }
@@ -107,6 +108,8 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
             html! {
                 <UserLogin
                     site_vars={site_vars}
+                    game_data={None}
+                    saves={None}
                 />
             }
         }
@@ -166,7 +169,7 @@ fn content_switch(routes: MainServerRoute, global_vars: GlobalVars) -> Html {
 
 #[function_component]
 pub fn ServerApp(props: &ServerAppProps) -> Html {
-    // let server_root = "https://v4.savaged.us".to_owned();
+    // let server_root = "https://v4-rust.savaged.us".to_owned();
 
     // let mut user = User::default();
 

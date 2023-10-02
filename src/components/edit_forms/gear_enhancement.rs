@@ -1,6 +1,7 @@
 use crate::components::admin::book_select::BookSelect;
 use crate::components::tertiary_menu::{TertiaryMenuItem, TertiaryMenu};
 use crate::libs::site_vars::SiteVars;
+use crate::components::effects_entry::EffectsEntry;
 use savaged_libs::book::Book;
 use savaged_libs::player_character::gear_enhancement::GearEnhancement;
 use standard_components::libs::local_storage_shortcuts::set_local_storage_string;
@@ -61,6 +62,8 @@ pub enum EditGearEnhancementMessage {
 
     UpdateNamePrefix(String),
     UpdateNameSuffix(String),
+
+    UpdateEffects( Vec<String> ),
 }
 
 pub struct EditGearEnhancement {
@@ -169,6 +172,14 @@ impl Component for EditGearEnhancement {
                 ctx.props().on_changed_callback.emit( self.edit_item.clone() );
                 return true;
             }
+
+            EditGearEnhancementMessage::UpdateEffects( new_value ) => {
+
+                self.edit_item.effects = new_value.clone();
+                ctx.props().on_changed_callback.emit( self.edit_item.clone());
+                return true;
+            }
+
             // EditGearEnhancementMessage::UpdateConflicts( new_value ) => {
 
             //     let mut nv: Vec<String> = Vec::new();
@@ -250,6 +261,18 @@ impl Component for EditGearEnhancement {
                 separate: false,
             },
         ];
+
+        sub_menu_items.push(
+            TertiaryMenuItem {
+                tag: "effects".to_owned(),
+                label: "Effects".to_owned(),
+                class: None,
+                callback: None,
+                title: None,
+                icon_class: None,
+                separate: false,
+            },
+        );
 
         if self.edit_item.for_ammo {
             sub_menu_items.push(
@@ -374,7 +397,7 @@ impl Component for EditGearEnhancement {
 
         let mut current_page = get_local_storage_string( &self.local_storage_page_name, "general".to_owned());
 
-        let valid_pages = vec!["general", "admin", "ammo", "armor", "weapon", "shield"];
+        let valid_pages = vec!["general", "admin", "effects", "ammo", "armor", "weapon", "shield"];
         if (current_page.as_str() == "admin"  && !ctx.props().site_vars.current_user.has_admin_access())
             || !valid_pages.contains(&current_page.as_str())
         {
@@ -463,6 +486,41 @@ impl Component for EditGearEnhancement {
 
                             <hr />
 
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Prefix"}
+
+                                value={(self.edit_item.name_prefix).to_owned()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNamePrefix) }
+                            />
+                            <InputText
+                                readonly={ctx.props().readonly}
+                                label={"Suffix"}
+
+                                value={(self.edit_item.name_suffix).to_owned()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNameSuffix) }
+                            />
+                        </div>
+                        <div class="col-md-6">
+
+                            <MarkdownEditor
+                                readonly={ctx.props().readonly}
+                                label={"Description"}
+                                starting_height={175}
+                                value={(self.edit_item.description).to_owned()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateDescription) }
+                            />
+                        </div>
+                    </div>
+                </fieldset>
+            }
+
+            if current_page.as_str() == "effects" || current_page.as_str() == "__all__" {
+                <fieldset class={"fieldset"}>
+                    <legend>{"Effects"}</legend>
+                    <div class="row full-width">
+                        <div class="col-md-6">
+
                             <InputCheckbox
                                 label="For Armor"
                                 readonly={ctx.props().readonly}
@@ -490,26 +548,12 @@ impl Component for EditGearEnhancement {
                             />
                         </div>
                         <div class="col-md-6">
-                        <InputText
-                            readonly={ctx.props().readonly}
-                            label={"Prefix"}
-
-                            value={(self.edit_item.name_prefix).to_owned()}
-                            onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNamePrefix) }
-                        />
-                        <InputText
-                            readonly={ctx.props().readonly}
-                            label={"Suffix"}
-
-                            value={(self.edit_item.name_suffix).to_owned()}
-                            onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateNameSuffix) }
-                        />
-                            <MarkdownEditor
+                            <EffectsEntry
                                 readonly={ctx.props().readonly}
-                                label={"Description"}
-                                starting_height={175}
-                                value={(self.edit_item.description).to_owned()}
-                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateDescription) }
+                                description="These effects will apply when this item is equipped"
+                                label={"Effects"}
+                                value={self.edit_item.effects.clone()}
+                                onchange={ ctx.link().callback( EditGearEnhancementMessage::UpdateEffects) }
                             />
                         </div>
                     </div>

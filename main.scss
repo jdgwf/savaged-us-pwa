@@ -389,6 +389,22 @@ body {
 
                     }
 
+                    .user-login-sync-statuses {
+                        position: absolute;
+                        top: -70px;
+                        width: 90%;
+                        left: 0;
+                        height: 1rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .lds-spinner,
+                        .lds-roller {
+                            scale: .2;
+                            margin-top: 0;
+                        }
+                    }
+
                     .user-login-badge {
                         display: block;
                         position: absolute;

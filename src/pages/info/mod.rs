@@ -90,6 +90,7 @@ fn content_switch(
         InfoRoute::InfoPartners => html! {
             <InfoPartners
                 site_vars={site_vars}
+                web_content={web_content}
             />
         },
 
